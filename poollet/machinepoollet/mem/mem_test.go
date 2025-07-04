@@ -9,6 +9,7 @@ import (
 	"time"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
@@ -43,8 +44,8 @@ var _ = Describe("MachineEventMapper", func() {
 						Name: mc.Name,
 						Capabilities: &iri.MachineClassCapabilities{
 							Resources: map[string]int64{
-								"cpu":    mc.Capabilities.CPU().Value(),
-								"memory": mc.Capabilities.Memory().Value(),
+								string(corev1alpha1.ResourceCPU):    mc.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): mc.Capabilities.Memory().Value(),
 							},
 						},
 					},

@@ -190,8 +190,8 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 						Name: mc.Name,
 						Capabilities: &iri.MachineClassCapabilities{
 							Resources: map[string]int64{
-								"cpu":    mc.Capabilities.CPU().Value(),
-								"memory": mc.Capabilities.Memory().Value(),
+								string(corev1alpha1.ResourceCPU):    mc.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): mc.Capabilities.Memory().Value(),
 							},
 						},
 					},
