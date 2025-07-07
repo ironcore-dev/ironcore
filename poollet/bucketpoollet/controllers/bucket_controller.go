@@ -20,7 +20,7 @@ import (
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
-	poolletutils "github.com/ironcore-dev/ironcore/utils/poollet"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"

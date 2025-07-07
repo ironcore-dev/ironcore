@@ -9,8 +9,8 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	testingbucket "github.com/ironcore-dev/ironcore/iri/testing/bucket"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
-	poolletutils "github.com/ironcore-dev/ironcore/utils/poollet"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

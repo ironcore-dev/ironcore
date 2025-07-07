@@ -18,10 +18,10 @@ import (
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	poolletutils "github.com/ironcore-dev/ironcore/utils/poollet"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"

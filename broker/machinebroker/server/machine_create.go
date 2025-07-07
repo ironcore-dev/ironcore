@@ -15,7 +15,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 
-	poolletutils "github.com/ironcore-dev/ironcore/utils/poollet"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"

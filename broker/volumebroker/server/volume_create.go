@@ -13,8 +13,8 @@ import (
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	poolletutils "github.com/ironcore-dev/ironcore/utils/poollet"
 
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
