@@ -29,6 +29,7 @@ const (
 	MachineRuntime_UpdateMachinePower_FullMethodName       = "/machine.v1alpha1.MachineRuntime/UpdateMachinePower"
 	MachineRuntime_AttachVolume_FullMethodName             = "/machine.v1alpha1.MachineRuntime/AttachVolume"
 	MachineRuntime_DetachVolume_FullMethodName             = "/machine.v1alpha1.MachineRuntime/DetachVolume"
+	MachineRuntime_UpdateVolume_FullMethodName             = "/machine.v1alpha1.MachineRuntime/UpdateVolume"
 	MachineRuntime_AttachNetworkInterface_FullMethodName   = "/machine.v1alpha1.MachineRuntime/AttachNetworkInterface"
 	MachineRuntime_DetachNetworkInterface_FullMethodName   = "/machine.v1alpha1.MachineRuntime/DetachNetworkInterface"
 	MachineRuntime_ListReservations_FullMethodName         = "/machine.v1alpha1.MachineRuntime/ListReservations"
@@ -51,6 +52,7 @@ type MachineRuntimeClient interface {
 	UpdateMachinePower(ctx context.Context, in *UpdateMachinePowerRequest, opts ...grpc.CallOption) (*UpdateMachinePowerResponse, error)
 	AttachVolume(ctx context.Context, in *AttachVolumeRequest, opts ...grpc.CallOption) (*AttachVolumeResponse, error)
 	DetachVolume(ctx context.Context, in *DetachVolumeRequest, opts ...grpc.CallOption) (*DetachVolumeResponse, error)
+	UpdateVolume(ctx context.Context, in *UpdateVolumeRequest, opts ...grpc.CallOption) (*UpdateVolumeResponse, error)
 	AttachNetworkInterface(ctx context.Context, in *AttachNetworkInterfaceRequest, opts ...grpc.CallOption) (*AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(ctx context.Context, in *DetachNetworkInterfaceRequest, opts ...grpc.CallOption) (*DetachNetworkInterfaceResponse, error)
 	ListReservations(ctx context.Context, in *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error)
@@ -158,6 +160,16 @@ func (c *machineRuntimeClient) DetachVolume(ctx context.Context, in *DetachVolum
 	return out, nil
 }
 
+func (c *machineRuntimeClient) UpdateVolume(ctx context.Context, in *UpdateVolumeRequest, opts ...grpc.CallOption) (*UpdateVolumeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateVolumeResponse)
+	err := c.cc.Invoke(ctx, MachineRuntime_UpdateVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *machineRuntimeClient) AttachNetworkInterface(ctx context.Context, in *AttachNetworkInterfaceRequest, opts ...grpc.CallOption) (*AttachNetworkInterfaceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AttachNetworkInterfaceResponse)
@@ -241,6 +253,7 @@ type MachineRuntimeServer interface {
 	UpdateMachinePower(context.Context, *UpdateMachinePowerRequest) (*UpdateMachinePowerResponse, error)
 	AttachVolume(context.Context, *AttachVolumeRequest) (*AttachVolumeResponse, error)
 	DetachVolume(context.Context, *DetachVolumeRequest) (*DetachVolumeResponse, error)
+	UpdateVolume(context.Context, *UpdateVolumeRequest) (*UpdateVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *AttachNetworkInterfaceRequest) (*AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *DetachNetworkInterfaceRequest) (*DetachNetworkInterfaceResponse, error)
 	ListReservations(context.Context, *ListReservationsRequest) (*ListReservationsResponse, error)
@@ -284,6 +297,9 @@ func (UnimplementedMachineRuntimeServer) AttachVolume(context.Context, *AttachVo
 }
 func (UnimplementedMachineRuntimeServer) DetachVolume(context.Context, *DetachVolumeRequest) (*DetachVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetachVolume not implemented")
+}
+func (UnimplementedMachineRuntimeServer) UpdateVolume(context.Context, *UpdateVolumeRequest) (*UpdateVolumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateVolume not implemented")
 }
 func (UnimplementedMachineRuntimeServer) AttachNetworkInterface(context.Context, *AttachNetworkInterfaceRequest) (*AttachNetworkInterfaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AttachNetworkInterface not implemented")
@@ -489,6 +505,24 @@ func _MachineRuntime_DetachVolume_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MachineRuntime_UpdateVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVolumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineRuntimeServer).UpdateVolume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MachineRuntime_UpdateVolume_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineRuntimeServer).UpdateVolume(ctx, req.(*UpdateVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MachineRuntime_AttachNetworkInterface_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AttachNetworkInterfaceRequest)
 	if err := dec(in); err != nil {
@@ -657,6 +691,10 @@ var MachineRuntime_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DetachVolume",
 			Handler:    _MachineRuntime_DetachVolume_Handler,
+		},
+		{
+			MethodName: "UpdateVolume",
+			Handler:    _MachineRuntime_UpdateVolume_Handler,
 		},
 		{
 			MethodName: "AttachNetworkInterface",

@@ -43,8 +43,10 @@ var _ = Describe("MachinePoolController", func() {
 					MachineClass: &iri.MachineClass{
 						Name: machineClass.Name,
 						Capabilities: &iri.MachineClassCapabilities{
-							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().Value(),
+							Resources: map[string]int64{
+								string(corev1alpha1.ResourceCPU):    machineClass.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): machineClass.Capabilities.Memory().Value(),
+							},
 						},
 					},
 					Quantity: machineClassCapacity,
@@ -55,8 +57,10 @@ var _ = Describe("MachinePoolController", func() {
 					MachineClass: &iri.MachineClass{
 						Name: machineClass2.Name,
 						Capabilities: &iri.MachineClassCapabilities{
-							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
+							Resources: map[string]int64{
+								string(corev1alpha1.ResourceCPU):    machineClass2.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): machineClass2.Capabilities.Memory().Value(),
+							},
 						},
 					},
 					Quantity: machineClass2Capacity,
@@ -140,6 +144,7 @@ var _ = Describe("MachinePoolController", func() {
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceCPU:    resource.MustParse("2"),
 				corev1alpha1.ResourceMemory: resource.MustParse("2Gi"),
+				"type-a.vendor.com/gpu":     resource.MustParse("1"),
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
@@ -150,8 +155,11 @@ var _ = Describe("MachinePoolController", func() {
 					MachineClass: &iri.MachineClass{
 						Name: machineClass.Name,
 						Capabilities: &iri.MachineClassCapabilities{
-							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().Value(),
+							Resources: map[string]int64{
+								string(corev1alpha1.ResourceCPU):    machineClass.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): machineClass.Capabilities.Memory().Value(),
+								"type-a.vendor.com/gpu":             1,
+							},
 						},
 					},
 				},
@@ -189,8 +197,11 @@ var _ = Describe("MachinePoolController", func() {
 					MachineClass: &iri.MachineClass{
 						Name: machineClass.Name,
 						Capabilities: &iri.MachineClassCapabilities{
-							CpuMillis:   machineClass.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass.Capabilities.Memory().Value(),
+							Resources: map[string]int64{
+								string(corev1alpha1.ResourceCPU):    machineClass.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): machineClass.Capabilities.Memory().Value(),
+								"type-a.vendor.com/gpu":             1,
+							},
 						},
 					},
 				},
@@ -200,8 +211,10 @@ var _ = Describe("MachinePoolController", func() {
 					MachineClass: &iri.MachineClass{
 						Name: machineClass2.Name,
 						Capabilities: &iri.MachineClassCapabilities{
-							CpuMillis:   machineClass2.Capabilities.CPU().MilliValue(),
-							MemoryBytes: machineClass2.Capabilities.Memory().Value(),
+							Resources: map[string]int64{
+								string(corev1alpha1.ResourceCPU):    machineClass2.Capabilities.CPU().Value(),
+								string(corev1alpha1.ResourceMemory): machineClass2.Capabilities.Memory().Value(),
+							},
 						},
 					},
 				},

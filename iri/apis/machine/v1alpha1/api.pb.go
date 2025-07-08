@@ -24,55 +24,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ReservationState int32
-
-const (
-	ReservationState_RESERVATION_STATE_PENDING  ReservationState = 0
-	ReservationState_RESERVATION_STATE_ACCEPTED ReservationState = 1
-	ReservationState_RESERVATION_STATE_REJECTED ReservationState = 2
-)
-
-// Enum value maps for ReservationState.
-var (
-	ReservationState_name = map[int32]string{
-		0: "RESERVATION_STATE_PENDING",
-		1: "RESERVATION_STATE_ACCEPTED",
-		2: "RESERVATION_STATE_REJECTED",
-	}
-	ReservationState_value = map[string]int32{
-		"RESERVATION_STATE_PENDING":  0,
-		"RESERVATION_STATE_ACCEPTED": 1,
-		"RESERVATION_STATE_REJECTED": 2,
-	}
-)
-
-func (x ReservationState) Enum() *ReservationState {
-	p := new(ReservationState)
-	*p = x
-	return p
-}
-
-func (x ReservationState) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ReservationState) Descriptor() protoreflect.EnumDescriptor {
-	return file_machine_v1alpha1_api_proto_enumTypes[0].Descriptor()
-}
-
-func (ReservationState) Type() protoreflect.EnumType {
-	return &file_machine_v1alpha1_api_proto_enumTypes[0]
-}
-
-func (x ReservationState) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ReservationState.Descriptor instead.
-func (ReservationState) EnumDescriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{0}
-}
-
 type Power int32
 
 const (
@@ -103,11 +54,11 @@ func (x Power) String() string {
 }
 
 func (Power) Descriptor() protoreflect.EnumDescriptor {
-	return file_machine_v1alpha1_api_proto_enumTypes[1].Descriptor()
+	return file_machine_v1alpha1_api_proto_enumTypes[0].Descriptor()
 }
 
 func (Power) Type() protoreflect.EnumType {
-	return &file_machine_v1alpha1_api_proto_enumTypes[1]
+	return &file_machine_v1alpha1_api_proto_enumTypes[0]
 }
 
 func (x Power) Number() protoreflect.EnumNumber {
@@ -116,7 +67,7 @@ func (x Power) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Power.Descriptor instead.
 func (Power) EnumDescriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{1}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{0}
 }
 
 type VolumeState int32
@@ -149,11 +100,11 @@ func (x VolumeState) String() string {
 }
 
 func (VolumeState) Descriptor() protoreflect.EnumDescriptor {
-	return file_machine_v1alpha1_api_proto_enumTypes[2].Descriptor()
+	return file_machine_v1alpha1_api_proto_enumTypes[1].Descriptor()
 }
 
 func (VolumeState) Type() protoreflect.EnumType {
-	return &file_machine_v1alpha1_api_proto_enumTypes[2]
+	return &file_machine_v1alpha1_api_proto_enumTypes[1]
 }
 
 func (x VolumeState) Number() protoreflect.EnumNumber {
@@ -162,7 +113,7 @@ func (x VolumeState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use VolumeState.Descriptor instead.
 func (VolumeState) EnumDescriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{2}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{1}
 }
 
 type NetworkInterfaceState int32
@@ -195,11 +146,11 @@ func (x NetworkInterfaceState) String() string {
 }
 
 func (NetworkInterfaceState) Descriptor() protoreflect.EnumDescriptor {
-	return file_machine_v1alpha1_api_proto_enumTypes[3].Descriptor()
+	return file_machine_v1alpha1_api_proto_enumTypes[2].Descriptor()
 }
 
 func (NetworkInterfaceState) Type() protoreflect.EnumType {
-	return &file_machine_v1alpha1_api_proto_enumTypes[3]
+	return &file_machine_v1alpha1_api_proto_enumTypes[2]
 }
 
 func (x NetworkInterfaceState) Number() protoreflect.EnumNumber {
@@ -208,7 +159,7 @@ func (x NetworkInterfaceState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use NetworkInterfaceState.Descriptor instead.
 func (NetworkInterfaceState) EnumDescriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{3}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{2}
 }
 
 type MachineState int32
@@ -250,11 +201,11 @@ func (x MachineState) String() string {
 }
 
 func (MachineState) Descriptor() protoreflect.EnumDescriptor {
-	return file_machine_v1alpha1_api_proto_enumTypes[4].Descriptor()
+	return file_machine_v1alpha1_api_proto_enumTypes[3].Descriptor()
 }
 
 func (MachineState) Type() protoreflect.EnumType {
-	return &file_machine_v1alpha1_api_proto_enumTypes[4]
+	return &file_machine_v1alpha1_api_proto_enumTypes[3]
 }
 
 func (x MachineState) Number() protoreflect.EnumNumber {
@@ -263,7 +214,7 @@ func (x MachineState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MachineState.Descriptor instead.
 func (MachineState) EnumDescriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{4}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{3}
 }
 
 type VolumeSpec struct {
@@ -456,8 +407,7 @@ func (x *EventFilter) GetEventsToTime() int64 {
 
 type MachineClassCapabilities struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CpuMillis     int64                  `protobuf:"varint,1,opt,name=cpu_millis,json=cpuMillis,proto3" json:"cpu_millis,omitempty"`
-	MemoryBytes   int64                  `protobuf:"varint,2,opt,name=memory_bytes,json=memoryBytes,proto3" json:"memory_bytes,omitempty"`
+	Resources     map[string]int64       `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -492,18 +442,11 @@ func (*MachineClassCapabilities) Descriptor() ([]byte, []int) {
 	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *MachineClassCapabilities) GetCpuMillis() int64 {
+func (x *MachineClassCapabilities) GetResources() map[string]int64 {
 	if x != nil {
-		return x.CpuMillis
+		return x.Resources
 	}
-	return 0
-}
-
-func (x *MachineClassCapabilities) GetMemoryBytes() int64 {
-	if x != nil {
-		return x.MemoryBytes
-	}
-	return 0
+	return nil
 }
 
 type Machine struct {
@@ -566,462 +509,6 @@ func (x *Machine) GetStatus() *MachineStatus {
 	return nil
 }
 
-type ListReservationsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Filter        *ReservationFilter     `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListReservationsRequest) Reset() {
-	*x = ListReservationsRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListReservationsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListReservationsRequest) ProtoMessage() {}
-
-func (x *ListReservationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListReservationsRequest.ProtoReflect.Descriptor instead.
-func (*ListReservationsRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ListReservationsRequest) GetFilter() *ReservationFilter {
-	if x != nil {
-		return x.Filter
-	}
-	return nil
-}
-
-type ListReservationsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Reservations  []*Reservation         `protobuf:"bytes,1,rep,name=reservations,proto3" json:"reservations,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListReservationsResponse) Reset() {
-	*x = ListReservationsResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListReservationsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListReservationsResponse) ProtoMessage() {}
-
-func (x *ListReservationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListReservationsResponse.ProtoReflect.Descriptor instead.
-func (*ListReservationsResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *ListReservationsResponse) GetReservations() []*Reservation {
-	if x != nil {
-		return x.Reservations
-	}
-	return nil
-}
-
-type CreateReservationRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Reservation   *Reservation           `protobuf:"bytes,1,opt,name=reservation,proto3" json:"reservation,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateReservationRequest) Reset() {
-	*x = CreateReservationRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateReservationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateReservationRequest) ProtoMessage() {}
-
-func (x *CreateReservationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateReservationRequest.ProtoReflect.Descriptor instead.
-func (*CreateReservationRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *CreateReservationRequest) GetReservation() *Reservation {
-	if x != nil {
-		return x.Reservation
-	}
-	return nil
-}
-
-type CreateReservationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Reservation   *Reservation           `protobuf:"bytes,1,opt,name=reservation,proto3" json:"reservation,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateReservationResponse) Reset() {
-	*x = CreateReservationResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateReservationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateReservationResponse) ProtoMessage() {}
-
-func (x *CreateReservationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateReservationResponse.ProtoReflect.Descriptor instead.
-func (*CreateReservationResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *CreateReservationResponse) GetReservation() *Reservation {
-	if x != nil {
-		return x.Reservation
-	}
-	return nil
-}
-
-type DeleteReservationRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReservationId string                 `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteReservationRequest) Reset() {
-	*x = DeleteReservationRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteReservationRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteReservationRequest) ProtoMessage() {}
-
-func (x *DeleteReservationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteReservationRequest.ProtoReflect.Descriptor instead.
-func (*DeleteReservationRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *DeleteReservationRequest) GetReservationId() string {
-	if x != nil {
-		return x.ReservationId
-	}
-	return ""
-}
-
-type DeleteReservationResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteReservationResponse) Reset() {
-	*x = DeleteReservationResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteReservationResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteReservationResponse) ProtoMessage() {}
-
-func (x *DeleteReservationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteReservationResponse.ProtoReflect.Descriptor instead.
-func (*DeleteReservationResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{10}
-}
-
-type ReservationFilter struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	LabelSelector map[string]string      `protobuf:"bytes,2,rep,name=label_selector,json=labelSelector,proto3" json:"label_selector,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReservationFilter) Reset() {
-	*x = ReservationFilter{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReservationFilter) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReservationFilter) ProtoMessage() {}
-
-func (x *ReservationFilter) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReservationFilter.ProtoReflect.Descriptor instead.
-func (*ReservationFilter) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *ReservationFilter) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ReservationFilter) GetLabelSelector() map[string]string {
-	if x != nil {
-		return x.LabelSelector
-	}
-	return nil
-}
-
-type Reservation struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Metadata      *v1alpha1.ObjectMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	Spec          *ReservationSpec         `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
-	Status        *ReservationStatus       `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Reservation) Reset() {
-	*x = Reservation{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Reservation) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Reservation) ProtoMessage() {}
-
-func (x *Reservation) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Reservation.ProtoReflect.Descriptor instead.
-func (*Reservation) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *Reservation) GetMetadata() *v1alpha1.ObjectMetadata {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
-}
-
-func (x *Reservation) GetSpec() *ReservationSpec {
-	if x != nil {
-		return x.Spec
-	}
-	return nil
-}
-
-func (x *Reservation) GetStatus() *ReservationStatus {
-	if x != nil {
-		return x.Status
-	}
-	return nil
-}
-
-type ReservationSpec struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Resources     map[string][]byte      `protobuf:"bytes,1,rep,name=resources,proto3" json:"resources,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReservationSpec) Reset() {
-	*x = ReservationSpec{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReservationSpec) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReservationSpec) ProtoMessage() {}
-
-func (x *ReservationSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReservationSpec.ProtoReflect.Descriptor instead.
-func (*ReservationSpec) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *ReservationSpec) GetResources() map[string][]byte {
-	if x != nil {
-		return x.Resources
-	}
-	return nil
-}
-
-type ReservationStatus struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	State         ReservationState       `protobuf:"varint,1,opt,name=state,proto3,enum=machine.v1alpha1.ReservationState" json:"state,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ReservationStatus) Reset() {
-	*x = ReservationStatus{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ReservationStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ReservationStatus) ProtoMessage() {}
-
-func (x *ReservationStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ReservationStatus.ProtoReflect.Descriptor instead.
-func (*ReservationStatus) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *ReservationStatus) GetState() ReservationState {
-	if x != nil {
-		return x.State
-	}
-	return ReservationState_RESERVATION_STATE_PENDING
-}
-
 type ImageSpec struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Image         string                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
@@ -1031,7 +518,7 @@ type ImageSpec struct {
 
 func (x *ImageSpec) Reset() {
 	*x = ImageSpec{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[15]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1043,7 +530,7 @@ func (x *ImageSpec) String() string {
 func (*ImageSpec) ProtoMessage() {}
 
 func (x *ImageSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[15]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1056,7 +543,7 @@ func (x *ImageSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImageSpec.ProtoReflect.Descriptor instead.
 func (*ImageSpec) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{15}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ImageSpec) GetImage() string {
@@ -1075,7 +562,7 @@ type EmptyDisk struct {
 
 func (x *EmptyDisk) Reset() {
 	*x = EmptyDisk{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[16]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1087,7 +574,7 @@ func (x *EmptyDisk) String() string {
 func (*EmptyDisk) ProtoMessage() {}
 
 func (x *EmptyDisk) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[16]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1100,7 +587,7 @@ func (x *EmptyDisk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EmptyDisk.ProtoReflect.Descriptor instead.
 func (*EmptyDisk) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{16}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *EmptyDisk) GetSizeBytes() int64 {
@@ -1124,7 +611,7 @@ type VolumeConnection struct {
 
 func (x *VolumeConnection) Reset() {
 	*x = VolumeConnection{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[17]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1136,7 +623,7 @@ func (x *VolumeConnection) String() string {
 func (*VolumeConnection) ProtoMessage() {}
 
 func (x *VolumeConnection) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[17]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1149,7 +636,7 @@ func (x *VolumeConnection) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeConnection.ProtoReflect.Descriptor instead.
 func (*VolumeConnection) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{17}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *VolumeConnection) GetDriver() string {
@@ -1206,7 +693,7 @@ type Volume struct {
 
 func (x *Volume) Reset() {
 	*x = Volume{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[18]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1218,7 +705,7 @@ func (x *Volume) String() string {
 func (*Volume) ProtoMessage() {}
 
 func (x *Volume) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[18]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1231,7 +718,7 @@ func (x *Volume) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Volume.ProtoReflect.Descriptor instead.
 func (*Volume) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{18}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Volume) GetName() string {
@@ -1274,7 +761,7 @@ type NetworkInterface struct {
 
 func (x *NetworkInterface) Reset() {
 	*x = NetworkInterface{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[19]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1286,7 +773,7 @@ func (x *NetworkInterface) String() string {
 func (*NetworkInterface) ProtoMessage() {}
 
 func (x *NetworkInterface) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[19]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1299,7 +786,7 @@ func (x *NetworkInterface) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkInterface.ProtoReflect.Descriptor instead.
 func (*NetworkInterface) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{19}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *NetworkInterface) GetName() string {
@@ -1344,7 +831,7 @@ type MachineSpec struct {
 
 func (x *MachineSpec) Reset() {
 	*x = MachineSpec{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[20]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1356,7 +843,7 @@ func (x *MachineSpec) String() string {
 func (*MachineSpec) ProtoMessage() {}
 
 func (x *MachineSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[20]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1369,7 +856,7 @@ func (x *MachineSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MachineSpec.ProtoReflect.Descriptor instead.
 func (*MachineSpec) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{20}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MachineSpec) GetPower() Power {
@@ -1427,7 +914,7 @@ type MachineStatus struct {
 
 func (x *MachineStatus) Reset() {
 	*x = MachineStatus{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[21]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1439,7 +926,7 @@ func (x *MachineStatus) String() string {
 func (*MachineStatus) ProtoMessage() {}
 
 func (x *MachineStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[21]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1452,7 +939,7 @@ func (x *MachineStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MachineStatus.ProtoReflect.Descriptor instead.
 func (*MachineStatus) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{21}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MachineStatus) GetObservedGeneration() int64 {
@@ -1501,7 +988,7 @@ type VolumeStatus struct {
 
 func (x *VolumeStatus) Reset() {
 	*x = VolumeStatus{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[22]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1513,7 +1000,7 @@ func (x *VolumeStatus) String() string {
 func (*VolumeStatus) ProtoMessage() {}
 
 func (x *VolumeStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[22]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1526,7 +1013,7 @@ func (x *VolumeStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeStatus.ProtoReflect.Descriptor instead.
 func (*VolumeStatus) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{22}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *VolumeStatus) GetName() string {
@@ -1561,7 +1048,7 @@ type NetworkInterfaceStatus struct {
 
 func (x *NetworkInterfaceStatus) Reset() {
 	*x = NetworkInterfaceStatus{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[23]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1573,7 +1060,7 @@ func (x *NetworkInterfaceStatus) String() string {
 func (*NetworkInterfaceStatus) ProtoMessage() {}
 
 func (x *NetworkInterfaceStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[23]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1586,7 +1073,7 @@ func (x *NetworkInterfaceStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkInterfaceStatus.ProtoReflect.Descriptor instead.
 func (*NetworkInterfaceStatus) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{23}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *NetworkInterfaceStatus) GetName() string {
@@ -1620,7 +1107,7 @@ type MachineClass struct {
 
 func (x *MachineClass) Reset() {
 	*x = MachineClass{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[24]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1632,7 +1119,7 @@ func (x *MachineClass) String() string {
 func (*MachineClass) ProtoMessage() {}
 
 func (x *MachineClass) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[24]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1645,7 +1132,7 @@ func (x *MachineClass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MachineClass.ProtoReflect.Descriptor instead.
 func (*MachineClass) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{24}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *MachineClass) GetName() string {
@@ -1672,7 +1159,7 @@ type MachineClassStatus struct {
 
 func (x *MachineClassStatus) Reset() {
 	*x = MachineClassStatus{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[25]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1684,7 +1171,7 @@ func (x *MachineClassStatus) String() string {
 func (*MachineClassStatus) ProtoMessage() {}
 
 func (x *MachineClassStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[25]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1697,7 +1184,7 @@ func (x *MachineClassStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MachineClassStatus.ProtoReflect.Descriptor instead.
 func (*MachineClassStatus) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{25}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *MachineClassStatus) GetMachineClass() *MachineClass {
@@ -1723,7 +1210,7 @@ type VersionRequest struct {
 
 func (x *VersionRequest) Reset() {
 	*x = VersionRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[26]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1735,7 +1222,7 @@ func (x *VersionRequest) String() string {
 func (*VersionRequest) ProtoMessage() {}
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[26]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1748,7 +1235,7 @@ func (x *VersionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{26}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *VersionRequest) GetVersion() string {
@@ -1771,7 +1258,7 @@ type VersionResponse struct {
 
 func (x *VersionResponse) Reset() {
 	*x = VersionResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[27]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1783,7 +1270,7 @@ func (x *VersionResponse) String() string {
 func (*VersionResponse) ProtoMessage() {}
 
 func (x *VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[27]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1796,7 +1283,7 @@ func (x *VersionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionResponse.ProtoReflect.Descriptor instead.
 func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{27}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *VersionResponse) GetRuntimeName() string {
@@ -1822,7 +1309,7 @@ type ListMachinesRequest struct {
 
 func (x *ListMachinesRequest) Reset() {
 	*x = ListMachinesRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[28]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1834,7 +1321,7 @@ func (x *ListMachinesRequest) String() string {
 func (*ListMachinesRequest) ProtoMessage() {}
 
 func (x *ListMachinesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[28]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1847,7 +1334,7 @@ func (x *ListMachinesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMachinesRequest.ProtoReflect.Descriptor instead.
 func (*ListMachinesRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{28}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListMachinesRequest) GetFilter() *MachineFilter {
@@ -1866,7 +1353,7 @@ type ListMachinesResponse struct {
 
 func (x *ListMachinesResponse) Reset() {
 	*x = ListMachinesResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[29]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1878,7 +1365,7 @@ func (x *ListMachinesResponse) String() string {
 func (*ListMachinesResponse) ProtoMessage() {}
 
 func (x *ListMachinesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[29]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1891,7 +1378,7 @@ func (x *ListMachinesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMachinesResponse.ProtoReflect.Descriptor instead.
 func (*ListMachinesResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{29}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ListMachinesResponse) GetMachines() []*Machine {
@@ -1910,7 +1397,7 @@ type ListEventsRequest struct {
 
 func (x *ListEventsRequest) Reset() {
 	*x = ListEventsRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[30]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1922,7 +1409,7 @@ func (x *ListEventsRequest) String() string {
 func (*ListEventsRequest) ProtoMessage() {}
 
 func (x *ListEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[30]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1935,7 +1422,7 @@ func (x *ListEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEventsRequest.ProtoReflect.Descriptor instead.
 func (*ListEventsRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{30}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListEventsRequest) GetFilter() *EventFilter {
@@ -1954,7 +1441,7 @@ type ListEventsResponse struct {
 
 func (x *ListEventsResponse) Reset() {
 	*x = ListEventsResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[31]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1966,7 +1453,7 @@ func (x *ListEventsResponse) String() string {
 func (*ListEventsResponse) ProtoMessage() {}
 
 func (x *ListEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[31]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1979,7 +1466,7 @@ func (x *ListEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEventsResponse.ProtoReflect.Descriptor instead.
 func (*ListEventsResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{31}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ListEventsResponse) GetEvents() []*v1alpha11.Event {
@@ -1998,7 +1485,7 @@ type CreateMachineRequest struct {
 
 func (x *CreateMachineRequest) Reset() {
 	*x = CreateMachineRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[32]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2010,7 +1497,7 @@ func (x *CreateMachineRequest) String() string {
 func (*CreateMachineRequest) ProtoMessage() {}
 
 func (x *CreateMachineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[32]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2023,7 +1510,7 @@ func (x *CreateMachineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMachineRequest.ProtoReflect.Descriptor instead.
 func (*CreateMachineRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{32}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateMachineRequest) GetMachine() *Machine {
@@ -2042,7 +1529,7 @@ type CreateMachineResponse struct {
 
 func (x *CreateMachineResponse) Reset() {
 	*x = CreateMachineResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[33]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2054,7 +1541,7 @@ func (x *CreateMachineResponse) String() string {
 func (*CreateMachineResponse) ProtoMessage() {}
 
 func (x *CreateMachineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[33]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2067,7 +1554,7 @@ func (x *CreateMachineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMachineResponse.ProtoReflect.Descriptor instead.
 func (*CreateMachineResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{33}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateMachineResponse) GetMachine() *Machine {
@@ -2086,7 +1573,7 @@ type DeleteMachineRequest struct {
 
 func (x *DeleteMachineRequest) Reset() {
 	*x = DeleteMachineRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[34]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2098,7 +1585,7 @@ func (x *DeleteMachineRequest) String() string {
 func (*DeleteMachineRequest) ProtoMessage() {}
 
 func (x *DeleteMachineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[34]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2111,7 +1598,7 @@ func (x *DeleteMachineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMachineRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMachineRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{34}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeleteMachineRequest) GetMachineId() string {
@@ -2129,7 +1616,7 @@ type DeleteMachineResponse struct {
 
 func (x *DeleteMachineResponse) Reset() {
 	*x = DeleteMachineResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[35]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2141,7 +1628,7 @@ func (x *DeleteMachineResponse) String() string {
 func (*DeleteMachineResponse) ProtoMessage() {}
 
 func (x *DeleteMachineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[35]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2154,7 +1641,7 @@ func (x *DeleteMachineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMachineResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMachineResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{35}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{25}
 }
 
 type UpdateMachineAnnotationsRequest struct {
@@ -2167,7 +1654,7 @@ type UpdateMachineAnnotationsRequest struct {
 
 func (x *UpdateMachineAnnotationsRequest) Reset() {
 	*x = UpdateMachineAnnotationsRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[36]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2179,7 +1666,7 @@ func (x *UpdateMachineAnnotationsRequest) String() string {
 func (*UpdateMachineAnnotationsRequest) ProtoMessage() {}
 
 func (x *UpdateMachineAnnotationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[36]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2192,7 +1679,7 @@ func (x *UpdateMachineAnnotationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMachineAnnotationsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMachineAnnotationsRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{36}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UpdateMachineAnnotationsRequest) GetMachineId() string {
@@ -2217,7 +1704,7 @@ type UpdateMachineAnnotationsResponse struct {
 
 func (x *UpdateMachineAnnotationsResponse) Reset() {
 	*x = UpdateMachineAnnotationsResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[37]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2229,7 +1716,7 @@ func (x *UpdateMachineAnnotationsResponse) String() string {
 func (*UpdateMachineAnnotationsResponse) ProtoMessage() {}
 
 func (x *UpdateMachineAnnotationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[37]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2242,7 +1729,7 @@ func (x *UpdateMachineAnnotationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMachineAnnotationsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateMachineAnnotationsResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{37}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{27}
 }
 
 type UpdateMachinePowerRequest struct {
@@ -2255,7 +1742,7 @@ type UpdateMachinePowerRequest struct {
 
 func (x *UpdateMachinePowerRequest) Reset() {
 	*x = UpdateMachinePowerRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[38]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2267,7 +1754,7 @@ func (x *UpdateMachinePowerRequest) String() string {
 func (*UpdateMachinePowerRequest) ProtoMessage() {}
 
 func (x *UpdateMachinePowerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[38]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2280,7 +1767,7 @@ func (x *UpdateMachinePowerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMachinePowerRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMachinePowerRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{38}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *UpdateMachinePowerRequest) GetMachineId() string {
@@ -2305,7 +1792,7 @@ type UpdateMachinePowerResponse struct {
 
 func (x *UpdateMachinePowerResponse) Reset() {
 	*x = UpdateMachinePowerResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[39]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2317,7 +1804,7 @@ func (x *UpdateMachinePowerResponse) String() string {
 func (*UpdateMachinePowerResponse) ProtoMessage() {}
 
 func (x *UpdateMachinePowerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[39]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2330,7 +1817,7 @@ func (x *UpdateMachinePowerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMachinePowerResponse.ProtoReflect.Descriptor instead.
 func (*UpdateMachinePowerResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{39}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{29}
 }
 
 type AttachVolumeRequest struct {
@@ -2343,7 +1830,7 @@ type AttachVolumeRequest struct {
 
 func (x *AttachVolumeRequest) Reset() {
 	*x = AttachVolumeRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[40]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2355,7 +1842,7 @@ func (x *AttachVolumeRequest) String() string {
 func (*AttachVolumeRequest) ProtoMessage() {}
 
 func (x *AttachVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[40]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2368,7 +1855,7 @@ func (x *AttachVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachVolumeRequest.ProtoReflect.Descriptor instead.
 func (*AttachVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{40}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *AttachVolumeRequest) GetMachineId() string {
@@ -2393,7 +1880,7 @@ type AttachVolumeResponse struct {
 
 func (x *AttachVolumeResponse) Reset() {
 	*x = AttachVolumeResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[41]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2405,7 +1892,7 @@ func (x *AttachVolumeResponse) String() string {
 func (*AttachVolumeResponse) ProtoMessage() {}
 
 func (x *AttachVolumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[41]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2418,7 +1905,7 @@ func (x *AttachVolumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachVolumeResponse.ProtoReflect.Descriptor instead.
 func (*AttachVolumeResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{41}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{31}
 }
 
 type DetachVolumeRequest struct {
@@ -2431,7 +1918,7 @@ type DetachVolumeRequest struct {
 
 func (x *DetachVolumeRequest) Reset() {
 	*x = DetachVolumeRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[42]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2443,7 +1930,7 @@ func (x *DetachVolumeRequest) String() string {
 func (*DetachVolumeRequest) ProtoMessage() {}
 
 func (x *DetachVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[42]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2456,7 +1943,7 @@ func (x *DetachVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetachVolumeRequest.ProtoReflect.Descriptor instead.
 func (*DetachVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{42}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DetachVolumeRequest) GetMachineId() string {
@@ -2481,7 +1968,7 @@ type DetachVolumeResponse struct {
 
 func (x *DetachVolumeResponse) Reset() {
 	*x = DetachVolumeResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[43]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2493,7 +1980,7 @@ func (x *DetachVolumeResponse) String() string {
 func (*DetachVolumeResponse) ProtoMessage() {}
 
 func (x *DetachVolumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[43]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2506,7 +1993,95 @@ func (x *DetachVolumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetachVolumeResponse.ProtoReflect.Descriptor instead.
 func (*DetachVolumeResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{43}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{33}
+}
+
+type UpdateVolumeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MachineId     string                 `protobuf:"bytes,1,opt,name=machine_id,json=machineId,proto3" json:"machine_id,omitempty"`
+	Volume        *Volume                `protobuf:"bytes,2,opt,name=volume,proto3" json:"volume,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateVolumeRequest) Reset() {
+	*x = UpdateVolumeRequest{}
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVolumeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVolumeRequest) ProtoMessage() {}
+
+func (x *UpdateVolumeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVolumeRequest.ProtoReflect.Descriptor instead.
+func (*UpdateVolumeRequest) Descriptor() ([]byte, []int) {
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *UpdateVolumeRequest) GetMachineId() string {
+	if x != nil {
+		return x.MachineId
+	}
+	return ""
+}
+
+func (x *UpdateVolumeRequest) GetVolume() *Volume {
+	if x != nil {
+		return x.Volume
+	}
+	return nil
+}
+
+type UpdateVolumeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateVolumeResponse) Reset() {
+	*x = UpdateVolumeResponse{}
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVolumeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVolumeResponse) ProtoMessage() {}
+
+func (x *UpdateVolumeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVolumeResponse.ProtoReflect.Descriptor instead.
+func (*UpdateVolumeResponse) Descriptor() ([]byte, []int) {
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{35}
 }
 
 type AttachNetworkInterfaceRequest struct {
@@ -2519,7 +2094,7 @@ type AttachNetworkInterfaceRequest struct {
 
 func (x *AttachNetworkInterfaceRequest) Reset() {
 	*x = AttachNetworkInterfaceRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[44]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2531,7 +2106,7 @@ func (x *AttachNetworkInterfaceRequest) String() string {
 func (*AttachNetworkInterfaceRequest) ProtoMessage() {}
 
 func (x *AttachNetworkInterfaceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[44]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2544,7 +2119,7 @@ func (x *AttachNetworkInterfaceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachNetworkInterfaceRequest.ProtoReflect.Descriptor instead.
 func (*AttachNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{44}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *AttachNetworkInterfaceRequest) GetMachineId() string {
@@ -2569,7 +2144,7 @@ type AttachNetworkInterfaceResponse struct {
 
 func (x *AttachNetworkInterfaceResponse) Reset() {
 	*x = AttachNetworkInterfaceResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[45]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2581,7 +2156,7 @@ func (x *AttachNetworkInterfaceResponse) String() string {
 func (*AttachNetworkInterfaceResponse) ProtoMessage() {}
 
 func (x *AttachNetworkInterfaceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[45]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2594,7 +2169,7 @@ func (x *AttachNetworkInterfaceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttachNetworkInterfaceResponse.ProtoReflect.Descriptor instead.
 func (*AttachNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{45}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{37}
 }
 
 type DetachNetworkInterfaceRequest struct {
@@ -2607,7 +2182,7 @@ type DetachNetworkInterfaceRequest struct {
 
 func (x *DetachNetworkInterfaceRequest) Reset() {
 	*x = DetachNetworkInterfaceRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[46]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2619,7 +2194,7 @@ func (x *DetachNetworkInterfaceRequest) String() string {
 func (*DetachNetworkInterfaceRequest) ProtoMessage() {}
 
 func (x *DetachNetworkInterfaceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[46]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2632,7 +2207,7 @@ func (x *DetachNetworkInterfaceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetachNetworkInterfaceRequest.ProtoReflect.Descriptor instead.
 func (*DetachNetworkInterfaceRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{46}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *DetachNetworkInterfaceRequest) GetMachineId() string {
@@ -2657,7 +2232,7 @@ type DetachNetworkInterfaceResponse struct {
 
 func (x *DetachNetworkInterfaceResponse) Reset() {
 	*x = DetachNetworkInterfaceResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[47]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2669,7 +2244,7 @@ func (x *DetachNetworkInterfaceResponse) String() string {
 func (*DetachNetworkInterfaceResponse) ProtoMessage() {}
 
 func (x *DetachNetworkInterfaceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[47]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2682,7 +2257,7 @@ func (x *DetachNetworkInterfaceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetachNetworkInterfaceResponse.ProtoReflect.Descriptor instead.
 func (*DetachNetworkInterfaceResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{47}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{39}
 }
 
 type StatusRequest struct {
@@ -2693,7 +2268,7 @@ type StatusRequest struct {
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[48]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2705,7 +2280,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[48]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2718,7 +2293,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{48}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{40}
 }
 
 type StatusResponse struct {
@@ -2730,7 +2305,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[49]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2742,7 +2317,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[49]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2755,7 +2330,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{49}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *StatusResponse) GetMachineClassStatus() []*MachineClassStatus {
@@ -2774,7 +2349,7 @@ type ExecRequest struct {
 
 func (x *ExecRequest) Reset() {
 	*x = ExecRequest{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[50]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2786,7 +2361,7 @@ func (x *ExecRequest) String() string {
 func (*ExecRequest) ProtoMessage() {}
 
 func (x *ExecRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[50]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2799,7 +2374,7 @@ func (x *ExecRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecRequest.ProtoReflect.Descriptor instead.
 func (*ExecRequest) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{50}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ExecRequest) GetMachineId() string {
@@ -2818,7 +2393,7 @@ type ExecResponse struct {
 
 func (x *ExecResponse) Reset() {
 	*x = ExecResponse{}
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[51]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2830,7 +2405,7 @@ func (x *ExecResponse) String() string {
 func (*ExecResponse) ProtoMessage() {}
 
 func (x *ExecResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_machine_v1alpha1_api_proto_msgTypes[51]
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2843,7 +2418,7 @@ func (x *ExecResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecResponse.ProtoReflect.Descriptor instead.
 func (*ExecResponse) Descriptor() ([]byte, []int) {
-	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{51}
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ExecResponse) GetUrl() string {
@@ -2886,43 +2461,16 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x0eevents_to_time\x18\x04 \x01(\x03R\feventsToTime\x1a@\n" +
 	"\x12LabelSelectorEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\\\n" +
-	"\x18MachineClassCapabilities\x12\x1d\n" +
-	"\n" +
-	"cpu_millis\x18\x01 \x01(\x03R\tcpuMillis\x12!\n" +
-	"\fmemory_bytes\x18\x02 \x01(\x03R\vmemoryBytes\"\xb0\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb1\x01\n" +
+	"\x18MachineClassCapabilities\x12W\n" +
+	"\tresources\x18\x01 \x03(\v29.machine.v1alpha1.MachineClassCapabilities.ResourcesEntryR\tresources\x1a<\n" +
+	"\x0eResourcesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x03R\x05value:\x028\x01\"\xb0\x01\n" +
 	"\aMachine\x129\n" +
 	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x121\n" +
 	"\x04spec\x18\x02 \x01(\v2\x1d.machine.v1alpha1.MachineSpecR\x04spec\x127\n" +
-	"\x06status\x18\x03 \x01(\v2\x1f.machine.v1alpha1.MachineStatusR\x06status\"V\n" +
-	"\x17ListReservationsRequest\x12;\n" +
-	"\x06filter\x18\x01 \x01(\v2#.machine.v1alpha1.ReservationFilterR\x06filter\"]\n" +
-	"\x18ListReservationsResponse\x12A\n" +
-	"\freservations\x18\x01 \x03(\v2\x1d.machine.v1alpha1.ReservationR\freservations\"[\n" +
-	"\x18CreateReservationRequest\x12?\n" +
-	"\vreservation\x18\x01 \x01(\v2\x1d.machine.v1alpha1.ReservationR\vreservation\"\\\n" +
-	"\x19CreateReservationResponse\x12?\n" +
-	"\vreservation\x18\x01 \x01(\v2\x1d.machine.v1alpha1.ReservationR\vreservation\"A\n" +
-	"\x18DeleteReservationRequest\x12%\n" +
-	"\x0ereservation_id\x18\x01 \x01(\tR\rreservationId\"\x1b\n" +
-	"\x19DeleteReservationResponse\"\xc4\x01\n" +
-	"\x11ReservationFilter\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12]\n" +
-	"\x0elabel_selector\x18\x02 \x03(\v26.machine.v1alpha1.ReservationFilter.LabelSelectorEntryR\rlabelSelector\x1a@\n" +
-	"\x12LabelSelectorEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbc\x01\n" +
-	"\vReservation\x129\n" +
-	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x125\n" +
-	"\x04spec\x18\x02 \x01(\v2!.machine.v1alpha1.ReservationSpecR\x04spec\x12;\n" +
-	"\x06status\x18\x03 \x01(\v2#.machine.v1alpha1.ReservationStatusR\x06status\"\x9f\x01\n" +
-	"\x0fReservationSpec\x12N\n" +
-	"\tresources\x18\x01 \x03(\v20.machine.v1alpha1.ReservationSpec.ResourcesEntryR\tresources\x1a<\n" +
-	"\x0eResourcesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"M\n" +
-	"\x11ReservationStatus\x128\n" +
-	"\x05state\x18\x01 \x01(\x0e2\".machine.v1alpha1.ReservationStateR\x05state\"!\n" +
+	"\x06status\x18\x03 \x01(\v2\x1f.machine.v1alpha1.MachineStatusR\x06status\"!\n" +
 	"\tImageSpec\x12\x14\n" +
 	"\x05image\x18\x01 \x01(\tR\x05image\"*\n" +
 	"\tEmptyDisk\x12\x1d\n" +
@@ -3036,7 +2584,12 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"machine_id\x18\x01 \x01(\tR\tmachineId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\"\x16\n" +
-	"\x14DetachVolumeResponse\"\x8f\x01\n" +
+	"\x14DetachVolumeResponse\"f\n" +
+	"\x13UpdateVolumeRequest\x12\x1d\n" +
+	"\n" +
+	"machine_id\x18\x01 \x01(\tR\tmachineId\x120\n" +
+	"\x06volume\x18\x02 \x01(\v2\x18.machine.v1alpha1.VolumeR\x06volume\"\x16\n" +
+	"\x14UpdateVolumeResponse\"\x8f\x01\n" +
 	"\x1dAttachNetworkInterfaceRequest\x12\x1d\n" +
 	"\n" +
 	"machine_id\x18\x01 \x01(\tR\tmachineId\x12O\n" +
@@ -3054,11 +2607,7 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"machine_id\x18\x01 \x01(\tR\tmachineId\" \n" +
 	"\fExecResponse\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url*q\n" +
-	"\x10ReservationState\x12\x1d\n" +
-	"\x19RESERVATION_STATE_PENDING\x10\x00\x12\x1e\n" +
-	"\x1aRESERVATION_STATE_ACCEPTED\x10\x01\x12\x1e\n" +
-	"\x1aRESERVATION_STATE_REJECTED\x10\x02*$\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url*$\n" +
 	"\x05Power\x12\f\n" +
 	"\bPOWER_ON\x10\x00\x12\r\n" +
 	"\tPOWER_OFF\x10\x01*6\n" +
@@ -3073,7 +2622,7 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x0fMACHINE_RUNNING\x10\x01\x12\x15\n" +
 	"\x11MACHINE_SUSPENDED\x10\x02\x12\x16\n" +
 	"\x12MACHINE_TERMINATED\x10\x03\x12\x17\n" +
-	"\x13MACHINE_TERMINATING\x10\x042\xf8\f\n" +
+	"\x13MACHINE_TERMINATING\x10\x042\x8c\v\n" +
 	"\x0eMachineRuntime\x12P\n" +
 	"\aVersion\x12 .machine.v1alpha1.VersionRequest\x1a!.machine.v1alpha1.VersionResponse\"\x00\x12Y\n" +
 	"\n" +
@@ -3084,12 +2633,10 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x18UpdateMachineAnnotations\x121.machine.v1alpha1.UpdateMachineAnnotationsRequest\x1a2.machine.v1alpha1.UpdateMachineAnnotationsResponse\x12o\n" +
 	"\x12UpdateMachinePower\x12+.machine.v1alpha1.UpdateMachinePowerRequest\x1a,.machine.v1alpha1.UpdateMachinePowerResponse\x12_\n" +
 	"\fAttachVolume\x12%.machine.v1alpha1.AttachVolumeRequest\x1a&.machine.v1alpha1.AttachVolumeResponse\"\x00\x12_\n" +
-	"\fDetachVolume\x12%.machine.v1alpha1.DetachVolumeRequest\x1a&.machine.v1alpha1.DetachVolumeResponse\"\x00\x12{\n" +
+	"\fDetachVolume\x12%.machine.v1alpha1.DetachVolumeRequest\x1a&.machine.v1alpha1.DetachVolumeResponse\"\x00\x12_\n" +
+	"\fUpdateVolume\x12%.machine.v1alpha1.UpdateVolumeRequest\x1a&.machine.v1alpha1.UpdateVolumeResponse\"\x00\x12{\n" +
 	"\x16AttachNetworkInterface\x12/.machine.v1alpha1.AttachNetworkInterfaceRequest\x1a0.machine.v1alpha1.AttachNetworkInterfaceResponse\x12{\n" +
-	"\x16DetachNetworkInterface\x12/.machine.v1alpha1.DetachNetworkInterfaceRequest\x1a0.machine.v1alpha1.DetachNetworkInterfaceResponse\x12k\n" +
-	"\x10ListReservations\x12).machine.v1alpha1.ListReservationsRequest\x1a*.machine.v1alpha1.ListReservationsResponse\"\x00\x12n\n" +
-	"\x11CreateReservation\x12*.machine.v1alpha1.CreateReservationRequest\x1a+.machine.v1alpha1.CreateReservationResponse\"\x00\x12n\n" +
-	"\x11DeleteReservation\x12*.machine.v1alpha1.DeleteReservationRequest\x1a+.machine.v1alpha1.DeleteReservationResponse\"\x00\x12K\n" +
+	"\x16DetachNetworkInterface\x12/.machine.v1alpha1.DetachNetworkInterfaceRequest\x1a0.machine.v1alpha1.DetachNetworkInterfaceResponse\x12K\n" +
 	"\x06Status\x12\x1f.machine.v1alpha1.StatusRequest\x1a .machine.v1alpha1.StatusResponse\x12E\n" +
 	"\x04Exec\x12\x1d.machine.v1alpha1.ExecRequest\x1a\x1e.machine.v1alpha1.ExecResponseB<Z:github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1b\x06proto3"
 
@@ -3105,163 +2652,141 @@ func file_machine_v1alpha1_api_proto_rawDescGZIP() []byte {
 	return file_machine_v1alpha1_api_proto_rawDescData
 }
 
-var file_machine_v1alpha1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_machine_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 63)
+var file_machine_v1alpha1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_machine_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 54)
 var file_machine_v1alpha1_api_proto_goTypes = []any{
-	(ReservationState)(0),                    // 0: machine.v1alpha1.ReservationState
-	(Power)(0),                               // 1: machine.v1alpha1.Power
-	(VolumeState)(0),                         // 2: machine.v1alpha1.VolumeState
-	(NetworkInterfaceState)(0),               // 3: machine.v1alpha1.NetworkInterfaceState
-	(MachineState)(0),                        // 4: machine.v1alpha1.MachineState
-	(*VolumeSpec)(nil),                       // 5: machine.v1alpha1.VolumeSpec
-	(*MachineFilter)(nil),                    // 6: machine.v1alpha1.MachineFilter
-	(*EventFilter)(nil),                      // 7: machine.v1alpha1.EventFilter
-	(*MachineClassCapabilities)(nil),         // 8: machine.v1alpha1.MachineClassCapabilities
-	(*Machine)(nil),                          // 9: machine.v1alpha1.Machine
-	(*ListReservationsRequest)(nil),          // 10: machine.v1alpha1.ListReservationsRequest
-	(*ListReservationsResponse)(nil),         // 11: machine.v1alpha1.ListReservationsResponse
-	(*CreateReservationRequest)(nil),         // 12: machine.v1alpha1.CreateReservationRequest
-	(*CreateReservationResponse)(nil),        // 13: machine.v1alpha1.CreateReservationResponse
-	(*DeleteReservationRequest)(nil),         // 14: machine.v1alpha1.DeleteReservationRequest
-	(*DeleteReservationResponse)(nil),        // 15: machine.v1alpha1.DeleteReservationResponse
-	(*ReservationFilter)(nil),                // 16: machine.v1alpha1.ReservationFilter
-	(*Reservation)(nil),                      // 17: machine.v1alpha1.Reservation
-	(*ReservationSpec)(nil),                  // 18: machine.v1alpha1.ReservationSpec
-	(*ReservationStatus)(nil),                // 19: machine.v1alpha1.ReservationStatus
-	(*ImageSpec)(nil),                        // 20: machine.v1alpha1.ImageSpec
-	(*EmptyDisk)(nil),                        // 21: machine.v1alpha1.EmptyDisk
-	(*VolumeConnection)(nil),                 // 22: machine.v1alpha1.VolumeConnection
-	(*Volume)(nil),                           // 23: machine.v1alpha1.Volume
-	(*NetworkInterface)(nil),                 // 24: machine.v1alpha1.NetworkInterface
-	(*MachineSpec)(nil),                      // 25: machine.v1alpha1.MachineSpec
-	(*MachineStatus)(nil),                    // 26: machine.v1alpha1.MachineStatus
-	(*VolumeStatus)(nil),                     // 27: machine.v1alpha1.VolumeStatus
-	(*NetworkInterfaceStatus)(nil),           // 28: machine.v1alpha1.NetworkInterfaceStatus
-	(*MachineClass)(nil),                     // 29: machine.v1alpha1.MachineClass
-	(*MachineClassStatus)(nil),               // 30: machine.v1alpha1.MachineClassStatus
-	(*VersionRequest)(nil),                   // 31: machine.v1alpha1.VersionRequest
-	(*VersionResponse)(nil),                  // 32: machine.v1alpha1.VersionResponse
-	(*ListMachinesRequest)(nil),              // 33: machine.v1alpha1.ListMachinesRequest
-	(*ListMachinesResponse)(nil),             // 34: machine.v1alpha1.ListMachinesResponse
-	(*ListEventsRequest)(nil),                // 35: machine.v1alpha1.ListEventsRequest
-	(*ListEventsResponse)(nil),               // 36: machine.v1alpha1.ListEventsResponse
-	(*CreateMachineRequest)(nil),             // 37: machine.v1alpha1.CreateMachineRequest
-	(*CreateMachineResponse)(nil),            // 38: machine.v1alpha1.CreateMachineResponse
-	(*DeleteMachineRequest)(nil),             // 39: machine.v1alpha1.DeleteMachineRequest
-	(*DeleteMachineResponse)(nil),            // 40: machine.v1alpha1.DeleteMachineResponse
-	(*UpdateMachineAnnotationsRequest)(nil),  // 41: machine.v1alpha1.UpdateMachineAnnotationsRequest
-	(*UpdateMachineAnnotationsResponse)(nil), // 42: machine.v1alpha1.UpdateMachineAnnotationsResponse
-	(*UpdateMachinePowerRequest)(nil),        // 43: machine.v1alpha1.UpdateMachinePowerRequest
-	(*UpdateMachinePowerResponse)(nil),       // 44: machine.v1alpha1.UpdateMachinePowerResponse
-	(*AttachVolumeRequest)(nil),              // 45: machine.v1alpha1.AttachVolumeRequest
-	(*AttachVolumeResponse)(nil),             // 46: machine.v1alpha1.AttachVolumeResponse
-	(*DetachVolumeRequest)(nil),              // 47: machine.v1alpha1.DetachVolumeRequest
-	(*DetachVolumeResponse)(nil),             // 48: machine.v1alpha1.DetachVolumeResponse
-	(*AttachNetworkInterfaceRequest)(nil),    // 49: machine.v1alpha1.AttachNetworkInterfaceRequest
-	(*AttachNetworkInterfaceResponse)(nil),   // 50: machine.v1alpha1.AttachNetworkInterfaceResponse
-	(*DetachNetworkInterfaceRequest)(nil),    // 51: machine.v1alpha1.DetachNetworkInterfaceRequest
-	(*DetachNetworkInterfaceResponse)(nil),   // 52: machine.v1alpha1.DetachNetworkInterfaceResponse
-	(*StatusRequest)(nil),                    // 53: machine.v1alpha1.StatusRequest
-	(*StatusResponse)(nil),                   // 54: machine.v1alpha1.StatusResponse
-	(*ExecRequest)(nil),                      // 55: machine.v1alpha1.ExecRequest
-	(*ExecResponse)(nil),                     // 56: machine.v1alpha1.ExecResponse
-	nil,                                      // 57: machine.v1alpha1.VolumeSpec.AttributesEntry
-	nil,                                      // 58: machine.v1alpha1.VolumeSpec.SecretDataEntry
-	nil,                                      // 59: machine.v1alpha1.MachineFilter.LabelSelectorEntry
-	nil,                                      // 60: machine.v1alpha1.EventFilter.LabelSelectorEntry
-	nil,                                      // 61: machine.v1alpha1.ReservationFilter.LabelSelectorEntry
-	nil,                                      // 62: machine.v1alpha1.ReservationSpec.ResourcesEntry
-	nil,                                      // 63: machine.v1alpha1.VolumeConnection.AttributesEntry
-	nil,                                      // 64: machine.v1alpha1.VolumeConnection.SecretDataEntry
-	nil,                                      // 65: machine.v1alpha1.VolumeConnection.EncryptionDataEntry
-	nil,                                      // 66: machine.v1alpha1.NetworkInterface.AttributesEntry
-	nil,                                      // 67: machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
-	(*v1alpha1.ObjectMetadata)(nil),          // 68: meta.v1alpha1.ObjectMetadata
-	(*v1alpha11.Event)(nil),                  // 69: event.v1alpha1.Event
+	(Power)(0),                               // 0: machine.v1alpha1.Power
+	(VolumeState)(0),                         // 1: machine.v1alpha1.VolumeState
+	(NetworkInterfaceState)(0),               // 2: machine.v1alpha1.NetworkInterfaceState
+	(MachineState)(0),                        // 3: machine.v1alpha1.MachineState
+	(*VolumeSpec)(nil),                       // 4: machine.v1alpha1.VolumeSpec
+	(*MachineFilter)(nil),                    // 5: machine.v1alpha1.MachineFilter
+	(*EventFilter)(nil),                      // 6: machine.v1alpha1.EventFilter
+	(*MachineClassCapabilities)(nil),         // 7: machine.v1alpha1.MachineClassCapabilities
+	(*Machine)(nil),                          // 8: machine.v1alpha1.Machine
+	(*ImageSpec)(nil),                        // 9: machine.v1alpha1.ImageSpec
+	(*EmptyDisk)(nil),                        // 10: machine.v1alpha1.EmptyDisk
+	(*VolumeConnection)(nil),                 // 11: machine.v1alpha1.VolumeConnection
+	(*Volume)(nil),                           // 12: machine.v1alpha1.Volume
+	(*NetworkInterface)(nil),                 // 13: machine.v1alpha1.NetworkInterface
+	(*MachineSpec)(nil),                      // 14: machine.v1alpha1.MachineSpec
+	(*MachineStatus)(nil),                    // 15: machine.v1alpha1.MachineStatus
+	(*VolumeStatus)(nil),                     // 16: machine.v1alpha1.VolumeStatus
+	(*NetworkInterfaceStatus)(nil),           // 17: machine.v1alpha1.NetworkInterfaceStatus
+	(*MachineClass)(nil),                     // 18: machine.v1alpha1.MachineClass
+	(*MachineClassStatus)(nil),               // 19: machine.v1alpha1.MachineClassStatus
+	(*VersionRequest)(nil),                   // 20: machine.v1alpha1.VersionRequest
+	(*VersionResponse)(nil),                  // 21: machine.v1alpha1.VersionResponse
+	(*ListMachinesRequest)(nil),              // 22: machine.v1alpha1.ListMachinesRequest
+	(*ListMachinesResponse)(nil),             // 23: machine.v1alpha1.ListMachinesResponse
+	(*ListEventsRequest)(nil),                // 24: machine.v1alpha1.ListEventsRequest
+	(*ListEventsResponse)(nil),               // 25: machine.v1alpha1.ListEventsResponse
+	(*CreateMachineRequest)(nil),             // 26: machine.v1alpha1.CreateMachineRequest
+	(*CreateMachineResponse)(nil),            // 27: machine.v1alpha1.CreateMachineResponse
+	(*DeleteMachineRequest)(nil),             // 28: machine.v1alpha1.DeleteMachineRequest
+	(*DeleteMachineResponse)(nil),            // 29: machine.v1alpha1.DeleteMachineResponse
+	(*UpdateMachineAnnotationsRequest)(nil),  // 30: machine.v1alpha1.UpdateMachineAnnotationsRequest
+	(*UpdateMachineAnnotationsResponse)(nil), // 31: machine.v1alpha1.UpdateMachineAnnotationsResponse
+	(*UpdateMachinePowerRequest)(nil),        // 32: machine.v1alpha1.UpdateMachinePowerRequest
+	(*UpdateMachinePowerResponse)(nil),       // 33: machine.v1alpha1.UpdateMachinePowerResponse
+	(*AttachVolumeRequest)(nil),              // 34: machine.v1alpha1.AttachVolumeRequest
+	(*AttachVolumeResponse)(nil),             // 35: machine.v1alpha1.AttachVolumeResponse
+	(*DetachVolumeRequest)(nil),              // 36: machine.v1alpha1.DetachVolumeRequest
+	(*DetachVolumeResponse)(nil),             // 37: machine.v1alpha1.DetachVolumeResponse
+	(*UpdateVolumeRequest)(nil),              // 38: machine.v1alpha1.UpdateVolumeRequest
+	(*UpdateVolumeResponse)(nil),             // 39: machine.v1alpha1.UpdateVolumeResponse
+	(*AttachNetworkInterfaceRequest)(nil),    // 40: machine.v1alpha1.AttachNetworkInterfaceRequest
+	(*AttachNetworkInterfaceResponse)(nil),   // 41: machine.v1alpha1.AttachNetworkInterfaceResponse
+	(*DetachNetworkInterfaceRequest)(nil),    // 42: machine.v1alpha1.DetachNetworkInterfaceRequest
+	(*DetachNetworkInterfaceResponse)(nil),   // 43: machine.v1alpha1.DetachNetworkInterfaceResponse
+	(*StatusRequest)(nil),                    // 44: machine.v1alpha1.StatusRequest
+	(*StatusResponse)(nil),                   // 45: machine.v1alpha1.StatusResponse
+	(*ExecRequest)(nil),                      // 46: machine.v1alpha1.ExecRequest
+	(*ExecResponse)(nil),                     // 47: machine.v1alpha1.ExecResponse
+	nil,                                      // 48: machine.v1alpha1.VolumeSpec.AttributesEntry
+	nil,                                      // 49: machine.v1alpha1.VolumeSpec.SecretDataEntry
+	nil,                                      // 50: machine.v1alpha1.MachineFilter.LabelSelectorEntry
+	nil,                                      // 51: machine.v1alpha1.EventFilter.LabelSelectorEntry
+	nil,                                      // 52: machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
+	nil,                                      // 53: machine.v1alpha1.VolumeConnection.AttributesEntry
+	nil,                                      // 54: machine.v1alpha1.VolumeConnection.SecretDataEntry
+	nil,                                      // 55: machine.v1alpha1.VolumeConnection.EncryptionDataEntry
+	nil,                                      // 56: machine.v1alpha1.NetworkInterface.AttributesEntry
+	nil,                                      // 57: machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
+	(*v1alpha1.ObjectMetadata)(nil),          // 58: meta.v1alpha1.ObjectMetadata
+	(*v1alpha11.Event)(nil),                  // 59: event.v1alpha1.Event
 }
 var file_machine_v1alpha1_api_proto_depIdxs = []int32{
-	57, // 0: machine.v1alpha1.VolumeSpec.attributes:type_name -> machine.v1alpha1.VolumeSpec.AttributesEntry
-	58, // 1: machine.v1alpha1.VolumeSpec.secret_data:type_name -> machine.v1alpha1.VolumeSpec.SecretDataEntry
-	59, // 2: machine.v1alpha1.MachineFilter.label_selector:type_name -> machine.v1alpha1.MachineFilter.LabelSelectorEntry
-	60, // 3: machine.v1alpha1.EventFilter.label_selector:type_name -> machine.v1alpha1.EventFilter.LabelSelectorEntry
-	68, // 4: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
-	25, // 5: machine.v1alpha1.Machine.spec:type_name -> machine.v1alpha1.MachineSpec
-	26, // 6: machine.v1alpha1.Machine.status:type_name -> machine.v1alpha1.MachineStatus
-	16, // 7: machine.v1alpha1.ListReservationsRequest.filter:type_name -> machine.v1alpha1.ReservationFilter
-	17, // 8: machine.v1alpha1.ListReservationsResponse.reservations:type_name -> machine.v1alpha1.Reservation
-	17, // 9: machine.v1alpha1.CreateReservationRequest.reservation:type_name -> machine.v1alpha1.Reservation
-	17, // 10: machine.v1alpha1.CreateReservationResponse.reservation:type_name -> machine.v1alpha1.Reservation
-	61, // 11: machine.v1alpha1.ReservationFilter.label_selector:type_name -> machine.v1alpha1.ReservationFilter.LabelSelectorEntry
-	68, // 12: machine.v1alpha1.Reservation.metadata:type_name -> meta.v1alpha1.ObjectMetadata
-	18, // 13: machine.v1alpha1.Reservation.spec:type_name -> machine.v1alpha1.ReservationSpec
-	19, // 14: machine.v1alpha1.Reservation.status:type_name -> machine.v1alpha1.ReservationStatus
-	62, // 15: machine.v1alpha1.ReservationSpec.resources:type_name -> machine.v1alpha1.ReservationSpec.ResourcesEntry
-	0,  // 16: machine.v1alpha1.ReservationStatus.state:type_name -> machine.v1alpha1.ReservationState
-	63, // 17: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
-	64, // 18: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
-	65, // 19: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
-	21, // 20: machine.v1alpha1.Volume.empty_disk:type_name -> machine.v1alpha1.EmptyDisk
-	22, // 21: machine.v1alpha1.Volume.connection:type_name -> machine.v1alpha1.VolumeConnection
-	66, // 22: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
-	1,  // 23: machine.v1alpha1.MachineSpec.power:type_name -> machine.v1alpha1.Power
-	20, // 24: machine.v1alpha1.MachineSpec.image:type_name -> machine.v1alpha1.ImageSpec
-	23, // 25: machine.v1alpha1.MachineSpec.volumes:type_name -> machine.v1alpha1.Volume
-	24, // 26: machine.v1alpha1.MachineSpec.network_interfaces:type_name -> machine.v1alpha1.NetworkInterface
-	4,  // 27: machine.v1alpha1.MachineStatus.state:type_name -> machine.v1alpha1.MachineState
-	27, // 28: machine.v1alpha1.MachineStatus.volumes:type_name -> machine.v1alpha1.VolumeStatus
-	28, // 29: machine.v1alpha1.MachineStatus.network_interfaces:type_name -> machine.v1alpha1.NetworkInterfaceStatus
-	2,  // 30: machine.v1alpha1.VolumeStatus.state:type_name -> machine.v1alpha1.VolumeState
-	3,  // 31: machine.v1alpha1.NetworkInterfaceStatus.state:type_name -> machine.v1alpha1.NetworkInterfaceState
-	8,  // 32: machine.v1alpha1.MachineClass.capabilities:type_name -> machine.v1alpha1.MachineClassCapabilities
-	29, // 33: machine.v1alpha1.MachineClassStatus.machine_class:type_name -> machine.v1alpha1.MachineClass
-	6,  // 34: machine.v1alpha1.ListMachinesRequest.filter:type_name -> machine.v1alpha1.MachineFilter
-	9,  // 35: machine.v1alpha1.ListMachinesResponse.machines:type_name -> machine.v1alpha1.Machine
-	7,  // 36: machine.v1alpha1.ListEventsRequest.filter:type_name -> machine.v1alpha1.EventFilter
-	69, // 37: machine.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
-	9,  // 38: machine.v1alpha1.CreateMachineRequest.machine:type_name -> machine.v1alpha1.Machine
-	9,  // 39: machine.v1alpha1.CreateMachineResponse.machine:type_name -> machine.v1alpha1.Machine
-	67, // 40: machine.v1alpha1.UpdateMachineAnnotationsRequest.annotations:type_name -> machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
-	1,  // 41: machine.v1alpha1.UpdateMachinePowerRequest.power:type_name -> machine.v1alpha1.Power
-	23, // 42: machine.v1alpha1.AttachVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
-	24, // 43: machine.v1alpha1.AttachNetworkInterfaceRequest.network_interface:type_name -> machine.v1alpha1.NetworkInterface
-	30, // 44: machine.v1alpha1.StatusResponse.machine_class_status:type_name -> machine.v1alpha1.MachineClassStatus
-	31, // 45: machine.v1alpha1.MachineRuntime.Version:input_type -> machine.v1alpha1.VersionRequest
-	35, // 46: machine.v1alpha1.MachineRuntime.ListEvents:input_type -> machine.v1alpha1.ListEventsRequest
-	33, // 47: machine.v1alpha1.MachineRuntime.ListMachines:input_type -> machine.v1alpha1.ListMachinesRequest
-	37, // 48: machine.v1alpha1.MachineRuntime.CreateMachine:input_type -> machine.v1alpha1.CreateMachineRequest
-	39, // 49: machine.v1alpha1.MachineRuntime.DeleteMachine:input_type -> machine.v1alpha1.DeleteMachineRequest
-	41, // 50: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:input_type -> machine.v1alpha1.UpdateMachineAnnotationsRequest
-	43, // 51: machine.v1alpha1.MachineRuntime.UpdateMachinePower:input_type -> machine.v1alpha1.UpdateMachinePowerRequest
-	45, // 52: machine.v1alpha1.MachineRuntime.AttachVolume:input_type -> machine.v1alpha1.AttachVolumeRequest
-	47, // 53: machine.v1alpha1.MachineRuntime.DetachVolume:input_type -> machine.v1alpha1.DetachVolumeRequest
-	49, // 54: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:input_type -> machine.v1alpha1.AttachNetworkInterfaceRequest
-	51, // 55: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:input_type -> machine.v1alpha1.DetachNetworkInterfaceRequest
-	10, // 56: machine.v1alpha1.MachineRuntime.ListReservations:input_type -> machine.v1alpha1.ListReservationsRequest
-	12, // 57: machine.v1alpha1.MachineRuntime.CreateReservation:input_type -> machine.v1alpha1.CreateReservationRequest
-	14, // 58: machine.v1alpha1.MachineRuntime.DeleteReservation:input_type -> machine.v1alpha1.DeleteReservationRequest
-	53, // 59: machine.v1alpha1.MachineRuntime.Status:input_type -> machine.v1alpha1.StatusRequest
-	55, // 60: machine.v1alpha1.MachineRuntime.Exec:input_type -> machine.v1alpha1.ExecRequest
-	32, // 61: machine.v1alpha1.MachineRuntime.Version:output_type -> machine.v1alpha1.VersionResponse
-	36, // 62: machine.v1alpha1.MachineRuntime.ListEvents:output_type -> machine.v1alpha1.ListEventsResponse
-	34, // 63: machine.v1alpha1.MachineRuntime.ListMachines:output_type -> machine.v1alpha1.ListMachinesResponse
-	38, // 64: machine.v1alpha1.MachineRuntime.CreateMachine:output_type -> machine.v1alpha1.CreateMachineResponse
-	40, // 65: machine.v1alpha1.MachineRuntime.DeleteMachine:output_type -> machine.v1alpha1.DeleteMachineResponse
-	42, // 66: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:output_type -> machine.v1alpha1.UpdateMachineAnnotationsResponse
-	44, // 67: machine.v1alpha1.MachineRuntime.UpdateMachinePower:output_type -> machine.v1alpha1.UpdateMachinePowerResponse
-	46, // 68: machine.v1alpha1.MachineRuntime.AttachVolume:output_type -> machine.v1alpha1.AttachVolumeResponse
-	48, // 69: machine.v1alpha1.MachineRuntime.DetachVolume:output_type -> machine.v1alpha1.DetachVolumeResponse
-	50, // 70: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:output_type -> machine.v1alpha1.AttachNetworkInterfaceResponse
-	52, // 71: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:output_type -> machine.v1alpha1.DetachNetworkInterfaceResponse
-	11, // 72: machine.v1alpha1.MachineRuntime.ListReservations:output_type -> machine.v1alpha1.ListReservationsResponse
-	13, // 73: machine.v1alpha1.MachineRuntime.CreateReservation:output_type -> machine.v1alpha1.CreateReservationResponse
-	15, // 74: machine.v1alpha1.MachineRuntime.DeleteReservation:output_type -> machine.v1alpha1.DeleteReservationResponse
-	54, // 75: machine.v1alpha1.MachineRuntime.Status:output_type -> machine.v1alpha1.StatusResponse
-	56, // 76: machine.v1alpha1.MachineRuntime.Exec:output_type -> machine.v1alpha1.ExecResponse
-	61, // [61:77] is the sub-list for method output_type
-	45, // [45:61] is the sub-list for method input_type
-	45, // [45:45] is the sub-list for extension type_name
-	45, // [45:45] is the sub-list for extension extendee
-	0,  // [0:45] is the sub-list for field type_name
+	48, // 0: machine.v1alpha1.VolumeSpec.attributes:type_name -> machine.v1alpha1.VolumeSpec.AttributesEntry
+	49, // 1: machine.v1alpha1.VolumeSpec.secret_data:type_name -> machine.v1alpha1.VolumeSpec.SecretDataEntry
+	50, // 2: machine.v1alpha1.MachineFilter.label_selector:type_name -> machine.v1alpha1.MachineFilter.LabelSelectorEntry
+	51, // 3: machine.v1alpha1.EventFilter.label_selector:type_name -> machine.v1alpha1.EventFilter.LabelSelectorEntry
+	52, // 4: machine.v1alpha1.MachineClassCapabilities.resources:type_name -> machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
+	58, // 5: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	14, // 6: machine.v1alpha1.Machine.spec:type_name -> machine.v1alpha1.MachineSpec
+	15, // 7: machine.v1alpha1.Machine.status:type_name -> machine.v1alpha1.MachineStatus
+	53, // 8: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
+	54, // 9: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
+	55, // 10: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
+	10, // 11: machine.v1alpha1.Volume.empty_disk:type_name -> machine.v1alpha1.EmptyDisk
+	11, // 12: machine.v1alpha1.Volume.connection:type_name -> machine.v1alpha1.VolumeConnection
+	56, // 13: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
+	0,  // 14: machine.v1alpha1.MachineSpec.power:type_name -> machine.v1alpha1.Power
+	9,  // 15: machine.v1alpha1.MachineSpec.image:type_name -> machine.v1alpha1.ImageSpec
+	12, // 16: machine.v1alpha1.MachineSpec.volumes:type_name -> machine.v1alpha1.Volume
+	13, // 17: machine.v1alpha1.MachineSpec.network_interfaces:type_name -> machine.v1alpha1.NetworkInterface
+	3,  // 18: machine.v1alpha1.MachineStatus.state:type_name -> machine.v1alpha1.MachineState
+	16, // 19: machine.v1alpha1.MachineStatus.volumes:type_name -> machine.v1alpha1.VolumeStatus
+	17, // 20: machine.v1alpha1.MachineStatus.network_interfaces:type_name -> machine.v1alpha1.NetworkInterfaceStatus
+	1,  // 21: machine.v1alpha1.VolumeStatus.state:type_name -> machine.v1alpha1.VolumeState
+	2,  // 22: machine.v1alpha1.NetworkInterfaceStatus.state:type_name -> machine.v1alpha1.NetworkInterfaceState
+	7,  // 23: machine.v1alpha1.MachineClass.capabilities:type_name -> machine.v1alpha1.MachineClassCapabilities
+	18, // 24: machine.v1alpha1.MachineClassStatus.machine_class:type_name -> machine.v1alpha1.MachineClass
+	5,  // 25: machine.v1alpha1.ListMachinesRequest.filter:type_name -> machine.v1alpha1.MachineFilter
+	8,  // 26: machine.v1alpha1.ListMachinesResponse.machines:type_name -> machine.v1alpha1.Machine
+	6,  // 27: machine.v1alpha1.ListEventsRequest.filter:type_name -> machine.v1alpha1.EventFilter
+	59, // 28: machine.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
+	8,  // 29: machine.v1alpha1.CreateMachineRequest.machine:type_name -> machine.v1alpha1.Machine
+	8,  // 30: machine.v1alpha1.CreateMachineResponse.machine:type_name -> machine.v1alpha1.Machine
+	57, // 31: machine.v1alpha1.UpdateMachineAnnotationsRequest.annotations:type_name -> machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
+	0,  // 32: machine.v1alpha1.UpdateMachinePowerRequest.power:type_name -> machine.v1alpha1.Power
+	12, // 33: machine.v1alpha1.AttachVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
+	12, // 34: machine.v1alpha1.UpdateVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
+	13, // 35: machine.v1alpha1.AttachNetworkInterfaceRequest.network_interface:type_name -> machine.v1alpha1.NetworkInterface
+	19, // 36: machine.v1alpha1.StatusResponse.machine_class_status:type_name -> machine.v1alpha1.MachineClassStatus
+	20, // 37: machine.v1alpha1.MachineRuntime.Version:input_type -> machine.v1alpha1.VersionRequest
+	24, // 38: machine.v1alpha1.MachineRuntime.ListEvents:input_type -> machine.v1alpha1.ListEventsRequest
+	22, // 39: machine.v1alpha1.MachineRuntime.ListMachines:input_type -> machine.v1alpha1.ListMachinesRequest
+	26, // 40: machine.v1alpha1.MachineRuntime.CreateMachine:input_type -> machine.v1alpha1.CreateMachineRequest
+	28, // 41: machine.v1alpha1.MachineRuntime.DeleteMachine:input_type -> machine.v1alpha1.DeleteMachineRequest
+	30, // 42: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:input_type -> machine.v1alpha1.UpdateMachineAnnotationsRequest
+	32, // 43: machine.v1alpha1.MachineRuntime.UpdateMachinePower:input_type -> machine.v1alpha1.UpdateMachinePowerRequest
+	34, // 44: machine.v1alpha1.MachineRuntime.AttachVolume:input_type -> machine.v1alpha1.AttachVolumeRequest
+	36, // 45: machine.v1alpha1.MachineRuntime.DetachVolume:input_type -> machine.v1alpha1.DetachVolumeRequest
+	38, // 46: machine.v1alpha1.MachineRuntime.UpdateVolume:input_type -> machine.v1alpha1.UpdateVolumeRequest
+	40, // 47: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:input_type -> machine.v1alpha1.AttachNetworkInterfaceRequest
+	42, // 48: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:input_type -> machine.v1alpha1.DetachNetworkInterfaceRequest
+	44, // 49: machine.v1alpha1.MachineRuntime.Status:input_type -> machine.v1alpha1.StatusRequest
+	46, // 50: machine.v1alpha1.MachineRuntime.Exec:input_type -> machine.v1alpha1.ExecRequest
+	21, // 51: machine.v1alpha1.MachineRuntime.Version:output_type -> machine.v1alpha1.VersionResponse
+	25, // 52: machine.v1alpha1.MachineRuntime.ListEvents:output_type -> machine.v1alpha1.ListEventsResponse
+	23, // 53: machine.v1alpha1.MachineRuntime.ListMachines:output_type -> machine.v1alpha1.ListMachinesResponse
+	27, // 54: machine.v1alpha1.MachineRuntime.CreateMachine:output_type -> machine.v1alpha1.CreateMachineResponse
+	29, // 55: machine.v1alpha1.MachineRuntime.DeleteMachine:output_type -> machine.v1alpha1.DeleteMachineResponse
+	31, // 56: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:output_type -> machine.v1alpha1.UpdateMachineAnnotationsResponse
+	33, // 57: machine.v1alpha1.MachineRuntime.UpdateMachinePower:output_type -> machine.v1alpha1.UpdateMachinePowerResponse
+	35, // 58: machine.v1alpha1.MachineRuntime.AttachVolume:output_type -> machine.v1alpha1.AttachVolumeResponse
+	37, // 59: machine.v1alpha1.MachineRuntime.DetachVolume:output_type -> machine.v1alpha1.DetachVolumeResponse
+	39, // 60: machine.v1alpha1.MachineRuntime.UpdateVolume:output_type -> machine.v1alpha1.UpdateVolumeResponse
+	41, // 61: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:output_type -> machine.v1alpha1.AttachNetworkInterfaceResponse
+	43, // 62: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:output_type -> machine.v1alpha1.DetachNetworkInterfaceResponse
+	45, // 63: machine.v1alpha1.MachineRuntime.Status:output_type -> machine.v1alpha1.StatusResponse
+	47, // 64: machine.v1alpha1.MachineRuntime.Exec:output_type -> machine.v1alpha1.ExecResponse
+	51, // [51:65] is the sub-list for method output_type
+	37, // [37:51] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_machine_v1alpha1_api_proto_init() }
@@ -3274,8 +2799,8 @@ func file_machine_v1alpha1_api_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_machine_v1alpha1_api_proto_rawDesc), len(file_machine_v1alpha1_api_proto_rawDesc)),
-			NumEnums:      5,
-			NumMessages:   63,
+			NumEnums:      4,
+			NumMessages:   54,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

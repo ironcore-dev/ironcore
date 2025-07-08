@@ -5,6 +5,7 @@ package update
 
 import (
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/common"
+	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/update/volume"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +15,9 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 		Use: "update",
 	}
 
-	cmd.AddCommand()
+	cmd.AddCommand(
+		volume.Command(streams, clientFactory),
+	)
 
 	return cmd
 }

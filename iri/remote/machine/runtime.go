@@ -66,6 +66,10 @@ func (r *remoteRuntime) DetachVolume(ctx context.Context, req *iri.DetachVolumeR
 	return r.client.DetachVolume(ctx, req)
 }
 
+func (r *remoteRuntime) UpdateVolume(ctx context.Context, req *iri.UpdateVolumeRequest) (*iri.UpdateVolumeResponse, error) {
+	return r.client.UpdateVolume(ctx, req)
+}
+
 func (r *remoteRuntime) AttachNetworkInterface(ctx context.Context, req *iri.AttachNetworkInterfaceRequest) (*iri.AttachNetworkInterfaceResponse, error) {
 	return r.client.AttachNetworkInterface(ctx, req)
 }

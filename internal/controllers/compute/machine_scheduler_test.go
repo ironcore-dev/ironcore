@@ -417,7 +417,7 @@ var _ = Describe("MachineScheduler", func() {
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create the machine")
 
-		By("checking that the machine is scheduled onto the machine pool")
+		By("checking that the machine isn't scheduled onto the machine pool")
 		Consistently(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef", BeNil()),
 		))
@@ -432,6 +432,77 @@ var _ = Describe("MachineScheduler", func() {
 		By("checking that the machine is scheduled onto the machine pool")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+		))
+	})
+
+	It("should schedule machine on pool with correctly allocatable resources", func(ctx SpecContext) {
+		By("creating a machine pool")
+		machinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
+
+		By("patching the machine pool status to contain a machine class")
+		Eventually(UpdateStatus(machinePool, func() {
+			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("5"),
+			}
+		})).Should(Succeed())
+
+		By("creating a second machine pool")
+		secondMachinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "second-test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, secondMachinePool)).To(Succeed(), "failed to create the second machine pool")
+
+		By("creating a second machine class")
+		secondMachineClass := &computev1alpha1.MachineClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "second-machine-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
+				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+				"type-a.vendor.com/gpu":     resource.MustParse("1"),
+			},
+		}
+		Expect(k8sClient.Create(ctx, secondMachineClass)).To(Succeed(), "failed to create second machine class")
+
+		By("patching the second machine pool status to contain a both machine classes")
+		Eventually(UpdateStatus(secondMachinePool, func() {
+			secondMachinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{
+				{Name: machineClass.Name},
+				{Name: secondMachineClass.Name},
+			}
+			secondMachinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):       resource.MustParse("5"),
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, secondMachineClass.Name): resource.MustParse("5"),
+			}
+		})).Should(Succeed())
+
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				Image: "my-image",
+				MachineClassRef: corev1.LocalObjectReference{
+					Name: secondMachineClass.Name,
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create the machine")
+
+		By("checking that the machine is scheduled onto the machine pool")
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef.Name", Equal(secondMachinePool.Name)),
 		))
 	})
 })

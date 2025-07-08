@@ -17,6 +17,7 @@ service MachineRuntime {
   rpc UpdateMachinePower(UpdateMachinePowerRequest) returns (UpdateMachinePowerResponse);
   rpc AttachVolume(AttachVolumeRequest) returns (AttachVolumeResponse) {};
   rpc DetachVolume(DetachVolumeRequest) returns (DetachVolumeResponse) {};
+  rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse) {}
   rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
   rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
 
@@ -49,8 +50,7 @@ message EventFilter {
 }
 
 message MachineClassCapabilities {
-  int64 cpu_millis = 1;
-  int64 memory_bytes = 2;
+  map<string, int64> resources = 1;
 }
 
 message Machine {
@@ -273,6 +273,14 @@ message DetachVolumeRequest {
 }
 
 message DetachVolumeResponse {
+}
+
+message UpdateVolumeRequest {
+  string machine_id = 1;
+  Volume volume = 2;
+}
+
+message UpdateVolumeResponse {
 }
 
 message AttachNetworkInterfaceRequest {

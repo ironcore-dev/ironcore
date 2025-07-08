@@ -6,6 +6,7 @@ package validation
 import (
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/networking"
+
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -64,8 +65,8 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 			}
 
 			if peeringPrefix := prefix.Prefix; peeringPrefix != nil {
-				if !peeringPrefix.IsSingleIP() {
-					allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must be a single IP"))
+				if !peeringPrefix.IsValid() {
+					allErrs = append(allErrs, field.Forbidden(fldPath.Child("prefix"), "must be a valid IP range"))
 				}
 			}
 
