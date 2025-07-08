@@ -13,6 +13,7 @@ import (
 type ReservationSpec struct {
 	Pools     []corev1.LocalObjectReference `json:"pools"`
 	Resources corev1alpha1.ResourceList     `json:"resources,omitempty"`
+	// TODO we might want to add a weight to indicate preference/priority
 }
 
 // ReservationStatus defines the observed state of Reservation
