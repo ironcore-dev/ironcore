@@ -42,7 +42,8 @@ const (
 
 	controllerManagerService = "controller-manager"
 
-	fooAnnotation = "foo"
+	fooDownwardAPILabel = "custom-downward-api-label"
+	fooAnnotation       = "foo"
 )
 
 func TestControllers(t *testing.T) {

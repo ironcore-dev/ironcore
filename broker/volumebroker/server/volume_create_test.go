@@ -9,6 +9,7 @@ import (
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -49,6 +50,7 @@ var _ = Describe("CreateVolume", func() {
 
 		By("inspecting the ironcore volume")
 		Expect(ironcoreVolume.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, "root-volume-uid"): "foobar",
 			volumebrokerv1alpha1.CreatedLabel: "true",
 			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 		}))

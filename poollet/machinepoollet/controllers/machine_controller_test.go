@@ -14,8 +14,8 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -117,7 +117,7 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -135,7 +135,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -265,7 +265,7 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -283,7 +283,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -453,7 +453,7 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -466,7 +466,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),

@@ -9,8 +9,8 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	testingbucket "github.com/ironcore-dev/ironcore/iri/testing/bucket"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -66,7 +66,7 @@ var _ = Describe("BucketController", func() {
 		Expect(ironcoreclient.PatchAddReconcileAnnotation(ctx, k8sClient, bucket)).Should(Succeed())
 
 		By("Waiting for the ironcore bucket Status to be up-to-date")
-		expectedBucketID := poolletproviderid.MakeID(testingbucket.FakeRuntimeName, iriBucket.Metadata.Id)
+		expectedBucketID := poolletutils.MakeID(testingbucket.FakeRuntimeName, iriBucket.Metadata.Id)
 		Eventually(Object(bucket)).Should(SatisfyAll(
 			HaveField("Status.State", storagev1alpha1.BucketStateAvailable),
 			HaveField("Status.BucketID", expectedBucketID.String()),

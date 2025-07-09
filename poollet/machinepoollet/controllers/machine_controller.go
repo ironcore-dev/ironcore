@@ -21,13 +21,13 @@ import (
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -332,7 +332,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 }
 
 func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
-	annotations := map[string]string{
+	labels := map[string]string{
 		v1alpha1.MachineUIDLabel:       string(machine.UID),
 		v1alpha1.MachineNamespaceLabel: machine.Namespace,
 		v1alpha1.MachineNameLabel:      machine.Name,
@@ -344,9 +344,9 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
 		}
 
-		annotations[v1alpha1.DownwardAPILabel(name)] = value
+		labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, name)] = value
 	}
-	return annotations, nil
+	return labels, nil
 }
 
 func (r *MachineReconciler) iriMachineAnnotations(
@@ -371,7 +371,7 @@ func (r *MachineReconciler) iriMachineAnnotations(
 			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
 		}
 
-		annotations[v1alpha1.DownwardAPIAnnotation(name)] = value
+		annotations[poolletutils.DownwardAPIAnnotation(v1alpha1.MachineDownwardAPIPrefix, name)] = value
 	}
 
 	return annotations, nil
@@ -536,7 +536,7 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 		return err
 	}
 
-	machineID := poolletproviderid.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
+	machineID := poolletutils.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
 
 	state, err := r.convertIRIMachineState(iriMachine.Status.State)
 	if err != nil {

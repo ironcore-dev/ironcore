@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
-package poollet
+package utils
 
 import (
 	"fmt"
@@ -39,4 +39,14 @@ func (i *ID) String() string {
 func ParseID(s string) (ID, error) {
 	var id ID
 	return id, id.UnmarshalText([]byte(s))
+}
+
+// DownwardAPILabel makes a downward api label name from the given name.
+func DownwardAPILabel(label_prefix, name string) string {
+	return label_prefix + name
+}
+
+// DownwardAPIAnnotation makes a downward api annotation name from the given name.
+func DownwardAPIAnnotation(annotation_prefix, name string) string {
+	return annotation_prefix + name
 }

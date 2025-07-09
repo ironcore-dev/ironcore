@@ -10,4 +10,6 @@ const (
 
 	FieldOwner      = "volumepoollet.ironcore.dev/field-owner"
 	VolumeFinalizer = "volumepoollet.ironcore.dev/volume"
+
+	VolumeDownwardAPIPrefix = "downward-api.volumepoollet.ironcore.dev/"
 )

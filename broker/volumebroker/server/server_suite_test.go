@@ -17,6 +17,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -140,6 +141,9 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		DeferCleanup(k8sClient.Delete, volumePool)
 
 		newSrv, err := server.New(cfg, server.Options{
+			BrokerDownwardAPILabels: map[string]string{
+				"root-volume-uid": volumepoolletv1alpha1.VolumeUIDLabel,
+			},
 			Namespace:      ns.Name,
 			VolumePoolName: volumePool.Name,
 			VolumePoolSelector: map[string]string{

@@ -9,6 +9,7 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -47,9 +48,9 @@ var _ = Describe("CreateMachine", func() {
 
 		By("inspecting the ironcore machine")
 		Expect(ironcoreMachine.Labels).To(Equal(map[string]string{
-			machinepoolletv1alpha1.DownwardAPILabel("root-machine-uid"): "foobar",
-			machinebrokerv1alpha1.CreatedLabel:                          "true",
-			machinebrokerv1alpha1.ManagerLabel:                          machinebrokerv1alpha1.MachineBrokerManager,
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-machine-uid"): "foobar",
+			machinebrokerv1alpha1.CreatedLabel: "true",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())

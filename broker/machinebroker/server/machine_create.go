@@ -13,8 +13,11 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -53,12 +56,12 @@ func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) map[string]s
 	labels := make(map[string]string)
 
 	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
-		value := machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)]
+		value := machine.GetMetadata().GetLabels()[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)]
 		if value == "" {
 			value = machine.GetMetadata().GetLabels()[defaultLabelName]
 		}
 		if value != "" {
-			labels[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)] = value
+			labels[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)] = value
 		}
 	}
 

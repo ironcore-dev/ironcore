@@ -20,7 +20,7 @@ import (
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -441,7 +441,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 	base := bucket.DeepCopy()
 	now := metav1.Now()
 
-	bucketID := poolletproviderid.MakeID(r.BucketRuntimeName, iriBucket.Metadata.Id)
+	bucketID := poolletutils.MakeID(r.BucketRuntimeName, iriBucket.Metadata.Id)
 
 	bucket.Status.Access = access
 	newState, err := r.convertIRIBucketState(iriBucket.Status.State)
