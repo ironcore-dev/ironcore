@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,18 +51,28 @@ type BucketReconciler struct {
 
 	BucketClassMapper bcm.BucketClassMapper
 
+	DownwardAPILabels      map[string]string
+	DownwardAPIAnnotations map[string]string
+
 	BucketPoolName   string
 	WatchFilterValue string
 
 	MaxConcurrentReconciles int
 }
 
-func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) map[string]string {
-	return map[string]string{
+func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) (map[string]string, error) {
+	labels := map[string]string{
 		bucketpoolletv1alpha1.BucketUIDLabel:       string(bucket.UID),
 		bucketpoolletv1alpha1.BucketNamespaceLabel: bucket.Namespace,
 		bucketpoolletv1alpha1.BucketNameLabel:      bucket.Name,
 	}
+	for downwardAPILabelName, fieldPath := range r.DownwardAPILabels {
+		value, err := fieldpath.ExtractFieldPathAsString(bucket, fieldPath)
+		if err == nil && value != "" {
+			labels[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)] = value
+		}
+	}
+	return labels, nil
 }
 
 func (r *BucketReconciler) iriBucketAnnotations(_ *storagev1alpha1.Bucket) map[string]string {
@@ -226,11 +237,15 @@ func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) *ir
 	}
 }
 
-func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket) *irimeta.ObjectMetadata {
-	return &irimeta.ObjectMetadata{
-		Labels:      r.iriBucketLabels(bucket),
-		Annotations: r.iriBucketAnnotations(bucket),
+func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket, errs []error) (*irimeta.ObjectMetadata, []error) {
+	labels, err := r.iriBucketLabels(bucket)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error preparing iri bucket labels: %w", err))
 	}
+	return &irimeta.ObjectMetadata{
+		Labels:      labels,
+		Annotations: r.iriBucketAnnotations(bucket),
+	}, errs
 }
 
 func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *storagev1alpha1.Bucket, bucketClassName string) (string, bool, error) {
@@ -270,7 +285,7 @@ func (r *BucketReconciler) prepareIRIBucket(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
-	metadata := r.prepareIRIBucketMetadata(bucket)
+	metadata, errs := r.prepareIRIBucketMetadata(bucket, errs)
 
 	if len(errs) > 0 {
 		return nil, false, fmt.Errorf("error(s) preparing iri bucket: %v", errs)

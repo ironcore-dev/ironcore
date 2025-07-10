@@ -74,7 +74,9 @@ var _ = Describe("BucketEventMapper", func() {
 			BucketRuntimeName: fakebucket.FakeRuntimeName,
 			BucketClassMapper: bucketClassMapper,
 			BucketPoolName:    bp.Name,
-		}).SetupWithManager(k8sManager)).To(Succeed())
+			DownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			}}).SetupWithManager(k8sManager)).To(Succeed())
 
 		mgrCtx, cancel := context.WithCancel(context.Background())
 		DeferCleanup(cancel)

@@ -245,7 +245,7 @@ func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) *ir
 func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume, errs []error) (*irimeta.ObjectMetadata, []error) {
 	labels, err := r.iriVolumeLabels(volume)
 	if err != nil {
-		errs = append(errs, fmt.Errorf("error preparing iri machine labels: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri volume labels: %w", err))
 	}
 	return &irimeta.ObjectMetadata{
 		Labels:      labels,
