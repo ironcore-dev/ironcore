@@ -10,6 +10,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -46,6 +47,7 @@ var _ = Describe("CreateBucket", func() {
 
 		By("inspecting the ironcore bucket")
 		Expect(ironcoreBucket.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, "root-bucket-uid"): "foobar",
 			bucketbrokerv1alpha1.CreatedLabel: "true",
 			bucketbrokerv1alpha1.ManagerLabel: bucketbrokerv1alpha1.BucketBrokerManager,
 		}))

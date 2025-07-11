@@ -24,8 +24,9 @@ import (
 )
 
 type Options struct {
-	GetConfigOptions config.GetConfigOptions
-	Address          string
+	GetConfigOptions        config.GetConfigOptions
+	Address                 string
+	BrokerDownwardAPILabels map[string]string
 
 	QPS   float32
 	Burst int
@@ -38,6 +39,8 @@ type Options struct {
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-bucketbroker.sock", "Address to listen on.")
+	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API."+
+		"Example: broker 'root-bucket-uid' from 'bucketpoollet.ironcore.dev/bucket-uid'.")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the target bucket pool to pin buckets to, if any.")
@@ -86,9 +89,10 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	srv, err := server.New(cfg, server.Options{
-		Namespace:          opts.Namespace,
-		BucketPoolName:     opts.BucketPoolName,
-		BucketPoolSelector: opts.BucketPoolSelector,
+		BrokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		Namespace:               opts.Namespace,
+		BucketPoolName:          opts.BucketPoolName,
+		BucketPoolSelector:      opts.BucketPoolSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating server: %w", err)

@@ -41,6 +41,9 @@ const (
 	apiServiceTimeout = 5 * time.Minute
 
 	controllerManagerService = "controller-manager"
+
+	fooDownwardAPILabel = "custom-downward-api-label"
+	fooAnnotation       = "foo"
 )
 
 func TestControllers(t *testing.T) {

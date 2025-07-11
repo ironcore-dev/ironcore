@@ -32,6 +32,9 @@ spec:
           args:
             - --health-probe-bind-address=:8081
             - --leader-elect
+            - --bucket-downward-api-label=root-bucket-namespace=metadata.labels['downward-api.bucketpoollet.ironcore.dev/root-bucket-namespace']
+            - --bucket-downward-api-label=root-bucket-name=metadata.labels['downward-api.bucketpoollet.ironcore.dev/root-bucket-name']
+            - --bucket-downward-api-label=root-bucket-uid=metadata.labels['downward-api.bucketpoollet.ironcore.dev/root-bucket-uid']
           image: bucketpoollet:latest
           name: manager
           securityContext:
@@ -62,6 +65,10 @@ spec:
             - /bucketbroker
           image: bucketbroker:latest
           name: broker
+          args:
+            - --broker-downward-api-label=root-bucket-namespace=bucketpoollet.ironcore.dev/root-bucket-namespace
+            - --broker-downward-api-label=root-bucket-name=bucketpoollet.ironcore.dev/root-bucket-name
+            - --broker-downward-api-label=root-bucket-uid=bucketpoollet.ironcore.dev/root-bucket-uid
           securityContext:
             allowPrivilegeEscalation: false
           livenessProbe:

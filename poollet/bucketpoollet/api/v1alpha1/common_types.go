@@ -10,4 +10,7 @@ const (
 
 	FieldOwner      = "bucketpoollet.ironcore.dev/field-owner"
 	BucketFinalizer = "bucketpoollet.ironcore.dev/bucket"
+
+	// DownwardAPIPrefix is the prefix for any downward label.
+	BucketDownwardAPIPrefix = "downward-api.bucketpoollet.ironcore.dev/"
 )

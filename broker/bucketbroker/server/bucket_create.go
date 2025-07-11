@@ -12,6 +12,9 @@ import (
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -22,6 +25,22 @@ type AggregateIronCoreBucket struct {
 	AccessSecret *corev1.Secret
 }
 
+func (s *Server) prepareIronCoreBucketLabels(bucket *iri.Bucket) map[string]string {
+	labels := make(map[string]string)
+
+	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
+		value := bucket.GetMetadata().GetLabels()[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)]
+		if value == "" {
+			value = bucket.GetMetadata().GetLabels()[defaultLabelName]
+		}
+		if value != "" {
+			labels[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)] = value
+		}
+	}
+
+	return labels
+}
+
 func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) (*AggregateIronCoreBucket, error) {
 	var bucketPoolRef *corev1.LocalObjectReference
 	if s.bucketPoolName != "" {
@@ -29,10 +48,14 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 			Name: s.bucketPoolName,
 		}
 	}
+	labels := s.prepareIronCoreBucketLabels(bucket)
 	ironcoreBucket := &storagev1alpha1.Bucket{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.generateID(),
+			Labels: maps.AppendMap(labels, map[string]string{
+				bucketbrokerv1alpha1.ManagerLabel: bucketbrokerv1alpha1.BucketBrokerManager,
+			}),
 		},
 		Spec: storagev1alpha1.BucketSpec{
 			BucketClassRef:     &corev1.LocalObjectReference{Name: bucket.Spec.Class},
@@ -43,7 +66,6 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 	if err := apiutils.SetObjectMetadata(ironcoreBucket, bucket.Metadata); err != nil {
 		return nil, err
 	}
-	apiutils.SetBucketManagerLabel(ironcoreBucket, bucketbrokerv1alpha1.BucketBrokerManager)
 
 	return &AggregateIronCoreBucket{
 		Bucket: ironcoreBucket,

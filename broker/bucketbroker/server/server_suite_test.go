@@ -16,6 +16,7 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/server"
+	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	. "github.com/onsi/ginkgo/v2"
@@ -137,6 +138,9 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *server.Server
 			BucketPoolName: bucketPool.Name,
 			BucketPoolSelector: map[string]string{
 				"pool": "test-pool",
+			},
+			BrokerDownwardAPILabels: map[string]string{
+				"root-bucket-uid": bucketpoolletv1alpha1.BucketUIDLabel,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())

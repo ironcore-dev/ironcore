@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/ironcore-dev/controller-utils/metautils"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -126,10 +125,6 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	}
 
 	return annotations, nil
-}
-
-func SetBucketManagerLabel(bucket *storagev1alpha1.Bucket, manager string) {
-	metautils.SetLabel(bucket, bucketbrokerv1alpha1.ManagerLabel, manager)
 }
 
 func IsManagedBy(o metav1.Object, manager string) bool {
