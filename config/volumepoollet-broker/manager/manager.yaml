@@ -66,9 +66,9 @@ spec:
           image: volumebroker:latest
           name: broker
           args:
-            - --broker-downward-api-label=root-volume-namespace=metadata.labels['downward-api.volumepoollet.ironcore.dev/root-volume-namespace']
-            - --broker-downward-api-label=root-volume-name=metadata.labels['downward-api.volumepoollet.ironcore.dev/root-volume-name']
-            - --broker-downward-api-label=root-volume-uid=metadata.labels['downward-api.volumepoollet.ironcore.dev/root-volume-uid']
+            - --broker-downward-api-label=root-volume-namespace=volumepoollet.ironcore.dev/root-volume-namespace
+            - --broker-downward-api-label=root-volume-name=volumepoollet.ironcore.dev/root-volume-name
+            - --broker-downward-api-label=root-volume-uid=volumepoollet.ironcore.dev/root-volume-uid
           securityContext:
             allowPrivilegeEscalation: false
           livenessProbe:
