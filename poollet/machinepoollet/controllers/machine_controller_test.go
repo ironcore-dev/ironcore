@@ -44,6 +44,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -59,6 +60,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -108,6 +110,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
@@ -185,6 +188,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -205,6 +209,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, nic)
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -215,6 +220,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -257,6 +263,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
@@ -342,6 +349,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the machine to be created")
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
@@ -372,6 +380,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the machine to be created")
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
@@ -424,6 +433,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("By getting ephimeral volume")
 		volumeKey := types.NamespacedName{
@@ -499,6 +509,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -519,6 +530,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -529,6 +541,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -547,6 +560,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, secondaryVolume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the secondary volume to be available")
 		Eventually(UpdateStatus(secondaryVolume, func() {
@@ -595,6 +609,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
@@ -650,6 +665,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -684,6 +700,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine with volume")
 		Eventually(srv).Should(SatisfyAll(
