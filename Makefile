@@ -82,7 +82,7 @@ manifests: controller-gen ## Generate ClusterRole and CustomResourceDefinition o
 	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
 
 .PHONY: generate
-generate: vgopath models-schema openapi-gen
+generate: vgopath models-schema openapi-gen proto
 	VGOPATH=$(VGOPATH) \
 	MODELS_SCHEMA=$(MODELS_SCHEMA) \
 	OPENAPI_GEN=$(OPENAPI_GEN) \
