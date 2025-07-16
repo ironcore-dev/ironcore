@@ -136,6 +136,7 @@ enum MachineState {
   MACHINE_SUSPENDED = 2;
   MACHINE_TERMINATED = 3;
   MACHINE_TERMINATING = 4;
+  MACHINE_STOPPED = 5;
 }
 
 message MachineClass {
