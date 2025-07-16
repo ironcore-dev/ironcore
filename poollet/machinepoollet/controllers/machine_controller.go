@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -30,11 +31,9 @@ import (
 	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -68,14 +67,8 @@ type MachineReconciler struct {
 
 func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
 	return map[string]string{
-		v1alpha1.MachineNamespaceLabel: machineKey.Namespace,
-		v1alpha1.MachineNameLabel:      machineKey.Name,
-	}
-}
-
-func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
-	return map[string]string{
-		v1alpha1.MachineUIDLabel: string(machineUID),
+		poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, "root-machine-namespace"): machineKey.Namespace,
+		poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, "root-machine-name"):      machineKey.Name,
 	}
 }
 
@@ -103,8 +96,17 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
+	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
+	machineUID := machine.Labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)]
+	if machineUID == "" {
+		machineUID = string(machine.GetUID())
+		labelKey = v1alpha1.MachineUIDLabel
+	}
+	labels := map[string]string{
+		labelKey: machineUID,
+	}
 	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
+		Filter: &iri.MachineFilter{LabelSelector: labels},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
@@ -214,7 +216,16 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Deleting machines by UID")
-	ok, err := r.deleteMachinesByMachineUID(ctx, log, machine.UID)
+	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
+	machineUID := machine.Labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)]
+	if machineUID == "" {
+		machineUID = string(machine.GetUID())
+		labelKey = v1alpha1.MachineUIDLabel
+	}
+	labels := map[string]string{
+		labelKey: machineUID,
+	}
+	ok, err := r.deleteMachinesByMachineUID(ctx, log, labels)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
 	}
@@ -232,13 +243,11 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
+func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, labels map[string]string) (bool, error) {
 	log.V(1).Info("Listing machines")
 	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
 		Filter: &iri.MachineFilter{
-			LabelSelector: map[string]string{
-				v1alpha1.MachineUIDLabel: string(machineUID),
-			},
+			LabelSelector: labels,
 		},
 	})
 	if err != nil {
