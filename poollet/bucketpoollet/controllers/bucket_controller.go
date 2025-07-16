@@ -5,8 +5,6 @@ package controllers
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -388,11 +386,6 @@ func (r *BucketReconciler) create(ctx context.Context, log logr.Logger, bucket *
 	return ctrl.Result{}, nil
 }
 
-func (r *BucketReconciler) bucketSecretName(bucketName string) string {
-	sum := sha256.Sum256([]byte(bucketName))
-	return hex.EncodeToString(sum[:])[:63]
-}
-
 var iriBucketStateToBucketState = map[iri.BucketState]storagev1alpha1.BucketState{
 	iri.BucketState_BUCKET_PENDING:   storagev1alpha1.BucketStatePending,
 	iri.BucketState_BUCKET_AVAILABLE: storagev1alpha1.BucketStateAvailable,
@@ -422,7 +415,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: bucket.Namespace,
-						Name:      r.bucketSecretName(bucket.Name),
+						Name:      string(bucket.UID),
 						Labels: map[string]string{
 							bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 						},
