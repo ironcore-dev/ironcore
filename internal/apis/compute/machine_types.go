@@ -112,7 +112,7 @@ type EmptyDiskVolumeSource struct {
 	SizeLimit *resource.Quantity
 }
 
-// NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.
+// NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.
 type NetworkInterfaceStatus struct {
 	// Name is the name of the NetworkInterface to whom the status belongs to.
 	Name string

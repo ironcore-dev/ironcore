@@ -244,7 +244,7 @@ github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference
 </em>
 </td>
 <td>
-<p>Destinations are the destinations for an LoadBalancer.</p>
+<p>Destinations are the destinations for a LoadBalancer.</p>
 </td>
 </tr>
 </tbody>
