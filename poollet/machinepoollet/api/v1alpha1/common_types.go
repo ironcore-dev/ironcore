@@ -16,6 +16,10 @@ const (
 	MachineNameLabel          = "machinepoollet.ironcore.dev/machine-name"
 	RootMachineUIDLabelSuffix = "root-machine-uid"
 
+	NetworkInterfaceUIDLabel       = "machinepoollet.ironcore.dev/nic-uid"
+	NetworkInterfaceNamespaceLabel = "machinepoollet.ironcore.dev/nic-namespace"
+	NetworkInterfaceNameLabel      = "machinepoollet.ironcore.dev/nic-name"
+
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
 	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
 

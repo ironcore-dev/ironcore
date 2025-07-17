@@ -137,6 +137,7 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
 				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
+				"root-nic-uid":     machinepoolletv1alpha1.NetworkInterfaceUIDLabel,
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())

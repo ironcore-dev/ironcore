@@ -15,6 +15,9 @@ import (
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -27,19 +30,36 @@ type IronCoreNetworkInterfaceConfig struct {
 	NetworkID  string
 	IPs        []commonv1alpha1.IP
 	Attributes map[string]string
+	Labels     map[string]string
 }
 
-func (s *Server) getIronCoreNetworkInterfaceConfig(nic *iri.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
-	ips, err := s.parseIPs(nic.Ips)
+func (s *Server) prepareIronCoreNetworkInterfaceLabels(networkinterface *iri.NetworkInterface) map[string]string {
+	labels := make(map[string]string)
+
+	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
+		value := networkinterface.GetLabels()[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)]
+		if value == "" {
+			value = networkinterface.GetLabels()[defaultLabelName]
+		}
+		if value != "" {
+			labels[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)] = value
+		}
+	}
+
+	return labels
+}
+func (s *Server) getIronCoreNetworkInterfaceConfig(iriNIC *iri.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
+	ips, err := s.parseIPs(iriNIC.Ips)
 	if err != nil {
 		return nil, err
 	}
-
+	labels := s.prepareIronCoreNetworkInterfaceLabels(iriNIC)
 	return &IronCoreNetworkInterfaceConfig{
-		Name:       nic.Name,
-		NetworkID:  nic.NetworkId,
+		Name:       iriNIC.Name,
+		NetworkID:  iriNIC.NetworkId,
 		IPs:        ips,
-		Attributes: nic.Attributes,
+		Attributes: iriNIC.Attributes,
+		Labels:     labels,
 	}, nil
 }
 
@@ -63,9 +83,9 @@ func (s *Server) createIronCoreNetworkInterface(
 			Annotations: map[string]string{
 				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 			},
-			Labels: map[string]string{
+			Labels: maps.AppendMap(cfg.Labels, map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-			},
+			}),
 			OwnerReferences: s.optionalOwnerReferences(ironcoreMachineGVK, optIronCoreMachine),
 		},
 		Spec: networkingv1alpha1.NetworkInterfaceSpec{
