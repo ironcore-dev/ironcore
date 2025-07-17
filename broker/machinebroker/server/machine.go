@@ -48,6 +48,17 @@ func (s *Server) convertIronCoreMachineState(state computev1alpha1.MachineState)
 	return 0, fmt.Errorf("unknown ironcore machine state %q", state)
 }
 
+func (s *Server) convertIronCorePowerState(power computev1alpha1.Power) (iri.Power, error) {
+	switch power {
+	case computev1alpha1.PowerOn:
+		return iri.Power_POWER_ON, nil
+	case computev1alpha1.PowerOff:
+		return iri.Power_POWER_OFF, nil
+	default:
+		return 0, fmt.Errorf("unknown power state: %q", power)
+	}
+}
+
 var ironcoreNetworkInterfaceStateToNetworkInterfaceAttachmentState = map[computev1alpha1.NetworkInterfaceState]iri.NetworkInterfaceState{
 	computev1alpha1.NetworkInterfaceStatePending:  iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING,
 	computev1alpha1.NetworkInterfaceStateAttached: iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED,
@@ -179,6 +190,11 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 		ignitionData = ignitionSecret.Data[computev1alpha1.DefaultIgnitionKey]
 	}
 
+	power, err := s.convertIronCorePowerState(aggIronCoreMachine.Machine.Spec.Power)
+	if err != nil {
+		return nil, fmt.Errorf("error converting power state: %w", err)
+	}
+
 	var imageSpec *iri.ImageSpec
 	if image := aggIronCoreMachine.Machine.Spec.Image; image != "" {
 		imageSpec = &iri.ImageSpec{
@@ -236,6 +252,7 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 	return &iri.Machine{
 		Metadata: metadata,
 		Spec: &iri.MachineSpec{
+			Power:             power,
 			Image:             imageSpec,
 			Class:             aggIronCoreMachine.Machine.Spec.MachineClassRef.Name,
 			IgnitionData:      ignitionData,
