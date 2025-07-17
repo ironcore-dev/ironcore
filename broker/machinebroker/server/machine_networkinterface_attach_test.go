@@ -7,7 +7,10 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -42,6 +45,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				Labels: map[string]string{
+					machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -66,6 +72,11 @@ var _ = Describe("AttachNetworkInterface", func() {
 		nicKey := client.ObjectKey{Namespace: ns.Name, Name: nicName}
 		Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 
+		By("inspecting the ironcore network interface")
+		Expect(nic.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"): "foobar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 		By("inspecting the ironcore network interface")
 		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
