@@ -5,7 +5,7 @@ The `exec` feature allows accessing the serial console of a
 The following parties are involved in implementing `exec`:
 
 * `ironcore-apiserver`
-* `machinepollet`
+* `machinepoollet`
 * `iri-machine` implementor
 
 The connection flow between those components looks like the following:

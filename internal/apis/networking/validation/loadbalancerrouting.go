@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// ValidateLoadBalancerRouting validates an LoadBalancerRouting object.
+// ValidateLoadBalancerRouting validates a LoadBalancerRouting object.
 func ValidateLoadBalancerRouting(loadBalancerRouting *networking.LoadBalancerRouting) field.ErrorList {
 	var allErrs field.ErrorList
 

@@ -11374,7 +11374,7 @@
 						"type": "string"
 					},
 					"destinations": {
-						"description": "Destinations are the destinations for an LoadBalancer.",
+						"description": "Destinations are the destinations for a LoadBalancer.",
 						"type": "array",
 						"items": {
 							"default": {},

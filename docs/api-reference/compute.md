@@ -1380,7 +1380,7 @@ NetworkInterface to use.</p>
 (<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus</a>)
 </p>
 <div>
-<p>NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.</p>
+<p>NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.</p>
 </div>
 <table>
 <thead>

@@ -20,7 +20,7 @@ import (
 var _ = Describe("machineclass controller", func() {
 	ns := SetupNamespace(&k8sClient)
 
-	It("removes the finalizer from machineclass only if there's no machine still using the machineclass", func(ctx SpecContext) {
+	It("should remove the finalizer from machineclass only if there's no machine still using the machineclass", func(ctx SpecContext) {
 		By("creating the machineclass consumed by the machine")
 		machineClass := &computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{

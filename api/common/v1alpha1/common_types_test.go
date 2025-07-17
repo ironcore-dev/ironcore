@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("TolerateTaints", func() {
-	It("returns true upon empty taints", func() {
+	It("should return true upon empty taints", func() {
 		Expect(TolerateTaints(nil, nil)).To(BeTrue(), "expected empty tolerations tolerate empty taints")
 
 		tolerations := []Toleration{
@@ -22,7 +22,7 @@ var _ = Describe("TolerateTaints", func() {
 		Expect(TolerateTaints(tolerations, nil)).To(BeTrue(), "expected non-empty tolerations tolerate empty taints")
 	})
 
-	It("returns false upon empty tolerations and non-empty taints", func() {
+	It("should return false upon empty tolerations and non-empty taints", func() {
 		taints := []Taint{
 			{
 				Key:    "key",
@@ -32,7 +32,7 @@ var _ = Describe("TolerateTaints", func() {
 		Expect(TolerateTaints(nil, taints)).To(BeFalse(), "expected empty tolerations don't tolerate non-empty taints")
 	})
 
-	It("returns false when tolerations don't cover all taints", func() {
+	It("should return false when tolerations don't cover all taints", func() {
 		tolerations := []Toleration{
 			{
 				Key:      "key",
@@ -54,7 +54,7 @@ var _ = Describe("TolerateTaints", func() {
 		Expect(TolerateTaints(tolerations, taints)).To(BeFalse(), "expected the tolerations don't cover all the taints")
 	})
 
-	It("returns false when tolerations cover all taints", func() {
+	It("should return false when tolerations cover all taints", func() {
 		tolerations := []Toleration{
 			{
 				Key:      "key",
