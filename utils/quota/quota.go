@@ -32,6 +32,21 @@ func Equals(a corev1alpha1.ResourceList, b corev1alpha1.ResourceList) bool {
 	return true
 }
 
+// Contains returns true if first list contains all of second list
+func Contains(a corev1alpha1.ResourceList, b corev1alpha1.ResourceList) bool {
+	for key, value1 := range b {
+		value2, found := a[key]
+		if !found {
+			return false
+		}
+		if value1.Cmp(value2) != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
 // LessThanOrEqual returns true if a < b for each key in b
 // If false, it returns the keys in a that exceeded b
 func LessThanOrEqual(a corev1alpha1.ResourceList, b corev1alpha1.ResourceList) (bool, sets.Set[corev1alpha1.ResourceName]) {

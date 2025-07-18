@@ -111,6 +111,7 @@ var _ = Describe("MachineEventMapper", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
