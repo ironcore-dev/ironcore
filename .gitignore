@@ -29,4 +29,5 @@ dev/
 charts/
 apiserver.local.config/
 default.etcd/
+.DS_Store
 
