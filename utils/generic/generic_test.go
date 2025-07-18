@@ -33,7 +33,7 @@ var _ = Describe("Generic", func() {
 	})
 
 	Describe("DerefFunc", func() {
-		It("return the value if the pointer is non-nil", func() {
+		It("should return the value if the pointer is non-nil", func() {
 			Expect(DerefFunc(Pointer(42), func() int {
 				Fail("should not be called")
 				return 0
@@ -46,7 +46,7 @@ var _ = Describe("Generic", func() {
 	})
 
 	Describe("Deref", func() {
-		It("return the value if the pointer is non-nil", func() {
+		It("should return the value if the pointer is non-nil", func() {
 			Expect(Deref(Pointer(42), 0)).To(Equal(42))
 		})
 

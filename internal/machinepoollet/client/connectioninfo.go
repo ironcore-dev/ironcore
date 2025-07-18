@@ -54,7 +54,7 @@ type MachinePoolConnectionInfoGetter struct {
 	defaultPort int
 	// transport is the transport to use to send a request to all machinepoollets.
 	transport http.RoundTripper
-	// insecureSkipTLSVerifyTransport is the transport to use if the kube-apiserver wants to skip verifying the TLS certificate of the machinepoolllet
+	// insecureSkipTLSVerifyTransport is the transport to use if the kube-apiserver wants to skip verifying the TLS certificate of the machinepoollet
 	insecureSkipTLSVerifyTransport http.RoundTripper
 	// preferredAddressTypes specifies the preferred order to use to find a node address
 	preferredAddressTypes []computev1alpha1.MachinePoolAddressType
