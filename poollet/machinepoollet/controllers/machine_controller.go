@@ -97,10 +97,9 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
 	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
-	machineUID := machine.Labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)]
+	machineUID := machine.Labels[labelKey]
 	if machineUID == "" {
 		machineUID = string(machine.GetUID())
-		labelKey = v1alpha1.MachineUIDLabel
 	}
 	labels := map[string]string{
 		labelKey: machineUID,
@@ -217,10 +216,9 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 
 	log.V(1).Info("Deleting machines by UID")
 	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
-	machineUID := machine.Labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)]
+	machineUID := machine.Labels[labelKey]
 	if machineUID == "" {
 		machineUID = string(machine.GetUID())
-		labelKey = v1alpha1.MachineUIDLabel
 	}
 	labels := map[string]string{
 		labelKey: machineUID,

@@ -21,6 +21,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/testing/machine"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
@@ -28,8 +29,7 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	"github.com/ironcore-dev/ironcore/utils/envtest/controllermanager"
 	"github.com/ironcore-dev/ironcore/utils/envtest/process"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,10 +41,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var (
@@ -231,7 +234,8 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
 			DownwardAPILabels: map[string]string{
-				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+				fooDownwardAPILabel:                fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+				v1alpha1.RootMachineUIDLabelSuffix: "metadata.uid",
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
