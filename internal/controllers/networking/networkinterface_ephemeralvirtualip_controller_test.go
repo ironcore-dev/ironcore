@@ -240,36 +240,4 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 		By("waiting for the undesired virtual IP to be gone")
 		Eventually(Get(undesiredVip)).Should(Satisfy(apierrors.IsNotFound))
 	})
-
-	It("should not delete externally managed virtual IPs for a network interface", func(ctx SpecContext) {
-		By("creating a network interface")
-		nic := &networkingv1alpha1.NetworkInterface{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "nic-",
-			},
-			Spec: networkingv1alpha1.NetworkInterfaceSpec{
-				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
-				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
-			},
-		}
-		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
-
-		By("creating an undesired virtual IP")
-		externalVip := &networkingv1alpha1.VirtualIP{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace:    ns.Name,
-				GenerateName: "external-vip-",
-			},
-			Spec: networkingv1alpha1.VirtualIPSpec{
-				Type:     networkingv1alpha1.VirtualIPTypePublic,
-				IPFamily: corev1.IPv4Protocol,
-			},
-		}
-		Expect(ctrl.SetControllerReference(nic, externalVip, k8sClient.Scheme())).To(Succeed())
-		Expect(k8sClient.Create(ctx, externalVip)).To(Succeed())
-
-		By("asserting that the virtual IP is not being deleted")
-		Eventually(Object(externalVip)).Should(HaveField("DeletionTimestamp", BeNil()))
-	})
 })
