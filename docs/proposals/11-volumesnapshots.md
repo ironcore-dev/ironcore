@@ -80,14 +80,18 @@ spec:
   volumeRef:
     name: example-volume
 status:
-  phase: Pending/Processing/Ready/Failed/Deleting
+  state: Pending/Processing/Ready/Failed/Deleting
   restoreSize: 10Gi
 ```  
 
 #### Fields:
 
 - `volumeRef`: Reference to the `Volume` to be snapshot. The `VolumeSnapshot` and `Volume` should be in the same namespace.
-- `status.phase`: The current phase of the snapshot. It can be `Pending`, `Processing`, `Ready`, `Failed`, or `Deleting`.
+- `status.state`: The current phase of the snapshot. It can be `Pending`, `Processing`, `Ready`, `Failed`, or `Deleting`.
+  - `Pending`: The snapshot resource has been created, but the snapshot has not yet been initiated.
+  - `Processing`: The snapshot is being processed by the storage provider.
+  - `Ready`: The snapshot has been successfully created and is ready for use.
+  - `Failed`: The snapshot creation has failed.
 - `status.restoreSize`: The size of the data in the snapshot. This will be populated by the system once the snapshot is ready.
 
 ### `VolumeSnapshotContent` Resource
@@ -100,7 +104,6 @@ kind: VolumeSnapshotContent
 metadata:
   name: example-volumesnapshotcontent
 spec:
-  deletionPolicy: Delete
   source:
     snapshotHandle: 1334353-234234-45435435 # Unique identifier for the snapshot in the storage provider
   volumeSnapshotRef:
@@ -148,6 +151,8 @@ enhanced to include methods for:
 - Creating a `VolumeSnapshot` from a `Volume`.
 - Deleting a `VolumeSnapshot` and its associated `VolumeSnapshotContent`.
 - Restoring a `Volume` from a `VolumeSnapshot`.
+- List all `VolumeSnapshotContent` resources managed by the volume provider.
+- Delete a `VolumeSnapshotContent` resource.
 
 ```protobuf
 service VolumeRuntime {
@@ -161,6 +166,11 @@ service VolumeRuntime {
   rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
   // ListSnapshots will be used to list all snapshots managed by the volume provider
   rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
+  
+  // ListSnapshotContents will be used to list all VolumeSnapshotContent resources managed by the volume provider.
+  rpc ListSnapshotContents(ListSnapshotContentsRequest) returns (ListSnapshotContentsResponse) {};
+  // DeleteSnapshotContent will be used to delete a VolumeSnapshotContent resource.
+  rpc DeleteSnapshotContent(DeleteSnapshotContentRequest) returns (DeleteSnapshotContentResponse) {};
 }
 ```
 
