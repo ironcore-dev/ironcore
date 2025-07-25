@@ -21,6 +21,10 @@ Resource Types:
 <a href="#storage.ironcore.dev/v1alpha1.VolumeClass">VolumeClass</a>
 </li><li>
 <a href="#storage.ironcore.dev/v1alpha1.VolumePool">VolumePool</a>
+</li><li>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshot">VolumeSnapshot</a>
+</li><li>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent</a>
 </li></ul>
 <h3 id="storage.ironcore.dev/v1alpha1.Bucket">Bucket
 </h3>
@@ -491,6 +495,20 @@ VolumeEncryption
 <p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>dataSource</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
+VolumeDataSource
+</a>
+</em>
+</td>
+<td>
+<p>DataSource is an optional field which provides information regarding
+the snapshot to be used as the source for the volume restoration</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -676,6 +694,182 @@ VolumePoolStatus
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshot">VolumeSnapshot
+</h3>
+<div>
+<p>VolumeSnapshot is the Schema for the VolumeSnapshots API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>VolumeSnapshot</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotSpec">
+VolumeSnapshotSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>volumeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeRef indicates which Volume to refer for VolumeSnapshot</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotStatus">
+VolumeSnapshotStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent
+</h3>
+<div>
+<p>VolumeSnapshotContent is the Schema for the volumepools API</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code><br/>
+string</td>
+<td>
+<code>
+storage.ironcore.dev/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+string
+</td>
+<td><code>VolumeSnapshotContent</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">
+VolumeSnapshotContentSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>source</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">
+VolumeSnapshotContentSource
+</a>
+</em>
+</td>
+<td>
+<p>Source defines the VolumeSnapshot handle</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeSnapshotRef</code><br/>
+<em>
+<a href="../common/#common.ironcore.dev/v1alpha1.UIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to
+An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
@@ -1391,6 +1585,57 @@ Kubernetes meta/v1.Time
 <div>
 <p>VolumeConditionType is a type a VolumeCondition can have.</p>
 </div>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeDataSource">VolumeDataSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSpec">VolumeSpec</a>)
+</p>
+<div>
+<p>VolumeDataSource represents the source for volume</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiGroup</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>APIGroup is the group for the resource being referenced</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is the type of resource being referenced</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of resource being referenced</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="storage.ironcore.dev/v1alpha1.VolumeEncryption">VolumeEncryption
 </h3>
 <p>
@@ -1667,6 +1912,187 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">VolumeSnapshotContentSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">VolumeSnapshotContentSpec</a>)
+</p>
+<div>
+<p>VolumeSnapshotContentSource contains VolumeSnapshotHandle of the snapshot</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>snapshotHandle</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>VolumeSnapshotHandle is a unique identifier for the snapshot in the storage provider</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">VolumeSnapshotContentSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent</a>)
+</p>
+<div>
+<p>VolumeSnapshotContentSpec defines the desired state of VolumeSnapshotContent</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>source</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">
+VolumeSnapshotContentSource
+</a>
+</em>
+</td>
+<td>
+<p>Source defines the VolumeSnapshot handle</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeSnapshotRef</code><br/>
+<em>
+<a href="../common/#common.ironcore.dev/v1alpha1.UIDReference">
+github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to
+An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotSpec">VolumeSnapshotSpec
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshot">VolumeSnapshot</a>)
+</p>
+<div>
+<p>VolumeSnapshotSpec defines the desired state of VolumeSnapshot</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>volumeRef</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>VolumeRef indicates which Volume to refer for VolumeSnapshot</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotState">VolumeSnapshotState
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotStatus">VolumeSnapshotStatus</a>)
+</p>
+<div>
+<p>VolumeSnapshotState is the state of a VolumeSnapshot</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Deleting&#34;</p></td>
+<td><p>VolumeSnapshotStateDeleting means the VolumeSnapshot is being deleted</p>
+</td>
+</tr><tr><td><p>&#34;Failed&#34;</p></td>
+<td><p>VolumeSnapshotStateFailed means the VolumeSnapshot creation has failed</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>VolumeSnapshotStatePending means the VolumeSnapshot resource has been created, but the snapshot has not yet been initiated</p>
+</td>
+</tr><tr><td><p>&#34;Processing&#34;</p></td>
+<td><p>VolumeSnapshotStateProcessing means the VolumeSnapshot is being processed by the storage provider</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotStatus">VolumeSnapshotStatus
+</h3>
+<p>
+(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshot">VolumeSnapshot</a>)
+</p>
+<div>
+<p>VolumeSnapshotStatus defines the observed state of VolumeSnapshot</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>state</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotState">
+VolumeSnapshotState
+</a>
+</em>
+</td>
+<td>
+<p>State represents the storage provider state of VolumeSnapshot</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>restoreSize</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
+k8s.io/apimachinery/pkg/api/resource.Quantity
+</a>
+</em>
+</td>
+<td>
+<p>RestoreSize is the size of storage required to restore from VolumeSnapshot</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="storage.ironcore.dev/v1alpha1.VolumeSpec">VolumeSpec
 </h3>
 <p>
@@ -1808,6 +2234,20 @@ VolumeEncryption
 </td>
 <td>
 <p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>dataSource</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
+VolumeDataSource
+</a>
+</em>
+</td>
+<td>
+<p>DataSource is an optional field which provides information regarding
+the snapshot to be used as the source for the volume restoration</p>
 </td>
 </tr>
 </tbody>
@@ -2098,6 +2538,20 @@ VolumeEncryption
 </td>
 <td>
 <p>Encryption is an optional field which provides attributes to encrypt Volume.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>dataSource</code><br/>
+<em>
+<a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
+VolumeDataSource
+</a>
+</em>
+</td>
+<td>
+<p>DataSource is an optional field which provides information regarding
+the snapshot to be used as the source for the volume restoration</p>
 </td>
 </tr>
 </table>
