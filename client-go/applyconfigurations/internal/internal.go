@@ -81,6 +81,20 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: value
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.common.v1alpha1.UIDReference
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: uid
+      type:
+        scalar: string
+    elementRelationship: atomic
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.DaemonEndpoint
   map:
     fields:
@@ -1533,6 +1547,20 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
+  map:
+    fields:
+    - name: apiGroup
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
   map:
     fields:
@@ -1627,12 +1655,87 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContent
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContentSpec
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContentSource
+  map:
+    fields:
+    - name: snapshotHandle
+      type:
+        scalar: string
+      default: ""
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContentSpec
+  map:
+    fields:
+    - name: source
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContentSource
+      default: {}
+    - name: volumeSnapshotRef
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.UIDReference
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec
+  map:
+    fields:
+    - name: volumeRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
+  map:
+    fields:
+    - name: restoreSize
+      type:
+        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: state
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec
   map:
     fields:
     - name: claimRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
+    - name: dataSource
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
     - name: encryption
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
