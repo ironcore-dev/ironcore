@@ -24,6 +24,7 @@ type VolumeSpecApplyConfiguration struct {
 	Unclaimable        *bool                               `json:"unclaimable,omitempty"`
 	Tolerations        []commonv1alpha1.Toleration         `json:"tolerations,omitempty"`
 	Encryption         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
+	DataSource         *VolumeDataSourceApplyConfiguration `json:"dataSource,omitempty"`
 }
 
 // VolumeSpecApplyConfiguration constructs a declarative configuration of the VolumeSpec type for use with
@@ -117,5 +118,13 @@ func (b *VolumeSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1.
 // If called multiple times, the Encryption field is set to the value of the last call.
 func (b *VolumeSpecApplyConfiguration) WithEncryption(value *VolumeEncryptionApplyConfiguration) *VolumeSpecApplyConfiguration {
 	b.Encryption = value
+	return b
+}
+
+// WithDataSource sets the DataSource field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the DataSource field is set to the value of the last call.
+func (b *VolumeSpecApplyConfiguration) WithDataSource(value *VolumeDataSourceApplyConfiguration) *VolumeSpecApplyConfiguration {
+	b.DataSource = value
 	return b
 }

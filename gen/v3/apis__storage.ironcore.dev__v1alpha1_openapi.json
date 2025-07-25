@@ -8562,6 +8562,31 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource": {
+				"description": "VolumeDataSource represents the source for volume",
+				"type": "object",
+				"required": [
+					"apiGroup",
+					"kind",
+					"name"
+				],
+				"properties": {
+					"apiGroup": {
+						"description": "APIGroup is the group for the resource being referenced",
+						"type": "string"
+					},
+					"kind": {
+						"description": "Kind is the type of resource being referenced",
+						"type": "string",
+						"default": ""
+					},
+					"name": {
+						"description": "Name is the name of resource being referenced",
+						"type": "string",
+						"default": ""
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
 				"description": "VolumeEncryption represents information to encrypt a volume.",
 				"type": "object",
@@ -8837,6 +8862,14 @@
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"dataSource": {
+						"description": "DataSource is an optional field which provides information regarding the snapshot to be used as the source for the volume restoration",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource"
 							}
 						]
 					},

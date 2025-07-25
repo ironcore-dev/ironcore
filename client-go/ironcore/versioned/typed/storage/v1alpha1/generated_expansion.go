@@ -16,3 +16,7 @@ type VolumeExpansion interface{}
 type VolumeClassExpansion interface{}
 
 type VolumePoolExpansion interface{}
+
+type VolumeSnapshotExpansion interface{}
+
+type VolumeSnapshotContentExpansion interface{}

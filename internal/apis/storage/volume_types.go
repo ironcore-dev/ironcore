@@ -41,6 +41,19 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption
+	// DataSource is an optional field which provides information regarding
+	// the snapshot to be used as the source for the volume restoration
+	DataSource *VolumeDataSource
+}
+
+// VolumeDataSource represents the source for volume
+type VolumeDataSource struct {
+	// APIGroup is the group for the resource being referenced
+	APIGroup *string `json:"apiGroup"`
+	// Kind is the type of resource being referenced
+	Kind string `json:"kind"`
+	// Name is the name of resource being referenced
+	Name string `json:"name"`
 }
 
 // VolumeAccess represents information on how to access a volume.

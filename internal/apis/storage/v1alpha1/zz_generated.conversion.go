@@ -17,6 +17,7 @@ import (
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
 	storage "github.com/ironcore-dev/ironcore/internal/apis/storage"
 	v1 "k8s.io/api/core/v1"
+	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -209,6 +210,16 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeDataSource)(nil), (*storage.VolumeDataSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(a.(*storagev1alpha1.VolumeDataSource), b.(*storage.VolumeDataSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeDataSource)(nil), (*storagev1alpha1.VolumeDataSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(a.(*storage.VolumeDataSource), b.(*storagev1alpha1.VolumeDataSource), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeEncryption)(nil), (*storage.VolumeEncryption)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(a.(*storagev1alpha1.VolumeEncryption), b.(*storage.VolumeEncryption), scope)
 	}); err != nil {
@@ -276,6 +287,86 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*storage.VolumePoolStatus)(nil), (*storagev1alpha1.VolumePoolStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(a.(*storage.VolumePoolStatus), b.(*storagev1alpha1.VolumePoolStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshot)(nil), (*storage.VolumeSnapshot)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshot_To_storage_VolumeSnapshot(a.(*storagev1alpha1.VolumeSnapshot), b.(*storage.VolumeSnapshot), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshot)(nil), (*storagev1alpha1.VolumeSnapshot)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshot_To_v1alpha1_VolumeSnapshot(a.(*storage.VolumeSnapshot), b.(*storagev1alpha1.VolumeSnapshot), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotContent)(nil), (*storage.VolumeSnapshotContent)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotContent_To_storage_VolumeSnapshotContent(a.(*storagev1alpha1.VolumeSnapshotContent), b.(*storage.VolumeSnapshotContent), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotContent)(nil), (*storagev1alpha1.VolumeSnapshotContent)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotContent_To_v1alpha1_VolumeSnapshotContent(a.(*storage.VolumeSnapshotContent), b.(*storagev1alpha1.VolumeSnapshotContent), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotContentList)(nil), (*storage.VolumeSnapshotContentList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotContentList_To_storage_VolumeSnapshotContentList(a.(*storagev1alpha1.VolumeSnapshotContentList), b.(*storage.VolumeSnapshotContentList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotContentList)(nil), (*storagev1alpha1.VolumeSnapshotContentList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotContentList_To_v1alpha1_VolumeSnapshotContentList(a.(*storage.VolumeSnapshotContentList), b.(*storagev1alpha1.VolumeSnapshotContentList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotContentSource)(nil), (*storage.VolumeSnapshotContentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(a.(*storagev1alpha1.VolumeSnapshotContentSource), b.(*storage.VolumeSnapshotContentSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotContentSource)(nil), (*storagev1alpha1.VolumeSnapshotContentSource)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(a.(*storage.VolumeSnapshotContentSource), b.(*storagev1alpha1.VolumeSnapshotContentSource), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotContentSpec)(nil), (*storage.VolumeSnapshotContentSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(a.(*storagev1alpha1.VolumeSnapshotContentSpec), b.(*storage.VolumeSnapshotContentSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotContentSpec)(nil), (*storagev1alpha1.VolumeSnapshotContentSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(a.(*storage.VolumeSnapshotContentSpec), b.(*storagev1alpha1.VolumeSnapshotContentSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotList)(nil), (*storage.VolumeSnapshotList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotList_To_storage_VolumeSnapshotList(a.(*storagev1alpha1.VolumeSnapshotList), b.(*storage.VolumeSnapshotList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotList)(nil), (*storagev1alpha1.VolumeSnapshotList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(a.(*storage.VolumeSnapshotList), b.(*storagev1alpha1.VolumeSnapshotList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotSpec)(nil), (*storage.VolumeSnapshotSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(a.(*storagev1alpha1.VolumeSnapshotSpec), b.(*storage.VolumeSnapshotSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotSpec)(nil), (*storagev1alpha1.VolumeSnapshotSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(a.(*storage.VolumeSnapshotSpec), b.(*storagev1alpha1.VolumeSnapshotSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storagev1alpha1.VolumeSnapshotStatus)(nil), (*storage.VolumeSnapshotStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(a.(*storagev1alpha1.VolumeSnapshotStatus), b.(*storage.VolumeSnapshotStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*storage.VolumeSnapshotStatus)(nil), (*storagev1alpha1.VolumeSnapshotStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(a.(*storage.VolumeSnapshotStatus), b.(*storagev1alpha1.VolumeSnapshotStatus), scope)
 	}); err != nil {
 		return err
 	}
@@ -774,6 +865,30 @@ func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.Vol
 	return autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in, out, s)
 }
 
+func autoConvert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1alpha1.VolumeDataSource, out *storage.VolumeDataSource, s conversion.Scope) error {
+	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
+	out.Kind = in.Kind
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1alpha1.VolumeDataSource, out *storage.VolumeDataSource, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in, out, s)
+}
+
+func autoConvert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.VolumeDataSource, out *storagev1alpha1.VolumeDataSource, s conversion.Scope) error {
+	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
+	out.Kind = in.Kind
+	out.Name = in.Name
+	return nil
+}
+
+// Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource is an autogenerated conversion function.
+func Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.VolumeDataSource, out *storagev1alpha1.VolumeDataSource, s conversion.Scope) error {
+	return autoConvert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in, out, s)
+}
+
 func autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *storagev1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
 	out.SecretRef = in.SecretRef
 	return nil
@@ -950,6 +1065,196 @@ func Convert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.V
 	return autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in, out, s)
 }
 
+func autoConvert_v1alpha1_VolumeSnapshot_To_storage_VolumeSnapshot(in *storagev1alpha1.VolumeSnapshot, out *storage.VolumeSnapshot, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshot_To_storage_VolumeSnapshot is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshot_To_storage_VolumeSnapshot(in *storagev1alpha1.VolumeSnapshot, out *storage.VolumeSnapshot, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshot_To_storage_VolumeSnapshot(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshot_To_v1alpha1_VolumeSnapshot(in *storage.VolumeSnapshot, out *storagev1alpha1.VolumeSnapshot, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_storage_VolumeSnapshot_To_v1alpha1_VolumeSnapshot is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshot_To_v1alpha1_VolumeSnapshot(in *storage.VolumeSnapshot, out *storagev1alpha1.VolumeSnapshot, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshot_To_v1alpha1_VolumeSnapshot(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotContent_To_storage_VolumeSnapshotContent(in *storagev1alpha1.VolumeSnapshotContent, out *storage.VolumeSnapshotContent, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotContent_To_storage_VolumeSnapshotContent is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotContent_To_storage_VolumeSnapshotContent(in *storagev1alpha1.VolumeSnapshotContent, out *storage.VolumeSnapshotContent, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotContent_To_storage_VolumeSnapshotContent(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotContent_To_v1alpha1_VolumeSnapshotContent(in *storage.VolumeSnapshotContent, out *storagev1alpha1.VolumeSnapshotContent, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotContent_To_v1alpha1_VolumeSnapshotContent is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotContent_To_v1alpha1_VolumeSnapshotContent(in *storage.VolumeSnapshotContent, out *storagev1alpha1.VolumeSnapshotContent, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotContent_To_v1alpha1_VolumeSnapshotContent(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotContentList_To_storage_VolumeSnapshotContentList(in *storagev1alpha1.VolumeSnapshotContentList, out *storage.VolumeSnapshotContentList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]storage.VolumeSnapshotContent)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotContentList_To_storage_VolumeSnapshotContentList is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotContentList_To_storage_VolumeSnapshotContentList(in *storagev1alpha1.VolumeSnapshotContentList, out *storage.VolumeSnapshotContentList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotContentList_To_storage_VolumeSnapshotContentList(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotContentList_To_v1alpha1_VolumeSnapshotContentList(in *storage.VolumeSnapshotContentList, out *storagev1alpha1.VolumeSnapshotContentList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]storagev1alpha1.VolumeSnapshotContent)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotContentList_To_v1alpha1_VolumeSnapshotContentList is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotContentList_To_v1alpha1_VolumeSnapshotContentList(in *storage.VolumeSnapshotContentList, out *storagev1alpha1.VolumeSnapshotContentList, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotContentList_To_v1alpha1_VolumeSnapshotContentList(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(in *storagev1alpha1.VolumeSnapshotContentSource, out *storage.VolumeSnapshotContentSource, s conversion.Scope) error {
+	out.VolumeSnapshotHandle = in.VolumeSnapshotHandle
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(in *storagev1alpha1.VolumeSnapshotContentSource, out *storage.VolumeSnapshotContentSource, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(in *storage.VolumeSnapshotContentSource, out *storagev1alpha1.VolumeSnapshotContentSource, s conversion.Scope) error {
+	out.VolumeSnapshotHandle = in.VolumeSnapshotHandle
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(in *storage.VolumeSnapshotContentSource, out *storagev1alpha1.VolumeSnapshotContentSource, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(in *storagev1alpha1.VolumeSnapshotContentSpec, out *storage.VolumeSnapshotContentSpec, s conversion.Scope) error {
+	if err := Convert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(&in.Source, &out.Source, s); err != nil {
+		return err
+	}
+	out.VolumeSnapshotRef = in.VolumeSnapshotRef
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(in *storagev1alpha1.VolumeSnapshotContentSpec, out *storage.VolumeSnapshotContentSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(in *storage.VolumeSnapshotContentSpec, out *storagev1alpha1.VolumeSnapshotContentSpec, s conversion.Scope) error {
+	if err := Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(&in.Source, &out.Source, s); err != nil {
+		return err
+	}
+	out.VolumeSnapshotRef = in.VolumeSnapshotRef
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(in *storage.VolumeSnapshotContentSpec, out *storagev1alpha1.VolumeSnapshotContentSpec, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotList_To_storage_VolumeSnapshotList(in *storagev1alpha1.VolumeSnapshotList, out *storage.VolumeSnapshotList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]storage.VolumeSnapshot)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotList_To_storage_VolumeSnapshotList is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotList_To_storage_VolumeSnapshotList(in *storagev1alpha1.VolumeSnapshotList, out *storage.VolumeSnapshotList, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotList_To_storage_VolumeSnapshotList(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(in *storage.VolumeSnapshotList, out *storagev1alpha1.VolumeSnapshotList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]storagev1alpha1.VolumeSnapshot)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(in *storage.VolumeSnapshotList, out *storagev1alpha1.VolumeSnapshotList, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *storagev1alpha1.VolumeSnapshotSpec, out *storage.VolumeSnapshotSpec, s conversion.Scope) error {
+	out.VolumeRef = in.VolumeRef
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *storagev1alpha1.VolumeSnapshotSpec, out *storage.VolumeSnapshotSpec, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *storage.VolumeSnapshotSpec, out *storagev1alpha1.VolumeSnapshotSpec, s conversion.Scope) error {
+	out.VolumeRef = in.VolumeRef
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *storage.VolumeSnapshotSpec, out *storagev1alpha1.VolumeSnapshotSpec, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in, out, s)
+}
+
+func autoConvert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *storagev1alpha1.VolumeSnapshotStatus, out *storage.VolumeSnapshotStatus, s conversion.Scope) error {
+	out.State = storage.VolumeSnapshotState(in.State)
+	out.RestoreSize = (*resource.Quantity)(unsafe.Pointer(in.RestoreSize))
+	return nil
+}
+
+// Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus is an autogenerated conversion function.
+func Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *storagev1alpha1.VolumeSnapshotStatus, out *storage.VolumeSnapshotStatus, s conversion.Scope) error {
+	return autoConvert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in, out, s)
+}
+
+func autoConvert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in *storage.VolumeSnapshotStatus, out *storagev1alpha1.VolumeSnapshotStatus, s conversion.Scope) error {
+	out.State = storagev1alpha1.VolumeSnapshotState(in.State)
+	out.RestoreSize = (*resource.Quantity)(unsafe.Pointer(in.RestoreSize))
+	return nil
+}
+
+// Convert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus is an autogenerated conversion function.
+func Convert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in *storage.VolumeSnapshotStatus, out *storagev1alpha1.VolumeSnapshotStatus, s conversion.Scope) error {
+	return autoConvert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in, out, s)
+}
+
 func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
 	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
 	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
@@ -961,6 +1266,7 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.V
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
+	out.DataSource = (*storage.VolumeDataSource)(unsafe.Pointer(in.DataSource))
 	return nil
 }
 
@@ -980,6 +1286,7 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
+	out.DataSource = (*storagev1alpha1.VolumeDataSource)(unsafe.Pointer(in.DataSource))
 	return nil
 }
 

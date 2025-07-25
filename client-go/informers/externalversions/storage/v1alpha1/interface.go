@@ -23,6 +23,10 @@ type Interface interface {
 	VolumeClasses() VolumeClassInformer
 	// VolumePools returns a VolumePoolInformer.
 	VolumePools() VolumePoolInformer
+	// VolumeSnapshots returns a VolumeSnapshotInformer.
+	VolumeSnapshots() VolumeSnapshotInformer
+	// VolumeSnapshotContents returns a VolumeSnapshotContentInformer.
+	VolumeSnapshotContents() VolumeSnapshotContentInformer
 }
 
 type version struct {
@@ -64,4 +68,14 @@ func (v *version) VolumeClasses() VolumeClassInformer {
 // VolumePools returns a VolumePoolInformer.
 func (v *version) VolumePools() VolumePoolInformer {
 	return &volumePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// VolumeSnapshots returns a VolumeSnapshotInformer.
+func (v *version) VolumeSnapshots() VolumeSnapshotInformer {
+	return &volumeSnapshotInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// VolumeSnapshotContents returns a VolumeSnapshotContentInformer.
+func (v *version) VolumeSnapshotContents() VolumeSnapshotContentInformer {
+	return &volumeSnapshotContentInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

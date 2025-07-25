@@ -2,7 +2,7 @@
 	"swagger": "2.0",
 	"info": {
 		"title": "Kubernetes",
-		"version": "1.32"
+		"version": "1.33"
 	},
 	"paths": {
 		"/.well-known/openid-configuration/": {
@@ -5119,6 +5119,196 @@
 				},
 				{
 					"$ref": "#/parameters/path-oPbzgLUj"
+				}
+			]
+		},
+		"/api/v1/namespaces/{namespace}/pods/{name}/resize": {
+			"get": {
+				"description": "read resize of the specified Pod",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"core_v1"
+				],
+				"operationId": "readCoreV1NamespacedPodResize",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "",
+					"kind": "Pod",
+					"version": "v1"
+				}
+			},
+			"put": {
+				"description": "replace resize of the specified Pod",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"core_v1"
+				],
+				"operationId": "replaceCoreV1NamespacedPodResize",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "",
+					"kind": "Pod",
+					"version": "v1"
+				}
+			},
+			"patch": {
+				"description": "partially update resize of the specified Pod",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"core_v1"
+				],
+				"operationId": "patchCoreV1NamespacedPodResize",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.core.v1.Pod"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "",
+					"kind": "Pod",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the Pod",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/namespace-vgWSWtn3"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
 				}
 			]
 		},
@@ -48837,6 +49027,491 @@
 				}
 			]
 		},
+		"/apis/networking.k8s.io/v1/ipaddresses": {
+			"get": {
+				"description": "list or watch objects of kind IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "listNetworkingV1IPAddress",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddressList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"post": {
+				"description": "create an IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "createNetworkingV1IPAddress",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"delete": {
+				"description": "delete collection of IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "deleteNetworkingV1CollectionIPAddress",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/ignoreStoreReadErrorWithClusterBreakingPotential-QbNkfIqj"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/ipaddresses/{name}": {
+			"get": {
+				"description": "read the specified IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "readNetworkingV1IPAddress",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"put": {
+				"description": "replace the specified IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "replaceNetworkingV1IPAddress",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"delete": {
+				"description": "delete an IPAddress",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "deleteNetworkingV1IPAddress",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/ignoreStoreReadErrorWithClusterBreakingPotential-QbNkfIqj"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"patch": {
+				"description": "partially update the specified IPAddress",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "patchNetworkingV1IPAddress",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the IPAddress",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
 		"/apis/networking.k8s.io/v1/namespaces/{namespace}/ingresses": {
 			"get": {
 				"description": "list or watch objects of kind Ingress",
@@ -50083,6 +50758,678 @@
 				}
 			]
 		},
+		"/apis/networking.k8s.io/v1/servicecidrs": {
+			"get": {
+				"description": "list or watch objects of kind ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "listNetworkingV1ServiceCIDR",
+				"parameters": [
+					{
+						"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					},
+					{
+						"$ref": "#/parameters/watch-XNNPZGbK"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDRList"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "list",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"post": {
+				"description": "create a ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "createNetworkingV1ServiceCIDR",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "post",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"delete": {
+				"description": "delete collection of ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "deleteNetworkingV1CollectionServiceCIDR",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"$ref": "#/parameters/continue-QfD61s0i"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/ignoreStoreReadErrorWithClusterBreakingPotential-QbNkfIqj"
+					},
+					{
+						"$ref": "#/parameters/labelSelector-5Zw57w4C"
+					},
+					{
+						"$ref": "#/parameters/limit-1NfNmdNH"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					},
+					{
+						"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+					},
+					{
+						"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+					},
+					{
+						"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+					},
+					{
+						"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "deletecollection",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/servicecidrs/{name}": {
+			"get": {
+				"description": "read the specified ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "readNetworkingV1ServiceCIDR",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"put": {
+				"description": "replace the specified ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "replaceNetworkingV1ServiceCIDR",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"delete": {
+				"description": "delete a ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "deleteNetworkingV1ServiceCIDR",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-2Y1dVQaQ"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/gracePeriodSeconds--K5HaBOS"
+					},
+					{
+						"$ref": "#/parameters/ignoreStoreReadErrorWithClusterBreakingPotential-QbNkfIqj"
+					},
+					{
+						"$ref": "#/parameters/orphanDependents-uRB25kX5"
+					},
+					{
+						"$ref": "#/parameters/propagationPolicy-6jk3prlO"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"202": {
+						"description": "Accepted",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Status"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "delete",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"patch": {
+				"description": "partially update the specified ServiceCIDR",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "patchNetworkingV1ServiceCIDR",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the ServiceCIDR",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/servicecidrs/{name}/status": {
+			"get": {
+				"description": "read status of the specified ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "readNetworkingV1ServiceCIDRStatus",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "get",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"put": {
+				"description": "replace status of the specified ServiceCIDR",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "replaceNetworkingV1ServiceCIDRStatus",
+				"parameters": [
+					{
+						"name": "body",
+						"in": "body",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-Qy4HdaTW"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "put",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"patch": {
+				"description": "partially update status of the specified ServiceCIDR",
+				"consumes": [
+					"application/json-patch+json",
+					"application/merge-patch+json",
+					"application/strategic-merge-patch+json",
+					"application/apply-patch+yaml"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "patchNetworkingV1ServiceCIDRStatus",
+				"parameters": [
+					{
+						"$ref": "#/parameters/body-78PwaGsr"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed",
+						"name": "dryRun",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/fieldManager-7c6nTn1T"
+					},
+					{
+						"uniqueItems": true,
+						"type": "string",
+						"description": "fieldValidation instructs the server on how to handle objects in the request (POST/PUT/PATCH) containing unknown or duplicate fields. Valid values are: - Ignore: This will ignore any unknown fields that are silently dropped from the object, and will ignore all but the last duplicate field that the decoder encounters. This is the default behavior prior to v1.23. - Warn: This will send a warning via the standard warning response header for each unknown field that is dropped from the object, and for each duplicate field that is encountered. The request will still succeed if there are no other errors, and will only persist the last of any duplicate fields. This is the default in v1.23+ - Strict: This will fail the request with a BadRequest error if any unknown fields would be dropped from the object, or if any duplicate fields are present. The error returned from the server will contain all unknown and duplicate fields encountered.",
+						"name": "fieldValidation",
+						"in": "query"
+					},
+					{
+						"$ref": "#/parameters/force-tOGGb0Yi"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"201": {
+						"description": "Created",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "patch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the ServiceCIDR",
+					"name": "name",
+					"in": "path",
+					"required": true
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				}
+			]
+		},
 		"/apis/networking.k8s.io/v1/watch/ingressclasses": {
 			"get": {
 				"description": "watch individual changes to a list of IngressClass. deprecated: use the 'watch' parameter with a list operation instead.",
@@ -50292,6 +51639,162 @@
 				},
 				{
 					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/watch/ipaddresses": {
+			"get": {
+				"description": "watch individual changes to a list of IPAddress. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "watchNetworkingV1IPAddressList",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/watch/ipaddresses/{name}": {
+			"get": {
+				"description": "watch changes to an object of kind IPAddress. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "watchNetworkingV1IPAddress",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the IPAddress",
+					"name": "name",
+					"in": "path",
+					"required": true
 				},
 				{
 					"$ref": "#/parameters/pretty-tJGM1-ng"
@@ -50690,6 +52193,162 @@
 				},
 				{
 					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/watch/servicecidrs": {
+			"get": {
+				"description": "watch individual changes to a list of ServiceCIDR. deprecated: use the 'watch' parameter with a list operation instead.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "watchNetworkingV1ServiceCIDRList",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watchlist",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"$ref": "#/parameters/pretty-tJGM1-ng"
+				},
+				{
+					"$ref": "#/parameters/resourceVersion-5WAnf1kx"
+				},
+				{
+					"$ref": "#/parameters/resourceVersionMatch-t8XhRHeC"
+				},
+				{
+					"$ref": "#/parameters/sendInitialEvents-rLXlEK_k"
+				},
+				{
+					"$ref": "#/parameters/timeoutSeconds-yvYezaOC"
+				},
+				{
+					"$ref": "#/parameters/watch-XNNPZGbK"
+				}
+			]
+		},
+		"/apis/networking.k8s.io/v1/watch/servicecidrs/{name}": {
+			"get": {
+				"description": "watch changes to an object of kind ServiceCIDR. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.",
+				"consumes": [
+					"*/*"
+				],
+				"produces": [
+					"application/json",
+					"application/yaml",
+					"application/vnd.kubernetes.protobuf",
+					"application/json;stream=watch",
+					"application/vnd.kubernetes.protobuf;stream=watch"
+				],
+				"schemes": [
+					"https"
+				],
+				"tags": [
+					"networking_v1"
+				],
+				"operationId": "watchNetworkingV1ServiceCIDR",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent"
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"x-kubernetes-action": "watch",
+				"x-kubernetes-group-version-kind": {
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			},
+			"parameters": [
+				{
+					"$ref": "#/parameters/allowWatchBookmarks-HC2hJt-J"
+				},
+				{
+					"$ref": "#/parameters/continue-QfD61s0i"
+				},
+				{
+					"$ref": "#/parameters/fieldSelector-xIcQKXFG"
+				},
+				{
+					"$ref": "#/parameters/labelSelector-5Zw57w4C"
+				},
+				{
+					"$ref": "#/parameters/limit-1NfNmdNH"
+				},
+				{
+					"uniqueItems": true,
+					"type": "string",
+					"description": "name of the ServiceCIDR",
+					"name": "name",
+					"in": "path",
+					"required": true
 				},
 				{
 					"$ref": "#/parameters/pretty-tJGM1-ng"
@@ -64637,7 +66296,7 @@
 		},
 		"/version/": {
 			"get": {
-				"description": "get the code version",
+				"description": "get the version information for this server",
 				"consumes": [
 					"application/json"
 				],
@@ -67502,6 +69161,29 @@
 				}
 			}
 		},
+		"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource": {
+			"description": "VolumeDataSource represents the source for volume",
+			"type": "object",
+			"required": [
+				"apiGroup",
+				"kind",
+				"name"
+			],
+			"properties": {
+				"apiGroup": {
+					"description": "APIGroup is the group for the resource being referenced",
+					"type": "string"
+				},
+				"kind": {
+					"description": "Kind is the type of resource being referenced",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name is the name of resource being referenced",
+					"type": "string"
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
 			"description": "VolumeEncryption represents information to encrypt a volume.",
 			"type": "object",
@@ -67711,6 +69393,10 @@
 				"claimRef": {
 					"description": "ClaimRef is the reference to the claiming entity of the Volume.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+				},
+				"dataSource": {
+					"description": "DataSource is an optional field which provides information regarding the snapshot to be used as the source for the volume restoration",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource"
 				},
 				"encryption": {
 					"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
@@ -69176,7 +70862,7 @@
 			"type": "object",
 			"properties": {
 				"availableReplicas": {
-					"description": "Total number of available pods (ready for at least minReadySeconds) targeted by this deployment.",
+					"description": "Total number of available non-terminating pods (ready for at least minReadySeconds) targeted by this deployment.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -69204,12 +70890,17 @@
 					"format": "int64"
 				},
 				"readyReplicas": {
-					"description": "readyReplicas is the number of pods targeted by this Deployment with a Ready Condition.",
+					"description": "Total number of non-terminating pods targeted by this Deployment with a Ready Condition.",
 					"type": "integer",
 					"format": "int32"
 				},
 				"replicas": {
-					"description": "Total number of non-terminated pods targeted by this deployment (their labels match the selector).",
+					"description": "Total number of non-terminating pods targeted by this deployment (their labels match the selector).",
+					"type": "integer",
+					"format": "int32"
+				},
+				"terminatingReplicas": {
+					"description": "Total number of terminating pods targeted by this deployment. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is an alpha field. Enable DeploymentReplicaSetTerminatingReplicas to be able to use this field.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -69219,7 +70910,7 @@
 					"format": "int32"
 				},
 				"updatedReplicas": {
-					"description": "Total number of non-terminated pods targeted by this deployment that have the desired template spec.",
+					"description": "Total number of non-terminating pods targeted by this deployment that have the desired template spec.",
 					"type": "integer",
 					"format": "int32"
 				}
@@ -69318,7 +71009,7 @@
 					"type": "string"
 				},
 				"items": {
-					"description": "List of ReplicaSets. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller",
+					"description": "List of ReplicaSets. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.apps.v1.ReplicaSet"
@@ -69354,7 +71045,7 @@
 					"format": "int32"
 				},
 				"replicas": {
-					"description": "Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller",
+					"description": "Replicas is the number of desired pods. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -69363,7 +71054,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
 				},
 				"template": {
-					"description": "Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template",
+					"description": "Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/#pod-template",
 					"$ref": "#/definitions/io.k8s.api.core.v1.PodTemplateSpec"
 				}
 			}
@@ -69376,7 +71067,7 @@
 			],
 			"properties": {
 				"availableReplicas": {
-					"description": "The number of available replicas (ready for at least minReadySeconds) for this replica set.",
+					"description": "The number of available non-terminating pods (ready for at least minReadySeconds) for this replica set.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -69394,7 +71085,7 @@
 					"x-kubernetes-patch-strategy": "merge"
 				},
 				"fullyLabeledReplicas": {
-					"description": "The number of pods that have labels matching the labels of the pod template of the replicaset.",
+					"description": "The number of non-terminating pods that have labels matching the labels of the pod template of the replicaset.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -69404,12 +71095,17 @@
 					"format": "int64"
 				},
 				"readyReplicas": {
-					"description": "readyReplicas is the number of pods targeted by this ReplicaSet with a Ready Condition.",
+					"description": "The number of non-terminating pods targeted by this ReplicaSet with a Ready Condition.",
 					"type": "integer",
 					"format": "int32"
 				},
 				"replicas": {
-					"description": "Replicas is the most recently observed number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller",
+					"description": "Replicas is the most recently observed number of non-terminating pods. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset",
+					"type": "integer",
+					"format": "int32"
+				},
+				"terminatingReplicas": {
+					"description": "The number of terminating pods for this replica set. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is an alpha field. Enable DeploymentReplicaSetTerminatingReplicas to be able to use this field.",
 					"type": "integer",
 					"format": "int32"
 				}
@@ -69586,8 +71282,7 @@
 			"type": "object",
 			"required": [
 				"selector",
-				"template",
-				"serviceName"
+				"template"
 			],
 			"properties": {
 				"minReadySeconds": {
@@ -70755,11 +72450,11 @@
 			}
 		},
 		"io.k8s.api.autoscaling.v2.HPAScalingRules": {
-			"description": "HPAScalingRules configures the scaling behavior for one direction. These Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.",
+			"description": "HPAScalingRules configures the scaling behavior for one direction via scaling Policy Rules and a configurable metric tolerance.\n\nScaling Policy Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.\n\nThe tolerance is applied to the metric values and prevents scaling too eagerly for small metric variations. (Note that setting a tolerance requires enabling the alpha HPAConfigurableTolerance feature gate.)",
 			"type": "object",
 			"properties": {
 				"policies": {
-					"description": "policies is a list of potential scaling polices which can be used during scaling. At least one policy must be specified, otherwise the HPAScalingRules will be discarded as invalid",
+					"description": "policies is a list of potential scaling polices which can be used during scaling. If not set, use the default values: - For scale up: allow doubling the number of pods, or an absolute change of 4 pods in a 15s window. - For scale down: allow all pods to be removed in a 15s window.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.autoscaling.v2.HPAScalingPolicy"
@@ -70774,6 +72469,10 @@
 					"description": "stabilizationWindowSeconds is the number of seconds for which past recommendations should be considered while scaling up or scaling down. StabilizationWindowSeconds must be greater than or equal to zero and less than or equal to 3600 (one hour). If not set, use the default values: - For scale up: 0 (i.e. no stabilization is done). - For scale down: 300 (i.e. the stabilization window is 300 seconds long).",
 					"type": "integer",
 					"format": "int32"
+				},
+				"tolerance": {
+					"description": "tolerance is the tolerance on the ratio between the current and desired metric value under which no updates are made to the desired number of replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not set, the default cluster-wide tolerance is applied (by default 10%).\n\nFor example, if autoscaling is configured with a memory consumption target of 100Mi, and scale-down and scale-up tolerances of 5% and 1% respectively, scaling will be triggered when the actual consumption falls below 95Mi or exceeds 101Mi.\n\nThis is an alpha field and requires enabling the HPAConfigurableTolerance feature gate.",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
 				}
 			}
 		},
@@ -71480,7 +73179,7 @@
 					"format": "int32"
 				},
 				"backoffLimitPerIndex": {
-					"description": "Specifies the limit for the number of retries within an index before marking this index as failed. When enabled the number of failures per index is kept in the pod's batch.kubernetes.io/job-index-failure-count annotation. It can only be set when Job's completionMode=Indexed, and the Pod's restart policy is Never. The field is immutable. This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).",
+					"description": "Specifies the limit for the number of retries within an index before marking this index as failed. When enabled the number of failures per index is kept in the pod's batch.kubernetes.io/job-index-failure-count annotation. It can only be set when Job's completionMode=Indexed, and the Pod's restart policy is Never. The field is immutable.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -71506,7 +73205,7 @@
 					"type": "boolean"
 				},
 				"maxFailedIndexes": {
-					"description": "Specifies the maximal number of failed indexes before marking the Job as failed, when backoffLimitPerIndex is set. Once the number of failed indexes exceeds this number the entire Job is marked as Failed and its execution is terminated. When left as null the job continues execution of all of its indexes and is marked with the `Complete` Job condition. It can only be specified when backoffLimitPerIndex is set. It can be null or up to completions. It is required and must be less than or equal to 10^4 when is completions greater than 10^5. This field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).",
+					"description": "Specifies the maximal number of failed indexes before marking the Job as failed, when backoffLimitPerIndex is set. Once the number of failed indexes exceeds this number the entire Job is marked as Failed and its execution is terminated. When left as null the job continues execution of all of its indexes and is marked with the `Complete` Job condition. It can only be specified when backoffLimitPerIndex is set. It can be null or up to completions. It is required and must be less than or equal to 10^4 when is completions greater than 10^5.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -71532,7 +73231,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
 				},
 				"successPolicy": {
-					"description": "successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.\n\nThis field is beta-level. To use this field, you must enable the `JobSuccessPolicy` feature gate (enabled by default).",
+					"description": "successPolicy specifies the policy when the Job can be declared as succeeded. If empty, the default behavior applies - the Job is declared as succeeded only when the number of succeeded pods equals to the completions. When the field is specified, it must be immutable and works only for the Indexed Jobs. Once the Job meets the SuccessPolicy, the lingering pods are terminated.",
 					"$ref": "#/definitions/io.k8s.api.batch.v1.SuccessPolicy"
 				},
 				"suspend": {
@@ -71583,7 +73282,7 @@
 					"format": "int32"
 				},
 				"failedIndexes": {
-					"description": "FailedIndexes holds the failed indexes when spec.backoffLimitPerIndex is set. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as \"1,3-5,7\". The set of failed indexes cannot overlap with the set of completed indexes.\n\nThis field is beta-level. It can be used when the `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).",
+					"description": "FailedIndexes holds the failed indexes when spec.backoffLimitPerIndex is set. The indexes are represented in the text format analogous as for the `completedIndexes` field, ie. they are kept as decimal integers separated by commas. The numbers are listed in increasing order. Three or more consecutive numbers are compressed and represented by the first and last element of the series, separated by a hyphen. For example, if the failed indexes are 1, 3, 4, 5 and 7, they are represented as \"1,3-5,7\". The set of failed indexes cannot overlap with the set of completed indexes.",
 					"type": "string"
 				},
 				"ready": {
@@ -71699,7 +73398,7 @@
 			],
 			"properties": {
 				"action": {
-					"description": "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are:\n\n- FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- FailIndex: indicates that the pod's index is marked as Failed and will\n  not be restarted.\n  This value is beta-level. It can be used when the\n  `JobBackoffLimitPerIndex` feature gate is enabled (enabled by default).\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.\n\nPossible enum values:\n - `\"Count\"` This is an action which might be taken on a pod failure - the pod failure is handled in the default way - the counter towards .backoffLimit, represented by the job's .status.failed field, is incremented.\n - `\"FailIndex\"` This is an action which might be taken on a pod failure - mark the Job's index as failed to avoid restarts within this index. This action can only be used when backoffLimitPerIndex is set. This value is beta-level.\n - `\"FailJob\"` This is an action which might be taken on a pod failure - mark the pod's job as Failed and terminate all running pods.\n - `\"Ignore\"` This is an action which might be taken on a pod failure - the counter towards .backoffLimit, represented by the job's .status.failed field, is not incremented and a replacement pod is created.",
+					"description": "Specifies the action taken on a pod failure when the requirements are satisfied. Possible values are:\n\n- FailJob: indicates that the pod's job is marked as Failed and all\n  running pods are terminated.\n- FailIndex: indicates that the pod's index is marked as Failed and will\n  not be restarted.\n- Ignore: indicates that the counter towards the .backoffLimit is not\n  incremented and a replacement pod is created.\n- Count: indicates that the pod is handled in the default way - the\n  counter towards the .backoffLimit is incremented.\nAdditional values are considered to be added in the future. Clients should react to an unknown action by skipping the rule.\n\nPossible enum values:\n - `\"Count\"` This is an action which might be taken on a pod failure - the pod failure is handled in the default way - the counter towards .backoffLimit, represented by the job's .status.failed field, is incremented.\n - `\"FailIndex\"` This is an action which might be taken on a pod failure - mark the Job's index as failed to avoid restarts within this index. This action can only be used when backoffLimitPerIndex is set.\n - `\"FailJob\"` This is an action which might be taken on a pod failure - mark the pod's job as Failed and terminate all running pods.\n - `\"Ignore\"` This is an action which might be taken on a pod failure - the counter towards .backoffLimit, represented by the job's .status.failed field, is not incremented and a replacement pod is created.",
 					"type": "string",
 					"enum": [
 						"Count",
@@ -73260,6 +74959,77 @@
 					"description": "State holds details about the container's current condition.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.ContainerState"
 				},
+				"stopSignal": {
+					"description": "StopSignal reports the effective stop signal for this container\n\nPossible enum values:\n - `\"SIGABRT\"`\n - `\"SIGALRM\"`\n - `\"SIGBUS\"`\n - `\"SIGCHLD\"`\n - `\"SIGCLD\"`\n - `\"SIGCONT\"`\n - `\"SIGFPE\"`\n - `\"SIGHUP\"`\n - `\"SIGILL\"`\n - `\"SIGINT\"`\n - `\"SIGIO\"`\n - `\"SIGIOT\"`\n - `\"SIGKILL\"`\n - `\"SIGPIPE\"`\n - `\"SIGPOLL\"`\n - `\"SIGPROF\"`\n - `\"SIGPWR\"`\n - `\"SIGQUIT\"`\n - `\"SIGRTMAX\"`\n - `\"SIGRTMAX-1\"`\n - `\"SIGRTMAX-10\"`\n - `\"SIGRTMAX-11\"`\n - `\"SIGRTMAX-12\"`\n - `\"SIGRTMAX-13\"`\n - `\"SIGRTMAX-14\"`\n - `\"SIGRTMAX-2\"`\n - `\"SIGRTMAX-3\"`\n - `\"SIGRTMAX-4\"`\n - `\"SIGRTMAX-5\"`\n - `\"SIGRTMAX-6\"`\n - `\"SIGRTMAX-7\"`\n - `\"SIGRTMAX-8\"`\n - `\"SIGRTMAX-9\"`\n - `\"SIGRTMIN\"`\n - `\"SIGRTMIN+1\"`\n - `\"SIGRTMIN+10\"`\n - `\"SIGRTMIN+11\"`\n - `\"SIGRTMIN+12\"`\n - `\"SIGRTMIN+13\"`\n - `\"SIGRTMIN+14\"`\n - `\"SIGRTMIN+15\"`\n - `\"SIGRTMIN+2\"`\n - `\"SIGRTMIN+3\"`\n - `\"SIGRTMIN+4\"`\n - `\"SIGRTMIN+5\"`\n - `\"SIGRTMIN+6\"`\n - `\"SIGRTMIN+7\"`\n - `\"SIGRTMIN+8\"`\n - `\"SIGRTMIN+9\"`\n - `\"SIGSEGV\"`\n - `\"SIGSTKFLT\"`\n - `\"SIGSTOP\"`\n - `\"SIGSYS\"`\n - `\"SIGTERM\"`\n - `\"SIGTRAP\"`\n - `\"SIGTSTP\"`\n - `\"SIGTTIN\"`\n - `\"SIGTTOU\"`\n - `\"SIGURG\"`\n - `\"SIGUSR1\"`\n - `\"SIGUSR2\"`\n - `\"SIGVTALRM\"`\n - `\"SIGWINCH\"`\n - `\"SIGXCPU\"`\n - `\"SIGXFSZ\"`",
+					"type": "string",
+					"enum": [
+						"SIGABRT",
+						"SIGALRM",
+						"SIGBUS",
+						"SIGCHLD",
+						"SIGCLD",
+						"SIGCONT",
+						"SIGFPE",
+						"SIGHUP",
+						"SIGILL",
+						"SIGINT",
+						"SIGIO",
+						"SIGIOT",
+						"SIGKILL",
+						"SIGPIPE",
+						"SIGPOLL",
+						"SIGPROF",
+						"SIGPWR",
+						"SIGQUIT",
+						"SIGRTMAX",
+						"SIGRTMAX-1",
+						"SIGRTMAX-10",
+						"SIGRTMAX-11",
+						"SIGRTMAX-12",
+						"SIGRTMAX-13",
+						"SIGRTMAX-14",
+						"SIGRTMAX-2",
+						"SIGRTMAX-3",
+						"SIGRTMAX-4",
+						"SIGRTMAX-5",
+						"SIGRTMAX-6",
+						"SIGRTMAX-7",
+						"SIGRTMAX-8",
+						"SIGRTMAX-9",
+						"SIGRTMIN",
+						"SIGRTMIN+1",
+						"SIGRTMIN+10",
+						"SIGRTMIN+11",
+						"SIGRTMIN+12",
+						"SIGRTMIN+13",
+						"SIGRTMIN+14",
+						"SIGRTMIN+15",
+						"SIGRTMIN+2",
+						"SIGRTMIN+3",
+						"SIGRTMIN+4",
+						"SIGRTMIN+5",
+						"SIGRTMIN+6",
+						"SIGRTMIN+7",
+						"SIGRTMIN+8",
+						"SIGRTMIN+9",
+						"SIGSEGV",
+						"SIGSTKFLT",
+						"SIGSTOP",
+						"SIGSYS",
+						"SIGTERM",
+						"SIGTRAP",
+						"SIGTSTP",
+						"SIGTTIN",
+						"SIGTTOU",
+						"SIGURG",
+						"SIGUSR1",
+						"SIGUSR2",
+						"SIGVTALRM",
+						"SIGWINCH",
+						"SIGXCPU",
+						"SIGXFSZ"
+					]
+				},
 				"user": {
 					"description": "User represents user identity information initially attached to the first process of the container",
 					"$ref": "#/definitions/io.k8s.api.core.v1.ContainerUser"
@@ -73377,7 +75147,7 @@
 			}
 		},
 		"io.k8s.api.core.v1.EndpointAddress": {
-			"description": "EndpointAddress is a tuple that describes single IP address.",
+			"description": "EndpointAddress is a tuple that describes single IP address. Deprecated: This API is deprecated in v1.33+.",
 			"type": "object",
 			"required": [
 				"ip"
@@ -73403,7 +75173,7 @@
 			"x-kubernetes-map-type": "atomic"
 		},
 		"io.k8s.api.core.v1.EndpointPort": {
-			"description": "EndpointPort is a tuple that describes a single port.",
+			"description": "EndpointPort is a tuple that describes a single port. Deprecated: This API is deprecated in v1.33+.",
 			"type": "object",
 			"required": [
 				"port"
@@ -73435,7 +75205,7 @@
 			"x-kubernetes-map-type": "atomic"
 		},
 		"io.k8s.api.core.v1.EndpointSubset": {
-			"description": "EndpointSubset is a group of addresses with a common set of ports. The expanded set of endpoints is the Cartesian product of Addresses x Ports. For example, given:\n\n\t{\n\t  Addresses: [{\"ip\": \"10.10.1.1\"}, {\"ip\": \"10.10.2.2\"}],\n\t  Ports:     [{\"name\": \"a\", \"port\": 8675}, {\"name\": \"b\", \"port\": 309}]\n\t}\n\nThe resulting set of endpoints can be viewed as:\n\n\ta: [ 10.10.1.1:8675, 10.10.2.2:8675 ],\n\tb: [ 10.10.1.1:309, 10.10.2.2:309 ]",
+			"description": "EndpointSubset is a group of addresses with a common set of ports. The expanded set of endpoints is the Cartesian product of Addresses x Ports. For example, given:\n\n\t{\n\t  Addresses: [{\"ip\": \"10.10.1.1\"}, {\"ip\": \"10.10.2.2\"}],\n\t  Ports:     [{\"name\": \"a\", \"port\": 8675}, {\"name\": \"b\", \"port\": 309}]\n\t}\n\nThe resulting set of endpoints can be viewed as:\n\n\ta: [ 10.10.1.1:8675, 10.10.2.2:8675 ],\n\tb: [ 10.10.1.1:309, 10.10.2.2:309 ]\n\nDeprecated: This API is deprecated in v1.33+.",
 			"type": "object",
 			"properties": {
 				"addresses": {
@@ -73465,7 +75235,7 @@
 			}
 		},
 		"io.k8s.api.core.v1.Endpoints": {
-			"description": "Endpoints is a collection of endpoints that implement the actual service. Example:\n\n\t Name: \"mysvc\",\n\t Subsets: [\n\t   {\n\t     Addresses: [{\"ip\": \"10.10.1.1\"}, {\"ip\": \"10.10.2.2\"}],\n\t     Ports: [{\"name\": \"a\", \"port\": 8675}, {\"name\": \"b\", \"port\": 309}]\n\t   },\n\t   {\n\t     Addresses: [{\"ip\": \"10.10.3.3\"}],\n\t     Ports: [{\"name\": \"a\", \"port\": 93}, {\"name\": \"b\", \"port\": 76}]\n\t   },\n\t]",
+			"description": "Endpoints is a collection of endpoints that implement the actual service. Example:\n\n\t Name: \"mysvc\",\n\t Subsets: [\n\t   {\n\t     Addresses: [{\"ip\": \"10.10.1.1\"}, {\"ip\": \"10.10.2.2\"}],\n\t     Ports: [{\"name\": \"a\", \"port\": 8675}, {\"name\": \"b\", \"port\": 309}]\n\t   },\n\t   {\n\t     Addresses: [{\"ip\": \"10.10.3.3\"}],\n\t     Ports: [{\"name\": \"a\", \"port\": 93}, {\"name\": \"b\", \"port\": 76}]\n\t   },\n\t]\n\nEndpoints is a legacy API and does not contain information about all Service features. Use discoveryv1.EndpointSlice for complete information about Service endpoints.\n\nDeprecated: This API is deprecated in v1.33+. Use discoveryv1.EndpointSlice.",
 			"type": "object",
 			"properties": {
 				"apiVersion": {
@@ -73498,7 +75268,7 @@
 			]
 		},
 		"io.k8s.api.core.v1.EndpointsList": {
-			"description": "EndpointsList is a list of endpoints.",
+			"description": "EndpointsList is a list of endpoints. Deprecated: This API is deprecated in v1.33+.",
 			"type": "object",
 			"required": [
 				"items"
@@ -73533,7 +75303,7 @@
 			]
 		},
 		"io.k8s.api.core.v1.EnvFromSource": {
-			"description": "EnvFromSource represents the source of a set of ConfigMaps",
+			"description": "EnvFromSource represents the source of a set of ConfigMaps or Secrets",
 			"type": "object",
 			"properties": {
 				"configMapRef": {
@@ -73541,7 +75311,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.ConfigMapEnvSource"
 				},
 				"prefix": {
-					"description": "An optional identifier to prepend to each key in the ConfigMap. Must be a C_IDENTIFIER.",
+					"description": "Optional text to prepend to the name of each environment variable. Must be a C_IDENTIFIER.",
 					"type": "string"
 				},
 				"secretRef": {
@@ -74453,6 +76223,77 @@
 				"preStop": {
 					"description": "PreStop is called immediately before a container is terminated due to an API request or management event such as liveness/startup probe failure, preemption, resource contention, etc. The handler is not called if the container crashes or exits. The Pod's termination grace period countdown begins before the PreStop hook is executed. Regardless of the outcome of the handler, the container will eventually terminate within the Pod's termination grace period (unless delayed by finalizers). Other management of the container blocks until the hook completes or until the termination grace period is reached. More info: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#container-hooks",
 					"$ref": "#/definitions/io.k8s.api.core.v1.LifecycleHandler"
+				},
+				"stopSignal": {
+					"description": "StopSignal defines which signal will be sent to a container when it is being stopped. If not specified, the default is defined by the container runtime in use. StopSignal can only be set for Pods with a non-empty .spec.os.name\n\nPossible enum values:\n - `\"SIGABRT\"`\n - `\"SIGALRM\"`\n - `\"SIGBUS\"`\n - `\"SIGCHLD\"`\n - `\"SIGCLD\"`\n - `\"SIGCONT\"`\n - `\"SIGFPE\"`\n - `\"SIGHUP\"`\n - `\"SIGILL\"`\n - `\"SIGINT\"`\n - `\"SIGIO\"`\n - `\"SIGIOT\"`\n - `\"SIGKILL\"`\n - `\"SIGPIPE\"`\n - `\"SIGPOLL\"`\n - `\"SIGPROF\"`\n - `\"SIGPWR\"`\n - `\"SIGQUIT\"`\n - `\"SIGRTMAX\"`\n - `\"SIGRTMAX-1\"`\n - `\"SIGRTMAX-10\"`\n - `\"SIGRTMAX-11\"`\n - `\"SIGRTMAX-12\"`\n - `\"SIGRTMAX-13\"`\n - `\"SIGRTMAX-14\"`\n - `\"SIGRTMAX-2\"`\n - `\"SIGRTMAX-3\"`\n - `\"SIGRTMAX-4\"`\n - `\"SIGRTMAX-5\"`\n - `\"SIGRTMAX-6\"`\n - `\"SIGRTMAX-7\"`\n - `\"SIGRTMAX-8\"`\n - `\"SIGRTMAX-9\"`\n - `\"SIGRTMIN\"`\n - `\"SIGRTMIN+1\"`\n - `\"SIGRTMIN+10\"`\n - `\"SIGRTMIN+11\"`\n - `\"SIGRTMIN+12\"`\n - `\"SIGRTMIN+13\"`\n - `\"SIGRTMIN+14\"`\n - `\"SIGRTMIN+15\"`\n - `\"SIGRTMIN+2\"`\n - `\"SIGRTMIN+3\"`\n - `\"SIGRTMIN+4\"`\n - `\"SIGRTMIN+5\"`\n - `\"SIGRTMIN+6\"`\n - `\"SIGRTMIN+7\"`\n - `\"SIGRTMIN+8\"`\n - `\"SIGRTMIN+9\"`\n - `\"SIGSEGV\"`\n - `\"SIGSTKFLT\"`\n - `\"SIGSTOP\"`\n - `\"SIGSYS\"`\n - `\"SIGTERM\"`\n - `\"SIGTRAP\"`\n - `\"SIGTSTP\"`\n - `\"SIGTTIN\"`\n - `\"SIGTTOU\"`\n - `\"SIGURG\"`\n - `\"SIGUSR1\"`\n - `\"SIGUSR2\"`\n - `\"SIGVTALRM\"`\n - `\"SIGWINCH\"`\n - `\"SIGXCPU\"`\n - `\"SIGXFSZ\"`",
+					"type": "string",
+					"enum": [
+						"SIGABRT",
+						"SIGALRM",
+						"SIGBUS",
+						"SIGCHLD",
+						"SIGCLD",
+						"SIGCONT",
+						"SIGFPE",
+						"SIGHUP",
+						"SIGILL",
+						"SIGINT",
+						"SIGIO",
+						"SIGIOT",
+						"SIGKILL",
+						"SIGPIPE",
+						"SIGPOLL",
+						"SIGPROF",
+						"SIGPWR",
+						"SIGQUIT",
+						"SIGRTMAX",
+						"SIGRTMAX-1",
+						"SIGRTMAX-10",
+						"SIGRTMAX-11",
+						"SIGRTMAX-12",
+						"SIGRTMAX-13",
+						"SIGRTMAX-14",
+						"SIGRTMAX-2",
+						"SIGRTMAX-3",
+						"SIGRTMAX-4",
+						"SIGRTMAX-5",
+						"SIGRTMAX-6",
+						"SIGRTMAX-7",
+						"SIGRTMAX-8",
+						"SIGRTMAX-9",
+						"SIGRTMIN",
+						"SIGRTMIN+1",
+						"SIGRTMIN+10",
+						"SIGRTMIN+11",
+						"SIGRTMIN+12",
+						"SIGRTMIN+13",
+						"SIGRTMIN+14",
+						"SIGRTMIN+15",
+						"SIGRTMIN+2",
+						"SIGRTMIN+3",
+						"SIGRTMIN+4",
+						"SIGRTMIN+5",
+						"SIGRTMIN+6",
+						"SIGRTMIN+7",
+						"SIGRTMIN+8",
+						"SIGRTMIN+9",
+						"SIGSEGV",
+						"SIGSTKFLT",
+						"SIGSTOP",
+						"SIGSYS",
+						"SIGTERM",
+						"SIGTRAP",
+						"SIGTSTP",
+						"SIGTTIN",
+						"SIGTTOU",
+						"SIGURG",
+						"SIGUSR1",
+						"SIGUSR2",
+						"SIGVTALRM",
+						"SIGWINCH",
+						"SIGXCPU",
+						"SIGXFSZ"
+					]
 				}
 			}
 		},
@@ -75326,6 +77167,17 @@
 				}
 			}
 		},
+		"io.k8s.api.core.v1.NodeSwapStatus": {
+			"description": "NodeSwapStatus represents swap memory information.",
+			"type": "object",
+			"properties": {
+				"capacity": {
+					"description": "Total amount of swap memory in bytes.",
+					"type": "integer",
+					"format": "int64"
+				}
+			}
+		},
 		"io.k8s.api.core.v1.NodeSystemInfo": {
 			"description": "NodeSystemInfo is a set of ids/uuids to uniquely identify the node.",
 			"type": "object",
@@ -75377,6 +77229,10 @@
 				"osImage": {
 					"description": "OS Image reported by the node from /etc/os-release (e.g. Debian GNU/Linux 7 (wheezy)).",
 					"type": "string"
+				},
+				"swap": {
+					"description": "Swap Info reported by the node.",
+					"$ref": "#/definitions/io.k8s.api.core.v1.NodeSwapStatus"
 				},
 				"systemUUID": {
 					"description": "SystemUUID reported by the node. For unique machine identification MachineID is preferred. This field is specific to Red Hat hosts https://access.redhat.com/documentation/en-us/red_hat_subscription_management/1/html/rhsm/uuid",
@@ -76046,7 +77902,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
 				},
 				"matchLabelKeys": {
-					"description": "MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both matchLabelKeys and labelSelector. Also, matchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
+					"description": "MatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both matchLabelKeys and labelSelector. Also, matchLabelKeys cannot be set when labelSelector isn't set.",
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -76054,7 +77910,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"mismatchLabelKeys": {
-					"description": "MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both mismatchLabelKeys and labelSelector. Also, mismatchLabelKeys cannot be set when labelSelector isn't set. This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).",
+					"description": "MismatchLabelKeys is a set of pod label keys to select which pods will be taken into consideration. The keys are used to lookup values from the incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)` to select the group of existing pods which pods will be taken into consideration for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming pod labels will be ignored. The default value is empty. The same key is forbidden to exist in both mismatchLabelKeys and labelSelector. Also, mismatchLabelKeys cannot be set when labelSelector isn't set.",
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -76120,6 +77976,11 @@
 				"message": {
 					"description": "Human-readable message indicating details about last transition.",
 					"type": "string"
+				},
+				"observedGeneration": {
+					"description": "If set, this represents the .metadata.generation that the pod condition was set based upon. This is an alpha field. Enable PodObservedGenerationTracking to be able to use this field.",
+					"type": "integer",
+					"format": "int64"
 				},
 				"reason": {
 					"description": "Unique, one-word, CamelCase reason for the condition's last transition.",
@@ -76729,6 +78590,11 @@
 					"description": "nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be scheduled right away as preemption victims receive their graceful termination periods. This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide to place the pod elsewhere if other nodes become available sooner. Scheduler may also decide to give the resources on this node to a higher priority pod that is created after preemption. As a result, this field may be different than PodSpec.nodeName when the pod is scheduled.",
 					"type": "string"
 				},
+				"observedGeneration": {
+					"description": "If set, this represents the .metadata.generation that the pod status was set based upon. This is an alpha field. Enable PodObservedGenerationTracking to be able to use this field.",
+					"type": "integer",
+					"format": "int64"
+				},
 				"phase": {
 					"description": "The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle. The conditions array, the reason and message fields, and the individual container status arrays contain more detail about the pod's status. There are five possible phase values:\n\nPending: The pod has been accepted by the Kubernetes system, but one or more of the container images has not been created. This includes time before being scheduled as well as time spent downloading images over the network, which could take a while. Running: The pod has been bound to a node, and all of the containers have been created. At least one container is still running, or is in the process of starting or restarting. Succeeded: All containers in the pod have terminated in success, and will not be restarted. Failed: All containers in the pod have terminated, and at least one container has terminated in failure. The container either exited with non-zero status or was terminated by the system. Unknown: For some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod.\n\nMore info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase\n\nPossible enum values:\n - `\"Failed\"` means that all containers in the pod have terminated, and at least one container has terminated in a failure (exited with a non-zero exit code or was stopped by the system).\n - `\"Pending\"` means the pod has been accepted by the system, but one or more of the containers has not been started. This includes time before being bound to a node, as well as time spent pulling images onto the host.\n - `\"Running\"` means the pod has been bound to a node and all of the containers have been started. At least one container is still running or is in the process of being restarted.\n - `\"Succeeded\"` means that all containers in the pod have voluntarily terminated with a container exit code of 0, and the system is not going to restart any of these containers.\n - `\"Unknown\"` means that for some reason the state of the pod could not be obtained, typically due to an error in communicating with the host of the pod. Deprecated: It isn't being set since 2015 (74da3b14b0c0f658b3bb8d2def5094686d0e9095)",
 					"type": "string",
@@ -76771,7 +78637,7 @@
 					"type": "string"
 				},
 				"resize": {
-					"description": "Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to \"Proposed\"",
+					"description": "Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to \"Proposed\" Deprecated: Resize status is moved to two pod conditions PodResizePending and PodResizeInProgress. PodResizePending will track states where the spec has been resized, but the Kubelet has not yet allocated the resources. PodResizeInProgress will track in-progress resizes, and should be present whenever allocated resources != acknowledged resources.",
 					"type": "string"
 				},
 				"resourceClaimStatuses": {
@@ -77459,7 +79325,8 @@
 							"NotBestEffort",
 							"NotTerminating",
 							"PriorityClass",
-							"Terminating"
+							"Terminating",
+							"VolumeAttributesClass"
 						]
 					},
 					"x-kubernetes-list-type": "atomic"
@@ -77699,7 +79566,7 @@
 					]
 				},
 				"scopeName": {
-					"description": "The name of the scope that the selector applies to.\n\nPossible enum values:\n - `\"BestEffort\"` Match all pod objects that have best effort quality of service\n - `\"CrossNamespacePodAffinity\"` Match all pod objects that have cross-namespace pod (anti)affinity mentioned.\n - `\"NotBestEffort\"` Match all pod objects that do not have best effort quality of service\n - `\"NotTerminating\"` Match all pod objects where spec.activeDeadlineSeconds is nil\n - `\"PriorityClass\"` Match all pod objects that have priority class mentioned\n - `\"Terminating\"` Match all pod objects where spec.activeDeadlineSeconds >=0",
+					"description": "The name of the scope that the selector applies to.\n\nPossible enum values:\n - `\"BestEffort\"` Match all pod objects that have best effort quality of service\n - `\"CrossNamespacePodAffinity\"` Match all pod objects that have cross-namespace pod (anti)affinity mentioned.\n - `\"NotBestEffort\"` Match all pod objects that do not have best effort quality of service\n - `\"NotTerminating\"` Match all pod objects where spec.activeDeadlineSeconds is nil\n - `\"PriorityClass\"` Match all pod objects that have priority class mentioned\n - `\"Terminating\"` Match all pod objects where spec.activeDeadlineSeconds >=0\n - `\"VolumeAttributesClass\"` Match all pvc objects that have volume attributes class mentioned.",
 					"type": "string",
 					"enum": [
 						"BestEffort",
@@ -77707,7 +79574,8 @@
 						"NotBestEffort",
 						"NotTerminating",
 						"PriorityClass",
-						"Terminating"
+						"Terminating",
+						"VolumeAttributesClass"
 					]
 				},
 				"values": {
@@ -78338,7 +80206,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.SessionAffinityConfig"
 				},
 				"trafficDistribution": {
-					"description": "TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to \"PreferClose\", implementations should prioritize endpoints that are topologically close (e.g., same zone). This is a beta field and requires enabling ServiceTrafficDistribution feature.",
+					"description": "TrafficDistribution offers a way to express preferences for how traffic is distributed to Service endpoints. Implementations can use this field as a hint, but are not required to guarantee strict adherence. If the field is not set, the implementation will apply its default routing strategy. If set to \"PreferClose\", implementations should prioritize endpoints that are in the same zone.",
 					"type": "string"
 				},
 				"type": {
@@ -78623,7 +80491,7 @@
 					"format": "int32"
 				},
 				"nodeAffinityPolicy": {
-					"description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector when calculating pod topology spread skew. Options are: - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations. - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\nIf this value is nil, the behavior is equivalent to the Honor policy. This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.\n\nPossible enum values:\n - `\"Honor\"` means use this scheduling directive when calculating pod topology spread skew.\n - `\"Ignore\"` means ignore this scheduling directive when calculating pod topology spread skew.",
+					"description": "NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector when calculating pod topology spread skew. Options are: - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations. - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.\n\nIf this value is nil, the behavior is equivalent to the Honor policy.\n\nPossible enum values:\n - `\"Honor\"` means use this scheduling directive when calculating pod topology spread skew.\n - `\"Ignore\"` means ignore this scheduling directive when calculating pod topology spread skew.",
 					"type": "string",
 					"enum": [
 						"Honor",
@@ -78631,7 +80499,7 @@
 					]
 				},
 				"nodeTaintsPolicy": {
-					"description": "NodeTaintsPolicy indicates how we will treat node taints when calculating pod topology spread skew. Options are: - Honor: nodes without taints, along with tainted nodes for which the incoming pod has a toleration, are included. - Ignore: node taints are ignored. All nodes are included.\n\nIf this value is nil, the behavior is equivalent to the Ignore policy. This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.\n\nPossible enum values:\n - `\"Honor\"` means use this scheduling directive when calculating pod topology spread skew.\n - `\"Ignore\"` means ignore this scheduling directive when calculating pod topology spread skew.",
+					"description": "NodeTaintsPolicy indicates how we will treat node taints when calculating pod topology spread skew. Options are: - Honor: nodes without taints, along with tainted nodes for which the incoming pod has a toleration, are included. - Ignore: node taints are ignored. All nodes are included.\n\nIf this value is nil, the behavior is equivalent to the Ignore policy.\n\nPossible enum values:\n - `\"Honor\"` means use this scheduling directive when calculating pod topology spread skew.\n - `\"Ignore\"` means ignore this scheduling directive when calculating pod topology spread skew.",
 					"type": "string",
 					"enum": [
 						"Honor",
@@ -78777,7 +80645,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.HostPathVolumeSource"
 				},
 				"image": {
-					"description": "image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:\n\n- Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.\n\nThe volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro) and non-executable files (noexec). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath). The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.",
+					"description": "image represents an OCI object (a container image or artifact) pulled and mounted on the kubelet's host machine. The volume is resolved at pod startup depending on which PullPolicy value is provided:\n\n- Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails. - Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present. - IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.\n\nThe volume gets re-resolved if the pod gets deleted and recreated, which means that new remote content will become available on pod recreation. A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message. The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field. The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images. The volume will be mounted read-only (ro) and non-executable files (noexec). Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33. The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.ImageVolumeSource"
 				},
 				"iscsi": {
@@ -79051,7 +80919,7 @@
 			],
 			"properties": {
 				"addresses": {
-					"description": "addresses of this endpoint. The contents of this field are interpreted according to the corresponding EndpointSlice addressType field. Consumers must handle different types of addresses in the context of their own capabilities. This must contain at least one address but no more than 100. These are all assumed to be fungible and clients may choose to only use the first element. Refer to: https://issue.k8s.io/106267",
+					"description": "addresses of this endpoint. For EndpointSlices of addressType \"IPv4\" or \"IPv6\", the values are IP addresses in canonical form. The syntax and semantics of other addressType values are not defined. This must contain at least one address but no more than 100. EndpointSlices generated by the EndpointSlice controller will always have exactly 1 address. No semantics are defined for additional addresses beyond the first, and kube-proxy does not look at them.",
 					"type": "array",
 					"items": {
 						"type": "string"
@@ -79096,15 +80964,15 @@
 			"type": "object",
 			"properties": {
 				"ready": {
-					"description": "ready indicates that this endpoint is prepared to receive traffic, according to whatever system is managing the endpoint. A nil value indicates an unknown state. In most cases consumers should interpret this unknown state as ready. For compatibility reasons, ready should never be \"true\" for terminating endpoints, except when the normal readiness behavior is being explicitly overridden, for example when the associated Service has set the publishNotReadyAddresses flag.",
+					"description": "ready indicates that this endpoint is ready to receive traffic, according to whatever system is managing the endpoint. A nil value should be interpreted as \"true\". In general, an endpoint should be marked ready if it is serving and not terminating, though this can be overridden in some cases, such as when the associated Service has set the publishNotReadyAddresses flag.",
 					"type": "boolean"
 				},
 				"serving": {
-					"description": "serving is identical to ready except that it is set regardless of the terminating state of endpoints. This condition should be set to true for a ready endpoint that is terminating. If nil, consumers should defer to the ready condition.",
+					"description": "serving indicates that this endpoint is able to receive traffic, according to whatever system is managing the endpoint. For endpoints backed by pods, the EndpointSlice controller will mark the endpoint as serving if the pod's Ready condition is True. A nil value should be interpreted as \"true\".",
 					"type": "boolean"
 				},
 				"terminating": {
-					"description": "terminating indicates that this endpoint is terminating. A nil value indicates an unknown state. Consumers should interpret this unknown state to mean that the endpoint is not terminating.",
+					"description": "terminating indicates that this endpoint is terminating. A nil value should be interpreted as \"false\".",
 					"type": "boolean"
 				}
 			}
@@ -79113,8 +80981,16 @@
 			"description": "EndpointHints provides hints describing how an endpoint should be consumed.",
 			"type": "object",
 			"properties": {
+				"forNodes": {
+					"description": "forNodes indicates the node(s) this endpoint should be consumed by when using topology aware routing. May contain a maximum of 8 entries. This is an Alpha feature and is only used when the PreferSameTrafficDistribution feature gate is enabled.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/io.k8s.api.discovery.v1.ForNode"
+					},
+					"x-kubernetes-list-type": "atomic"
+				},
 				"forZones": {
-					"description": "forZones indicates the zone(s) this endpoint should be consumed by to enable topology aware routing.",
+					"description": "forZones indicates the zone(s) this endpoint should be consumed by when using topology aware routing. May contain a maximum of 8 entries.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.discovery.v1.ForZone"
@@ -79136,7 +81012,7 @@
 					"type": "string"
 				},
 				"port": {
-					"description": "port represents the port number of the endpoint. If this is not specified, ports are not restricted and must be interpreted in the context of the specific consumer.",
+					"description": "port represents the port number of the endpoint. If the EndpointSlice is derived from a Kubernetes service, this must be set to the service's target port. EndpointSlices used for other purposes may have a nil port.",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -79153,7 +81029,7 @@
 			"x-kubernetes-map-type": "atomic"
 		},
 		"io.k8s.api.discovery.v1.EndpointSlice": {
-			"description": "EndpointSlice represents a subset of the endpoints that implement a service. For a given service there may be multiple EndpointSlice objects, selected by labels, which must be joined to produce the full set of endpoints.",
+			"description": "EndpointSlice represents a set of service endpoints. Most EndpointSlices are created by the EndpointSlice controller to represent the Pods selected by Service objects. For a given service there may be multiple EndpointSlice objects which must be joined to produce the full set of endpoints; you can find all of the slices for a given service by listing EndpointSlices in the service's namespace whose `kubernetes.io/service-name` label contains the service's name.",
 			"type": "object",
 			"required": [
 				"addressType",
@@ -79161,7 +81037,7 @@
 			],
 			"properties": {
 				"addressType": {
-					"description": "addressType specifies the type of address carried by this EndpointSlice. All addresses in this slice must be the same type. This field is immutable after creation. The following address types are currently supported: * IPv4: Represents an IPv4 Address. * IPv6: Represents an IPv6 Address. * FQDN: Represents a Fully Qualified Domain Name.\n\nPossible enum values:\n - `\"FQDN\"` represents a FQDN.\n - `\"IPv4\"` represents an IPv4 Address.\n - `\"IPv6\"` represents an IPv6 Address.",
+					"description": "addressType specifies the type of address carried by this EndpointSlice. All addresses in this slice must be the same type. This field is immutable after creation. The following address types are currently supported: * IPv4: Represents an IPv4 Address. * IPv6: Represents an IPv6 Address. * FQDN: Represents a Fully Qualified Domain Name. (Deprecated) The EndpointSlice controller only generates, and kube-proxy only processes, slices of addressType \"IPv4\" and \"IPv6\". No semantics are defined for the \"FQDN\" type.\n\nPossible enum values:\n - `\"FQDN\"` represents a FQDN.\n - `\"IPv4\"` represents an IPv4 Address.\n - `\"IPv6\"` represents an IPv6 Address.",
 					"type": "string",
 					"enum": [
 						"FQDN",
@@ -79190,7 +81066,7 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
 				},
 				"ports": {
-					"description": "ports specifies the list of network ports exposed by each endpoint in this slice. Each port must have a unique name. When ports is empty, it indicates that there are no defined ports. When a port is defined with a nil port value, it indicates \"all ports\". Each slice may include a maximum of 100 ports.",
+					"description": "ports specifies the list of network ports exposed by each endpoint in this slice. Each port must have a unique name. Each slice may include a maximum of 100 ports. Services always have at least 1 port, so EndpointSlices generated by the EndpointSlice controller will likewise always have at least 1 port. EndpointSlices used for other purposes may have an empty ports list.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.discovery.v1.EndpointPort"
@@ -79240,6 +81116,19 @@
 					"version": "v1"
 				}
 			]
+		},
+		"io.k8s.api.discovery.v1.ForNode": {
+			"description": "ForNode provides information about which nodes should consume this endpoint.",
+			"type": "object",
+			"required": [
+				"name"
+			],
+			"properties": {
+				"name": {
+					"description": "name represents the name of the node.",
+					"type": "string"
+				}
+			}
 		},
 		"io.k8s.api.discovery.v1.ForZone": {
 			"description": "ForZone provides information about which zones should consume this endpoint.",
@@ -80021,6 +81910,83 @@
 				}
 			}
 		},
+		"io.k8s.api.networking.v1.IPAddress": {
+			"description": "IPAddress represents a single IP of a single IP Family. The object is designed to be used by APIs that operate on IP addresses. The object is used by the Service core API for allocation of IP addresses. An IP address can be represented in different formats, to guarantee the uniqueness of the IP, the name of the object is the IP address in canonical format, four decimal digits separated by dots suppressing leading zeros for IPv4 and the representation defined by RFC 5952 for IPv6. Valid: 192.168.1.5 or 2001:db8::1 or 2001:db8:aaaa:bbbb:cccc:dddd:eeee:1 Invalid: 10.01.2.3 or 2001:db8:0:0:0::1",
+			"type": "object",
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+				},
+				"spec": {
+					"description": "spec is the desired state of the IPAddress. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+					"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddressSpec"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "networking.k8s.io",
+					"kind": "IPAddress",
+					"version": "v1"
+				}
+			]
+		},
+		"io.k8s.api.networking.v1.IPAddressList": {
+			"description": "IPAddressList contains a list of IPAddress.",
+			"type": "object",
+			"required": [
+				"items"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"items": {
+					"description": "items is the list of IPAddresses.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/io.k8s.api.networking.v1.IPAddress"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "networking.k8s.io",
+					"kind": "IPAddressList",
+					"version": "v1"
+				}
+			]
+		},
+		"io.k8s.api.networking.v1.IPAddressSpec": {
+			"description": "IPAddressSpec describe the attributes in an IP Address.",
+			"type": "object",
+			"required": [
+				"parentRef"
+			],
+			"properties": {
+				"parentRef": {
+					"description": "ParentRef references the resource that an IPAddress is attached to. An IPAddress must reference a parent object.",
+					"$ref": "#/definitions/io.k8s.api.networking.v1.ParentReference"
+				}
+			}
+		},
 		"io.k8s.api.networking.v1.IPBlock": {
 			"description": "IPBlock describes a particular CIDR (Ex. \"192.168.1.0/24\",\"2001:db8::/64\") that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The except entry describes CIDRs that should not be included within this rule.",
 			"type": "object",
@@ -80575,6 +82541,32 @@
 				}
 			}
 		},
+		"io.k8s.api.networking.v1.ParentReference": {
+			"description": "ParentReference describes a reference to a parent object.",
+			"type": "object",
+			"required": [
+				"resource",
+				"name"
+			],
+			"properties": {
+				"group": {
+					"description": "Group is the group of the object being referenced.",
+					"type": "string"
+				},
+				"name": {
+					"description": "Name is the name of the object being referenced.",
+					"type": "string"
+				},
+				"namespace": {
+					"description": "Namespace is the namespace of the object being referenced.",
+					"type": "string"
+				},
+				"resource": {
+					"description": "Resource is the resource of the object being referenced.",
+					"type": "string"
+				}
+			}
+		},
 		"io.k8s.api.networking.v1.ServiceBackendPort": {
 			"description": "ServiceBackendPort is the service port being referenced.",
 			"type": "object",
@@ -80590,6 +82582,107 @@
 				}
 			},
 			"x-kubernetes-map-type": "atomic"
+		},
+		"io.k8s.api.networking.v1.ServiceCIDR": {
+			"description": "ServiceCIDR defines a range of IP addresses using CIDR format (e.g. 192.168.0.0/24 or 2001:db2::/64). This range is used to allocate ClusterIPs to Service objects.",
+			"type": "object",
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+				},
+				"spec": {
+					"description": "spec is the desired state of the ServiceCIDR. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+					"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDRSpec"
+				},
+				"status": {
+					"description": "status represents the current state of the ServiceCIDR. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status",
+					"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDRStatus"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDR",
+					"version": "v1"
+				}
+			]
+		},
+		"io.k8s.api.networking.v1.ServiceCIDRList": {
+			"description": "ServiceCIDRList contains a list of ServiceCIDR objects.",
+			"type": "object",
+			"required": [
+				"items"
+			],
+			"properties": {
+				"apiVersion": {
+					"description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+					"type": "string"
+				},
+				"items": {
+					"description": "items is the list of ServiceCIDRs.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/io.k8s.api.networking.v1.ServiceCIDR"
+					}
+				},
+				"kind": {
+					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+					"type": "string"
+				},
+				"metadata": {
+					"description": "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"
+				}
+			},
+			"x-kubernetes-group-version-kind": [
+				{
+					"group": "networking.k8s.io",
+					"kind": "ServiceCIDRList",
+					"version": "v1"
+				}
+			]
+		},
+		"io.k8s.api.networking.v1.ServiceCIDRSpec": {
+			"description": "ServiceCIDRSpec define the CIDRs the user wants to use for allocating ClusterIPs for Services.",
+			"type": "object",
+			"properties": {
+				"cidrs": {
+					"description": "CIDRs defines the IP blocks in CIDR notation (e.g. \"192.168.0.0/24\" or \"2001:db8::/64\") from which to assign service cluster IPs. Max of two CIDRs is allowed, one of each IP family. This field is immutable.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"x-kubernetes-list-type": "atomic"
+				}
+			}
+		},
+		"io.k8s.api.networking.v1.ServiceCIDRStatus": {
+			"description": "ServiceCIDRStatus describes the current state of the ServiceCIDR.",
+			"type": "object",
+			"properties": {
+				"conditions": {
+					"description": "conditions holds an array of metav1.Condition that describe the state of the ServiceCIDR. Current service state",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.Condition"
+					},
+					"x-kubernetes-list-map-keys": [
+						"type"
+					],
+					"x-kubernetes-list-type": "map",
+					"x-kubernetes-patch-merge-key": "type",
+					"x-kubernetes-patch-strategy": "merge"
+				}
+			}
 		},
 		"io.k8s.api.node.v1.Overhead": {
 			"description": "Overhead structure represents the resource overhead associated with running a pod.",
@@ -80816,7 +82909,7 @@
 					"x-kubernetes-patch-strategy": "replace"
 				},
 				"unhealthyPodEvictionPolicy": {
-					"description": "UnhealthyPodEvictionPolicy defines the criteria for when unhealthy pods should be considered for eviction. Current implementation considers healthy pods, as pods that have status.conditions item with type=\"Ready\",status=\"True\".\n\nValid policies are IfHealthyBudget and AlwaysAllow. If no policy is specified, the default behavior will be used, which corresponds to the IfHealthyBudget policy.\n\nIfHealthyBudget policy means that running pods (status.phase=\"Running\"), but not yet healthy can be evicted only if the guarded application is not disrupted (status.currentHealthy is at least equal to status.desiredHealthy). Healthy pods will be subject to the PDB for eviction.\n\nAlwaysAllow policy means that all running pods (status.phase=\"Running\"), but not yet healthy are considered disrupted and can be evicted regardless of whether the criteria in a PDB is met. This means perspective running pods of a disrupted application might not get a chance to become healthy. Healthy pods will be subject to the PDB for eviction.\n\nAdditional policies may be added in the future. Clients making eviction decisions should disallow eviction of unhealthy pods if they encounter an unrecognized policy in this field.\n\nThis field is beta-level. The eviction API uses this field when the feature gate PDBUnhealthyPodEvictionPolicy is enabled (enabled by default).\n\nPossible enum values:\n - `\"AlwaysAllow\"` policy means that all running pods (status.phase=\"Running\"), but not yet healthy are considered disrupted and can be evicted regardless of whether the criteria in a PDB is met. This means perspective running pods of a disrupted application might not get a chance to become healthy. Healthy pods will be subject to the PDB for eviction.\n - `\"IfHealthyBudget\"` policy means that running pods (status.phase=\"Running\"), but not yet healthy can be evicted only if the guarded application is not disrupted (status.currentHealthy is at least equal to status.desiredHealthy). Healthy pods will be subject to the PDB for eviction.",
+					"description": "UnhealthyPodEvictionPolicy defines the criteria for when unhealthy pods should be considered for eviction. Current implementation considers healthy pods, as pods that have status.conditions item with type=\"Ready\",status=\"True\".\n\nValid policies are IfHealthyBudget and AlwaysAllow. If no policy is specified, the default behavior will be used, which corresponds to the IfHealthyBudget policy.\n\nIfHealthyBudget policy means that running pods (status.phase=\"Running\"), but not yet healthy can be evicted only if the guarded application is not disrupted (status.currentHealthy is at least equal to status.desiredHealthy). Healthy pods will be subject to the PDB for eviction.\n\nAlwaysAllow policy means that all running pods (status.phase=\"Running\"), but not yet healthy are considered disrupted and can be evicted regardless of whether the criteria in a PDB is met. This means perspective running pods of a disrupted application might not get a chance to become healthy. Healthy pods will be subject to the PDB for eviction.\n\nAdditional policies may be added in the future. Clients making eviction decisions should disallow eviction of unhealthy pods if they encounter an unrecognized policy in this field.\n\nPossible enum values:\n - `\"AlwaysAllow\"` policy means that all running pods (status.phase=\"Running\"), but not yet healthy are considered disrupted and can be evicted regardless of whether the criteria in a PDB is met. This means perspective running pods of a disrupted application might not get a chance to become healthy. Healthy pods will be subject to the PDB for eviction.\n - `\"IfHealthyBudget\"` policy means that running pods (status.phase=\"Running\"), but not yet healthy can be evicted only if the guarded application is not disrupted (status.currentHealthy is at least equal to status.desiredHealthy). Healthy pods will be subject to the PDB for eviction.",
 					"type": "string",
 					"enum": [
 						"AlwaysAllow",
@@ -81449,6 +83542,11 @@
 					"description": "fsGroupPolicy defines if the underlying volume supports changing ownership and permission of the volume before being mounted. Refer to the specific FSGroupPolicy values for additional details.\n\nThis field was immutable in Kubernetes < 1.29 and now is mutable.\n\nDefaults to ReadWriteOnceWithFSType, which will examine each volume to determine if Kubernetes should modify ownership and permissions of the volume. With the default policy the defined fsGroup will only be applied if a fstype is defined and the volume's access mode contains ReadWriteOnce.",
 					"type": "string"
 				},
+				"nodeAllocatableUpdatePeriodSeconds": {
+					"description": "nodeAllocatableUpdatePeriodSeconds specifies the interval between periodic updates of the CSINode allocatable capacity for this driver. When set, both periodic updates and updates triggered by capacity-related failures are enabled. If not set, no updates occur (neither periodic nor upon detecting capacity-related failures), and the allocatable.count remains static. The minimum allowed value for this field is 10 seconds.\n\nThis is an alpha feature and requires the MutableCSINodeAllocatableCount feature gate to be enabled.\n\nThis field is mutable.",
+					"type": "integer",
+					"format": "int64"
+				},
 				"podInfoOnMount": {
 					"description": "podInfoOnMount indicates this CSI volume driver requires additional pod information (like podName, podUID, etc.) during mount operations, if set to true. If set to false, pod information will not be passed on mount. Default is false.\n\nThe CSI driver specifies podInfoOnMount as part of driver deployment. If true, Kubelet will pass pod information as VolumeContext in the CSI NodePublishVolume() calls. The CSI driver is responsible for parsing and validating the information passed in as VolumeContext.\n\nThe following VolumeContext will be passed if podInfoOnMount is set to true. This list might grow, but the prefix will be used. \"csi.storage.k8s.io/pod.name\": pod.Name \"csi.storage.k8s.io/pod.namespace\": pod.Namespace \"csi.storage.k8s.io/pod.uid\": string(pod.UID) \"csi.storage.k8s.io/ephemeral\": \"true\" if the volume is an ephemeral inline volume\n                                defined by a CSIVolumeSource, otherwise \"false\"\n\n\"csi.storage.k8s.io/ephemeral\" is a new feature in Kubernetes 1.16. It is only required for drivers which support both the \"Persistent\" and \"Ephemeral\" VolumeLifecycleMode. Other drivers can leave pod info disabled and/or ignore this field. As Kubernetes 1.15 doesn't support this field, drivers can only support one mode when deployed on such a cluster and the deployment determines which mode that is, for example via a command line parameter of the driver.\n\nThis field was immutable in Kubernetes < 1.29 and now is mutable.",
 					"type": "boolean"
@@ -81950,6 +84048,11 @@
 			"description": "VolumeError captures an error encountered during a volume operation.",
 			"type": "object",
 			"properties": {
+				"errorCode": {
+					"description": "errorCode is a numeric gRPC code representing the error encountered during Attach or Detach operations.\n\nThis is an optional, alpha field that requires the MutableCSINodeAllocatableCount feature gate being enabled to be set.",
+					"type": "integer",
+					"format": "int32"
+				},
 				"message": {
 					"description": "message represents the error encountered during Attach or Detach operation. This string may be logged, so it should not contain sensitive information.",
 					"type": "string"
@@ -83284,6 +85387,11 @@
 					"version": "v1beta1"
 				},
 				{
+					"group": "resource.k8s.io",
+					"kind": "DeleteOptions",
+					"version": "v1beta2"
+				},
+				{
 					"group": "scheduling.k8s.io",
 					"kind": "DeleteOptions",
 					"version": "v1"
@@ -84061,6 +86169,11 @@
 					"version": "v1beta1"
 				},
 				{
+					"group": "resource.k8s.io",
+					"kind": "WatchEvent",
+					"version": "v1beta2"
+				},
+				{
 					"group": "scheduling.k8s.io",
 					"kind": "WatchEvent",
 					"version": "v1"
@@ -84132,6 +86245,14 @@
 				"compiler": {
 					"type": "string"
 				},
+				"emulationMajor": {
+					"description": "EmulationMajor is the major version of the emulation version",
+					"type": "string"
+				},
+				"emulationMinor": {
+					"description": "EmulationMinor is the minor version of the emulation version",
+					"type": "string"
+				},
 				"gitCommit": {
 					"type": "string"
 				},
@@ -84145,9 +86266,19 @@
 					"type": "string"
 				},
 				"major": {
+					"description": "Major is the major version of the binary version",
+					"type": "string"
+				},
+				"minCompatibilityMajor": {
+					"description": "MinCompatibilityMajor is the major version of the minimum compatibility version",
+					"type": "string"
+				},
+				"minCompatibilityMinor": {
+					"description": "MinCompatibilityMinor is the minor version of the minimum compatibility version",
 					"type": "string"
 				},
 				"minor": {
+					"description": "Minor is the minor version of the binary version",
 					"type": "string"
 				},
 				"platform": {
