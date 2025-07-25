@@ -14,6 +14,7 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/utils/claimmanager"
@@ -25,6 +26,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/kubectl/pkg/util/fieldpath"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -214,6 +216,24 @@ func (r *MachineReconciler) getNetworkInterfaceIPs(
 	return ips, true, nil
 }
 
+func (r *MachineReconciler) iriNetworkInterfaceLabels(networkinterface *networkingv1alpha1.NetworkInterface) (map[string]string, error) {
+	labels := map[string]string{
+		v1alpha1.NetworkInterfaceUIDLabel:       string(networkinterface.UID),
+		v1alpha1.NetworkInterfaceNamespaceLabel: networkinterface.Namespace,
+		v1alpha1.NetworkInterfaceNameLabel:      networkinterface.Name,
+	}
+
+	for name, fieldPath := range r.DownwardAPILabels {
+		value, err := fieldpath.ExtractFieldPathAsString(networkinterface, fieldPath)
+		if err != nil {
+			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
+		}
+
+		labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, name)] = value
+	}
+	return labels, nil
+}
+
 func (r *MachineReconciler) prepareIRINetworkInterface(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
@@ -229,6 +249,10 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s network %s not found", nic.Name, networkKey.Name)
 		return nil, false, nil
 	}
+	labels, err := r.iriNetworkInterfaceLabels(nic)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing iri networkinterface labels: %w", err)
+	}
 
 	ips, ok, err := r.getNetworkInterfaceIPs(ctx, machine, nic)
 	if err != nil || !ok {
@@ -240,6 +264,7 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		NetworkId:  network.Spec.ProviderID,
 		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
 		Attributes: nic.Spec.Attributes,
+		Labels:     labels,
 	}, true, nil
 }
 

@@ -20,7 +20,7 @@ type LoadBalancerRouting struct {
 	// NetworkRef is the network the load balancer is assigned to.
 	NetworkRef commonv1alpha1.LocalUIDReference
 
-	// Destinations are the destinations for an LoadBalancer.
+	// Destinations are the destinations for a LoadBalancer.
 	Destinations []LoadBalancerDestination
 }
 

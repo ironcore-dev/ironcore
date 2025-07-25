@@ -62,7 +62,7 @@ var _ = Describe("MachineScheduler", func() {
 		))
 	})
 
-	It("should schedule schedule machines onto machine pools if the pool becomes available later than the machine", func(ctx SpecContext) {
+	It("should schedule machines onto machine pools if the pool becomes available later than the machine", func(ctx SpecContext) {
 		By("creating a machine w/ the requested machine class")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{

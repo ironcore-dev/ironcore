@@ -271,7 +271,7 @@ var _ = Describe("NetworkPeeringController", func() {
 		Eventually(Get(network2)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should not peer two networks if they dont exactly reference each other", func(ctx SpecContext) {
+	It("should not peer two networks if they don't exactly reference each other", func(ctx SpecContext) {
 		By("creating a network network-1")
 		network1 := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{

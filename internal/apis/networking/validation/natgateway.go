@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// ValidateNATGateway validates an NATGateway object.
+// ValidateNATGateway validates a NATGateway object.
 func ValidateNATGateway(natGateway *networking.NATGateway) field.ErrorList {
 	var allErrs field.ErrorList
 

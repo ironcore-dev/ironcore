@@ -1667,7 +1667,7 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref common.Refe
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "NetworkInterfaceStatus reports the status of an NetworkInterfaceSource.",
+				Description: "NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"name": {
@@ -2888,7 +2888,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref common.Refe
 					},
 					"destinations": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Destinations are the destinations for an LoadBalancer.",
+							Description: "Destinations are the destinations for a LoadBalancer.",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
