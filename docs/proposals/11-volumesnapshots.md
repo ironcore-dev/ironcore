@@ -80,16 +80,15 @@ spec:
   volumeRef:
     name: example-volume
 status:
-  state: Pending/Processing/Ready/Failed/Deleting
+  state: Pending/Ready/Failed
   restoreSize: 10Gi
 ```  
 
 #### Fields:
 
 - `volumeRef`: Reference to the `Volume` to be snapshot. The `VolumeSnapshot` and `Volume` should be in the same namespace.
-- `status.state`: The current phase of the snapshot. It can be `Pending`, `Processing`, `Ready`, `Failed`, or `Deleting`.
+- `status.state`: The current phase of the snapshot. It can be `Pending`, `Ready` or `Failed`.
   - `Pending`: The snapshot resource has been created, but the snapshot has not yet been initiated.
-  - `Processing`: The snapshot is being processed by the storage provider.
   - `Ready`: The snapshot has been successfully created and is ready for use.
   - `Failed`: The snapshot creation has failed.
 - `status.restoreSize`: The size of the data in the snapshot. This will be populated by the system once the snapshot is ready.
