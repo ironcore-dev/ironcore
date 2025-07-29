@@ -11,10 +11,10 @@ import (
 // VolumeSnapshotContentSpec defines the desired state of VolumeSnapshotContent
 type VolumeSnapshotContentSpec struct {
 	// Source defines the VolumeSnapshot handle
-	Source VolumeSnapshotContentSource `json:"source,omitempty"`
+	Source *VolumeSnapshotContentSource `json:"source"`
 	// VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to
 	// An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source
-	VolumeSnapshotRef commonv1alpha1.UIDReference `json:"volumeSnapshotRef,omitempty"`
+	VolumeSnapshotRef *commonv1alpha1.UIDReference `json:"volumeSnapshotRef"`
 }
 
 // VolumeSnapshotContentSource contains VolumeSnapshotHandle of the snapshot

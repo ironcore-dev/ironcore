@@ -6041,18 +6041,17 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentSpec(ref common.R
 					"source": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Source defines the VolumeSnapshot handle",
-							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSource"),
 						},
 					},
 					"volumeSnapshotRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source",
-							Default:     map[string]interface{}{},
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference"),
 						},
 					},
 				},
+				Required: []string{"source", "volumeSnapshotRef"},
 			},
 		},
 		Dependencies: []string{
@@ -6119,7 +6118,6 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref common.Referenc
 					"volumeRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeRef indicates which Volume to refer for VolumeSnapshot",
-							Default:     map[string]interface{}{},
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},

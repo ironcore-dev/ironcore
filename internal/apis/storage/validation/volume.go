@@ -10,10 +10,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/storage"
+)
+
+var supportedDataSourceKinds = sets.New(
+	storage.VolumeSnapshotResource,
 )
 
 func ValidateVolume(volume *storage.Volume) field.ErrorList {
@@ -94,6 +99,18 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 	if spec.Encryption != nil {
 		for _, msg := range apivalidation.NameIsDNSLabel(spec.Encryption.SecretRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("encryption").Child("secretRef").Child("name"), spec.Encryption.SecretRef.Name, msg))
+		}
+	}
+
+	if dataSource := spec.DataSource; dataSource != nil {
+		for _, msg := range apivalidation.NameIsDNSLabel(dataSource.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("dataSource", "name"), dataSource.Name, msg))
+		}
+		if len(dataSource.Kind) == 0 {
+			allErrs = append(allErrs, field.Required(fldPath.Child("dataSource", "kind"), "must specify data source kind"))
+		}
+		if !supportedDataSourceKinds.Has(dataSource.Kind) {
+			allErrs = append(allErrs, field.NotSupported(fldPath.Child("dataSource", "kind"), dataSource.Kind, supportedDataSourceKinds.UnsortedList()))
 		}
 	}
 

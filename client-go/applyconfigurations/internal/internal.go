@@ -1706,18 +1706,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: source
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotContentSource
-      default: {}
     - name: volumeSnapshotRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.UIDReference
-      default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec
   map:
     fields:
     - name: volumeRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
-      default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
   map:
     fields:
