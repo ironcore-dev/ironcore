@@ -1166,10 +1166,8 @@ func Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotConte
 }
 
 func autoConvert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContentSpec(in *storagev1alpha1.VolumeSnapshotContentSpec, out *storage.VolumeSnapshotContentSpec, s conversion.Scope) error {
-	if err := Convert_v1alpha1_VolumeSnapshotContentSource_To_storage_VolumeSnapshotContentSource(&in.Source, &out.Source, s); err != nil {
-		return err
-	}
-	out.VolumeSnapshotRef = in.VolumeSnapshotRef
+	out.Source = (*storage.VolumeSnapshotContentSource)(unsafe.Pointer(in.Source))
+	out.VolumeSnapshotRef = (*commonv1alpha1.UIDReference)(unsafe.Pointer(in.VolumeSnapshotRef))
 	return nil
 }
 
@@ -1179,10 +1177,8 @@ func Convert_v1alpha1_VolumeSnapshotContentSpec_To_storage_VolumeSnapshotContent
 }
 
 func autoConvert_storage_VolumeSnapshotContentSpec_To_v1alpha1_VolumeSnapshotContentSpec(in *storage.VolumeSnapshotContentSpec, out *storagev1alpha1.VolumeSnapshotContentSpec, s conversion.Scope) error {
-	if err := Convert_storage_VolumeSnapshotContentSource_To_v1alpha1_VolumeSnapshotContentSource(&in.Source, &out.Source, s); err != nil {
-		return err
-	}
-	out.VolumeSnapshotRef = in.VolumeSnapshotRef
+	out.Source = (*storagev1alpha1.VolumeSnapshotContentSource)(unsafe.Pointer(in.Source))
+	out.VolumeSnapshotRef = (*commonv1alpha1.UIDReference)(unsafe.Pointer(in.VolumeSnapshotRef))
 	return nil
 }
 
@@ -1214,7 +1210,7 @@ func Convert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(in *stora
 }
 
 func autoConvert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *storagev1alpha1.VolumeSnapshotSpec, out *storage.VolumeSnapshotSpec, s conversion.Scope) error {
-	out.VolumeRef = in.VolumeRef
+	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	return nil
 }
 
@@ -1224,7 +1220,7 @@ func Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *stora
 }
 
 func autoConvert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *storage.VolumeSnapshotSpec, out *storagev1alpha1.VolumeSnapshotSpec, s conversion.Scope) error {
-	out.VolumeRef = in.VolumeRef
+	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	return nil
 }
 

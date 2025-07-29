@@ -9,10 +9,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// VolumeSnapshotResource is a constant for the name of the VolumeSnapshot resource.
+const VolumeSnapshotResource = "VolumeSnapshot"
+
 // VolumeSnapshotSpec defines the desired state of VolumeSnapshot
 type VolumeSnapshotSpec struct {
 	// VolumeRef indicates which Volume to refer for VolumeSnapshot
-	VolumeRef corev1.LocalObjectReference
+	VolumeRef *corev1.LocalObjectReference
 }
 
 // VolumeSnapshotStatus defines the observed state of VolumeSnapshot

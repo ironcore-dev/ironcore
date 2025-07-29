@@ -12,7 +12,7 @@ import (
 // VolumeSnapshotSpec defines the desired state of VolumeSnapshot
 type VolumeSnapshotSpec struct {
 	// VolumeRef indicates which Volume to refer for VolumeSnapshot
-	VolumeRef corev1.LocalObjectReference `json:"volumeRef"`
+	VolumeRef *corev1.LocalObjectReference `json:"volumeRef"`
 }
 
 // VolumeSnapshotStatus defines the observed state of VolumeSnapshot

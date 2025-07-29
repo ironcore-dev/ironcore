@@ -131,6 +131,14 @@ var _ = Describe("Volume", func() {
 			},
 			Not(ContainElement(InvalidField("spec.encryption.secretRef.name"))),
 		),
+		Entry("valid data source name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					DataSource: &storage.VolumeDataSource{Name: "foo"},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.dataSource.name"))),
+		),
 	)
 
 	DescribeTable("ValidateVolumeUpdate",
