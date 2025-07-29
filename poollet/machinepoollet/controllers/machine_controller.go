@@ -57,8 +57,11 @@ type MachineReconciler struct {
 
 	MachinePoolName string
 
-	DownwardAPILabels      map[string]string
-	DownwardAPIAnnotations map[string]string
+	MachineDownwardAPILabels      map[string]string
+	MachineDownwardAPIAnnotations map[string]string
+
+	NicDownwardAPILabels      map[string]string
+	NicDownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
 
@@ -345,7 +348,7 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 		v1alpha1.MachineNameLabel:      machine.Name,
 	}
 
-	for name, fieldPath := range r.DownwardAPILabels {
+	for name, fieldPath := range r.MachineDownwardAPILabels {
 		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
 		if err != nil {
 			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
@@ -372,7 +375,7 @@ func (r *MachineReconciler) iriMachineAnnotations(
 		v1alpha1.NetworkInterfaceMappingAnnotation: nicMappingString,
 	}
 
-	for name, fieldPath := range r.DownwardAPIAnnotations {
+	for name, fieldPath := range r.MachineDownwardAPIAnnotations {
 		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
 		if err != nil {
 			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)

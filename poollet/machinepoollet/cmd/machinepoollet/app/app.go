@@ -73,9 +73,12 @@ type Options struct {
 	LeaderElectionKubeconfig string
 	ProbeAddr                string
 
-	MachinePoolName                      string
-	MachineDownwardAPILabels             map[string]string
-	MachineDownwardAPIAnnotations        map[string]string
+	MachinePoolName               string
+	MachineDownwardAPILabels      map[string]string
+	MachineDownwardAPIAnnotations map[string]string
+
+	NicDownwardAPILabels                 map[string]string
+	NicDownwardAPIAnnotations            map[string]string
 	ProviderID                           string
 	MachineRuntimeEndpoint               string
 	MachineRuntimeSocketDiscoveryTimeout time.Duration
@@ -117,6 +120,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
 	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the iri machine.")
 	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the iri machine.")
+	fs.StringToStringVar(&o.NicDownwardAPILabels, "nic-downward-api-label", o.NicDownwardAPILabels, "Downward-API labels to set on the iri nic.")
+	fs.StringToStringVar(&o.NicDownwardAPIAnnotations, "nic-downward-api-annotation", o.NicDownwardAPIAnnotations, "Downward-API annotations to set on the iri nic.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
@@ -407,17 +412,19 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("machines"),
-			Client:                  mgr.GetClient(),
-			MachineRuntime:          machineRuntime,
-			MachineRuntimeName:      version.RuntimeName,
-			MachineRuntimeVersion:   version.RuntimeVersion,
-			MachineClassMapper:      machineClassMapper,
-			MachinePoolName:         opts.MachinePoolName,
-			DownwardAPILabels:       opts.MachineDownwardAPILabels,
-			DownwardAPIAnnotations:  opts.MachineDownwardAPIAnnotations,
-			WatchFilterValue:        opts.WatchFilterValue,
-			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
+			EventRecorder:                 mgr.GetEventRecorderFor("machines"),
+			Client:                        mgr.GetClient(),
+			MachineRuntime:                machineRuntime,
+			MachineRuntimeName:            version.RuntimeName,
+			MachineRuntimeVersion:         version.RuntimeVersion,
+			MachineClassMapper:            machineClassMapper,
+			MachinePoolName:               opts.MachinePoolName,
+			MachineDownwardAPILabels:      opts.MachineDownwardAPILabels,
+			MachineDownwardAPIAnnotations: opts.MachineDownwardAPIAnnotations,
+			NicDownwardAPILabels:          opts.NicDownwardAPILabels,
+			NicDownwardAPIAnnotations:     opts.NicDownwardAPIAnnotations,
+			WatchFilterValue:              opts.WatchFilterValue,
+			MaxConcurrentReconciles:       opts.MaxConcurrentReconciles,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine reconciler with manager: %w", err)
 		}
