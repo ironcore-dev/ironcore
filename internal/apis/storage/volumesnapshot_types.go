@@ -30,16 +30,12 @@ type VolumeSnapshotStatus struct {
 type VolumeSnapshotState string
 
 const (
-	// VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use
-	VolumeSnapshotStateReady VolumeSnapshotState = "Ready"
 	// VolumeSnapshotStatePending means the VolumeSnapshot resource has been created, but the snapshot has not yet been initiated
 	VolumeSnapshotStatePending VolumeSnapshotState = "Pending"
-	// VolumeSnapshotStateProcessing means the VolumeSnapshot is being processed by the storage provider
-	VolumeSnapshotStateProcessing VolumeSnapshotState = "Processing"
+	// VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use
+	VolumeSnapshotStateReady VolumeSnapshotState = "Ready"
 	// VolumeSnapshotStateFailed means the VolumeSnapshot creation has failed
 	VolumeSnapshotStateFailed VolumeSnapshotState = "Failed"
-	// VolumeSnapshotStateDeleting means the VolumeSnapshot is being deleted
-	VolumeSnapshotStateDeleting VolumeSnapshotState = "Deleting"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
