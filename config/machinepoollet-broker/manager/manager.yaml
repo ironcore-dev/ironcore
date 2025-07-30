@@ -35,9 +35,9 @@ spec:
         - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-namespace']
         - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-name']
         - --machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-uid']
-        - --machine-downward-api-label=root-nic-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-namespace']
-        - --machine-downward-api-label=root-nic-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-name']
-        - --machine-downward-api-label=root-nic-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-uid']
+        - --nic-downward-api-label=root-nic-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-namespace']
+        - --nic-downward-api-label=root-nic-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-name']
+        - --nic-downward-api-label=root-nic-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-uid']
         image: machinepoollet:latest
         env:
         - name: KUBERNETES_SERVICE_NAME

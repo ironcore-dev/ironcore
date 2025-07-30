@@ -223,7 +223,7 @@ func (r *MachineReconciler) iriNetworkInterfaceLabels(networkinterface *networki
 		v1alpha1.NetworkInterfaceNameLabel:      networkinterface.Name,
 	}
 
-	for name, fieldPath := range r.DownwardAPILabels {
+	for name, fieldPath := range r.NicDownwardAPILabels {
 		value, err := fieldpath.ExtractFieldPathAsString(networkinterface, fieldPath)
 		if err != nil {
 			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)

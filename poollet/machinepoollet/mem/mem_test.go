@@ -81,9 +81,12 @@ var _ = Describe("MachineEventMapper", func() {
 			MachineRuntimeVersion: fakemachine.FakeVersion,
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
-			DownwardAPILabels: map[string]string{
+			MachineDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 				machinepoolletv1alpha1.RootMachineUIDLabelSuffix: "metadata.uid",
+			},
+			NicDownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
