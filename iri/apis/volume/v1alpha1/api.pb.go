@@ -73,6 +73,55 @@ func (VolumeState) EnumDescriptor() ([]byte, []int) {
 	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{0}
 }
 
+type SnapshotState int32
+
+const (
+	SnapshotState_SNAPSHOT_PENDING SnapshotState = 0
+	SnapshotState_SNAPSHOT_READY   SnapshotState = 1
+	SnapshotState_SNAPSHOT_FAILED  SnapshotState = 2
+)
+
+// Enum value maps for SnapshotState.
+var (
+	SnapshotState_name = map[int32]string{
+		0: "SNAPSHOT_PENDING",
+		1: "SNAPSHOT_READY",
+		2: "SNAPSHOT_FAILED",
+	}
+	SnapshotState_value = map[string]int32{
+		"SNAPSHOT_PENDING": 0,
+		"SNAPSHOT_READY":   1,
+		"SNAPSHOT_FAILED":  2,
+	}
+)
+
+func (x SnapshotState) Enum() *SnapshotState {
+	p := new(SnapshotState)
+	*p = x
+	return p
+}
+
+func (x SnapshotState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SnapshotState) Descriptor() protoreflect.EnumDescriptor {
+	return file_volume_v1alpha1_api_proto_enumTypes[1].Descriptor()
+}
+
+func (SnapshotState) Type() protoreflect.EnumType {
+	return &file_volume_v1alpha1_api_proto_enumTypes[1]
+}
+
+func (x SnapshotState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SnapshotState.Descriptor instead.
+func (SnapshotState) EnumDescriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{1}
+}
+
 type VolumeFilter struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -281,19 +330,80 @@ func (x *EncryptionSpec) GetSecretData() map[string][]byte {
 	return nil
 }
 
-type VolumeSpec struct {
+type VolumeDataSource struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Image         string                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
-	Class         string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
-	Resources     *VolumeResources       `protobuf:"bytes,3,opt,name=resources,proto3" json:"resources,omitempty"`
-	Encryption    *EncryptionSpec        `protobuf:"bytes,4,opt,name=encryption,proto3" json:"encryption,omitempty"`
+	ApiGroup      string                 `protobuf:"bytes,1,opt,name=api_group,json=apiGroup,proto3" json:"api_group,omitempty"`
+	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
+func (x *VolumeDataSource) Reset() {
+	*x = VolumeDataSource{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VolumeDataSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VolumeDataSource) ProtoMessage() {}
+
+func (x *VolumeDataSource) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VolumeDataSource.ProtoReflect.Descriptor instead.
+func (*VolumeDataSource) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *VolumeDataSource) GetApiGroup() string {
+	if x != nil {
+		return x.ApiGroup
+	}
+	return ""
+}
+
+func (x *VolumeDataSource) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *VolumeDataSource) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type VolumeSpec struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Image            string                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Class            string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
+	Resources        *VolumeResources       `protobuf:"bytes,3,opt,name=resources,proto3" json:"resources,omitempty"`
+	Encryption       *EncryptionSpec        `protobuf:"bytes,4,opt,name=encryption,proto3" json:"encryption,omitempty"`
+	VolumeDataSource *VolumeDataSource      `protobuf:"bytes,5,opt,name=volume_data_source,json=volumeDataSource,proto3" json:"volume_data_source,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
 func (x *VolumeSpec) Reset() {
 	*x = VolumeSpec{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[4]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -305,7 +415,7 @@ func (x *VolumeSpec) String() string {
 func (*VolumeSpec) ProtoMessage() {}
 
 func (x *VolumeSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[4]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,7 +428,7 @@ func (x *VolumeSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeSpec.ProtoReflect.Descriptor instead.
 func (*VolumeSpec) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{4}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *VolumeSpec) GetImage() string {
@@ -349,6 +459,13 @@ func (x *VolumeSpec) GetEncryption() *EncryptionSpec {
 	return nil
 }
 
+func (x *VolumeSpec) GetVolumeDataSource() *VolumeDataSource {
+	if x != nil {
+		return x.VolumeDataSource
+	}
+	return nil
+}
+
 type VolumeStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	State         VolumeState            `protobuf:"varint,1,opt,name=state,proto3,enum=volume.v1alpha1.VolumeState" json:"state,omitempty"`
@@ -360,7 +477,7 @@ type VolumeStatus struct {
 
 func (x *VolumeStatus) Reset() {
 	*x = VolumeStatus{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[5]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -372,7 +489,7 @@ func (x *VolumeStatus) String() string {
 func (*VolumeStatus) ProtoMessage() {}
 
 func (x *VolumeStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[5]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -385,7 +502,7 @@ func (x *VolumeStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeStatus.ProtoReflect.Descriptor instead.
 func (*VolumeStatus) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{5}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *VolumeStatus) GetState() VolumeState {
@@ -420,7 +537,7 @@ type Volume struct {
 
 func (x *Volume) Reset() {
 	*x = Volume{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[6]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -432,7 +549,7 @@ func (x *Volume) String() string {
 func (*Volume) ProtoMessage() {}
 
 func (x *Volume) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[6]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -445,7 +562,7 @@ func (x *Volume) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Volume.ProtoReflect.Descriptor instead.
 func (*Volume) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{6}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Volume) GetMetadata() *v1alpha1.ObjectMetadata {
@@ -479,7 +596,7 @@ type VolumeClassCapabilities struct {
 
 func (x *VolumeClassCapabilities) Reset() {
 	*x = VolumeClassCapabilities{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[7]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -491,7 +608,7 @@ func (x *VolumeClassCapabilities) String() string {
 func (*VolumeClassCapabilities) ProtoMessage() {}
 
 func (x *VolumeClassCapabilities) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[7]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -504,7 +621,7 @@ func (x *VolumeClassCapabilities) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeClassCapabilities.ProtoReflect.Descriptor instead.
 func (*VolumeClassCapabilities) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{7}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *VolumeClassCapabilities) GetTps() int64 {
@@ -531,7 +648,7 @@ type VolumeClass struct {
 
 func (x *VolumeClass) Reset() {
 	*x = VolumeClass{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[8]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -543,7 +660,7 @@ func (x *VolumeClass) String() string {
 func (*VolumeClass) ProtoMessage() {}
 
 func (x *VolumeClass) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[8]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -556,7 +673,7 @@ func (x *VolumeClass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeClass.ProtoReflect.Descriptor instead.
 func (*VolumeClass) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{8}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *VolumeClass) GetName() string {
@@ -583,7 +700,7 @@ type VolumeClassStatus struct {
 
 func (x *VolumeClassStatus) Reset() {
 	*x = VolumeClassStatus{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[9]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -595,7 +712,7 @@ func (x *VolumeClassStatus) String() string {
 func (*VolumeClassStatus) ProtoMessage() {}
 
 func (x *VolumeClassStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[9]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -608,7 +725,7 @@ func (x *VolumeClassStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeClassStatus.ProtoReflect.Descriptor instead.
 func (*VolumeClassStatus) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{9}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *VolumeClassStatus) GetVolumeClass() *VolumeClass {
@@ -637,7 +754,7 @@ type VolumeAccess struct {
 
 func (x *VolumeAccess) Reset() {
 	*x = VolumeAccess{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[10]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -649,7 +766,7 @@ func (x *VolumeAccess) String() string {
 func (*VolumeAccess) ProtoMessage() {}
 
 func (x *VolumeAccess) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[10]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -662,7 +779,7 @@ func (x *VolumeAccess) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VolumeAccess.ProtoReflect.Descriptor instead.
 func (*VolumeAccess) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{10}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *VolumeAccess) GetDriver() string {
@@ -702,7 +819,7 @@ type ListEventsRequest struct {
 
 func (x *ListEventsRequest) Reset() {
 	*x = ListEventsRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[11]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -714,7 +831,7 @@ func (x *ListEventsRequest) String() string {
 func (*ListEventsRequest) ProtoMessage() {}
 
 func (x *ListEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[11]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -727,7 +844,7 @@ func (x *ListEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEventsRequest.ProtoReflect.Descriptor instead.
 func (*ListEventsRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{11}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ListEventsRequest) GetFilter() *EventFilter {
@@ -746,7 +863,7 @@ type ListEventsResponse struct {
 
 func (x *ListEventsResponse) Reset() {
 	*x = ListEventsResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[12]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -758,7 +875,7 @@ func (x *ListEventsResponse) String() string {
 func (*ListEventsResponse) ProtoMessage() {}
 
 func (x *ListEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[12]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -771,7 +888,7 @@ func (x *ListEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEventsResponse.ProtoReflect.Descriptor instead.
 func (*ListEventsResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{12}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ListEventsResponse) GetEvents() []*v1alpha11.Event {
@@ -790,7 +907,7 @@ type VersionRequest struct {
 
 func (x *VersionRequest) Reset() {
 	*x = VersionRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[13]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -802,7 +919,7 @@ func (x *VersionRequest) String() string {
 func (*VersionRequest) ProtoMessage() {}
 
 func (x *VersionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[13]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -815,7 +932,7 @@ func (x *VersionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionRequest.ProtoReflect.Descriptor instead.
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{13}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *VersionRequest) GetVersion() string {
@@ -838,7 +955,7 @@ type VersionResponse struct {
 
 func (x *VersionResponse) Reset() {
 	*x = VersionResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[14]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -850,7 +967,7 @@ func (x *VersionResponse) String() string {
 func (*VersionResponse) ProtoMessage() {}
 
 func (x *VersionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[14]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -863,7 +980,7 @@ func (x *VersionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionResponse.ProtoReflect.Descriptor instead.
 func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{14}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *VersionResponse) GetRuntimeName() string {
@@ -889,7 +1006,7 @@ type ListVolumesRequest struct {
 
 func (x *ListVolumesRequest) Reset() {
 	*x = ListVolumesRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[15]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -901,7 +1018,7 @@ func (x *ListVolumesRequest) String() string {
 func (*ListVolumesRequest) ProtoMessage() {}
 
 func (x *ListVolumesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[15]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -914,7 +1031,7 @@ func (x *ListVolumesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVolumesRequest.ProtoReflect.Descriptor instead.
 func (*ListVolumesRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{15}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListVolumesRequest) GetFilter() *VolumeFilter {
@@ -933,7 +1050,7 @@ type ListVolumesResponse struct {
 
 func (x *ListVolumesResponse) Reset() {
 	*x = ListVolumesResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[16]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -945,7 +1062,7 @@ func (x *ListVolumesResponse) String() string {
 func (*ListVolumesResponse) ProtoMessage() {}
 
 func (x *ListVolumesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[16]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -958,7 +1075,7 @@ func (x *ListVolumesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVolumesResponse.ProtoReflect.Descriptor instead.
 func (*ListVolumesResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{16}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ListVolumesResponse) GetVolumes() []*Volume {
@@ -977,7 +1094,7 @@ type CreateVolumeRequest struct {
 
 func (x *CreateVolumeRequest) Reset() {
 	*x = CreateVolumeRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[17]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -989,7 +1106,7 @@ func (x *CreateVolumeRequest) String() string {
 func (*CreateVolumeRequest) ProtoMessage() {}
 
 func (x *CreateVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[17]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1002,7 +1119,7 @@ func (x *CreateVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateVolumeRequest.ProtoReflect.Descriptor instead.
 func (*CreateVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{17}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CreateVolumeRequest) GetVolume() *Volume {
@@ -1022,7 +1139,7 @@ type ExpandVolumeRequest struct {
 
 func (x *ExpandVolumeRequest) Reset() {
 	*x = ExpandVolumeRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[18]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1034,7 +1151,7 @@ func (x *ExpandVolumeRequest) String() string {
 func (*ExpandVolumeRequest) ProtoMessage() {}
 
 func (x *ExpandVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[18]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1047,7 +1164,7 @@ func (x *ExpandVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExpandVolumeRequest.ProtoReflect.Descriptor instead.
 func (*ExpandVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{18}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ExpandVolumeRequest) GetVolumeId() string {
@@ -1073,7 +1190,7 @@ type CreateVolumeResponse struct {
 
 func (x *CreateVolumeResponse) Reset() {
 	*x = CreateVolumeResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[19]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1085,7 +1202,7 @@ func (x *CreateVolumeResponse) String() string {
 func (*CreateVolumeResponse) ProtoMessage() {}
 
 func (x *CreateVolumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[19]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1098,7 +1215,7 @@ func (x *CreateVolumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateVolumeResponse.ProtoReflect.Descriptor instead.
 func (*CreateVolumeResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{19}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CreateVolumeResponse) GetVolume() *Volume {
@@ -1116,7 +1233,7 @@ type ExpandVolumeResponse struct {
 
 func (x *ExpandVolumeResponse) Reset() {
 	*x = ExpandVolumeResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[20]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1128,7 +1245,7 @@ func (x *ExpandVolumeResponse) String() string {
 func (*ExpandVolumeResponse) ProtoMessage() {}
 
 func (x *ExpandVolumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[20]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1141,7 +1258,7 @@ func (x *ExpandVolumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExpandVolumeResponse.ProtoReflect.Descriptor instead.
 func (*ExpandVolumeResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{20}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{21}
 }
 
 type DeleteVolumeRequest struct {
@@ -1153,7 +1270,7 @@ type DeleteVolumeRequest struct {
 
 func (x *DeleteVolumeRequest) Reset() {
 	*x = DeleteVolumeRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[21]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1165,7 +1282,7 @@ func (x *DeleteVolumeRequest) String() string {
 func (*DeleteVolumeRequest) ProtoMessage() {}
 
 func (x *DeleteVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[21]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1178,7 +1295,7 @@ func (x *DeleteVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteVolumeRequest.ProtoReflect.Descriptor instead.
 func (*DeleteVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{21}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *DeleteVolumeRequest) GetVolumeId() string {
@@ -1196,7 +1313,7 @@ type DeleteVolumeResponse struct {
 
 func (x *DeleteVolumeResponse) Reset() {
 	*x = DeleteVolumeResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[22]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1208,7 +1325,7 @@ func (x *DeleteVolumeResponse) String() string {
 func (*DeleteVolumeResponse) ProtoMessage() {}
 
 func (x *DeleteVolumeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[22]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1221,7 +1338,7 @@ func (x *DeleteVolumeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteVolumeResponse.ProtoReflect.Descriptor instead.
 func (*DeleteVolumeResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{22}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{23}
 }
 
 type StatusRequest struct {
@@ -1232,7 +1349,7 @@ type StatusRequest struct {
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[23]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1244,7 +1361,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[23]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1257,7 +1374,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{23}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{24}
 }
 
 type StatusResponse struct {
@@ -1269,7 +1386,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[24]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1281,7 +1398,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_volume_v1alpha1_api_proto_msgTypes[24]
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1294,7 +1411,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{24}
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *StatusResponse) GetVolumeClassStatus() []*VolumeClassStatus {
@@ -1302,6 +1419,854 @@ func (x *StatusResponse) GetVolumeClassStatus() []*VolumeClassStatus {
 		return x.VolumeClassStatus
 	}
 	return nil
+}
+
+type SnapshotSpec struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VolumeName    string                 `protobuf:"bytes,1,opt,name=volume_name,json=volumeName,proto3" json:"volume_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SnapshotSpec) Reset() {
+	*x = SnapshotSpec{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotSpec) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotSpec) ProtoMessage() {}
+
+func (x *SnapshotSpec) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotSpec.ProtoReflect.Descriptor instead.
+func (*SnapshotSpec) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SnapshotSpec) GetVolumeName() string {
+	if x != nil {
+		return x.VolumeName
+	}
+	return ""
+}
+
+type SnapshotStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	State         SnapshotState          `protobuf:"varint,1,opt,name=state,proto3,enum=volume.v1alpha1.SnapshotState" json:"state,omitempty"`
+	RestoreSize   int64                  `protobuf:"varint,2,opt,name=restore_size,json=restoreSize,proto3" json:"restore_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SnapshotStatus) Reset() {
+	*x = SnapshotStatus{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotStatus) ProtoMessage() {}
+
+func (x *SnapshotStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotStatus.ProtoReflect.Descriptor instead.
+func (*SnapshotStatus) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SnapshotStatus) GetState() SnapshotState {
+	if x != nil {
+		return x.State
+	}
+	return SnapshotState_SNAPSHOT_PENDING
+}
+
+func (x *SnapshotStatus) GetRestoreSize() int64 {
+	if x != nil {
+		return x.RestoreSize
+	}
+	return 0
+}
+
+type Snapshot struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Metadata      *v1alpha1.ObjectMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec          *SnapshotSpec            `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
+	Status        *SnapshotStatus          `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Snapshot) Reset() {
+	*x = Snapshot{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Snapshot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Snapshot) ProtoMessage() {}
+
+func (x *Snapshot) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Snapshot.ProtoReflect.Descriptor instead.
+func (*Snapshot) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *Snapshot) GetMetadata() *v1alpha1.ObjectMetadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *Snapshot) GetSpec() *SnapshotSpec {
+	if x != nil {
+		return x.Spec
+	}
+	return nil
+}
+
+func (x *Snapshot) GetStatus() *SnapshotStatus {
+	if x != nil {
+		return x.Status
+	}
+	return nil
+}
+
+type UIDReference struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Namespace     string                 `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Uid           string                 `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UIDReference) Reset() {
+	*x = UIDReference{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UIDReference) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UIDReference) ProtoMessage() {}
+
+func (x *UIDReference) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UIDReference.ProtoReflect.Descriptor instead.
+func (*UIDReference) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *UIDReference) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *UIDReference) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UIDReference) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+type SnapshotContentSpec struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	SnapshotHandle string                 `protobuf:"bytes,1,opt,name=snapshot_handle,json=snapshotHandle,proto3" json:"snapshot_handle,omitempty"`
+	SnapshotRef    *UIDReference          `protobuf:"bytes,2,opt,name=snapshot_ref,json=snapshotRef,proto3" json:"snapshot_ref,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *SnapshotContentSpec) Reset() {
+	*x = SnapshotContentSpec{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotContentSpec) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotContentSpec) ProtoMessage() {}
+
+func (x *SnapshotContentSpec) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotContentSpec.ProtoReflect.Descriptor instead.
+func (*SnapshotContentSpec) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *SnapshotContentSpec) GetSnapshotHandle() string {
+	if x != nil {
+		return x.SnapshotHandle
+	}
+	return ""
+}
+
+func (x *SnapshotContentSpec) GetSnapshotRef() *UIDReference {
+	if x != nil {
+		return x.SnapshotRef
+	}
+	return nil
+}
+
+type SnapshotContent struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Metadata      *v1alpha1.ObjectMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Spec          *SnapshotContentSpec     `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SnapshotContent) Reset() {
+	*x = SnapshotContent{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotContent) ProtoMessage() {}
+
+func (x *SnapshotContent) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotContent.ProtoReflect.Descriptor instead.
+func (*SnapshotContent) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *SnapshotContent) GetMetadata() *v1alpha1.ObjectMetadata {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *SnapshotContent) GetSpec() *SnapshotContentSpec {
+	if x != nil {
+		return x.Spec
+	}
+	return nil
+}
+
+type SnapshotFilter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	LabelSelector map[string]string      `protobuf:"bytes,2,rep,name=label_selector,json=labelSelector,proto3" json:"label_selector,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SnapshotFilter) Reset() {
+	*x = SnapshotFilter{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotFilter) ProtoMessage() {}
+
+func (x *SnapshotFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotFilter.ProtoReflect.Descriptor instead.
+func (*SnapshotFilter) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *SnapshotFilter) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SnapshotFilter) GetLabelSelector() map[string]string {
+	if x != nil {
+		return x.LabelSelector
+	}
+	return nil
+}
+
+type SnapshotContentFilter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	LabelSelector map[string]string      `protobuf:"bytes,2,rep,name=label_selector,json=labelSelector,proto3" json:"label_selector,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SnapshotContentFilter) Reset() {
+	*x = SnapshotContentFilter{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SnapshotContentFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SnapshotContentFilter) ProtoMessage() {}
+
+func (x *SnapshotContentFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SnapshotContentFilter.ProtoReflect.Descriptor instead.
+func (*SnapshotContentFilter) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *SnapshotContentFilter) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SnapshotContentFilter) GetLabelSelector() map[string]string {
+	if x != nil {
+		return x.LabelSelector
+	}
+	return nil
+}
+
+type ListSnapshotsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filter        *SnapshotFilter        `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSnapshotsRequest) Reset() {
+	*x = ListSnapshotsRequest{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSnapshotsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSnapshotsRequest) ProtoMessage() {}
+
+func (x *ListSnapshotsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSnapshotsRequest.ProtoReflect.Descriptor instead.
+func (*ListSnapshotsRequest) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *ListSnapshotsRequest) GetFilter() *SnapshotFilter {
+	if x != nil {
+		return x.Filter
+	}
+	return nil
+}
+
+type ListSnapshotsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Snapshot      []*Snapshot            `protobuf:"bytes,1,rep,name=snapshot,proto3" json:"snapshot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSnapshotsResponse) Reset() {
+	*x = ListSnapshotsResponse{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSnapshotsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSnapshotsResponse) ProtoMessage() {}
+
+func (x *ListSnapshotsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSnapshotsResponse.ProtoReflect.Descriptor instead.
+func (*ListSnapshotsResponse) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *ListSnapshotsResponse) GetSnapshot() []*Snapshot {
+	if x != nil {
+		return x.Snapshot
+	}
+	return nil
+}
+
+type CreateSnapshotRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Snapshot      *Snapshot              `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateSnapshotRequest) Reset() {
+	*x = CreateSnapshotRequest{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSnapshotRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSnapshotRequest) ProtoMessage() {}
+
+func (x *CreateSnapshotRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSnapshotRequest.ProtoReflect.Descriptor instead.
+func (*CreateSnapshotRequest) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *CreateSnapshotRequest) GetSnapshot() *Snapshot {
+	if x != nil {
+		return x.Snapshot
+	}
+	return nil
+}
+
+type CreateSnapshotResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Snapshot      *Snapshot              `protobuf:"bytes,1,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateSnapshotResponse) Reset() {
+	*x = CreateSnapshotResponse{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSnapshotResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSnapshotResponse) ProtoMessage() {}
+
+func (x *CreateSnapshotResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSnapshotResponse.ProtoReflect.Descriptor instead.
+func (*CreateSnapshotResponse) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *CreateSnapshotResponse) GetSnapshot() *Snapshot {
+	if x != nil {
+		return x.Snapshot
+	}
+	return nil
+}
+
+type DeleteSnapshotRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SnapshotId    string                 `protobuf:"bytes,1,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteSnapshotRequest) Reset() {
+	*x = DeleteSnapshotRequest{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSnapshotRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSnapshotRequest) ProtoMessage() {}
+
+func (x *DeleteSnapshotRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSnapshotRequest.ProtoReflect.Descriptor instead.
+func (*DeleteSnapshotRequest) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *DeleteSnapshotRequest) GetSnapshotId() string {
+	if x != nil {
+		return x.SnapshotId
+	}
+	return ""
+}
+
+type DeleteSnapshotResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteSnapshotResponse) Reset() {
+	*x = DeleteSnapshotResponse{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSnapshotResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSnapshotResponse) ProtoMessage() {}
+
+func (x *DeleteSnapshotResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSnapshotResponse.ProtoReflect.Descriptor instead.
+func (*DeleteSnapshotResponse) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{39}
+}
+
+type ListSnapshotContentsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filter        *SnapshotContentFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSnapshotContentsRequest) Reset() {
+	*x = ListSnapshotContentsRequest{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSnapshotContentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSnapshotContentsRequest) ProtoMessage() {}
+
+func (x *ListSnapshotContentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSnapshotContentsRequest.ProtoReflect.Descriptor instead.
+func (*ListSnapshotContentsRequest) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *ListSnapshotContentsRequest) GetFilter() *SnapshotContentFilter {
+	if x != nil {
+		return x.Filter
+	}
+	return nil
+}
+
+type ListSnapshotContentsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Snapshot      []*Snapshot            `protobuf:"bytes,1,rep,name=snapshot,proto3" json:"snapshot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSnapshotContentsResponse) Reset() {
+	*x = ListSnapshotContentsResponse{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSnapshotContentsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSnapshotContentsResponse) ProtoMessage() {}
+
+func (x *ListSnapshotContentsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSnapshotContentsResponse.ProtoReflect.Descriptor instead.
+func (*ListSnapshotContentsResponse) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *ListSnapshotContentsResponse) GetSnapshot() []*Snapshot {
+	if x != nil {
+		return x.Snapshot
+	}
+	return nil
+}
+
+type DeleteSnapshotContentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SnapshotId    string                 `protobuf:"bytes,1,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteSnapshotContentRequest) Reset() {
+	*x = DeleteSnapshotContentRequest{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSnapshotContentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSnapshotContentRequest) ProtoMessage() {}
+
+func (x *DeleteSnapshotContentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSnapshotContentRequest.ProtoReflect.Descriptor instead.
+func (*DeleteSnapshotContentRequest) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *DeleteSnapshotContentRequest) GetSnapshotId() string {
+	if x != nil {
+		return x.SnapshotId
+	}
+	return ""
+}
+
+type DeleteSnapshotContentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteSnapshotContentResponse) Reset() {
+	*x = DeleteSnapshotContentResponse{}
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSnapshotContentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSnapshotContentResponse) ProtoMessage() {}
+
+func (x *DeleteSnapshotContentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_volume_v1alpha1_api_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSnapshotContentResponse.ProtoReflect.Descriptor instead.
+func (*DeleteSnapshotContentResponse) Descriptor() ([]byte, []int) {
+	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{43}
 }
 
 var File_volume_v1alpha1_api_proto protoreflect.FileDescriptor
@@ -1330,7 +2295,11 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"secretData\x1a=\n" +
 	"\x0fSecretDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"\xb9\x01\n" +
+	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"W\n" +
+	"\x10VolumeDataSource\x12\x1b\n" +
+	"\tapi_group\x18\x01 \x01(\tR\bapiGroup\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\"\x8a\x02\n" +
 	"\n" +
 	"VolumeSpec\x12\x14\n" +
 	"\x05image\x18\x01 \x01(\tR\x05image\x12\x14\n" +
@@ -1338,7 +2307,8 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\tresources\x18\x03 \x01(\v2 .volume.v1alpha1.VolumeResourcesR\tresources\x12?\n" +
 	"\n" +
 	"encryption\x18\x04 \x01(\v2\x1f.volume.v1alpha1.EncryptionSpecR\n" +
-	"encryption\"\xb9\x01\n" +
+	"encryption\x12O\n" +
+	"\x12volume_data_source\x18\x05 \x01(\v2!.volume.v1alpha1.VolumeDataSourceR\x10volumeDataSource\"\xb9\x01\n" +
 	"\fVolumeStatus\x122\n" +
 	"\x05state\x18\x01 \x01(\x0e2\x1c.volume.v1alpha1.VolumeStateR\x05state\x125\n" +
 	"\x06access\x18\x02 \x01(\v2\x1d.volume.v1alpha1.VolumeAccessR\x06access\x12>\n" +
@@ -1396,11 +2366,67 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\x14DeleteVolumeResponse\"\x0f\n" +
 	"\rStatusRequest\"d\n" +
 	"\x0eStatusResponse\x12R\n" +
-	"\x13volume_class_status\x18\x01 \x03(\v2\".volume.v1alpha1.VolumeClassStatusR\x11volumeClassStatus*I\n" +
+	"\x13volume_class_status\x18\x01 \x03(\v2\".volume.v1alpha1.VolumeClassStatusR\x11volumeClassStatus\"/\n" +
+	"\fSnapshotSpec\x12\x1f\n" +
+	"\vvolume_name\x18\x01 \x01(\tR\n" +
+	"volumeName\"i\n" +
+	"\x0eSnapshotStatus\x124\n" +
+	"\x05state\x18\x01 \x01(\x0e2\x1e.volume.v1alpha1.SnapshotStateR\x05state\x12!\n" +
+	"\frestore_size\x18\x02 \x01(\x03R\vrestoreSize\"\xb1\x01\n" +
+	"\bSnapshot\x129\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x121\n" +
+	"\x04spec\x18\x02 \x01(\v2\x1d.volume.v1alpha1.SnapshotSpecR\x04spec\x127\n" +
+	"\x06status\x18\x03 \x01(\v2\x1f.volume.v1alpha1.SnapshotStatusR\x06status\"R\n" +
+	"\fUIDReference\x12\x1c\n" +
+	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
+	"\x03uid\x18\x03 \x01(\tR\x03uid\"\x80\x01\n" +
+	"\x13SnapshotContentSpec\x12'\n" +
+	"\x0fsnapshot_handle\x18\x01 \x01(\tR\x0esnapshotHandle\x12@\n" +
+	"\fsnapshot_ref\x18\x02 \x01(\v2\x1d.volume.v1alpha1.UIDReferenceR\vsnapshotRef\"\x86\x01\n" +
+	"\x0fSnapshotContent\x129\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x128\n" +
+	"\x04spec\x18\x02 \x01(\v2$.volume.v1alpha1.SnapshotContentSpecR\x04spec\"\xbd\x01\n" +
+	"\x0eSnapshotFilter\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12Y\n" +
+	"\x0elabel_selector\x18\x02 \x03(\v22.volume.v1alpha1.SnapshotFilter.LabelSelectorEntryR\rlabelSelector\x1a@\n" +
+	"\x12LabelSelectorEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xcb\x01\n" +
+	"\x15SnapshotContentFilter\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12`\n" +
+	"\x0elabel_selector\x18\x02 \x03(\v29.volume.v1alpha1.SnapshotContentFilter.LabelSelectorEntryR\rlabelSelector\x1a@\n" +
+	"\x12LabelSelectorEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"O\n" +
+	"\x14ListSnapshotsRequest\x127\n" +
+	"\x06filter\x18\x01 \x01(\v2\x1f.volume.v1alpha1.SnapshotFilterR\x06filter\"N\n" +
+	"\x15ListSnapshotsResponse\x125\n" +
+	"\bsnapshot\x18\x01 \x03(\v2\x19.volume.v1alpha1.SnapshotR\bsnapshot\"N\n" +
+	"\x15CreateSnapshotRequest\x125\n" +
+	"\bsnapshot\x18\x01 \x01(\v2\x19.volume.v1alpha1.SnapshotR\bsnapshot\"O\n" +
+	"\x16CreateSnapshotResponse\x125\n" +
+	"\bsnapshot\x18\x01 \x01(\v2\x19.volume.v1alpha1.SnapshotR\bsnapshot\"8\n" +
+	"\x15DeleteSnapshotRequest\x12\x1f\n" +
+	"\vsnapshot_id\x18\x01 \x01(\tR\n" +
+	"snapshotId\"\x18\n" +
+	"\x16DeleteSnapshotResponse\"]\n" +
+	"\x1bListSnapshotContentsRequest\x12>\n" +
+	"\x06filter\x18\x01 \x01(\v2&.volume.v1alpha1.SnapshotContentFilterR\x06filter\"U\n" +
+	"\x1cListSnapshotContentsResponse\x125\n" +
+	"\bsnapshot\x18\x01 \x03(\v2\x19.volume.v1alpha1.SnapshotR\bsnapshot\"?\n" +
+	"\x1cDeleteSnapshotContentRequest\x12\x1f\n" +
+	"\vsnapshot_id\x18\x01 \x01(\tR\n" +
+	"snapshotId\"\x1f\n" +
+	"\x1dDeleteSnapshotContentResponse*I\n" +
 	"\vVolumeState\x12\x12\n" +
 	"\x0eVOLUME_PENDING\x10\x00\x12\x14\n" +
 	"\x10VOLUME_AVAILABLE\x10\x01\x12\x10\n" +
-	"\fVOLUME_ERROR\x10\x022\xfe\x04\n" +
+	"\fVOLUME_ERROR\x10\x02*N\n" +
+	"\rSnapshotState\x12\x14\n" +
+	"\x10SNAPSHOT_PENDING\x10\x00\x12\x12\n" +
+	"\x0eSNAPSHOT_READY\x10\x01\x12\x13\n" +
+	"\x0fSNAPSHOT_FAILED\x10\x022\x9b\t\n" +
 	"\rVolumeRuntime\x12N\n" +
 	"\aVersion\x12\x1f.volume.v1alpha1.VersionRequest\x1a .volume.v1alpha1.VersionResponse\"\x00\x12W\n" +
 	"\n" +
@@ -1408,7 +2434,12 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\vListVolumes\x12#.volume.v1alpha1.ListVolumesRequest\x1a$.volume.v1alpha1.ListVolumesResponse\"\x00\x12]\n" +
 	"\fCreateVolume\x12$.volume.v1alpha1.CreateVolumeRequest\x1a%.volume.v1alpha1.CreateVolumeResponse\"\x00\x12]\n" +
 	"\fExpandVolume\x12$.volume.v1alpha1.ExpandVolumeRequest\x1a%.volume.v1alpha1.ExpandVolumeResponse\"\x00\x12]\n" +
-	"\fDeleteVolume\x12$.volume.v1alpha1.DeleteVolumeRequest\x1a%.volume.v1alpha1.DeleteVolumeResponse\"\x00\x12K\n" +
+	"\fDeleteVolume\x12$.volume.v1alpha1.DeleteVolumeRequest\x1a%.volume.v1alpha1.DeleteVolumeResponse\"\x00\x12c\n" +
+	"\x0eCreateSnapshot\x12&.volume.v1alpha1.CreateSnapshotRequest\x1a'.volume.v1alpha1.CreateSnapshotResponse\"\x00\x12c\n" +
+	"\x0eDeleteSnapshot\x12&.volume.v1alpha1.DeleteSnapshotRequest\x1a'.volume.v1alpha1.DeleteSnapshotResponse\"\x00\x12`\n" +
+	"\rListSnapshots\x12%.volume.v1alpha1.ListSnapshotsRequest\x1a&.volume.v1alpha1.ListSnapshotsResponse\"\x00\x12u\n" +
+	"\x14ListSnapshotContents\x12,.volume.v1alpha1.ListSnapshotContentsRequest\x1a-.volume.v1alpha1.ListSnapshotContentsResponse\"\x00\x12x\n" +
+	"\x15DeleteSnapshotContent\x12-.volume.v1alpha1.DeleteSnapshotContentRequest\x1a..volume.v1alpha1.DeleteSnapshotContentResponse\"\x00\x12K\n" +
 	"\x06Status\x12\x1e.volume.v1alpha1.StatusRequest\x1a\x1f.volume.v1alpha1.StatusResponse\"\x00B;Z9github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1b\x06proto3"
 
 var (
@@ -1423,86 +2454,134 @@ func file_volume_v1alpha1_api_proto_rawDescGZIP() []byte {
 	return file_volume_v1alpha1_api_proto_rawDescData
 }
 
-var file_volume_v1alpha1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_volume_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_volume_v1alpha1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_volume_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
 var file_volume_v1alpha1_api_proto_goTypes = []any{
-	(VolumeState)(0),                // 0: volume.v1alpha1.VolumeState
-	(*VolumeFilter)(nil),            // 1: volume.v1alpha1.VolumeFilter
-	(*EventFilter)(nil),             // 2: volume.v1alpha1.EventFilter
-	(*VolumeResources)(nil),         // 3: volume.v1alpha1.VolumeResources
-	(*EncryptionSpec)(nil),          // 4: volume.v1alpha1.EncryptionSpec
-	(*VolumeSpec)(nil),              // 5: volume.v1alpha1.VolumeSpec
-	(*VolumeStatus)(nil),            // 6: volume.v1alpha1.VolumeStatus
-	(*Volume)(nil),                  // 7: volume.v1alpha1.Volume
-	(*VolumeClassCapabilities)(nil), // 8: volume.v1alpha1.VolumeClassCapabilities
-	(*VolumeClass)(nil),             // 9: volume.v1alpha1.VolumeClass
-	(*VolumeClassStatus)(nil),       // 10: volume.v1alpha1.VolumeClassStatus
-	(*VolumeAccess)(nil),            // 11: volume.v1alpha1.VolumeAccess
-	(*ListEventsRequest)(nil),       // 12: volume.v1alpha1.ListEventsRequest
-	(*ListEventsResponse)(nil),      // 13: volume.v1alpha1.ListEventsResponse
-	(*VersionRequest)(nil),          // 14: volume.v1alpha1.VersionRequest
-	(*VersionResponse)(nil),         // 15: volume.v1alpha1.VersionResponse
-	(*ListVolumesRequest)(nil),      // 16: volume.v1alpha1.ListVolumesRequest
-	(*ListVolumesResponse)(nil),     // 17: volume.v1alpha1.ListVolumesResponse
-	(*CreateVolumeRequest)(nil),     // 18: volume.v1alpha1.CreateVolumeRequest
-	(*ExpandVolumeRequest)(nil),     // 19: volume.v1alpha1.ExpandVolumeRequest
-	(*CreateVolumeResponse)(nil),    // 20: volume.v1alpha1.CreateVolumeResponse
-	(*ExpandVolumeResponse)(nil),    // 21: volume.v1alpha1.ExpandVolumeResponse
-	(*DeleteVolumeRequest)(nil),     // 22: volume.v1alpha1.DeleteVolumeRequest
-	(*DeleteVolumeResponse)(nil),    // 23: volume.v1alpha1.DeleteVolumeResponse
-	(*StatusRequest)(nil),           // 24: volume.v1alpha1.StatusRequest
-	(*StatusResponse)(nil),          // 25: volume.v1alpha1.StatusResponse
-	nil,                             // 26: volume.v1alpha1.VolumeFilter.LabelSelectorEntry
-	nil,                             // 27: volume.v1alpha1.EventFilter.LabelSelectorEntry
-	nil,                             // 28: volume.v1alpha1.EncryptionSpec.SecretDataEntry
-	nil,                             // 29: volume.v1alpha1.VolumeAccess.AttributesEntry
-	nil,                             // 30: volume.v1alpha1.VolumeAccess.SecretDataEntry
-	(*v1alpha1.ObjectMetadata)(nil), // 31: meta.v1alpha1.ObjectMetadata
-	(*v1alpha11.Event)(nil),         // 32: event.v1alpha1.Event
+	(VolumeState)(0),                      // 0: volume.v1alpha1.VolumeState
+	(SnapshotState)(0),                    // 1: volume.v1alpha1.SnapshotState
+	(*VolumeFilter)(nil),                  // 2: volume.v1alpha1.VolumeFilter
+	(*EventFilter)(nil),                   // 3: volume.v1alpha1.EventFilter
+	(*VolumeResources)(nil),               // 4: volume.v1alpha1.VolumeResources
+	(*EncryptionSpec)(nil),                // 5: volume.v1alpha1.EncryptionSpec
+	(*VolumeDataSource)(nil),              // 6: volume.v1alpha1.VolumeDataSource
+	(*VolumeSpec)(nil),                    // 7: volume.v1alpha1.VolumeSpec
+	(*VolumeStatus)(nil),                  // 8: volume.v1alpha1.VolumeStatus
+	(*Volume)(nil),                        // 9: volume.v1alpha1.Volume
+	(*VolumeClassCapabilities)(nil),       // 10: volume.v1alpha1.VolumeClassCapabilities
+	(*VolumeClass)(nil),                   // 11: volume.v1alpha1.VolumeClass
+	(*VolumeClassStatus)(nil),             // 12: volume.v1alpha1.VolumeClassStatus
+	(*VolumeAccess)(nil),                  // 13: volume.v1alpha1.VolumeAccess
+	(*ListEventsRequest)(nil),             // 14: volume.v1alpha1.ListEventsRequest
+	(*ListEventsResponse)(nil),            // 15: volume.v1alpha1.ListEventsResponse
+	(*VersionRequest)(nil),                // 16: volume.v1alpha1.VersionRequest
+	(*VersionResponse)(nil),               // 17: volume.v1alpha1.VersionResponse
+	(*ListVolumesRequest)(nil),            // 18: volume.v1alpha1.ListVolumesRequest
+	(*ListVolumesResponse)(nil),           // 19: volume.v1alpha1.ListVolumesResponse
+	(*CreateVolumeRequest)(nil),           // 20: volume.v1alpha1.CreateVolumeRequest
+	(*ExpandVolumeRequest)(nil),           // 21: volume.v1alpha1.ExpandVolumeRequest
+	(*CreateVolumeResponse)(nil),          // 22: volume.v1alpha1.CreateVolumeResponse
+	(*ExpandVolumeResponse)(nil),          // 23: volume.v1alpha1.ExpandVolumeResponse
+	(*DeleteVolumeRequest)(nil),           // 24: volume.v1alpha1.DeleteVolumeRequest
+	(*DeleteVolumeResponse)(nil),          // 25: volume.v1alpha1.DeleteVolumeResponse
+	(*StatusRequest)(nil),                 // 26: volume.v1alpha1.StatusRequest
+	(*StatusResponse)(nil),                // 27: volume.v1alpha1.StatusResponse
+	(*SnapshotSpec)(nil),                  // 28: volume.v1alpha1.SnapshotSpec
+	(*SnapshotStatus)(nil),                // 29: volume.v1alpha1.SnapshotStatus
+	(*Snapshot)(nil),                      // 30: volume.v1alpha1.Snapshot
+	(*UIDReference)(nil),                  // 31: volume.v1alpha1.UIDReference
+	(*SnapshotContentSpec)(nil),           // 32: volume.v1alpha1.SnapshotContentSpec
+	(*SnapshotContent)(nil),               // 33: volume.v1alpha1.SnapshotContent
+	(*SnapshotFilter)(nil),                // 34: volume.v1alpha1.SnapshotFilter
+	(*SnapshotContentFilter)(nil),         // 35: volume.v1alpha1.SnapshotContentFilter
+	(*ListSnapshotsRequest)(nil),          // 36: volume.v1alpha1.ListSnapshotsRequest
+	(*ListSnapshotsResponse)(nil),         // 37: volume.v1alpha1.ListSnapshotsResponse
+	(*CreateSnapshotRequest)(nil),         // 38: volume.v1alpha1.CreateSnapshotRequest
+	(*CreateSnapshotResponse)(nil),        // 39: volume.v1alpha1.CreateSnapshotResponse
+	(*DeleteSnapshotRequest)(nil),         // 40: volume.v1alpha1.DeleteSnapshotRequest
+	(*DeleteSnapshotResponse)(nil),        // 41: volume.v1alpha1.DeleteSnapshotResponse
+	(*ListSnapshotContentsRequest)(nil),   // 42: volume.v1alpha1.ListSnapshotContentsRequest
+	(*ListSnapshotContentsResponse)(nil),  // 43: volume.v1alpha1.ListSnapshotContentsResponse
+	(*DeleteSnapshotContentRequest)(nil),  // 44: volume.v1alpha1.DeleteSnapshotContentRequest
+	(*DeleteSnapshotContentResponse)(nil), // 45: volume.v1alpha1.DeleteSnapshotContentResponse
+	nil,                                   // 46: volume.v1alpha1.VolumeFilter.LabelSelectorEntry
+	nil,                                   // 47: volume.v1alpha1.EventFilter.LabelSelectorEntry
+	nil,                                   // 48: volume.v1alpha1.EncryptionSpec.SecretDataEntry
+	nil,                                   // 49: volume.v1alpha1.VolumeAccess.AttributesEntry
+	nil,                                   // 50: volume.v1alpha1.VolumeAccess.SecretDataEntry
+	nil,                                   // 51: volume.v1alpha1.SnapshotFilter.LabelSelectorEntry
+	nil,                                   // 52: volume.v1alpha1.SnapshotContentFilter.LabelSelectorEntry
+	(*v1alpha1.ObjectMetadata)(nil),       // 53: meta.v1alpha1.ObjectMetadata
+	(*v1alpha11.Event)(nil),               // 54: event.v1alpha1.Event
 }
 var file_volume_v1alpha1_api_proto_depIdxs = []int32{
-	26, // 0: volume.v1alpha1.VolumeFilter.label_selector:type_name -> volume.v1alpha1.VolumeFilter.LabelSelectorEntry
-	27, // 1: volume.v1alpha1.EventFilter.label_selector:type_name -> volume.v1alpha1.EventFilter.LabelSelectorEntry
-	28, // 2: volume.v1alpha1.EncryptionSpec.secret_data:type_name -> volume.v1alpha1.EncryptionSpec.SecretDataEntry
-	3,  // 3: volume.v1alpha1.VolumeSpec.resources:type_name -> volume.v1alpha1.VolumeResources
-	4,  // 4: volume.v1alpha1.VolumeSpec.encryption:type_name -> volume.v1alpha1.EncryptionSpec
-	0,  // 5: volume.v1alpha1.VolumeStatus.state:type_name -> volume.v1alpha1.VolumeState
-	11, // 6: volume.v1alpha1.VolumeStatus.access:type_name -> volume.v1alpha1.VolumeAccess
-	3,  // 7: volume.v1alpha1.VolumeStatus.resources:type_name -> volume.v1alpha1.VolumeResources
-	31, // 8: volume.v1alpha1.Volume.metadata:type_name -> meta.v1alpha1.ObjectMetadata
-	5,  // 9: volume.v1alpha1.Volume.spec:type_name -> volume.v1alpha1.VolumeSpec
-	6,  // 10: volume.v1alpha1.Volume.status:type_name -> volume.v1alpha1.VolumeStatus
-	8,  // 11: volume.v1alpha1.VolumeClass.capabilities:type_name -> volume.v1alpha1.VolumeClassCapabilities
-	9,  // 12: volume.v1alpha1.VolumeClassStatus.volume_class:type_name -> volume.v1alpha1.VolumeClass
-	29, // 13: volume.v1alpha1.VolumeAccess.attributes:type_name -> volume.v1alpha1.VolumeAccess.AttributesEntry
-	30, // 14: volume.v1alpha1.VolumeAccess.secret_data:type_name -> volume.v1alpha1.VolumeAccess.SecretDataEntry
-	2,  // 15: volume.v1alpha1.ListEventsRequest.filter:type_name -> volume.v1alpha1.EventFilter
-	32, // 16: volume.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
-	1,  // 17: volume.v1alpha1.ListVolumesRequest.filter:type_name -> volume.v1alpha1.VolumeFilter
-	7,  // 18: volume.v1alpha1.ListVolumesResponse.volumes:type_name -> volume.v1alpha1.Volume
-	7,  // 19: volume.v1alpha1.CreateVolumeRequest.volume:type_name -> volume.v1alpha1.Volume
-	3,  // 20: volume.v1alpha1.ExpandVolumeRequest.resources:type_name -> volume.v1alpha1.VolumeResources
-	7,  // 21: volume.v1alpha1.CreateVolumeResponse.volume:type_name -> volume.v1alpha1.Volume
-	10, // 22: volume.v1alpha1.StatusResponse.volume_class_status:type_name -> volume.v1alpha1.VolumeClassStatus
-	14, // 23: volume.v1alpha1.VolumeRuntime.Version:input_type -> volume.v1alpha1.VersionRequest
-	12, // 24: volume.v1alpha1.VolumeRuntime.ListEvents:input_type -> volume.v1alpha1.ListEventsRequest
-	16, // 25: volume.v1alpha1.VolumeRuntime.ListVolumes:input_type -> volume.v1alpha1.ListVolumesRequest
-	18, // 26: volume.v1alpha1.VolumeRuntime.CreateVolume:input_type -> volume.v1alpha1.CreateVolumeRequest
-	19, // 27: volume.v1alpha1.VolumeRuntime.ExpandVolume:input_type -> volume.v1alpha1.ExpandVolumeRequest
-	22, // 28: volume.v1alpha1.VolumeRuntime.DeleteVolume:input_type -> volume.v1alpha1.DeleteVolumeRequest
-	24, // 29: volume.v1alpha1.VolumeRuntime.Status:input_type -> volume.v1alpha1.StatusRequest
-	15, // 30: volume.v1alpha1.VolumeRuntime.Version:output_type -> volume.v1alpha1.VersionResponse
-	13, // 31: volume.v1alpha1.VolumeRuntime.ListEvents:output_type -> volume.v1alpha1.ListEventsResponse
-	17, // 32: volume.v1alpha1.VolumeRuntime.ListVolumes:output_type -> volume.v1alpha1.ListVolumesResponse
-	20, // 33: volume.v1alpha1.VolumeRuntime.CreateVolume:output_type -> volume.v1alpha1.CreateVolumeResponse
-	21, // 34: volume.v1alpha1.VolumeRuntime.ExpandVolume:output_type -> volume.v1alpha1.ExpandVolumeResponse
-	23, // 35: volume.v1alpha1.VolumeRuntime.DeleteVolume:output_type -> volume.v1alpha1.DeleteVolumeResponse
-	25, // 36: volume.v1alpha1.VolumeRuntime.Status:output_type -> volume.v1alpha1.StatusResponse
-	30, // [30:37] is the sub-list for method output_type
-	23, // [23:30] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	46, // 0: volume.v1alpha1.VolumeFilter.label_selector:type_name -> volume.v1alpha1.VolumeFilter.LabelSelectorEntry
+	47, // 1: volume.v1alpha1.EventFilter.label_selector:type_name -> volume.v1alpha1.EventFilter.LabelSelectorEntry
+	48, // 2: volume.v1alpha1.EncryptionSpec.secret_data:type_name -> volume.v1alpha1.EncryptionSpec.SecretDataEntry
+	4,  // 3: volume.v1alpha1.VolumeSpec.resources:type_name -> volume.v1alpha1.VolumeResources
+	5,  // 4: volume.v1alpha1.VolumeSpec.encryption:type_name -> volume.v1alpha1.EncryptionSpec
+	6,  // 5: volume.v1alpha1.VolumeSpec.volume_data_source:type_name -> volume.v1alpha1.VolumeDataSource
+	0,  // 6: volume.v1alpha1.VolumeStatus.state:type_name -> volume.v1alpha1.VolumeState
+	13, // 7: volume.v1alpha1.VolumeStatus.access:type_name -> volume.v1alpha1.VolumeAccess
+	4,  // 8: volume.v1alpha1.VolumeStatus.resources:type_name -> volume.v1alpha1.VolumeResources
+	53, // 9: volume.v1alpha1.Volume.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	7,  // 10: volume.v1alpha1.Volume.spec:type_name -> volume.v1alpha1.VolumeSpec
+	8,  // 11: volume.v1alpha1.Volume.status:type_name -> volume.v1alpha1.VolumeStatus
+	10, // 12: volume.v1alpha1.VolumeClass.capabilities:type_name -> volume.v1alpha1.VolumeClassCapabilities
+	11, // 13: volume.v1alpha1.VolumeClassStatus.volume_class:type_name -> volume.v1alpha1.VolumeClass
+	49, // 14: volume.v1alpha1.VolumeAccess.attributes:type_name -> volume.v1alpha1.VolumeAccess.AttributesEntry
+	50, // 15: volume.v1alpha1.VolumeAccess.secret_data:type_name -> volume.v1alpha1.VolumeAccess.SecretDataEntry
+	3,  // 16: volume.v1alpha1.ListEventsRequest.filter:type_name -> volume.v1alpha1.EventFilter
+	54, // 17: volume.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
+	2,  // 18: volume.v1alpha1.ListVolumesRequest.filter:type_name -> volume.v1alpha1.VolumeFilter
+	9,  // 19: volume.v1alpha1.ListVolumesResponse.volumes:type_name -> volume.v1alpha1.Volume
+	9,  // 20: volume.v1alpha1.CreateVolumeRequest.volume:type_name -> volume.v1alpha1.Volume
+	4,  // 21: volume.v1alpha1.ExpandVolumeRequest.resources:type_name -> volume.v1alpha1.VolumeResources
+	9,  // 22: volume.v1alpha1.CreateVolumeResponse.volume:type_name -> volume.v1alpha1.Volume
+	12, // 23: volume.v1alpha1.StatusResponse.volume_class_status:type_name -> volume.v1alpha1.VolumeClassStatus
+	1,  // 24: volume.v1alpha1.SnapshotStatus.state:type_name -> volume.v1alpha1.SnapshotState
+	53, // 25: volume.v1alpha1.Snapshot.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	28, // 26: volume.v1alpha1.Snapshot.spec:type_name -> volume.v1alpha1.SnapshotSpec
+	29, // 27: volume.v1alpha1.Snapshot.status:type_name -> volume.v1alpha1.SnapshotStatus
+	31, // 28: volume.v1alpha1.SnapshotContentSpec.snapshot_ref:type_name -> volume.v1alpha1.UIDReference
+	53, // 29: volume.v1alpha1.SnapshotContent.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	32, // 30: volume.v1alpha1.SnapshotContent.spec:type_name -> volume.v1alpha1.SnapshotContentSpec
+	51, // 31: volume.v1alpha1.SnapshotFilter.label_selector:type_name -> volume.v1alpha1.SnapshotFilter.LabelSelectorEntry
+	52, // 32: volume.v1alpha1.SnapshotContentFilter.label_selector:type_name -> volume.v1alpha1.SnapshotContentFilter.LabelSelectorEntry
+	34, // 33: volume.v1alpha1.ListSnapshotsRequest.filter:type_name -> volume.v1alpha1.SnapshotFilter
+	30, // 34: volume.v1alpha1.ListSnapshotsResponse.snapshot:type_name -> volume.v1alpha1.Snapshot
+	30, // 35: volume.v1alpha1.CreateSnapshotRequest.snapshot:type_name -> volume.v1alpha1.Snapshot
+	30, // 36: volume.v1alpha1.CreateSnapshotResponse.snapshot:type_name -> volume.v1alpha1.Snapshot
+	35, // 37: volume.v1alpha1.ListSnapshotContentsRequest.filter:type_name -> volume.v1alpha1.SnapshotContentFilter
+	30, // 38: volume.v1alpha1.ListSnapshotContentsResponse.snapshot:type_name -> volume.v1alpha1.Snapshot
+	16, // 39: volume.v1alpha1.VolumeRuntime.Version:input_type -> volume.v1alpha1.VersionRequest
+	14, // 40: volume.v1alpha1.VolumeRuntime.ListEvents:input_type -> volume.v1alpha1.ListEventsRequest
+	18, // 41: volume.v1alpha1.VolumeRuntime.ListVolumes:input_type -> volume.v1alpha1.ListVolumesRequest
+	20, // 42: volume.v1alpha1.VolumeRuntime.CreateVolume:input_type -> volume.v1alpha1.CreateVolumeRequest
+	21, // 43: volume.v1alpha1.VolumeRuntime.ExpandVolume:input_type -> volume.v1alpha1.ExpandVolumeRequest
+	24, // 44: volume.v1alpha1.VolumeRuntime.DeleteVolume:input_type -> volume.v1alpha1.DeleteVolumeRequest
+	38, // 45: volume.v1alpha1.VolumeRuntime.CreateSnapshot:input_type -> volume.v1alpha1.CreateSnapshotRequest
+	40, // 46: volume.v1alpha1.VolumeRuntime.DeleteSnapshot:input_type -> volume.v1alpha1.DeleteSnapshotRequest
+	36, // 47: volume.v1alpha1.VolumeRuntime.ListSnapshots:input_type -> volume.v1alpha1.ListSnapshotsRequest
+	42, // 48: volume.v1alpha1.VolumeRuntime.ListSnapshotContents:input_type -> volume.v1alpha1.ListSnapshotContentsRequest
+	44, // 49: volume.v1alpha1.VolumeRuntime.DeleteSnapshotContent:input_type -> volume.v1alpha1.DeleteSnapshotContentRequest
+	26, // 50: volume.v1alpha1.VolumeRuntime.Status:input_type -> volume.v1alpha1.StatusRequest
+	17, // 51: volume.v1alpha1.VolumeRuntime.Version:output_type -> volume.v1alpha1.VersionResponse
+	15, // 52: volume.v1alpha1.VolumeRuntime.ListEvents:output_type -> volume.v1alpha1.ListEventsResponse
+	19, // 53: volume.v1alpha1.VolumeRuntime.ListVolumes:output_type -> volume.v1alpha1.ListVolumesResponse
+	22, // 54: volume.v1alpha1.VolumeRuntime.CreateVolume:output_type -> volume.v1alpha1.CreateVolumeResponse
+	23, // 55: volume.v1alpha1.VolumeRuntime.ExpandVolume:output_type -> volume.v1alpha1.ExpandVolumeResponse
+	25, // 56: volume.v1alpha1.VolumeRuntime.DeleteVolume:output_type -> volume.v1alpha1.DeleteVolumeResponse
+	39, // 57: volume.v1alpha1.VolumeRuntime.CreateSnapshot:output_type -> volume.v1alpha1.CreateSnapshotResponse
+	41, // 58: volume.v1alpha1.VolumeRuntime.DeleteSnapshot:output_type -> volume.v1alpha1.DeleteSnapshotResponse
+	37, // 59: volume.v1alpha1.VolumeRuntime.ListSnapshots:output_type -> volume.v1alpha1.ListSnapshotsResponse
+	43, // 60: volume.v1alpha1.VolumeRuntime.ListSnapshotContents:output_type -> volume.v1alpha1.ListSnapshotContentsResponse
+	45, // 61: volume.v1alpha1.VolumeRuntime.DeleteSnapshotContent:output_type -> volume.v1alpha1.DeleteSnapshotContentResponse
+	27, // 62: volume.v1alpha1.VolumeRuntime.Status:output_type -> volume.v1alpha1.StatusResponse
+	51, // [51:63] is the sub-list for method output_type
+	39, // [39:51] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_volume_v1alpha1_api_proto_init() }
@@ -1515,8 +2594,8 @@ func file_volume_v1alpha1_api_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_volume_v1alpha1_api_proto_rawDesc), len(file_volume_v1alpha1_api_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   30,
+			NumEnums:      2,
+			NumMessages:   51,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -13,6 +13,11 @@ service VolumeRuntime {
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
+  rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
+  rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
+  rpc ListSnapshotContents(ListSnapshotContentsRequest) returns (ListSnapshotContentsResponse) {};
+  rpc DeleteSnapshotContent(DeleteSnapshotContentRequest) returns (DeleteSnapshotContentResponse) {};
 
   rpc Status(StatusRequest) returns (StatusResponse) {};
 }
@@ -37,11 +42,18 @@ message EncryptionSpec {
   map<string, bytes> secret_data = 1;
 }
 
+message VolumeDataSource {
+  string api_group  = 1;
+  string kind  = 2;
+  string name = 3;
+}
+
 message VolumeSpec {
   string image = 1;
   string class = 2;
   VolumeResources resources = 3;
   EncryptionSpec encryption = 4;
+  VolumeDataSource volume_data_source = 5;
 }
 
 message VolumeStatus {
@@ -140,4 +152,89 @@ message StatusRequest {
 
 message StatusResponse {
   repeated VolumeClassStatus volume_class_status = 1;
+}
+
+enum SnapshotState {
+  SNAPSHOT_PENDING = 0;
+  SNAPSHOT_READY = 1;
+  SNAPSHOT_FAILED = 2;
+}
+
+message SnapshotSpec {
+  string volume_name = 1;
+}
+
+message SnapshotStatus {
+  SnapshotState state = 1;
+  int64 restore_size = 2;
+}
+
+message Snapshot {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  SnapshotSpec spec = 2;
+  SnapshotStatus status = 3;
+}
+
+message UIDReference {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+}
+
+message SnapshotContentSpec {
+  string snapshot_handle = 1;
+  UIDReference snapshot_ref = 2;
+}
+
+message SnapshotContent {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  SnapshotContentSpec spec = 2;
+}
+
+message SnapshotFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message SnapshotContentFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message ListSnapshotsRequest {
+  SnapshotFilter filter = 1;
+}
+
+message ListSnapshotsResponse {
+  repeated Snapshot snapshot = 1;
+}
+
+message CreateSnapshotRequest {
+  Snapshot snapshot = 1;
+}
+
+message CreateSnapshotResponse {
+  Snapshot snapshot = 1;
+}
+
+message DeleteSnapshotRequest {
+  string snapshot_id = 1;
+}
+
+message DeleteSnapshotResponse {
+}
+
+message ListSnapshotContentsRequest {
+  SnapshotContentFilter filter = 1;
+}
+
+message ListSnapshotContentsResponse {
+  repeated Snapshot snapshot = 1;
+}
+
+message DeleteSnapshotContentRequest {
+  string snapshot_id = 1;
+}
+
+message DeleteSnapshotContentResponse {
 }
