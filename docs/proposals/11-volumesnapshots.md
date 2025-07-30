@@ -114,7 +114,6 @@ spec:
     
 #### Fields:
 
-- `deletionPolicy`: Defines what happens to the snapshot content when the `VolumeSnapshot` is deleted. It can be `Delete` or `Retain`.
 - `source`: Contains the `snapshotHandle`, which is a unique identifier for the snapshot in the storage provider.
 - `volumeSnapshotRef`: Reference to the `VolumeSnapshot` that this content belongs to. It includes the name, namespace, and UID of the `VolumeSnapshot`.
 
