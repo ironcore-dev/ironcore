@@ -102,6 +102,7 @@ apiVersion: storage.ironcore.dev/v1alpha1
 kind: VolumeSnapshotContent
 metadata:
   name: example-volumesnapshotcontent
+  namespace: default
 spec:
   source:
     snapshotHandle: 1334353-234234-45435435 # Unique identifier for the snapshot in the storage provider
@@ -126,6 +127,7 @@ apiVersion: storage.ironcore.dev/v1alpha1
 kind: Volume
 metadata:
   name: restored-volume
+  namespace: default
 spec:
   volumeClassRef:
     name: example-volumeclass
