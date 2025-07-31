@@ -1,7 +1,7 @@
 # VolumeSnapshot
-The `Ironcore` `VolumeSnapshot` resource allows users to take point-in-time snapshots of the content of a `Volume` without creating an entirely new volume. This functionality allows users to backup databases before performing edit or delete modifications on data.
+The `Ironcore` `VolumeSnapshot` resource allows users to take point-in-time snapshots of the content of a `Volume` without creating an entirely new volume. This functionality allows users to take backup before performing any modifications on data.
 
-# Example VolumeSnapshot Resource
+## Example VolumeSnapshot Resource
 An example of how to define a `VolumeSnapshot` resource in `Ironcore`
 
 ```
@@ -14,12 +14,12 @@ spec:
     name: volume-sample
 ```
 
-# Key Fields:
+## Key Fields:
 
 - `volumeRef`(`string`): `volumeRef` refers to the name of an Ironcore `volume` to create a volume snapshot.
 
 
-# Reconciliation Process:
+## Reconciliation Process:
 
 - **Fetch VolumeSnapshot Resource**: Retrieve the `VolumeSnapshot` resource and clean up any orphaned `IRI` volume snapshots if the resource is missing.
 
