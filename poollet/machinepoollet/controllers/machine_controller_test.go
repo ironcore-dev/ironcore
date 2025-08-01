@@ -34,10 +34,14 @@ var _ = Describe("MachineController", func() {
 
 	It("Should create a machine with an ephemeral NIC and ensure claimed networkInterfaceRef matches the ephemeral NIC", func(ctx SpecContext) {
 		By("creating a network")
+		const fooAnnotationValue = "bar"
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
 				ProviderID: "foo",
@@ -72,7 +76,6 @@ var _ = Describe("MachineController", func() {
 		})).Should(Succeed())
 
 		By("creating a machine")
-		const fooAnnotationValue = "bar"
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -159,6 +162,9 @@ var _ = Describe("MachineController", func() {
 			Labels: map[string]string{
 				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
 			},
+			NetworkLabels: map[string]string{
+				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			},
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
@@ -207,6 +213,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
 				ProviderID: "foo",
@@ -316,6 +325,9 @@ var _ = Describe("MachineController", func() {
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
 			Labels: map[string]string{
+				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			},
+			NetworkLabels: map[string]string{
 				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
 			},
 		})))

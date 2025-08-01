@@ -230,6 +230,19 @@ func (r *MachineReconciler) iriNetworkInterfaceLabels(networkinterface *networki
 	return labels, nil
 }
 
+func (r *MachineReconciler) iriNetworkLabels(network *networkingv1alpha1.Network) (map[string]string, error) {
+	labels := map[string]string{}
+
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(network, r.NetworkDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range apiLabels {
+		labels[k] = v
+	}
+	return labels, nil
+}
+
 func (r *MachineReconciler) prepareIRINetworkInterface(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
@@ -250,17 +263,22 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		return nil, false, fmt.Errorf("error preparing iri networkinterface labels: %w", err)
 	}
 
+	networkLabels, err := r.iriNetworkLabels(network)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing iri network labels: %w", err)
+	}
+
 	ips, ok, err := r.getNetworkInterfaceIPs(ctx, machine, nic)
 	if err != nil || !ok {
 		return nil, false, err
 	}
-
 	return &iri.NetworkInterface{
-		Name:       machineNicName,
-		NetworkId:  network.Spec.ProviderID,
-		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
-		Attributes: nic.Spec.Attributes,
-		Labels:     labels,
+		Name:          machineNicName,
+		NetworkId:     network.Spec.ProviderID,
+		Ips:           utilslices.Map(ips, commonv1alpha1.IP.String),
+		Attributes:    nic.Spec.Attributes,
+		Labels:        labels,
+		NetworkLabels: networkLabels,
 	}, true, nil
 }
 
