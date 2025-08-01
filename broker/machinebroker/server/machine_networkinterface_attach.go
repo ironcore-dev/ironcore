@@ -12,10 +12,10 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	"google.golang.org/grpc/codes"
@@ -26,40 +26,29 @@ import (
 )
 
 type IronCoreNetworkInterfaceConfig struct {
-	Name       string
-	NetworkID  string
-	IPs        []commonv1alpha1.IP
-	Attributes map[string]string
-	Labels     map[string]string
+	Name          string
+	NetworkID     string
+	IPs           []commonv1alpha1.IP
+	Attributes    map[string]string
+	Labels        map[string]string
+	NetworkLabels map[string]string
 }
 
-func (s *Server) prepareIronCoreNetworkInterfaceLabels(networkinterface *iri.NetworkInterface) map[string]string {
-	labels := make(map[string]string)
-
-	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
-		value := networkinterface.GetLabels()[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)]
-		if value == "" {
-			value = networkinterface.GetLabels()[defaultLabelName]
-		}
-		if value != "" {
-			labels[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)] = value
-		}
-	}
-
-	return labels
-}
 func (s *Server) getIronCoreNetworkInterfaceConfig(iriNIC *iri.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
 	ips, err := s.parseIPs(iriNIC.Ips)
 	if err != nil {
 		return nil, err
 	}
-	labels := s.prepareIronCoreNetworkInterfaceLabels(iriNIC)
+
+	nicLabels := brokerutils.PrepareDownwardAPILabels(iriNIC.GetLabels(), s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
+	networkLabels := brokerutils.PrepareDownwardAPILabels(iriNIC.GetNetworkLabels(), s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
 	return &IronCoreNetworkInterfaceConfig{
-		Name:       iriNIC.Name,
-		NetworkID:  iriNIC.NetworkId,
-		IPs:        ips,
-		Attributes: iriNIC.Attributes,
-		Labels:     labels,
+		Name:          iriNIC.Name,
+		NetworkID:     iriNIC.NetworkId,
+		IPs:           ips,
+		Attributes:    iriNIC.Attributes,
+		Labels:        nicLabels,
+		NetworkLabels: networkLabels,
 	}, nil
 }
 
@@ -71,7 +60,7 @@ func (s *Server) createIronCoreNetworkInterface(
 	cfg *IronCoreNetworkInterfaceConfig,
 ) (ironcoreMachineNic *computev1alpha1.NetworkInterface, aggIronCoreNic *AggregateIronCoreNetworkInterface, retErr error) {
 	log.V(1).Info("Getting network for handle")
-	ironcoreNetwork, err := s.networks.GetNetwork(ctx, cfg.NetworkID)
+	ironcoreNetwork, err := s.networks.GetNetwork(ctx, cfg.NetworkID, cfg.NetworkLabels)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error getting network: %w", err)
 	}

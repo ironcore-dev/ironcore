@@ -34,7 +34,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
-	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -69,13 +68,12 @@ func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) (map[
 		volumepoolletv1alpha1.VolumeNamespaceLabel: volume.Namespace,
 		volumepoolletv1alpha1.VolumeNameLabel:      volume.Name,
 	}
-	for name, fieldPath := range r.DownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(volume, fieldPath)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
-		}
-
-		labels[poolletutils.DownwardAPILabel(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, name)] = value
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(volume, r.DownwardAPILabels, volumepoolletv1alpha1.VolumeDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range apiLabels {
+		labels[k] = v
 	}
 	return labels, nil
 }
