@@ -240,6 +240,9 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			NicDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 			},
+			NetworkDownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		machineEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Machine, error) {

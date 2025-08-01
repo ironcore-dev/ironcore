@@ -9,11 +9,13 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
+
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
-	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+
 	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,22 +27,6 @@ type AggregateIronCoreBucket struct {
 	AccessSecret *corev1.Secret
 }
 
-func (s *Server) prepareIronCoreBucketLabels(bucket *iri.Bucket) map[string]string {
-	labels := make(map[string]string)
-
-	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
-		value := bucket.GetMetadata().GetLabels()[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)]
-		if value == "" {
-			value = bucket.GetMetadata().GetLabels()[defaultLabelName]
-		}
-		if value != "" {
-			labels[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)] = value
-		}
-	}
-
-	return labels
-}
-
 func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) (*AggregateIronCoreBucket, error) {
 	var bucketPoolRef *corev1.LocalObjectReference
 	if s.bucketPoolName != "" {
@@ -48,7 +34,11 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 			Name: s.bucketPoolName,
 		}
 	}
-	labels := s.prepareIronCoreBucketLabels(bucket)
+	labels := brokerutils.PrepareDownwardAPILabels(
+		bucket.GetMetadata().GetLabels(),
+		s.brokerDownwardAPILabels,
+		bucketpoolletv1alpha1.BucketDownwardAPIPrefix,
+	)
 	ironcoreBucket := &storagev1alpha1.Bucket{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
