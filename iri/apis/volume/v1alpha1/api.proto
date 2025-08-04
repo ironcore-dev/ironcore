@@ -13,11 +13,11 @@ service VolumeRuntime {
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
-  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
-  rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
-  rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
-  rpc ListSnapshotContents(ListSnapshotContentsRequest) returns (ListSnapshotContentsResponse) {};
-  rpc DeleteSnapshotContent(DeleteSnapshotContentRequest) returns (DeleteSnapshotContentResponse) {};
+  rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
+  rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
+  rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
+  rpc ListVolumeSnapshotContents(ListVolumeSnapshotContentsRequest) returns (ListVolumeSnapshotContentsResponse) {};
+  rpc DeleteVolumeSnapshotContent(DeleteVolumeSnapshotContentRequest) returns (DeleteVolumeSnapshotContentResponse) {};
 
   rpc Status(StatusRequest) returns (StatusResponse) {};
 }
@@ -154,25 +154,25 @@ message StatusResponse {
   repeated VolumeClassStatus volume_class_status = 1;
 }
 
-enum SnapshotState {
-  SNAPSHOT_PENDING = 0;
-  SNAPSHOT_READY = 1;
-  SNAPSHOT_FAILED = 2;
+enum VolumeSnapshotState {
+  VOLUME_SNAPSHOT_PENDING = 0;
+  VOLUME_SNAPSHOT_READY = 1;
+  VOLUME_SNAPSHOT_FAILED = 2;
 }
 
-message SnapshotSpec {
+message VolumeSnapshotSpec {
   string volume_name = 1;
 }
 
-message SnapshotStatus {
-  SnapshotState state = 1;
+message VolumeSnapshotStatus {
+  VolumeSnapshotState state = 1;
   int64 restore_size = 2;
 }
 
-message Snapshot {
+message VolumeSnapshot {
   meta.v1alpha1.ObjectMetadata metadata = 1;
-  SnapshotSpec spec = 2;
-  SnapshotStatus status = 3;
+  VolumeSnapshotSpec spec = 2;
+  VolumeSnapshotStatus status = 3;
 }
 
 message UIDReference {
@@ -181,60 +181,60 @@ message UIDReference {
   string uid = 3;
 }
 
-message SnapshotContentSpec {
-  string snapshot_handle = 1;
+message VolumeSnapshotContentSpec {
+  string volume_snapshot_handle = 1;
   UIDReference snapshot_ref = 2;
 }
 
-message SnapshotContent {
+message VolumeSnapshotContent {
   meta.v1alpha1.ObjectMetadata metadata = 1;
-  SnapshotContentSpec spec = 2;
+  VolumeSnapshotContentSpec spec = 2;
 }
 
-message SnapshotFilter {
+message VolumeSnapshotFilter {
   string id = 1;
   map<string, string> label_selector = 2;
 }
 
-message SnapshotContentFilter {
+message VolumeSnapshotContentFilter {
   string id = 1;
   map<string, string> label_selector = 2;
 }
 
-message ListSnapshotsRequest {
-  SnapshotFilter filter = 1;
+message ListVolumeSnapshotsRequest {
+  VolumeSnapshotFilter filter = 1;
 }
 
-message ListSnapshotsResponse {
-  repeated Snapshot snapshot = 1;
+message ListVolumeSnapshotsResponse {
+  repeated VolumeSnapshot volume_snapshot = 1;
 }
 
-message CreateSnapshotRequest {
-  Snapshot snapshot = 1;
+message CreateVolumeSnapshotRequest {
+  VolumeSnapshot volume_snapshot = 1;
 }
 
-message CreateSnapshotResponse {
-  Snapshot snapshot = 1;
+message CreateVolumeSnapshotResponse {
+  VolumeSnapshot volume_snapshot = 1;
 }
 
-message DeleteSnapshotRequest {
-  string snapshot_id = 1;
+message DeleteVolumeSnapshotRequest {
+  string volume_snapshot_id = 1;
 }
 
-message DeleteSnapshotResponse {
+message DeleteVolumeSnapshotResponse {
 }
 
-message ListSnapshotContentsRequest {
-  SnapshotContentFilter filter = 1;
+message ListVolumeSnapshotContentsRequest {
+  VolumeSnapshotContentFilter filter = 1;
 }
 
-message ListSnapshotContentsResponse {
-  repeated Snapshot snapshot = 1;
+message ListVolumeSnapshotContentsResponse {
+  repeated VolumeSnapshot volume_snapshot = 1;
 }
 
-message DeleteSnapshotContentRequest {
-  string snapshot_id = 1;
+message DeleteVolumeSnapshotContentRequest {
+  string volume_snapshot_id = 1;
 }
 
-message DeleteSnapshotContentResponse {
+message DeleteVolumeSnapshotContentResponse {
 }
