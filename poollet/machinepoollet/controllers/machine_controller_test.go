@@ -158,9 +158,6 @@ var _ = Describe("MachineController", func() {
 			Ips:       []string{"10.0.0.11"},
 			Labels: map[string]string{
 				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-				machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    nicName,
-				machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               ns.Name,
-				machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
 			},
 		})))
 
@@ -320,9 +317,6 @@ var _ = Describe("MachineController", func() {
 			Ips:       []string{"10.0.0.1"},
 			Labels: map[string]string{
 				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-				machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    nic.Name,
-				machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               ns.Name,
-				machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
 			},
 		})))
 
