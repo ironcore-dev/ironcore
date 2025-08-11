@@ -217,12 +217,8 @@ func (r *MachineReconciler) getNetworkInterfaceIPs(
 }
 
 func (r *MachineReconciler) iriNetworkInterfaceLabels(networkinterface *networkingv1alpha1.NetworkInterface) (map[string]string, error) {
-	labels := map[string]string{
-		v1alpha1.NetworkInterfaceUIDLabel:       string(networkinterface.UID),
-		v1alpha1.NetworkInterfaceNamespaceLabel: networkinterface.Namespace,
-		v1alpha1.NetworkInterfaceNameLabel:      networkinterface.Name,
-	}
 
+	labels := map[string]string{}
 	for name, fieldPath := range r.NicDownwardAPILabels {
 		value, err := fieldpath.ExtractFieldPathAsString(networkinterface, fieldPath)
 		if err != nil {

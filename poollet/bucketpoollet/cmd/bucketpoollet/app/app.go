@@ -100,7 +100,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringToStringVar(&o.BucketDownwardAPILabels, "bucket-downward-api-label", o.BucketDownwardAPILabels, "Downward-API labels to set on the IRI bucket.")
-	fs.StringToStringVar(&o.BucketDownwardAPIAnnotations, "bucket-downward-api-annotations", o.BucketDownwardAPIAnnotations, "Downward-API annotations to set on the IRI bucket.")
+	fs.StringToStringVar(&o.BucketDownwardAPIAnnotations, "bucket-downward-api-annotation", o.BucketDownwardAPIAnnotations, "Downward-API annotations to set on the IRI bucket.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the bucket pool to announce / watch")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the bucket pool.")
 	fs.StringVar(&o.BucketRuntimeEndpoint, "bucket-runtime-endpoint", o.BucketRuntimeEndpoint, "Endpoint of the remote bucket runtime service.")
