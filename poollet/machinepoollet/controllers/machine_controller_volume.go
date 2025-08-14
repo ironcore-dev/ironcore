@@ -385,30 +385,35 @@ func (r *MachineReconciler) getVolumeStatusesForMachine(
 		errs                         []error
 	)
 
+	for _, iriVolume := range iriMachine.Status.Volumes {
+		var volumeStatusValues computev1alpha1.VolumeStatus
+		volumeStatusValues, err := r.convertIRIVolumeStatus(iriVolume, iriVolume.Name)
+		if err != nil {
+			return nil, fmt.Errorf("[volume %s] %w", iriVolume.Name, err)
+		}
+		volumeStatus := existingVolumeStatusesByName[iriVolume.Name]
+		r.addVolumeStatusValues(now, &volumeStatus, &volumeStatusValues)
+		volumeStatuses = append(volumeStatuses, volumeStatus)
+	}
+
 	for _, machineVolume := range machine.Spec.Volumes {
 		var (
-			iriVolumeStatus, ok = iriVolumeStatusByName[machineVolume.Name]
-			volumeStatusValues  computev1alpha1.VolumeStatus
+			_, ok              = iriVolumeStatusByName[machineVolume.Name]
+			volumeStatusValues computev1alpha1.VolumeStatus
 		)
 		volumeName := computev1alpha1.MachineVolumeName(machine.Name, machineVolume)
-		if ok {
-			var err error
-			volumeStatusValues, err = r.convertIRIVolumeStatus(iriVolumeStatus, volumeName)
-			if err != nil {
-				return nil, fmt.Errorf("[volume %s] %w", machineVolume.Name, err)
-			}
-		} else {
+		if !ok {
 			volumeStatusValues = computev1alpha1.VolumeStatus{
 				Name:      machineVolume.Name,
 				State:     computev1alpha1.VolumeStatePending,
 				VolumeRef: corev1.LocalObjectReference{Name: volumeName},
 			}
+			volumeStatus := existingVolumeStatusesByName[machineVolume.Name]
+			r.addVolumeStatusValues(now, &volumeStatus, &volumeStatusValues)
+			volumeStatuses = append(volumeStatuses, volumeStatus)
 		}
-
-		volumeStatus := existingVolumeStatusesByName[machineVolume.Name]
-		r.addVolumeStatusValues(now, &volumeStatus, &volumeStatusValues)
-		volumeStatuses = append(volumeStatuses, volumeStatus)
 	}
+
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
