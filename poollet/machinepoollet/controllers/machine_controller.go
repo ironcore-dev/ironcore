@@ -63,6 +63,9 @@ type MachineReconciler struct {
 	NicDownwardAPILabels      map[string]string
 	NicDownwardAPIAnnotations map[string]string
 
+	NetworkDownwardAPILabels      map[string]string
+	NetworkDownwardAPIAnnotations map[string]string
+
 	WatchFilterValue string
 
 	MaxConcurrentReconciles int
@@ -348,13 +351,12 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 		v1alpha1.MachineNameLabel:      machine.Name,
 	}
 
-	for name, fieldPath := range r.MachineDownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
-		}
-
-		labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, name)] = value
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(machine, r.MachineDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range apiLabels {
+		labels[k] = v
 	}
 	return labels, nil
 }

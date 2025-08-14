@@ -169,11 +169,12 @@ func (s *Server) convertIronCoreNetworkInterfaceAttachment(
 		}
 
 		return &iri.NetworkInterface{
-			Name:       ironcoreMachineNic.Name,
-			NetworkId:  ironcoreNic.Network.Spec.ProviderID,
-			Ips:        ips,
-			Attributes: ironcoreNic.NetworkInterface.Spec.Attributes,
-			Labels:     ironcoreNic.NetworkInterface.Labels,
+			Name:          ironcoreMachineNic.Name,
+			NetworkId:     ironcoreNic.Network.Spec.ProviderID,
+			Ips:           ips,
+			Attributes:    ironcoreNic.NetworkInterface.Spec.Attributes,
+			Labels:        ironcoreNic.NetworkInterface.Labels,
+			NetworkLabels: ironcoreNic.Network.Labels,
 		}, nil
 	default:
 		return nil, fmt.Errorf("unrecognized ironcore machine network interface %#v", ironcoreMachineNic)

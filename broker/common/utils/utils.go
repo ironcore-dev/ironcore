@@ -6,6 +6,8 @@ package utils
 import (
 	"context"
 
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -54,4 +56,23 @@ func ClientObjectGetter[ObjPtr ObjectPtr[Obj], Obj any](
 		}
 		return objPtr, nil
 	}
+}
+
+func PrepareDownwardAPILabels(
+	labelSource map[string]string,
+	downwardAPILabels map[string]string,
+	prefix string,
+) map[string]string {
+	preparedLabels := make(map[string]string)
+	for downwardAPILabelName, defaultLabelName := range downwardAPILabels {
+		key := poolletutils.DownwardAPILabel(prefix, downwardAPILabelName)
+		value := labelSource[key]
+		if value == "" {
+			value = labelSource[defaultLabelName]
+		}
+		if value != "" {
+			preparedLabels[key] = value
+		}
+	}
+	return preparedLabels
 }
