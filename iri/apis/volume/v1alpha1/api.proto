@@ -161,7 +161,7 @@ enum VolumeSnapshotState {
 }
 
 message VolumeSnapshotSpec {
-  string volume_name = 1;
+  string volume_id = 1;
 }
 
 message VolumeSnapshotStatus {
