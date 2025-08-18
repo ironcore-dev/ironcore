@@ -13,6 +13,11 @@ service VolumeRuntime {
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
+  rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
+  rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
+  rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
+  rpc ListVolumeSnapshotContents(ListVolumeSnapshotContentsRequest) returns (ListVolumeSnapshotContentsResponse) {};
+  rpc DeleteVolumeSnapshotContent(DeleteVolumeSnapshotContentRequest) returns (DeleteVolumeSnapshotContentResponse) {};
 
   rpc Status(StatusRequest) returns (StatusResponse) {};
 }
@@ -37,11 +42,18 @@ message EncryptionSpec {
   map<string, bytes> secret_data = 1;
 }
 
+message VolumeDataSource {
+  string api_group  = 1;
+  string kind  = 2;
+  string name = 3;
+}
+
 message VolumeSpec {
   string image = 1;
   string class = 2;
   VolumeResources resources = 3;
   EncryptionSpec encryption = 4;
+  VolumeDataSource volume_data_source = 5;
 }
 
 message VolumeStatus {
@@ -140,4 +152,89 @@ message StatusRequest {
 
 message StatusResponse {
   repeated VolumeClassStatus volume_class_status = 1;
+}
+
+enum VolumeSnapshotState {
+  VOLUME_SNAPSHOT_PENDING = 0;
+  VOLUME_SNAPSHOT_READY = 1;
+  VOLUME_SNAPSHOT_FAILED = 2;
+}
+
+message VolumeSnapshotSpec {
+  string volume_id = 1;
+}
+
+message VolumeSnapshotStatus {
+  VolumeSnapshotState state = 1;
+  int64 restore_size = 2;
+}
+
+message VolumeSnapshot {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  VolumeSnapshotSpec spec = 2;
+  VolumeSnapshotStatus status = 3;
+}
+
+message UIDReference {
+  string namespace = 1;
+  string name = 2;
+  string uid = 3;
+}
+
+message VolumeSnapshotContentSpec {
+  string volume_snapshot_handle = 1;
+  UIDReference snapshot_ref = 2;
+}
+
+message VolumeSnapshotContent {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  VolumeSnapshotContentSpec spec = 2;
+}
+
+message VolumeSnapshotFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message VolumeSnapshotContentFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message ListVolumeSnapshotsRequest {
+  VolumeSnapshotFilter filter = 1;
+}
+
+message ListVolumeSnapshotsResponse {
+  repeated VolumeSnapshot volume_snapshot = 1;
+}
+
+message CreateVolumeSnapshotRequest {
+  VolumeSnapshot volume_snapshot = 1;
+}
+
+message CreateVolumeSnapshotResponse {
+  VolumeSnapshot volume_snapshot = 1;
+}
+
+message DeleteVolumeSnapshotRequest {
+  string volume_snapshot_id = 1;
+}
+
+message DeleteVolumeSnapshotResponse {
+}
+
+message ListVolumeSnapshotContentsRequest {
+  VolumeSnapshotContentFilter filter = 1;
+}
+
+message ListVolumeSnapshotContentsResponse {
+  repeated VolumeSnapshot volume_snapshot = 1;
+}
+
+message DeleteVolumeSnapshotContentRequest {
+  string volume_snapshot_id = 1;
+}
+
+message DeleteVolumeSnapshotContentResponse {
 }
