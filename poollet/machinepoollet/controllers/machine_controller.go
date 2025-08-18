@@ -34,6 +34,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -78,6 +79,12 @@ func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey)
 	}
 }
 
+func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
+	return map[string]string{
+		v1alpha1.MachineUIDLabel: string(machineUID),
+	}
+}
+
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch;update;patch
@@ -102,16 +109,8 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
-	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
-	machineUID := machine.Labels[labelKey]
-	if machineUID == "" {
-		machineUID = string(machine.GetUID())
-	}
-	labels := map[string]string{
-		labelKey: machineUID,
-	}
 	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{LabelSelector: labels},
+		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.GetUID())},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
@@ -221,15 +220,7 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Deleting machines by UID")
-	labelKey := poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, v1alpha1.RootMachineUIDLabelSuffix)
-	machineUID := machine.Labels[labelKey]
-	if machineUID == "" {
-		machineUID = string(machine.GetUID())
-	}
-	labels := map[string]string{
-		labelKey: machineUID,
-	}
-	ok, err := r.deleteMachinesByMachineUID(ctx, log, labels)
+	ok, err := r.deleteMachinesByMachineUID(ctx, log, machine.GetUID())
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
 	}
@@ -247,12 +238,10 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 	return ctrl.Result{}, nil
 }
 
-func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, labels map[string]string) (bool, error) {
+func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
 	log.V(1).Info("Listing machines")
 	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{
-			LabelSelector: labels,
-		},
+		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machineUID)},
 	})
 	if err != nil {
 		return false, fmt.Errorf("error listing machines: %w", err)

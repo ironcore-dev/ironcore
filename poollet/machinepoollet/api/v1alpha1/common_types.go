@@ -11,10 +11,9 @@ import (
 )
 
 const (
-	MachineUIDLabel           = "machinepoollet.ironcore.dev/machine-uid"
-	MachineNamespaceLabel     = "machinepoollet.ironcore.dev/machine-namespace"
-	MachineNameLabel          = "machinepoollet.ironcore.dev/machine-name"
-	RootMachineUIDLabelSuffix = "root-machine-uid"
+	MachineUIDLabel       = "machinepoollet.ironcore.dev/machine-uid"
+	MachineNamespaceLabel = "machinepoollet.ironcore.dev/machine-namespace"
+	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
 
 	NetworkInterfaceUIDLabel       = "machinepoollet.ironcore.dev/nic-uid"
 	NetworkInterfaceNamespaceLabel = "machinepoollet.ironcore.dev/nic-namespace"
