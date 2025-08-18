@@ -1423,7 +1423,7 @@ func (x *StatusResponse) GetVolumeClassStatus() []*VolumeClassStatus {
 
 type VolumeSnapshotSpec struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	VolumeName    string                 `protobuf:"bytes,1,opt,name=volume_name,json=volumeName,proto3" json:"volume_name,omitempty"`
+	VolumeId      string                 `protobuf:"bytes,1,opt,name=volume_id,json=volumeId,proto3" json:"volume_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1458,9 +1458,9 @@ func (*VolumeSnapshotSpec) Descriptor() ([]byte, []int) {
 	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{26}
 }
 
-func (x *VolumeSnapshotSpec) GetVolumeName() string {
+func (x *VolumeSnapshotSpec) GetVolumeId() string {
 	if x != nil {
-		return x.VolumeName
+		return x.VolumeId
 	}
 	return ""
 }
@@ -2366,10 +2366,9 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\x14DeleteVolumeResponse\"\x0f\n" +
 	"\rStatusRequest\"d\n" +
 	"\x0eStatusResponse\x12R\n" +
-	"\x13volume_class_status\x18\x01 \x03(\v2\".volume.v1alpha1.VolumeClassStatusR\x11volumeClassStatus\"5\n" +
-	"\x12VolumeSnapshotSpec\x12\x1f\n" +
-	"\vvolume_name\x18\x01 \x01(\tR\n" +
-	"volumeName\"u\n" +
+	"\x13volume_class_status\x18\x01 \x03(\v2\".volume.v1alpha1.VolumeClassStatusR\x11volumeClassStatus\"1\n" +
+	"\x12VolumeSnapshotSpec\x12\x1b\n" +
+	"\tvolume_id\x18\x01 \x01(\tR\bvolumeId\"u\n" +
 	"\x14VolumeSnapshotStatus\x12:\n" +
 	"\x05state\x18\x01 \x01(\x0e2$.volume.v1alpha1.VolumeSnapshotStateR\x05state\x12!\n" +
 	"\frestore_size\x18\x02 \x01(\x03R\vrestoreSize\"\xc3\x01\n" +
