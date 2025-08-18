@@ -64,6 +64,7 @@ func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) map[string]s
 			labels[poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, downwardAPILabelName)] = value
 		}
 	}
+	labels[machinepoolletv1alpha1.MachineUIDLabel] = machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.MachineUIDLabel]
 
 	return labels
 }
