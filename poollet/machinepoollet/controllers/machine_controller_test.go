@@ -143,7 +143,7 @@ var _ = Describe("MachineController", func() {
 
 		By("inspecting the iri machine")
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
-		// Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.ParentMachineUIDLabel, string(machine.UID)))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.MachineUIDLabel, string(machine.UID)))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{

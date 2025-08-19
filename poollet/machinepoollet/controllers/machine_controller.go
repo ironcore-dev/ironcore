@@ -814,7 +814,7 @@ func (r *MachineReconciler) prepareIRIMachine(
 		errs = append(errs, fmt.Errorf("error preparing iri machine labels: %w", err))
 	}
 
-	annotations, err := r.iriMachineAnnotations(machine, 1, machineNicMappings)
+	annotations, err := r.iriMachineAnnotations(machine, 0, machineNicMappings)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing iri machine annotations: %w", err))
 	}
