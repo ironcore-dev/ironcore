@@ -16,6 +16,7 @@ import (
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -159,11 +160,9 @@ var _ = Describe("MachineController", func() {
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.11"},
-			Labels: map[string]string{
-				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-			},
-			NetworkLabels: map[string]string{
-				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			Attributes: map[string]string{
+				machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
 			},
 		})))
 
@@ -324,11 +323,9 @@ var _ = Describe("MachineController", func() {
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
-			Labels: map[string]string{
-				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-			},
-			NetworkLabels: map[string]string{
-				poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			Attributes: map[string]string{
+				machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
 			},
 		})))
 

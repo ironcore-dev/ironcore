@@ -26,12 +26,10 @@ import (
 )
 
 type IronCoreNetworkInterfaceConfig struct {
-	Name          string
-	NetworkID     string
-	IPs           []commonv1alpha1.IP
-	Attributes    map[string]string
-	Labels        map[string]string
-	NetworkLabels map[string]string
+	Name       string
+	NetworkID  string
+	IPs        []commonv1alpha1.IP
+	Attributes map[string]string
 }
 
 func (s *Server) getIronCoreNetworkInterfaceConfig(iriNIC *iri.NetworkInterface) (*IronCoreNetworkInterfaceConfig, error) {
@@ -40,15 +38,37 @@ func (s *Server) getIronCoreNetworkInterfaceConfig(iriNIC *iri.NetworkInterface)
 		return nil, err
 	}
 
-	nicLabels := brokerutils.PrepareDownwardAPILabels(iriNIC.GetLabels(), s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
-	networkLabels := brokerutils.PrepareDownwardAPILabels(iriNIC.GetNetworkLabels(), s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
+	sourceAttr := iriNIC.GetAttributes()
+
+	nicLabelsString, nicLabelsPresent := sourceAttr[machinepoolletv1alpha1.NICLabelsAttributeKey]
+	networkLabelsString, networkLabelsPresent := sourceAttr[machinepoolletv1alpha1.NetworkLabelsAttributeKey]
+
+	nicLabels, err := maps.UnmarshalLabels(nicLabelsString, nicLabelsPresent)
+	if err != nil {
+		return nil, err
+	}
+
+	networkLabels, err := maps.UnmarshalLabels(networkLabelsString, networkLabelsPresent)
+	if err != nil {
+		return nil, err
+	}
+
+	preparedNicLabels := brokerutils.PrepareDownwardAPILabels(nicLabels, s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
+	preparedNetworkLabels := brokerutils.PrepareDownwardAPILabels(networkLabels, s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
+
+	newAttributes := make(map[string]string)
+	for k, v := range iriNIC.Attributes {
+		newAttributes[k] = v
+	}
+
+	newAttributes[machinepoolletv1alpha1.NICLabelsAttributeKey] = string(maps.MustMarshalJSON(preparedNicLabels))
+	newAttributes[machinepoolletv1alpha1.NetworkLabelsAttributeKey] = string(maps.MustMarshalJSON(preparedNetworkLabels))
+
 	return &IronCoreNetworkInterfaceConfig{
-		Name:          iriNIC.Name,
-		NetworkID:     iriNIC.NetworkId,
-		IPs:           ips,
-		Attributes:    iriNIC.Attributes,
-		Labels:        nicLabels,
-		NetworkLabels: networkLabels,
+		Name:       iriNIC.Name,
+		NetworkID:  iriNIC.NetworkId,
+		IPs:        ips,
+		Attributes: newAttributes,
 	}, nil
 }
 
@@ -60,7 +80,13 @@ func (s *Server) createIronCoreNetworkInterface(
 	cfg *IronCoreNetworkInterfaceConfig,
 ) (ironcoreMachineNic *computev1alpha1.NetworkInterface, aggIronCoreNic *AggregateIronCoreNetworkInterface, retErr error) {
 	log.V(1).Info("Getting network for handle")
-	ironcoreNetwork, err := s.networks.GetNetwork(ctx, cfg.NetworkID, cfg.NetworkLabels)
+
+	networkLabelsString, networkLabelsPresent := cfg.Attributes[machinepoolletv1alpha1.NetworkLabelsAttributeKey]
+	networkLabels, err := maps.UnmarshalLabels(networkLabelsString, networkLabelsPresent)
+	if err != nil {
+		return nil, nil, err
+	}
+	ironcoreNetwork, err := s.networks.GetNetwork(ctx, cfg.NetworkID, networkLabels)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error getting network: %w", err)
 	}
@@ -72,9 +98,9 @@ func (s *Server) createIronCoreNetworkInterface(
 			Annotations: map[string]string{
 				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 			},
-			Labels: maps.AppendMap(cfg.Labels, map[string]string{
+			Labels: map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-			}),
+			},
 			OwnerReferences: s.optionalOwnerReferences(ironcoreMachineGVK, optIronCoreMachine),
 		},
 		Spec: networkingv1alpha1.NetworkInterfaceSpec{
@@ -85,6 +111,14 @@ func (s *Server) createIronCoreNetworkInterface(
 			Attributes: cfg.Attributes,
 		},
 	}
+
+	nicLabelsString, nicLabelsPresent := cfg.Attributes[machinepoolletv1alpha1.NICLabelsAttributeKey]
+	nicLabels, err := maps.UnmarshalLabels(nicLabelsString, nicLabelsPresent)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ironcoreNic.Labels = maps.AppendMap(nicLabels, ironcoreNic.Labels)
 	log.V(1).Info("Creating ironcore network interface")
 	if err := s.cluster.Client().Create(ctx, ironcoreNic); err != nil {
 		return nil, nil, fmt.Errorf("error creating ironcore network interface: %w", err)

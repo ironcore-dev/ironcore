@@ -11,9 +11,11 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -39,17 +41,22 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
+		nicLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
+		}
+		networkLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+		}
+
 		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
 			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
-				Labels: map[string]string{
-					machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
-				},
-				NetworkLabels: map[string]string{
-					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -120,14 +127,21 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
+		nicLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
+		}
+		networkLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+		}
 		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
 			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
-				NetworkLabels: map[string]string{
-					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -197,8 +211,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
-				NetworkLabels: map[string]string{
-					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())

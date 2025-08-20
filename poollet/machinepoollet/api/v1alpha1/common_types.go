@@ -24,6 +24,9 @@ const (
 	NetworkNamespaceLabel = "machinepoollet.ironcore.dev/network-namespace"
 	NetworkNameLabel      = "machinepoollet.ironcore.dev/network-name"
 
+	NICLabelsAttributeKey     = "nicLabels"
+	NetworkLabelsAttributeKey = "networkLabels"
+
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
 	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
 
