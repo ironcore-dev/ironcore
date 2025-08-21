@@ -91,6 +91,10 @@ func (s *Server) createIronCoreNetworkInterface(
 		return nil, nil, fmt.Errorf("error getting network: %w", err)
 	}
 
+	nicAttributes := maps.Clone(cfg.Attributes)
+	delete(nicAttributes, machinepoolletv1alpha1.NICLabelsAttributeKey)
+	delete(nicAttributes, machinepoolletv1alpha1.NetworkLabelsAttributeKey)
+
 	ironcoreNic := &networkingv1alpha1.NetworkInterface{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.cluster.Namespace(),
@@ -108,7 +112,7 @@ func (s *Server) createIronCoreNetworkInterface(
 			MachineRef: s.optionalLocalUIDReference(optIronCoreMachine),
 			IPFamilies: s.getIronCoreIPsIPFamilies(cfg.IPs),
 			IPs:        s.ironcoreIPsToIronCoreIPSources(cfg.IPs),
-			Attributes: cfg.Attributes,
+			Attributes: nicAttributes,
 		},
 	}
 

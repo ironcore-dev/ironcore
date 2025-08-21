@@ -88,6 +88,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 		By("inspecting the ironcore network interface")
+		Expect(nic.Spec.Attributes).To(Not(HaveKey(machinepoolletv1alpha1.NICLabelsAttributeKey)))
+		Expect(nic.Spec.Attributes).To(Not(HaveKey(machinepoolletv1alpha1.NetworkLabelsAttributeKey)))
 		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
 		}))
