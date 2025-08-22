@@ -21,7 +21,6 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/testing/machine"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
@@ -234,8 +233,7 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
 			MachineDownwardAPILabels: map[string]string{
-				fooDownwardAPILabel:                fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
-				v1alpha1.RootMachineUIDLabelSuffix: "metadata.uid",
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 			},
 			NicDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),

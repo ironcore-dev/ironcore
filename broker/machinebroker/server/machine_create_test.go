@@ -49,8 +49,9 @@ var _ = Describe("CreateMachine", func() {
 		By("inspecting the ironcore machine")
 		Expect(ironcoreMachine.Labels).To(Equal(map[string]string{
 			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-machine-uid"): "foobar",
-			machinebrokerv1alpha1.CreatedLabel: "true",
-			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+			machinebrokerv1alpha1.CreatedLabel:     "true",
+			machinebrokerv1alpha1.ManagerLabel:     machinebrokerv1alpha1.MachineBrokerManager,
+			machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 		}))
 		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
