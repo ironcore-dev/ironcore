@@ -34,6 +34,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -94,8 +95,22 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return r.reconcileExists(ctx, log, machine)
 }
 
+func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
+	return map[string]string{
+		v1alpha1.MachineUIDLabel: string(machineUID),
+	}
+}
+
 func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
-	if machine.Status.MachineID != "" {
+	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
+		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error listing machines by machine uid label filter: %w", err)
+	}
+
+	//TODO: Remove this fix once migration is done
+	if len(res.Machines) == 0 && machine.Status.MachineID != "" {
 		machineID, err := poolletutils.ParseID(machine.Status.MachineID)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing machineID: %w", err)
@@ -104,11 +119,11 @@ func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machin
 			Filter: &iri.MachineFilter{Id: machineID.ID},
 		})
 		if err != nil {
-			return nil, fmt.Errorf("error listing machines filtering by id: %w", err)
+			return nil, fmt.Errorf("error listing machines by machine id: %w", err)
 		}
 		return res.Machines, nil
 	}
-	return []*iri.Machine{}, nil
+	return res.Machines, nil
 }
 
 func (r *MachineReconciler) getMachineByID(ctx context.Context, id string) (*iri.Machine, error) {
