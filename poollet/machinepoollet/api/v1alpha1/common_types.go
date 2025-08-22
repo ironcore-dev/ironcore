@@ -20,6 +20,10 @@ const (
 	NetworkInterfaceNamespaceLabel = "machinepoollet.ironcore.dev/nic-namespace"
 	NetworkInterfaceNameLabel      = "machinepoollet.ironcore.dev/nic-name"
 
+	NetworkUIDLabel       = "machinepoollet.ironcore.dev/network-uid"
+	NetworkNamespaceLabel = "machinepoollet.ironcore.dev/network-namespace"
+	NetworkNameLabel      = "machinepoollet.ironcore.dev/network-name"
+
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
 	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
 

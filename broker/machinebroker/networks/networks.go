@@ -14,6 +14,7 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/cluster"
+	"github.com/ironcore-dev/ironcore/utils/maps"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/workqueue"
@@ -42,9 +43,10 @@ func NewManager(cluster cluster.Cluster) *Manager {
 }
 
 type waiter struct {
-	network *networkingv1alpha1.Network
-	error   error
-	done    chan struct{}
+	network       *networkingv1alpha1.Network
+	error         error
+	done          chan struct{}
+	networkLabels map[string]string
 }
 
 func (e *Manager) getNetworkForProviderID(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
@@ -81,7 +83,7 @@ func (e *Manager) providerIDHash(providerID string) string {
 	return rand.SafeEncodeString(fmt.Sprint(h.Sum32()))
 }
 
-func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.Logger, providerID string) (*networkingv1alpha1.Network, error) {
+func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.Logger, providerID string, labels map[string]string) (*networkingv1alpha1.Network, error) {
 	network, err := e.getNetworkForProviderID(ctx, providerID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting network for providerID: %w", err)
@@ -102,9 +104,9 @@ func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.
 			Annotations: map[string]string{
 				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 			},
-			Labels: map[string]string{
+			Labels: maps.AppendMap(labels, map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-			},
+			}),
 		},
 		Spec: networkingv1alpha1.NetworkSpec{
 			ProviderID: providerID,
@@ -125,9 +127,9 @@ func (e *Manager) setNetworkAsAvailable(ctx context.Context, network *networking
 	return nil
 }
 
-func (e *Manager) doWork(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
+func (e *Manager) doWork(ctx context.Context, providerID string, labels map[string]string) (*networkingv1alpha1.Network, error) {
 	log := ctrl.LoggerFrom(ctx)
-	network, err := e.getOrCreateNetworkForProviderID(ctx, log, providerID)
+	network, err := e.getOrCreateNetworkForProviderID(ctx, log, providerID, labels)
 	if err != nil {
 		return nil, fmt.Errorf("error getting / creating network for providerID: %w", err)
 	}
@@ -150,7 +152,14 @@ func (e *Manager) processNextWorkItem(ctx context.Context) bool {
 	}
 	defer e.queue.Done(providerID)
 
-	network, err := e.doWork(ctx, providerID)
+	var labels map[string]string
+	e.waitersByProviderIDMu.Lock()
+	if w, ok := e.waitersByProviderID[providerID]; ok {
+		labels = w.networkLabels
+	}
+	e.waitersByProviderIDMu.Unlock()
+
+	network, err := e.doWork(ctx, providerID, labels)
 	e.emit(providerID, network, err)
 	e.queue.Forget(providerID)
 	return true
@@ -188,7 +197,7 @@ func (e *Manager) Start(ctx context.Context) error {
 	return nil
 }
 
-func (e *Manager) getOrCreateWaiter(providerID string) *waiter {
+func (e *Manager) getOrCreateWaiter(providerID string, labels map[string]string) *waiter {
 	e.waitersByProviderIDMu.Lock()
 	defer e.waitersByProviderIDMu.Unlock()
 
@@ -197,7 +206,9 @@ func (e *Manager) getOrCreateWaiter(providerID string) *waiter {
 		return w
 	}
 
-	w = &waiter{done: make(chan struct{})}
+	w = &waiter{
+		done:          make(chan struct{}),
+		networkLabels: labels}
 	e.waitersByProviderID[providerID] = w
 	e.queue.Add(providerID)
 	return w
@@ -220,8 +231,8 @@ func (e *Manager) emit(providerID string, network *networkingv1alpha1.Network, e
 	delete(e.waitersByProviderID, providerID)
 }
 
-func (e *Manager) GetNetwork(ctx context.Context, providerID string) (*networkingv1alpha1.Network, error) {
-	w := e.getOrCreateWaiter(providerID)
+func (e *Manager) GetNetwork(ctx context.Context, providerID string, labels map[string]string) (*networkingv1alpha1.Network, error) {
+	w := e.getOrCreateWaiter(providerID, labels)
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

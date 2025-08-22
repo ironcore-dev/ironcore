@@ -48,6 +48,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Labels: map[string]string{
 					machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
 				},
+				NetworkLabels: map[string]string{
+					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -94,6 +97,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
 		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 	})
 
 	It("should correctly re-create a network in case it has been removed", func(ctx SpecContext) {
@@ -119,6 +126,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				NetworkLabels: map[string]string{
+					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -160,6 +170,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
 		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 
 		By("detaching the network interface")
 		Expect(srv.DetachNetworkInterface(ctx, &iri.DetachNetworkInterfaceRequest{
@@ -183,6 +197,9 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				NetworkLabels: map[string]string{
+					machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -192,6 +209,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
+		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 	})
 })
