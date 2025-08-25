@@ -14,7 +14,7 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/cluster"
-	"github.com/ironcore-dev/ironcore/utils/maps"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/workqueue"
@@ -104,7 +104,7 @@ func (e *Manager) getOrCreateNetworkForProviderID(ctx context.Context, log logr.
 			Annotations: map[string]string{
 				commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 			},
-			Labels: maps.AppendMap(labels, map[string]string{
+			Labels: utilsmaps.AppendMap(labels, map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 			}),
 		},

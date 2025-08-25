@@ -13,12 +13,12 @@ import (
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
 	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -189,7 +189,7 @@ func (s *Server) createIronCoreMachine(
 			Namespace:   s.cluster.Namespace(),
 			Name:        s.cluster.IDGen().Generate(),
 			Annotations: cfg.Annotations,
-			Labels: maps.AppendMap(cfg.Labels, map[string]string{
+			Labels: utilsmaps.AppendMap(cfg.Labels, map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 			}),
 		},

@@ -12,11 +12,11 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	machinebrokerutils "github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/maps"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -161,8 +161,20 @@ var _ = Describe("MachineController", func() {
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.11"},
 			Attributes: map[string]string{
-				machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
-				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(machinebrokerutils.MustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+				})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(machinebrokerutils.MustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),
+					machinepoolletv1alpha1.NetworkUIDLabel:       string(network.UID),
+					machinepoolletv1alpha1.NetworkNamespaceLabel: string(network.Namespace),
+					machinepoolletv1alpha1.NetworkNameLabel:      string(network.Name),
+				})),
 			},
 		})))
 
@@ -324,8 +336,20 @@ var _ = Describe("MachineController", func() {
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
 			Attributes: map[string]string{
-				machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
-				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(map[string]string{poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue})),
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(machinebrokerutils.MustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+				})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(machinebrokerutils.MustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),
+					machinepoolletv1alpha1.NetworkUIDLabel:       string(network.UID),
+					machinepoolletv1alpha1.NetworkNamespaceLabel: string(network.Namespace),
+					machinepoolletv1alpha1.NetworkNameLabel:      string(network.Name),
+				})),
 			},
 		})))
 
