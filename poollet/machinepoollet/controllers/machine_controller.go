@@ -28,7 +28,7 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
-	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	corev1 "k8s.io/api/core/v1"
@@ -355,9 +355,7 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 	if err != nil {
 		return nil, err
 	}
-	for k, v := range apiLabels {
-		labels[k] = v
-	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
 }
 
@@ -517,7 +515,7 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 			continue
 		}
 
-		nic, ok := utilmaps.Pop(unhandledNicByUID, ref.UID)
+		nic, ok := utilsmaps.Pop(unhandledNicByUID, ref.UID)
 		if !ok {
 			continue
 		}

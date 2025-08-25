@@ -16,7 +16,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 
-	"github.com/ironcore-dev/ironcore/utils/maps"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -43,7 +43,7 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.generateID(),
-			Labels: maps.AppendMap(labels, map[string]string{
+			Labels: utilsmaps.AppendMap(labels, map[string]string{
 				bucketbrokerv1alpha1.ManagerLabel: bucketbrokerv1alpha1.BucketBrokerManager,
 			}),
 		},

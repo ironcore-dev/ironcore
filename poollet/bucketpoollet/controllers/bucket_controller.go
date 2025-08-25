@@ -24,6 +24,7 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,9 +68,7 @@ func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) (map[
 	if err != nil {
 		return nil, err
 	}
-	for k, v := range apiLabels {
-		labels[k] = v
-	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
 }
 

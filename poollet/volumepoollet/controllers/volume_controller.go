@@ -22,6 +22,7 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -72,9 +73,7 @@ func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) (map[
 	if err != nil {
 		return nil, err
 	}
-	for k, v := range apiLabels {
-		labels[k] = v
-	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
 }
 

@@ -8,10 +8,11 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/maps"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -55,8 +56,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -83,15 +84,12 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(k8sClient.Get(ctx, nicKey, nic)).To(Succeed())
 
 		By("inspecting the ironcore network interface")
+		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
+			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+		}))
 		Expect(nic.Labels).To(Equal(map[string]string{
 			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"): "foobar",
 			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-		}))
-		By("inspecting the ironcore network interface")
-		Expect(nic.Spec.Attributes).To(Not(HaveKey(machinepoolletv1alpha1.NICLabelsAttributeKey)))
-		Expect(nic.Spec.Attributes).To(Not(HaveKey(machinepoolletv1alpha1.NetworkLabelsAttributeKey)))
-		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
-			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
 		}))
 
 		By("getting the referenced ironcore network")
@@ -142,8 +140,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -172,6 +170,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		By("inspecting the ironcore network interface")
 		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
+		}))
+		Expect(nic.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"): "foobar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 
 		By("getting the referenced ironcore network")
@@ -214,8 +216,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(maps.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(maps.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
