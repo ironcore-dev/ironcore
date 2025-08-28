@@ -239,6 +239,11 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			},
 			NicDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+				"root-nic-uid":      "metadata.uid",
+			},
+			NetworkDownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+				"root-network-uid":  "metadata.uid",
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 

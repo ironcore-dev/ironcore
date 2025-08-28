@@ -9,7 +9,6 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -169,16 +168,11 @@ func (s *Server) convertIronCoreNetworkInterfaceAttachment(
 			return nil, err
 		}
 
-		labels := ironcoreNic.NetworkInterface.GetLabels()
-		//TODO Remove once labels are not part of API
-		delete(labels, machinebrokerv1alpha1.ManagerLabel)
-
 		return &iri.NetworkInterface{
 			Name:       ironcoreMachineNic.Name,
 			NetworkId:  ironcoreNic.Network.Spec.ProviderID,
 			Ips:        ips,
 			Attributes: ironcoreNic.NetworkInterface.Spec.Attributes,
-			Labels:     labels,
 		}, nil
 	default:
 		return nil, fmt.Errorf("unrecognized ironcore machine network interface %#v", ironcoreMachineNic)

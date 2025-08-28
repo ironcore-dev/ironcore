@@ -107,7 +107,7 @@ func (s *Server) aggregateIronCoreMachine(
 
 			aggIronCoreNic, err := s.aggregateIronCoreNetworkInterface(ctx, rd, ironcoreNic)
 			if err != nil {
-				return nil, fmt.Errorf("error aggregating network interface: %w", err)
+				return nil, fmt.Errorf("error aggregating ironcore network interface %s: %w", ironcoreNic.Name, err)
 			}
 
 			aggIronCoreNics[machineNic.Name] = aggIronCoreNic

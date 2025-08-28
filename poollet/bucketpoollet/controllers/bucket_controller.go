@@ -24,13 +24,13 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
-	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -64,12 +64,11 @@ func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) (map[
 		bucketpoolletv1alpha1.BucketNamespaceLabel: bucket.Namespace,
 		bucketpoolletv1alpha1.BucketNameLabel:      bucket.Name,
 	}
-	for downwardAPILabelName, fieldPath := range r.DownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(bucket, fieldPath)
-		if err == nil && value != "" {
-			labels[poolletutils.DownwardAPILabel(bucketpoolletv1alpha1.BucketDownwardAPIPrefix, downwardAPILabelName)] = value
-		}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(bucket, r.DownwardAPILabels, bucketpoolletv1alpha1.BucketDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
 	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
 }
 

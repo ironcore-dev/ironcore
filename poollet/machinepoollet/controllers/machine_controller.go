@@ -28,7 +28,7 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
-	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	corev1 "k8s.io/api/core/v1"
@@ -62,6 +62,9 @@ type MachineReconciler struct {
 
 	NicDownwardAPILabels      map[string]string
 	NicDownwardAPIAnnotations map[string]string
+
+	NetworkDownwardAPILabels      map[string]string
+	NetworkDownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
 
@@ -348,14 +351,11 @@ func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (
 		v1alpha1.MachineNameLabel:      machine.Name,
 	}
 
-	for name, fieldPath := range r.MachineDownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
-		}
-
-		labels[poolletutils.DownwardAPILabel(v1alpha1.MachineDownwardAPIPrefix, name)] = value
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(machine, r.MachineDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
 	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
 }
 
@@ -515,7 +515,7 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 			continue
 		}
 
-		nic, ok := utilmaps.Pop(unhandledNicByUID, ref.UID)
+		nic, ok := utilsmaps.Pop(unhandledNicByUID, ref.UID)
 		if !ok {
 			continue
 		}
