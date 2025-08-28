@@ -35,6 +35,10 @@ const (
 	ResourceRequestsMemory = ResourcesRequestsPrefix + ResourceMemory
 	// ResourceRequestsStorage is the amount of requested storage in bytes.
 	ResourceRequestsStorage = ResourcesRequestsPrefix + ResourceStorage
+	// ResourceRequestsTPS is the amount of requested throughput per second.
+	ResourceRequestsTPS = ResourcesRequestsPrefix + ResourceTPS
+	// ResourceRequestsIOPS is the amount of requested IOPS in input/output operations per second.
+	ResourceRequestsIOPS = ResourcesRequestsPrefix + ResourceIOPS
 
 	// ResourceCountNamespacePrefix is resource namespace prefix for counting resources.
 	ResourceCountNamespacePrefix = "count/"

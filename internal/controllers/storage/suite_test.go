@@ -199,3 +199,17 @@ func SetupVolumeClass() *storagev1alpha1.VolumeClass {
 		}
 	})
 }
+
+func SetupBucketClass() *storagev1alpha1.BucketClass {
+	return SetupObjectStruct[*storagev1alpha1.BucketClass](&k8sClient, func(bucketClass *storagev1alpha1.BucketClass) {
+		*bucketClass = storagev1alpha1.BucketClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "bucket-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceTPS:  resource.MustParse("100Mi"),
+				corev1alpha1.ResourceIOPS: resource.MustParse("100"),
+			},
+		}
+	})
+}
