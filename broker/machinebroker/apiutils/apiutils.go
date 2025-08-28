@@ -167,11 +167,3 @@ func IsManagedBy(o metav1.Object, manager string) bool {
 	actual, ok := o.GetLabels()[machinebrokerv1alpha1.ManagerLabel]
 	return ok && actual == manager
 }
-
-func MustMarshalJSON(v interface{}) string {
-	data, err := json.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
-}

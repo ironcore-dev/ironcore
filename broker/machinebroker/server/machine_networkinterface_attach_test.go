@@ -4,12 +4,12 @@
 package server_test
 
 import (
+	"encoding/json"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
@@ -56,8 +56,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -140,8 +140,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -216,8 +216,8 @@ var _ = Describe("AttachNetworkInterface", func() {
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
 				Attributes: map[string]string{
-					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(apiutils.MustMarshalJSON(nicLabels)),
-					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(apiutils.MustMarshalJSON(networkLabels)),
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
 				},
 			},
 		})).Error().NotTo(HaveOccurred())
@@ -235,3 +235,11 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 	})
 })
+
+func mustMarshalJSON(v interface{}) string {
+	data, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
