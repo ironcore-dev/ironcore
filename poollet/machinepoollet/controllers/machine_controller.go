@@ -109,20 +109,6 @@ func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machin
 		return nil, fmt.Errorf("error listing machines by machine uid label filter: %w", err)
 	}
 
-	//TODO: Remove this fix once migration is done
-	if len(res.Machines) == 0 && machine.Status.MachineID != "" {
-		machineID, err := poolletutils.ParseID(machine.Status.MachineID)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing machineID: %w", err)
-		}
-		res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-			Filter: &iri.MachineFilter{Id: machineID.ID},
-		})
-		if err != nil {
-			return nil, fmt.Errorf("error listing machines by machine id: %w", err)
-		}
-		return res.Machines, nil
-	}
 	return res.Machines, nil
 }
 
