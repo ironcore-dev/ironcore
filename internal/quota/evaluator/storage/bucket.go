@@ -14,6 +14,7 @@ import (
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/generic"
 	"github.com/ironcore-dev/ironcore/utils/quota"
 	"golang.org/x/exp/slices"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -25,7 +26,8 @@ var (
 
 	BucketResourceNames = sets.New(
 		bucketCountResourceName,
-		corev1alpha1.ResourceRequestsStorage,
+		corev1alpha1.ResourceRequestsTPS,
+		corev1alpha1.ResourceRequestsIOPS,
 	)
 )
 
@@ -97,13 +99,22 @@ func toExternalBucketOrError(obj client.Object) (*storagev1alpha1.Bucket, error)
 }
 
 func (m *bucketEvaluator) Usage(ctx context.Context, item client.Object) (corev1alpha1.ResourceList, error) {
-	_, err := toExternalBucketOrError(item)
+	bucket, err := toExternalBucketOrError(item)
 	if err != nil {
 		return nil, err
 	}
 
+	bucketClassName := bucket.Spec.BucketClassRef.Name
+
+	capabilities, ok := m.capabilities.Get(ctx, bucketClassName)
+	if !ok {
+		return nil, apierrors.NewBadRequest(fmt.Sprintf("bucket class %q not found", bucketClassName))
+	}
+
 	return corev1alpha1.ResourceList{
-		// TODO: return more detailed usage
-		bucketCountResourceName: resource.MustParse("1"),
+		bucketCountResourceName:           resource.MustParse("1"),
+		corev1alpha1.ResourceRequestsTPS:  *capabilities.TPS(),
+		corev1alpha1.ResourceRequestsIOPS: *capabilities.IOPS(),
 	}, nil
+
 }

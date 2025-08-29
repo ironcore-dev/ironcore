@@ -211,7 +211,7 @@ var _ = Describe("Storage", func() {
 					GenerateName: "bucket-",
 				},
 				Spec: storagev1alpha1.BucketSpec{
-					BucketClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 					BucketPoolRef:  &corev1.LocalObjectReference{Name: bucketPool1},
 				},
 			}
@@ -224,7 +224,7 @@ var _ = Describe("Storage", func() {
 					GenerateName: "bucket-",
 				},
 				Spec: storagev1alpha1.BucketSpec{
-					BucketClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 					BucketPoolRef:  &corev1.LocalObjectReference{Name: bucketPool2},
 				},
 			}
@@ -237,7 +237,7 @@ var _ = Describe("Storage", func() {
 					GenerateName: "bucket-",
 				},
 				Spec: storagev1alpha1.BucketSpec{
-					BucketClassRef: &corev1.LocalObjectReference{Name: "my-class"},
+					BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 				},
 			}
 			Expect(k8sClient.Create(ctx, bucket3)).To(Succeed())
