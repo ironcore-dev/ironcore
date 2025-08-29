@@ -206,7 +206,7 @@ message ListVolumeSnapshotsRequest {
 }
 
 message ListVolumeSnapshotsResponse {
-  repeated VolumeSnapshot volume_snapshot = 1;
+  repeated VolumeSnapshot volume_snapshots = 1;
 }
 
 message CreateVolumeSnapshotRequest {
