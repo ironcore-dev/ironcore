@@ -72,6 +72,7 @@ type Options struct {
 	LeaderElectionNamespace  string
 	LeaderElectionKubeconfig string
 	ProbeAddr                string
+	PprofAddr                string
 
 	MachinePoolName               string
 	MachineDownwardAPILabels      map[string]string
@@ -115,6 +116,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.EnableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics server")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	fs.StringVar(&o.PprofAddr, "pprof-bind-address", "", "The address the Pprof endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -317,6 +319,7 @@ func Run(ctx context.Context, opts Options) error {
 		Scheme:                  scheme,
 		Metrics:                 metricsServerOptions,
 		HealthProbeBindAddress:  opts.ProbeAddr,
+		PprofBindAddress:        opts.PprofAddr,
 		LeaderElection:          opts.EnableLeaderElection,
 		LeaderElectionID:        "bfafcebe.ironcore.dev",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
