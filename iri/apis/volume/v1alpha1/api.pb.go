@@ -1890,10 +1890,10 @@ func (x *ListVolumeSnapshotsRequest) GetFilter() *VolumeSnapshotFilter {
 }
 
 type ListVolumeSnapshotsResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	VolumeSnapshot []*VolumeSnapshot      `protobuf:"bytes,1,rep,name=volume_snapshot,json=volumeSnapshot,proto3" json:"volume_snapshot,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	VolumeSnapshots []*VolumeSnapshot      `protobuf:"bytes,1,rep,name=volume_snapshots,json=volumeSnapshots,proto3" json:"volume_snapshots,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ListVolumeSnapshotsResponse) Reset() {
@@ -1926,9 +1926,9 @@ func (*ListVolumeSnapshotsResponse) Descriptor() ([]byte, []int) {
 	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{35}
 }
 
-func (x *ListVolumeSnapshotsResponse) GetVolumeSnapshot() []*VolumeSnapshot {
+func (x *ListVolumeSnapshotsResponse) GetVolumeSnapshots() []*VolumeSnapshot {
 	if x != nil {
-		return x.VolumeSnapshot
+		return x.VolumeSnapshots
 	}
 	return nil
 }
@@ -2399,9 +2399,9 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"[\n" +
 	"\x1aListVolumeSnapshotsRequest\x12=\n" +
-	"\x06filter\x18\x01 \x01(\v2%.volume.v1alpha1.VolumeSnapshotFilterR\x06filter\"g\n" +
-	"\x1bListVolumeSnapshotsResponse\x12H\n" +
-	"\x0fvolume_snapshot\x18\x01 \x03(\v2\x1f.volume.v1alpha1.VolumeSnapshotR\x0evolumeSnapshot\"g\n" +
+	"\x06filter\x18\x01 \x01(\v2%.volume.v1alpha1.VolumeSnapshotFilterR\x06filter\"i\n" +
+	"\x1bListVolumeSnapshotsResponse\x12J\n" +
+	"\x10volume_snapshots\x18\x01 \x03(\v2\x1f.volume.v1alpha1.VolumeSnapshotR\x0fvolumeSnapshots\"g\n" +
 	"\x1bCreateVolumeSnapshotRequest\x12H\n" +
 	"\x0fvolume_snapshot\x18\x01 \x01(\v2\x1f.volume.v1alpha1.VolumeSnapshotR\x0evolumeSnapshot\"h\n" +
 	"\x1cCreateVolumeSnapshotResponse\x12H\n" +
@@ -2545,7 +2545,7 @@ var file_volume_v1alpha1_api_proto_depIdxs = []int32{
 	51, // 31: volume.v1alpha1.VolumeSnapshotFilter.label_selector:type_name -> volume.v1alpha1.VolumeSnapshotFilter.LabelSelectorEntry
 	52, // 32: volume.v1alpha1.VolumeSnapshotContentFilter.label_selector:type_name -> volume.v1alpha1.VolumeSnapshotContentFilter.LabelSelectorEntry
 	34, // 33: volume.v1alpha1.ListVolumeSnapshotsRequest.filter:type_name -> volume.v1alpha1.VolumeSnapshotFilter
-	30, // 34: volume.v1alpha1.ListVolumeSnapshotsResponse.volume_snapshot:type_name -> volume.v1alpha1.VolumeSnapshot
+	30, // 34: volume.v1alpha1.ListVolumeSnapshotsResponse.volume_snapshots:type_name -> volume.v1alpha1.VolumeSnapshot
 	30, // 35: volume.v1alpha1.CreateVolumeSnapshotRequest.volume_snapshot:type_name -> volume.v1alpha1.VolumeSnapshot
 	30, // 36: volume.v1alpha1.CreateVolumeSnapshotResponse.volume_snapshot:type_name -> volume.v1alpha1.VolumeSnapshot
 	35, // 37: volume.v1alpha1.ListVolumeSnapshotContentsRequest.filter:type_name -> volume.v1alpha1.VolumeSnapshotContentFilter
