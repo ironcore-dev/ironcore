@@ -105,6 +105,7 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		s.brokerDownwardAPILabels,
 		machinepoolletv1alpha1.MachineDownwardAPIPrefix,
 	)
+	labels[machinepoolletv1alpha1.MachineUIDLabel] = machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.MachineUIDLabel]
 	annotations, err := s.prepareIronCoreMachineAnnotations(machine)
 	if err != nil {
 		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)

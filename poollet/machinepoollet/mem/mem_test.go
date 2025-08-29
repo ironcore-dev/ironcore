@@ -14,7 +14,6 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	fakemachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
-	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mem"
@@ -83,7 +82,6 @@ var _ = Describe("MachineEventMapper", func() {
 			MachinePoolName:       mp.Name,
 			MachineDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
-				machinepoolletv1alpha1.RootMachineUIDLabelSuffix: "metadata.uid",
 			},
 			NicDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),

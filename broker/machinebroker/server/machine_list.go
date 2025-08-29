@@ -18,7 +18,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -63,7 +62,7 @@ func (s *Server) listIroncoreMachines(ctx context.Context, filter *iri.MachineFi
 		machinebrokerv1alpha1.CreatedLabel: "true",
 	}
 
-	if filter != nil {
+	if filter != nil && filter.LabelSelector != nil {
 		for k := range filter.LabelSelector {
 			matchingLabels[k] = filter.LabelSelector[k]
 		}
@@ -185,25 +184,6 @@ func (s *Server) listMachines(ctx context.Context, filter *iri.MachineFilter) ([
 	return res, nil
 }
 
-func (s *Server) filterMachines(machines []*iri.Machine, filter *iri.MachineFilter) []*iri.Machine {
-	if filter == nil {
-		return machines
-	}
-
-	var (
-		res []*iri.Machine
-		sel = labels.SelectorFromSet(filter.LabelSelector)
-	)
-	for _, iriMachine := range machines {
-		if !sel.Matches(labels.Set(iriMachine.Metadata.Labels)) {
-			continue
-		}
-
-		res = append(res, iriMachine)
-	}
-	return res
-}
-
 func (s *Server) getMachine(ctx context.Context, id string) (*iri.Machine, error) {
 	aggregateIronCoreMachine, err := s.getAggregateIronCoreMachine(ctx, id)
 	if err != nil {
@@ -230,23 +210,10 @@ func (s *Server) ListMachines(ctx context.Context, req *iri.ListMachinesRequest)
 		}, nil
 	}
 
-	if labelFilter := req.Filter; labelFilter != nil && labelFilter.LabelSelector != nil {
-		machines, err := s.listMachines(ctx, labelFilter)
-		if err != nil {
-			return nil, convertInternalErrorToGRPC(err)
-		}
-
-		return &iri.ListMachinesResponse{
-			Machines: machines,
-		}, nil
-	}
-
-	machines, err := s.listMachines(ctx, nil)
+	machines, err := s.listMachines(ctx, req.Filter)
 	if err != nil {
 		return nil, convertInternalErrorToGRPC(err)
 	}
-
-	machines = s.filterMachines(machines, req.Filter)
 
 	return &iri.ListMachinesResponse{
 		Machines: machines,
