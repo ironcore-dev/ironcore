@@ -145,10 +145,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec":                  schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus":                schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot":                  schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContent":           schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContent(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentList":       schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSource":     schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentSource(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSpec":       schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotList":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus":            schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref),
@@ -5919,146 +5915,6 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref common.ReferenceCal
 	}
 }
 
-func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContent(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeSnapshotContent is the Schema for the volumepools API",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSpec"),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeSnapshotContentList contains a list of VolumeSnapshotContent",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContent"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContent", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeSnapshotContentSource contains VolumeSnapshotHandle of the snapshot",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"snapshotHandle": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeSnapshotHandle is a unique identifier for the snapshot in the storage provider",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"snapshotHandle"},
-			},
-		},
-	}
-}
-
-func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotContentSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "VolumeSnapshotContentSpec defines the desired state of VolumeSnapshotContent",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"source": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Source defines the VolumeSnapshot handle",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSource"),
-						},
-					},
-					"volumeSnapshotRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference"),
-						},
-					},
-				},
-				Required: []string{"source", "volumeSnapshotRef"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotContentSource"},
-	}
-}
-
 func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -6137,6 +5993,13 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref common.Refere
 				Description: "VolumeSnapshotStatus defines the observed state of VolumeSnapshot",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
+					"snapshotID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SnapshotID is the provider-specific snapshot ID in the format 'TYPE://SNAPSHOT_ID'.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State represents the storage provider state of VolumeSnapshot",

@@ -43,10 +43,6 @@ func (c *FakeStorageV1alpha1) VolumeSnapshots(namespace string) v1alpha1.VolumeS
 	return newFakeVolumeSnapshots(c, namespace)
 }
 
-func (c *FakeStorageV1alpha1) VolumeSnapshotContents(namespace string) v1alpha1.VolumeSnapshotContentInterface {
-	return newFakeVolumeSnapshotContents(c, namespace)
-}
-
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeStorageV1alpha1) RESTClient() rest.Interface {
