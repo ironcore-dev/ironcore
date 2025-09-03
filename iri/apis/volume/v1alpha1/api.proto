@@ -42,10 +42,17 @@ message EncryptionSpec {
   map<string, bytes> secret_data = 1;
 }
 
+message ImageDataSource {
+  string image = 1;
+} 
+
+message SnapshotDataSource{
+  string snapshot_id = 1;
+}
+
 message VolumeDataSource {
-  string api_group  = 1;
-  string kind  = 2;
-  string name = 3;
+  ImageDataSource image_data_source  = 1;
+  SnapshotDataSource snapshot_data_source  = 2;
 }
 
 message VolumeSpec {
