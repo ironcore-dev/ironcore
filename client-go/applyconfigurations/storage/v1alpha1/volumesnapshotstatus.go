@@ -13,6 +13,7 @@ import (
 // VolumeSnapshotStatusApplyConfiguration represents a declarative configuration of the VolumeSnapshotStatus type for use
 // with apply.
 type VolumeSnapshotStatusApplyConfiguration struct {
+	SnapshotID  *string                              `json:"snapshotID,omitempty"`
 	State       *storagev1alpha1.VolumeSnapshotState `json:"state,omitempty"`
 	RestoreSize *resource.Quantity                   `json:"restoreSize,omitempty"`
 }
@@ -21,6 +22,14 @@ type VolumeSnapshotStatusApplyConfiguration struct {
 // apply.
 func VolumeSnapshotStatus() *VolumeSnapshotStatusApplyConfiguration {
 	return &VolumeSnapshotStatusApplyConfiguration{}
+}
+
+// WithSnapshotID sets the SnapshotID field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SnapshotID field is set to the value of the last call.
+func (b *VolumeSnapshotStatusApplyConfiguration) WithSnapshotID(value string) *VolumeSnapshotStatusApplyConfiguration {
+	b.SnapshotID = &value
+	return b
 }
 
 // WithState sets the State field in the declarative configuration to the given value

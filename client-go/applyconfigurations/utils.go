@@ -227,12 +227,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.VolumePoolStatusApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshot"):
 		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotApplyConfiguration{}
-	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotContent"):
-		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotContentApplyConfiguration{}
-	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotContentSource"):
-		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotContentSourceApplyConfiguration{}
-	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotContentSpec"):
-		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotContentSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotSpec"):
 		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotStatus"):

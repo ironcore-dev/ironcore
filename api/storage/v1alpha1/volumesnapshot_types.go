@@ -17,6 +17,8 @@ type VolumeSnapshotSpec struct {
 
 // VolumeSnapshotStatus defines the observed state of VolumeSnapshot
 type VolumeSnapshotStatus struct {
+	// SnapshotID is the provider-specific snapshot ID in the format 'TYPE://SNAPSHOT_ID'.
+	SnapshotID string `json:"snapshotID,omitempty"`
 	// State represents the storage provider state of VolumeSnapshot
 	State VolumeSnapshotState `json:"state,omitempty"`
 	// RestoreSize is the size of storage required to restore from VolumeSnapshot

@@ -23,8 +23,6 @@ Resource Types:
 <a href="#storage.ironcore.dev/v1alpha1.VolumePool">VolumePool</a>
 </li><li>
 <a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshot">VolumeSnapshot</a>
-</li><li>
-<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent</a>
 </li></ul>
 <h3 id="storage.ironcore.dev/v1alpha1.Bucket">Bucket
 </h3>
@@ -781,95 +779,6 @@ VolumeSnapshotStatus
 </em>
 </td>
 <td>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent
-</h3>
-<div>
-<p>VolumeSnapshotContent is the Schema for the volumepools API</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code><br/>
-string</td>
-<td>
-<code>
-storage.ironcore.dev/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code><br/>
-string
-</td>
-<td><code>VolumeSnapshotContent</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code><br/>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code><br/>
-<em>
-<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">
-VolumeSnapshotContentSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>source</code><br/>
-<em>
-<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">
-VolumeSnapshotContentSource
-</a>
-</em>
-</td>
-<td>
-<p>Source defines the VolumeSnapshot handle</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeSnapshotRef</code><br/>
-<em>
-<a href="../common/#common.ironcore.dev/v1alpha1.UIDReference">
-github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to
-An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source</p>
-</td>
-</tr>
-</table>
 </td>
 </tr>
 </tbody>
@@ -1912,80 +1821,6 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 </tr>
 </tbody>
 </table>
-<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">VolumeSnapshotContentSource
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">VolumeSnapshotContentSpec</a>)
-</p>
-<div>
-<p>VolumeSnapshotContentSource contains VolumeSnapshotHandle of the snapshot</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>snapshotHandle</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>VolumeSnapshotHandle is a unique identifier for the snapshot in the storage provider</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSpec">VolumeSnapshotContentSpec
-</h3>
-<p>
-(<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContent">VolumeSnapshotContent</a>)
-</p>
-<div>
-<p>VolumeSnapshotContentSpec defines the desired state of VolumeSnapshotContent</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>source</code><br/>
-<em>
-<a href="#storage.ironcore.dev/v1alpha1.VolumeSnapshotContentSource">
-VolumeSnapshotContentSource
-</a>
-</em>
-</td>
-<td>
-<p>Source defines the VolumeSnapshot handle</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>volumeSnapshotRef</code><br/>
-<em>
-<a href="../common/#common.ironcore.dev/v1alpha1.UIDReference">
-github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference
-</a>
-</em>
-</td>
-<td>
-<p>VolumeSnapshotRef is the reference to the VolumeSnapshot that this content belongs to
-An empty namespace indicates that the target VolumeSnapshot resides in the same namespace as the source</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="storage.ironcore.dev/v1alpha1.VolumeSnapshotSpec">VolumeSnapshotSpec
 </h3>
 <p>
@@ -2032,17 +1867,11 @@ Kubernetes core/v1.LocalObjectReference
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr><td><p>&#34;Deleting&#34;</p></td>
-<td><p>VolumeSnapshotStateDeleting means the VolumeSnapshot is being deleted</p>
-</td>
-</tr><tr><td><p>&#34;Failed&#34;</p></td>
+<tbody><tr><td><p>&#34;Failed&#34;</p></td>
 <td><p>VolumeSnapshotStateFailed means the VolumeSnapshot creation has failed</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
 <td><p>VolumeSnapshotStatePending means the VolumeSnapshot resource has been created, but the snapshot has not yet been initiated</p>
-</td>
-</tr><tr><td><p>&#34;Processing&#34;</p></td>
-<td><p>VolumeSnapshotStateProcessing means the VolumeSnapshot is being processed by the storage provider</p>
 </td>
 </tr><tr><td><p>&#34;Ready&#34;</p></td>
 <td><p>VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use</p>
@@ -2065,6 +1894,17 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>snapshotID</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>SnapshotID is the provider-specific snapshot ID in the format &lsquo;TYPE://SNAPSHOT_ID&rsquo;.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>state</code><br/>
