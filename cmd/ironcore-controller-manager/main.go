@@ -109,6 +109,7 @@ func main() {
 	var enableHTTP2 bool
 	var enableLeaderElection bool
 	var probeAddr string
+	var pprofAddr string
 	var prefixAllocationTimeout time.Duration
 	var volumeBindTimeout time.Duration
 	var virtualIPBindTimeout time.Duration
@@ -125,6 +126,7 @@ func main() {
 	flag.BoolVar(&enableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics server")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	flag.StringVar(&pprofAddr, "pprof-bind-address", "", "The address the Pprof endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -252,6 +254,7 @@ func main() {
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
 		HealthProbeBindAddress: probeAddr,
+		PprofBindAddress:       pprofAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d0ae00be.ironcore.dev",
 	})
