@@ -18,6 +18,7 @@ import (
 
 var _ = Describe("BucketScheduler", func() {
 	ns := SetupNamespace(&k8sClient)
+	bucketClass := SetupBucketClass()
 
 	BeforeEach(func(ctx SpecContext) {
 		By("waiting for the cached client to report no bucket pools")
@@ -40,7 +41,7 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket pool status to contain a bucket class")
 		bucketPoolBase := bucketPool.DeepCopy()
-		bucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: "my-bucketclass"}}
+		bucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: bucketClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, bucketPool, client.MergeFrom(bucketPoolBase))).
 			To(Succeed(), "failed to patch bucket pool status")
 
@@ -51,7 +52,7 @@ var _ = Describe("BucketScheduler", func() {
 				GenerateName: "test-bucket-",
 			},
 			Spec: storagev1alpha1.BucketSpec{
-				BucketClassRef: &corev1.LocalObjectReference{Name: "my-bucketclass"},
+				BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, bucket)).To(Succeed(), "failed to create bucket")
@@ -72,7 +73,7 @@ var _ = Describe("BucketScheduler", func() {
 				GenerateName: "test-bucket-",
 			},
 			Spec: storagev1alpha1.BucketSpec{
-				BucketClassRef: &corev1.LocalObjectReference{Name: "my-bucketclass"},
+				BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, bucket)).To(Succeed(), "failed to create bucket")
@@ -97,7 +98,7 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket pool status to contain a bucket class")
 		bucketPoolBase := bucketPool.DeepCopy()
-		bucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: "my-bucketclass"}}
+		bucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: bucketClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, bucketPool, client.MergeFrom(bucketPoolBase))).
 			To(Succeed(), "failed to patch bucket pool status")
 
@@ -119,7 +120,7 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket pool status to contain a bucket class")
 		bucketPoolNoMatchingLabelsBase := bucketPoolNoMatchingLabels.DeepCopy()
-		bucketPoolNoMatchingLabels.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: "my-bucketclass"}}
+		bucketPoolNoMatchingLabels.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: bucketClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, bucketPoolNoMatchingLabels, client.MergeFrom(bucketPoolNoMatchingLabelsBase))).
 			To(Succeed(), "failed to patch bucket pool status")
 
@@ -136,7 +137,7 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket pool status to contain a bucket class")
 		bucketPoolMatchingLabelsBase := bucketPoolMatchingLabels.DeepCopy()
-		bucketPoolMatchingLabels.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: "my-bucketclass"}}
+		bucketPoolMatchingLabels.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: bucketClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, bucketPoolMatchingLabels, client.MergeFrom(bucketPoolMatchingLabelsBase))).
 			To(Succeed(), "failed to patch bucket pool status")
 
@@ -150,7 +151,7 @@ var _ = Describe("BucketScheduler", func() {
 				BucketPoolSelector: map[string]string{
 					"foo": "bar",
 				},
-				BucketClassRef: &corev1.LocalObjectReference{Name: "my-bucketclass"},
+				BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, bucket)).To(Succeed(), "failed to create bucket")
@@ -187,7 +188,7 @@ var _ = Describe("BucketScheduler", func() {
 
 		By("patching the bucket pool status to contain a bucket class")
 		bucketPoolBase := taintedBucketPool.DeepCopy()
-		taintedBucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: "my-bucketclass"}}
+		taintedBucketPool.Status.AvailableBucketClasses = []corev1.LocalObjectReference{{Name: bucketClass.Name}}
 		Expect(k8sClient.Status().Patch(ctx, taintedBucketPool, client.MergeFrom(bucketPoolBase))).
 			To(Succeed(), "failed to patch the bucket pool status")
 
@@ -198,7 +199,7 @@ var _ = Describe("BucketScheduler", func() {
 				GenerateName: "test-bucket-",
 			},
 			Spec: storagev1alpha1.BucketSpec{
-				BucketClassRef: &corev1.LocalObjectReference{Name: "my-bucketclass"},
+				BucketClassRef: &corev1.LocalObjectReference{Name: bucketClass.Name},
 			},
 		}
 		Expect(k8sClient.Create(ctx, bucket)).To(Succeed(), "failed to create the bucket")
