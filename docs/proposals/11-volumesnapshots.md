@@ -37,9 +37,8 @@ reviewers:
 
 ## Summary
 
-We propose the introduction of two new resources to the IronCore project: `VolumeSnapshot` and `VolumeSnapshotContent`. 
-The `VolumeSnapshot` resource would allow users to take point-in-time snapshots of the content of a `Volume`. 
-The `VolumeSnapshotContent` represents the actual storage-provider-specific snapshot content. We also propose an 
+We propose the introduction of new resource to the IronCore project: `VolumeSnapshot`. The `VolumeSnapshot` 
+resource would allow users to take point-in-time snapshots of the content of a `Volume`. We also propose an 
 enhancement to the `Volume` resource to provide a path for restoring from a snapshot. These new resources and 
 changes would provide users with increased capabilities for data protection and disaster recovery.
 
@@ -80,6 +79,7 @@ spec:
   volumeRef:
     name: example-volume
 status:
+  snapshotID: 029321790472c133de32f05944bc2543629fe4b4264dc42f8d95a87adbba265
   state: Pending/Ready/Failed
   restoreSize: 10Gi
 ```  
@@ -87,35 +87,12 @@ status:
 #### Fields:
 
 - `volumeRef`: Reference to the `Volume` to be snapshot. The `VolumeSnapshot` and `Volume` should be in the same namespace.
+- `snapshotID`: Reference to the storage-provider specific snapshot object.
 - `status.state`: The current phase of the snapshot. It can be `Pending`, `Ready` or `Failed`.
   - `Pending`: The snapshot resource has been created, but the snapshot has not yet been initiated.
   - `Ready`: The snapshot has been successfully created and is ready for use.
   - `Failed`: The snapshot creation has failed.
 - `status.restoreSize`: The size of the data in the snapshot. This will be populated by the system once the snapshot is ready.
-
-### `VolumeSnapshotContent` Resource
-
-The `VolumeSnapshotContent` resource will have the following structure:
-
-```yaml
-apiVersion: storage.ironcore.dev/v1alpha1
-kind: VolumeSnapshotContent
-metadata:
-  name: example-volumesnapshotcontent
-  namespace: default
-spec:
-  source:
-    snapshotHandle: 1334353-234234-45435435 # Unique identifier for the snapshot in the storage provider
-  volumeSnapshotRef:
-    name: example-snapshot
-    namespace: default
-    uid: 12345678-1234-5678-1234-123456789012
-```
-    
-#### Fields:
-
-- `source`: Contains the `snapshotHandle`, which is a unique identifier for the snapshot in the storage provider.
-- `volumeSnapshotRef`: Reference to the `VolumeSnapshot` that this content belongs to. It includes the name, namespace, and UID of the `VolumeSnapshot`.
 
 ### Volume Resource Enhancement
 
@@ -151,8 +128,6 @@ enhanced to include methods for:
 - Creating a `VolumeSnapshot` from a `Volume`.
 - Deleting a `VolumeSnapshot` and its associated `VolumeSnapshotContent`.
 - Restoring a `Volume` from a `VolumeSnapshot`.
-- List all `VolumeSnapshotContent` resources managed by the volume provider.
-- Delete a `VolumeSnapshotContent` resource.
 
 ```protobuf
 service VolumeRuntime {
@@ -160,17 +135,12 @@ service VolumeRuntime {
   // when creating a new Volume.
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
 
-  // CreateSnapshot will be used to create a snapshot of a Volume.
-  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
-  // DeleteSnapshot will be used to delete a snapshot and its associated content.
-  rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
-  // ListSnapshots will be used to list all snapshots managed by the volume provider
-  rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
-  
-  // ListSnapshotContents will be used to list all VolumeSnapshotContent resources managed by the volume provider.
-  rpc ListSnapshotContents(ListSnapshotContentsRequest) returns (ListSnapshotContentsResponse) {};
-  // DeleteSnapshotContent will be used to delete a VolumeSnapshotContent resource.
-  rpc DeleteSnapshotContent(DeleteSnapshotContentRequest) returns (DeleteSnapshotContentResponse) {};
+  // CreateVolumeSnapshot will be used to create a snapshot of a Volume.
+  rpc CreateVolumeSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
+  // DeleteVolumeSnapshot will be used to delete a snapshot and its associated content.
+  rpc DeleteVolumeSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
+  // ListVolumeSnapshots will be used to list all snapshots managed by the volume provider
+  rpc ListVolumeSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
 }
 ```
 
@@ -178,7 +148,7 @@ service VolumeRuntime {
 
 Once the proposal is approved, the implementation will follow these stages:
 
-1. Define the `VolumeSnapshot` and `VolumeSnapshotContent` resources in the `ironcore` project.
+1. Define the `VolumeSnapshot` resources in the `ironcore` project.
 2. Extend the `VolumeRuntime` interface to support snapshot creation and restoration.
 3. Implement the runtime interface methods in the `volume-broker` component
 4. Implement the runtime interface methods in the respective storage provider components.
@@ -189,7 +159,7 @@ snapshots by invoking the appropriate methods in the `VolumeRuntime` interface.
 
 Potential alternatives to the proposed changes could include:
 
-1. **Third-Party Snapshot Tools**: One alternative to implementing a `VolumeSnapshot` and `VolumeSnapshotContent` resource could be 
+1. **Third-Party Snapshot Tools**: One alternative to implementing a `VolumeSnapshot` resource could be 
 to recommend users leverage existing third-party tools or cloud-provider services for managing snapshots. However, 
 this approach might lack the integration and ease of use that come with an inbuilt solution.
 2. **Application-Level Snapshots**: Another alternative could be to allow applications to manage their own snapshots

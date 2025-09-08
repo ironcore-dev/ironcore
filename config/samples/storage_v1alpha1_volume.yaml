@@ -9,3 +9,7 @@ spec:
   #   name: volumepool-sample
   resources:
     storage: 100Gi
+  dataSource:
+    apiGroup: storage.ironcore.dev/v1alpha1
+    kind: VolumeSnapshot
+    name: example-snapshot

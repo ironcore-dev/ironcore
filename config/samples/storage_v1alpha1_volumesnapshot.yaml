@@ -1,0 +1,11 @@
+apiVersion: storage.ironcore.dev/v1alpha1
+kind: VolumeSnapshot
+metadata:
+  name: volume-snapshot-sample
+  namespace: default
+spec:
+  volumeRef:
+    name: volume-sample
+status:
+  state: Pending/Ready/Failed
+  restoreSize: 10Gi
