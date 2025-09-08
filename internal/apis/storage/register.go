@@ -37,6 +37,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&VolumePoolList{},
 		&Volume{},
 		&VolumeList{},
+		&VolumeSnapshot{},
+		&VolumeSnapshotList{},
 		&BucketClass{},
 		&BucketClassList{},
 		&BucketPool{},
