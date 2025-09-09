@@ -20,18 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	VolumeRuntime_Version_FullMethodName                     = "/volume.v1alpha1.VolumeRuntime/Version"
-	VolumeRuntime_ListEvents_FullMethodName                  = "/volume.v1alpha1.VolumeRuntime/ListEvents"
-	VolumeRuntime_ListVolumes_FullMethodName                 = "/volume.v1alpha1.VolumeRuntime/ListVolumes"
-	VolumeRuntime_CreateVolume_FullMethodName                = "/volume.v1alpha1.VolumeRuntime/CreateVolume"
-	VolumeRuntime_ExpandVolume_FullMethodName                = "/volume.v1alpha1.VolumeRuntime/ExpandVolume"
-	VolumeRuntime_DeleteVolume_FullMethodName                = "/volume.v1alpha1.VolumeRuntime/DeleteVolume"
-	VolumeRuntime_CreateVolumeSnapshot_FullMethodName        = "/volume.v1alpha1.VolumeRuntime/CreateVolumeSnapshot"
-	VolumeRuntime_DeleteVolumeSnapshot_FullMethodName        = "/volume.v1alpha1.VolumeRuntime/DeleteVolumeSnapshot"
-	VolumeRuntime_ListVolumeSnapshots_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/ListVolumeSnapshots"
-	VolumeRuntime_ListVolumeSnapshotContents_FullMethodName  = "/volume.v1alpha1.VolumeRuntime/ListVolumeSnapshotContents"
-	VolumeRuntime_DeleteVolumeSnapshotContent_FullMethodName = "/volume.v1alpha1.VolumeRuntime/DeleteVolumeSnapshotContent"
-	VolumeRuntime_Status_FullMethodName                      = "/volume.v1alpha1.VolumeRuntime/Status"
+	VolumeRuntime_Version_FullMethodName              = "/volume.v1alpha1.VolumeRuntime/Version"
+	VolumeRuntime_ListEvents_FullMethodName           = "/volume.v1alpha1.VolumeRuntime/ListEvents"
+	VolumeRuntime_ListVolumes_FullMethodName          = "/volume.v1alpha1.VolumeRuntime/ListVolumes"
+	VolumeRuntime_CreateVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/CreateVolume"
+	VolumeRuntime_ExpandVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/ExpandVolume"
+	VolumeRuntime_DeleteVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/DeleteVolume"
+	VolumeRuntime_CreateVolumeSnapshot_FullMethodName = "/volume.v1alpha1.VolumeRuntime/CreateVolumeSnapshot"
+	VolumeRuntime_DeleteVolumeSnapshot_FullMethodName = "/volume.v1alpha1.VolumeRuntime/DeleteVolumeSnapshot"
+	VolumeRuntime_ListVolumeSnapshots_FullMethodName  = "/volume.v1alpha1.VolumeRuntime/ListVolumeSnapshots"
+	VolumeRuntime_Status_FullMethodName               = "/volume.v1alpha1.VolumeRuntime/Status"
 )
 
 // VolumeRuntimeClient is the client API for VolumeRuntime service.
@@ -47,8 +45,6 @@ type VolumeRuntimeClient interface {
 	CreateVolumeSnapshot(ctx context.Context, in *CreateVolumeSnapshotRequest, opts ...grpc.CallOption) (*CreateVolumeSnapshotResponse, error)
 	DeleteVolumeSnapshot(ctx context.Context, in *DeleteVolumeSnapshotRequest, opts ...grpc.CallOption) (*DeleteVolumeSnapshotResponse, error)
 	ListVolumeSnapshots(ctx context.Context, in *ListVolumeSnapshotsRequest, opts ...grpc.CallOption) (*ListVolumeSnapshotsResponse, error)
-	ListVolumeSnapshotContents(ctx context.Context, in *ListVolumeSnapshotContentsRequest, opts ...grpc.CallOption) (*ListVolumeSnapshotContentsResponse, error)
-	DeleteVolumeSnapshotContent(ctx context.Context, in *DeleteVolumeSnapshotContentRequest, opts ...grpc.CallOption) (*DeleteVolumeSnapshotContentResponse, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 }
 
@@ -150,26 +146,6 @@ func (c *volumeRuntimeClient) ListVolumeSnapshots(ctx context.Context, in *ListV
 	return out, nil
 }
 
-func (c *volumeRuntimeClient) ListVolumeSnapshotContents(ctx context.Context, in *ListVolumeSnapshotContentsRequest, opts ...grpc.CallOption) (*ListVolumeSnapshotContentsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListVolumeSnapshotContentsResponse)
-	err := c.cc.Invoke(ctx, VolumeRuntime_ListVolumeSnapshotContents_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *volumeRuntimeClient) DeleteVolumeSnapshotContent(ctx context.Context, in *DeleteVolumeSnapshotContentRequest, opts ...grpc.CallOption) (*DeleteVolumeSnapshotContentResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteVolumeSnapshotContentResponse)
-	err := c.cc.Invoke(ctx, VolumeRuntime_DeleteVolumeSnapshotContent_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *volumeRuntimeClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StatusResponse)
@@ -193,8 +169,6 @@ type VolumeRuntimeServer interface {
 	CreateVolumeSnapshot(context.Context, *CreateVolumeSnapshotRequest) (*CreateVolumeSnapshotResponse, error)
 	DeleteVolumeSnapshot(context.Context, *DeleteVolumeSnapshotRequest) (*DeleteVolumeSnapshotResponse, error)
 	ListVolumeSnapshots(context.Context, *ListVolumeSnapshotsRequest) (*ListVolumeSnapshotsResponse, error)
-	ListVolumeSnapshotContents(context.Context, *ListVolumeSnapshotContentsRequest) (*ListVolumeSnapshotContentsResponse, error)
-	DeleteVolumeSnapshotContent(context.Context, *DeleteVolumeSnapshotContentRequest) (*DeleteVolumeSnapshotContentResponse, error)
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 	mustEmbedUnimplementedVolumeRuntimeServer()
 }
@@ -232,12 +206,6 @@ func (UnimplementedVolumeRuntimeServer) DeleteVolumeSnapshot(context.Context, *D
 }
 func (UnimplementedVolumeRuntimeServer) ListVolumeSnapshots(context.Context, *ListVolumeSnapshotsRequest) (*ListVolumeSnapshotsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListVolumeSnapshots not implemented")
-}
-func (UnimplementedVolumeRuntimeServer) ListVolumeSnapshotContents(context.Context, *ListVolumeSnapshotContentsRequest) (*ListVolumeSnapshotContentsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListVolumeSnapshotContents not implemented")
-}
-func (UnimplementedVolumeRuntimeServer) DeleteVolumeSnapshotContent(context.Context, *DeleteVolumeSnapshotContentRequest) (*DeleteVolumeSnapshotContentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteVolumeSnapshotContent not implemented")
 }
 func (UnimplementedVolumeRuntimeServer) Status(context.Context, *StatusRequest) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
@@ -425,42 +393,6 @@ func _VolumeRuntime_ListVolumeSnapshots_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _VolumeRuntime_ListVolumeSnapshotContents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListVolumeSnapshotContentsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(VolumeRuntimeServer).ListVolumeSnapshotContents(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: VolumeRuntime_ListVolumeSnapshotContents_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VolumeRuntimeServer).ListVolumeSnapshotContents(ctx, req.(*ListVolumeSnapshotContentsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _VolumeRuntime_DeleteVolumeSnapshotContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteVolumeSnapshotContentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(VolumeRuntimeServer).DeleteVolumeSnapshotContent(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: VolumeRuntime_DeleteVolumeSnapshotContent_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VolumeRuntimeServer).DeleteVolumeSnapshotContent(ctx, req.(*DeleteVolumeSnapshotContentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _VolumeRuntime_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusRequest)
 	if err := dec(in); err != nil {
@@ -521,14 +453,6 @@ var VolumeRuntime_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVolumeSnapshots",
 			Handler:    _VolumeRuntime_ListVolumeSnapshots_Handler,
-		},
-		{
-			MethodName: "ListVolumeSnapshotContents",
-			Handler:    _VolumeRuntime_ListVolumeSnapshotContents_Handler,
-		},
-		{
-			MethodName: "DeleteVolumeSnapshotContent",
-			Handler:    _VolumeRuntime_DeleteVolumeSnapshotContent_Handler,
 		},
 		{
 			MethodName: "Status",
