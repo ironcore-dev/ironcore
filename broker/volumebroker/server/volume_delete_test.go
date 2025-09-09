@@ -24,6 +24,7 @@ var _ = Describe("DeleteVolume", func() {
 		createRes, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
 			Volume: &iri.Volume{
 				Metadata: &irimeta.ObjectMetadata{
+					Id: "foo",
 					Labels: map[string]string{
 						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 					},
