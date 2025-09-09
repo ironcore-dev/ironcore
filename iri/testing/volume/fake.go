@@ -149,7 +149,6 @@ func (r *FakeRuntimeService) CreateVolume(ctx context.Context, req *iri.CreateVo
 	defer r.Unlock()
 
 	volume := req.Volume
-	volume.Metadata.Id = r.idGen.Generate()
 	volume.Metadata.CreatedAt = time.Now().UnixNano()
 	volume.Status = &iri.VolumeStatus{}
 

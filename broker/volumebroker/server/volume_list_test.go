@@ -4,6 +4,8 @@
 package server_test
 
 import (
+	"strconv"
+
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
@@ -24,6 +26,7 @@ var _ = Describe("ListVolumes", func() {
 			res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
 				Volume: &iri.Volume{
 					Metadata: &irimeta.ObjectMetadata{
+						Id: "foo" + strconv.Itoa(i),
 						Labels: map[string]string{
 							volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 						},
@@ -39,6 +42,10 @@ var _ = Describe("ListVolumes", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res).NotTo(BeNil())
 			Volumes[i] = res.Volume
+
+			DeferCleanup(srv.DeleteVolume, &iri.DeleteVolumeRequest{
+				VolumeId: res.Volume.Metadata.Id,
+			})
 		}
 
 		By("listing the Volumes")

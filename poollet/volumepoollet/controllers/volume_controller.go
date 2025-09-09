@@ -81,32 +81,14 @@ func (r *VolumeReconciler) iriVolumeAnnotations(_ *storagev1alpha1.Volume) map[s
 	return map[string]string{}
 }
 
-func (r *VolumeReconciler) listIRIVolumesByKey(ctx context.Context, volumeKey client.ObjectKey) ([]*iri.Volume, error) {
+func (r *VolumeReconciler) getIRIVolumeByID(ctx context.Context, volumeID types.UID) ([]*iri.Volume, error) {
 	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
 		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeNamespaceLabel: volumeKey.Namespace,
-				volumepoolletv1alpha1.VolumeNameLabel:      volumeKey.Name,
-			},
+			Id: string(volumeID),
 		},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error listing volumes by key: %w", err)
-	}
-	volumes := res.Volumes
-	return volumes, nil
-}
-
-func (r *VolumeReconciler) listIRIVolumesByUID(ctx context.Context, volumeUID types.UID) ([]*iri.Volume, error) {
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
-		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeUIDLabel: string(volumeUID),
-			},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing volumes by uid: %w", err)
+		return nil, fmt.Errorf("error listing volumes by id: %w", err)
 	}
 	return res.Volumes, nil
 }
@@ -124,18 +106,18 @@ func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting volume %s: %w", req.NamespacedName, err)
 		}
-		return r.deleteGone(ctx, log, req.NamespacedName)
+		return r.deleteGone(ctx, log, volume.UID)
 	}
 	return r.reconcileExists(ctx, log, volume)
 }
 
-func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volumeKey client.ObjectKey) (ctrl.Result, error) {
+func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volumeUID types.UID) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Listing iri volumes by key")
-	volumes, err := r.listIRIVolumesByKey(ctx, volumeKey)
+	log.V(1).Info("Listing iri volumes by Id")
+	volumes, err := r.getIRIVolumeByID(ctx, volumeUID)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing iri volumes by key: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error listing iri volumes by Id: %w", err)
 	}
 
 	ok, err := r.deleteIRIVolumes(ctx, log, volumes)
@@ -206,7 +188,7 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	log.V(1).Info("Finalizer present")
 
 	log.V(1).Info("Listing volumes")
-	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
+	volumes, err := r.getIRIVolumeByID(ctx, volume.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing volumes by uid: %w", err)
 	}
@@ -245,6 +227,7 @@ func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volu
 		errs = append(errs, fmt.Errorf("error preparing iri volume labels: %w", err))
 	}
 	return &irimeta.ObjectMetadata{
+		Id:          string(volume.UID),
 		Labels:      labels,
 		Annotations: r.iriVolumeAnnotations(volume),
 	}, errs
@@ -375,9 +358,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	log.V(1).Info("Listing volumes")
 	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
 		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
-			},
+			Id: string(volume.UID),
 		},
 	})
 	if err != nil {
@@ -415,7 +396,7 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Creating volume")
+	log.V(1).Info("Creating volume", "volume before ", iriVolume)
 	res, err := r.VolumeRuntime.CreateVolume(ctx, &iri.CreateVolumeRequest{
 		Volume: iriVolume,
 	})
@@ -427,14 +408,14 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 
 	volumeID := iriVolume.Metadata.Id
 	log = log.WithValues("VolumeID", volumeID)
-	log.V(1).Info("Created")
+	log.V(1).Info("Created", "volume after ", iriVolume)
 
 	log.V(1).Info("Updating status")
 	if err := r.updateStatus(ctx, log, volume, iriVolume); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating volume status: %w", err)
 	}
 
-	log.V(1).Info("Created")
+	log.V(1).Info("Created", "volume after ", iriVolume)
 	return ctrl.Result{}, nil
 }
 

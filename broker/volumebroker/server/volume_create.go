@@ -69,7 +69,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 	ironcoreVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
-			Name:      s.idGen.Generate(),
+			Name:      volume.Metadata.Id,
 			Labels: utilsmaps.AppendMap(labels, map[string]string{
 				volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 			}),
