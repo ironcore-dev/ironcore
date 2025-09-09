@@ -16,8 +16,6 @@ service VolumeRuntime {
   rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
   rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
   rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
-  rpc ListVolumeSnapshotContents(ListVolumeSnapshotContentsRequest) returns (ListVolumeSnapshotContentsResponse) {};
-  rpc DeleteVolumeSnapshotContent(DeleteVolumeSnapshotContentRequest) returns (DeleteVolumeSnapshotContentResponse) {};
 
   rpc Status(StatusRequest) returns (StatusResponse) {};
 }
@@ -182,28 +180,7 @@ message VolumeSnapshot {
   VolumeSnapshotStatus status = 3;
 }
 
-message UIDReference {
-  string namespace = 1;
-  string name = 2;
-  string uid = 3;
-}
-
-message VolumeSnapshotContentSpec {
-  string volume_snapshot_handle = 1;
-  UIDReference snapshot_ref = 2;
-}
-
-message VolumeSnapshotContent {
-  meta.v1alpha1.ObjectMetadata metadata = 1;
-  VolumeSnapshotContentSpec spec = 2;
-}
-
 message VolumeSnapshotFilter {
-  string id = 1;
-  map<string, string> label_selector = 2;
-}
-
-message VolumeSnapshotContentFilter {
   string id = 1;
   map<string, string> label_selector = 2;
 }
@@ -229,19 +206,4 @@ message DeleteVolumeSnapshotRequest {
 }
 
 message DeleteVolumeSnapshotResponse {
-}
-
-message ListVolumeSnapshotContentsRequest {
-  VolumeSnapshotContentFilter filter = 1;
-}
-
-message ListVolumeSnapshotContentsResponse {
-  repeated VolumeSnapshot volume_snapshot = 1;
-}
-
-message DeleteVolumeSnapshotContentRequest {
-  string volume_snapshot_id = 1;
-}
-
-message DeleteVolumeSnapshotContentResponse {
 }
