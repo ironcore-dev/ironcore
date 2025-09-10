@@ -29,11 +29,11 @@ type VolumeSnapshotStatus struct {
 type VolumeSnapshotState string
 
 const (
-	// VolumeSnapshotStatePending means the VolumeSnapshot resource has been created, but the snapshot has not yet been initiated
+	// VolumeSnapshotStatePending reports whether a VolumeSnapshot is about to be ready.
 	VolumeSnapshotStatePending VolumeSnapshotState = "Pending"
-	// VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use
+	// VolumeSnapshotStateReady reports whether a VolumeSnapshot is ready to be used.
 	VolumeSnapshotStateReady VolumeSnapshotState = "Ready"
-	// VolumeSnapshotStateFailed means the VolumeSnapshot creation has failed
+	// VolumeSnapshotStateFailed reports that a VolumeSnapshot is in failed state.
 	VolumeSnapshotStateFailed VolumeSnapshotState = "Failed"
 )
 

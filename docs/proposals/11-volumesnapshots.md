@@ -126,7 +126,7 @@ To support the creation and restoration of `VolumeSnapshot` resources, the `Volu
 enhanced to include methods for:
 
 - Creating a `VolumeSnapshot` from a `Volume`.
-- Deleting a `VolumeSnapshot` and its associated `VolumeSnapshotContent`.
+- Deleting a `VolumeSnapshot`.
 - Restoring a `Volume` from a `VolumeSnapshot`.
 
 ```protobuf
