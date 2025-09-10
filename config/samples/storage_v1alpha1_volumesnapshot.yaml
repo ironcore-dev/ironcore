@@ -6,6 +6,6 @@ metadata:
 spec:
   volumeRef:
     name: volume-sample
-status:
-  state: Pending/Ready/Failed
-  restoreSize: 10Gi
+#status:
+#  state: Pending/Ready/Failed
+#  restoreSize: 10Gi
