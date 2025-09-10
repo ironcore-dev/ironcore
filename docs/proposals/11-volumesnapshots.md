@@ -148,7 +148,7 @@ service VolumeRuntime {
 
 Once the proposal is approved, the implementation will follow these stages:
 
-1. Define the `VolumeSnapshot` resources in the `ironcore` project.
+1. Define the `VolumeSnapshot` resource in the `ironcore` project.
 2. Extend the `VolumeRuntime` interface to support snapshot creation and restoration.
 3. Implement the runtime interface methods in the `volume-broker` component
 4. Implement the runtime interface methods in the respective storage provider components.
