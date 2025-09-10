@@ -160,17 +160,17 @@ service VolumeRuntime {
   // when creating a new Volume.
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
 
-  // CreateVolumeSnapshot will be used to create a snapshot of a Volume.
-  rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
-  // DeleteVolumeSnapshot will be used to delete a snapshot and its associated content.
-  rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
-  // ListVolumeSnapshots will be used to list all snapshots managed by the volume provider
-  rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
+  // CreateSnapshot will be used to create a snapshot of a Volume.
+  rpc CreateSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
+  // DeleteSnapshot will be used to delete a snapshot and its associated content.
+  rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
+  // ListSnapshots will be used to list all snapshots managed by the volume provider
+  rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
   
-  // ListVolumeSnapshotContents will be used to list all VolumeSnapshotContent resources managed by the volume provider.
-  rpc ListVolumeSnapshotContents(ListVolumeSnapshotContentsRequest) returns (ListVolumeSnapshotContentsResponse) {};
-  // DeleteVolumeSnapshotContent will be used to delete a VolumeSnapshotContent resource.
-  rpc DeleteVolumeSnapshotContent(DeleteVolumeSnapshotContentRequest) returns (DeleteVolumeSnapshotContentResponse) {};
+  // ListSnapshotContents will be used to list all VolumeSnapshotContent resources managed by the volume provider.
+  rpc ListSnapshotContents(ListSnapshotContentsRequest) returns (ListSnapshotContentsResponse) {};
+  // DeleteSnapshotContent will be used to delete a VolumeSnapshotContent resource.
+  rpc DeleteSnapshotContent(DeleteSnapshotContentRequest) returns (DeleteSnapshotContentResponse) {};
 }
 ```
 
