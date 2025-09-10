@@ -20,7 +20,7 @@ var (
 
 	headers = []metav1.TableColumnDefinition{
 		{Name: "Name", Type: "string", Format: "name", Description: objectMetaSwaggerDoc["name"]},
-		{Name: "VolumeRef", Type: "string", Description: "The volume reference this volume snapshot is created for"},
+		{Name: "VolumeRef", Type: "string", Description: "The volume this snapshot is created from"},
 		{Name: "State", Type: "string", Description: "The state of the volume snapshot"},
 		{Name: "Age", Type: "string", Format: "date", Description: objectMetaSwaggerDoc["creationTimestamp"]},
 	}
