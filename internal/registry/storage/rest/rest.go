@@ -13,6 +13,7 @@ import (
 	volumestorage "github.com/ironcore-dev/ironcore/internal/registry/storage/volume/storage"
 	volumeclassstore "github.com/ironcore-dev/ironcore/internal/registry/storage/volumeclass/storage"
 	volumepoolstorage "github.com/ironcore-dev/ironcore/internal/registry/storage/volumepool/storage"
+	volumesnapshotstorage "github.com/ironcore-dev/ironcore/internal/registry/storage/volumesnapshot/storage"
 	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/registry/generic"
@@ -90,6 +91,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 
 	storageMap["buckets"] = bucketStorage.Bucket
 	storageMap["buckets/status"] = bucketStorage.Status
+
+	volumeSnapshotStorage, err := volumesnapshotstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["volumesnapshots"] = volumeSnapshotStorage.VolumeSnapshot
+	storageMap["volumesnapshots/status"] = volumeSnapshotStorage.Status
 
 	return storageMap, nil
 }

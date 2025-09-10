@@ -21,6 +21,7 @@ type StorageV1alpha1Interface interface {
 	VolumesGetter
 	VolumeClassesGetter
 	VolumePoolsGetter
+	VolumeSnapshotsGetter
 }
 
 // StorageV1alpha1Client is used to interact with features provided by the storage.ironcore.dev group.
@@ -50,6 +51,10 @@ func (c *StorageV1alpha1Client) VolumeClasses() VolumeClassInterface {
 
 func (c *StorageV1alpha1Client) VolumePools() VolumePoolInterface {
 	return newVolumePools(c)
+}
+
+func (c *StorageV1alpha1Client) VolumeSnapshots(namespace string) VolumeSnapshotInterface {
+	return newVolumeSnapshots(c, namespace)
 }
 
 // NewForConfig creates a new StorageV1alpha1Client for the given config.

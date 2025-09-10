@@ -18,6 +18,12 @@ func SetDefaults_VolumeStatus(status *v1alpha1.VolumeStatus) {
 	}
 }
 
+func SetDefaults_VolumeSnapshotStatus(status *v1alpha1.VolumeSnapshotStatus) {
+	if status.State == "" {
+		status.State = v1alpha1.VolumeSnapshotStatePending
+	}
+}
+
 func SetDefaults_BucketStatus(status *v1alpha1.BucketStatus) {
 	if status.State == "" {
 		status.State = v1alpha1.BucketStatePending

@@ -36,3 +36,11 @@ type VolumeClassListerExpansion interface{}
 // VolumePoolListerExpansion allows custom methods to be added to
 // VolumePoolLister.
 type VolumePoolListerExpansion interface{}
+
+// VolumeSnapshotListerExpansion allows custom methods to be added to
+// VolumeSnapshotLister.
+type VolumeSnapshotListerExpansion interface{}
+
+// VolumeSnapshotNamespaceListerExpansion allows custom methods to be added to
+// VolumeSnapshotNamespaceLister.
+type VolumeSnapshotNamespaceListerExpansion interface{}
