@@ -134,11 +134,11 @@ service VolumeRuntime {
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
 
   // CreateVolumeSnapshot will be used to create a snapshot of a Volume.
-  rpc CreateVolumeSnapshot(CreateSnapshotRequest) returns (CreateSnapshotResponse) {};
+  rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
   // DeleteVolumeSnapshot will be used to delete a snapshot and its associated content.
-  rpc DeleteVolumeSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {};
+  rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
   // ListVolumeSnapshots will be used to list all snapshots managed by the volume provider
-  rpc ListVolumeSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {};
+  rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
 }
 ```
 
