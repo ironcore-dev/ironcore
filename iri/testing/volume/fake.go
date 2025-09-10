@@ -32,6 +32,10 @@ type FakeVolume struct {
 	*iri.Volume
 }
 
+type FakeVolumeSnapshot struct {
+	*iri.VolumeSnapshot
+}
+
 type FakeVolumeClassStatus struct {
 	iri.VolumeClassStatus
 }
@@ -45,6 +49,7 @@ type FakeRuntimeService struct {
 	idGen idgen.IDGen
 
 	Volumes             map[string]*FakeVolume
+	VolumeSnapshots     map[string]*FakeVolumeSnapshot
 	VolumeClassesStatus map[string]*FakeVolumeClassStatus
 	Events              []*FakeEvent
 }
@@ -54,6 +59,7 @@ func NewFakeRuntimeService() *FakeRuntimeService {
 		idGen: idgen.Default,
 
 		Volumes:             make(map[string]*FakeVolume),
+		VolumeSnapshots:     make(map[string]*FakeVolumeSnapshot),
 		VolumeClassesStatus: make(map[string]*FakeVolumeClassStatus),
 		Events:              []*FakeEvent{},
 	}
@@ -66,6 +72,16 @@ func (r *FakeRuntimeService) SetVolumes(volumes []*FakeVolume) {
 	r.Volumes = make(map[string]*FakeVolume)
 	for _, volume := range volumes {
 		r.Volumes[volume.Metadata.Id] = volume
+	}
+}
+
+func (r *FakeRuntimeService) SetVolumeSnapshots(volumeSnapshots []*FakeVolumeSnapshot) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.VolumeSnapshots = make(map[string]*FakeVolumeSnapshot)
+	for _, volumeSnapshot := range volumeSnapshots {
+		r.VolumeSnapshots[volumeSnapshot.Metadata.Id] = volumeSnapshot
 	}
 }
 
@@ -175,6 +191,60 @@ func (r *FakeRuntimeService) DeleteVolume(ctx context.Context, req *iri.DeleteVo
 
 	delete(r.Volumes, volumeID)
 	return &iri.DeleteVolumeResponse{}, nil
+}
+
+func (r *FakeRuntimeService) ListVolumeSnapshots(ctx context.Context, req *iri.ListVolumeSnapshotsRequest) (*iri.ListVolumeSnapshotsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	filter := req.Filter
+
+	var res []*iri.VolumeSnapshot
+	for _, v := range r.VolumeSnapshots {
+		if filter != nil {
+			if filter.Id != "" && filter.Id != v.Metadata.Id {
+				continue
+			}
+			if filter.LabelSelector != nil && !filterInLabels(filter.LabelSelector, v.Metadata.Labels) {
+				continue
+			}
+		}
+
+		volumeSnapshot := v.VolumeSnapshot
+		res = append(res, volumeSnapshot)
+	}
+	return &iri.ListVolumeSnapshotsResponse{VolumeSnapshots: res}, nil
+}
+
+func (r *FakeRuntimeService) CreateVolumeSnapshot(ctx context.Context, req *iri.CreateVolumeSnapshotRequest) (*iri.CreateVolumeSnapshotResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	volumeSnapshot := req.VolumeSnapshot
+	volumeSnapshot.Metadata.Id = r.idGen.Generate()
+	volumeSnapshot.Metadata.CreatedAt = time.Now().UnixNano()
+	volumeSnapshot.Status = &iri.VolumeSnapshotStatus{}
+
+	r.VolumeSnapshots[volumeSnapshot.Metadata.Id] = &FakeVolumeSnapshot{
+		VolumeSnapshot: volumeSnapshot,
+	}
+
+	return &iri.CreateVolumeSnapshotResponse{
+		VolumeSnapshot: volumeSnapshot,
+	}, nil
+}
+
+func (r *FakeRuntimeService) DeleteVolumeSnapshot(ctx context.Context, req *iri.DeleteVolumeSnapshotRequest) (*iri.DeleteVolumeSnapshotResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	volumeSnapshotID := req.VolumeSnapshotId
+	if _, ok := r.VolumeSnapshots[volumeSnapshotID]; !ok {
+		return nil, status.Errorf(codes.NotFound, "volume snapshot %q not found", volumeSnapshotID)
+	}
+
+	delete(r.VolumeSnapshots, volumeSnapshotID)
+	return &iri.DeleteVolumeSnapshotResponse{}, nil
 }
 
 func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
