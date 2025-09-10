@@ -52,6 +52,18 @@ func (r *remoteRuntime) DeleteVolume(ctx context.Context, request *iri.DeleteVol
 	return r.client.DeleteVolume(ctx, request)
 }
 
+func (r *remoteRuntime) CreateVolumeSnapshot(ctx context.Context, request *iri.CreateVolumeSnapshotRequest) (*iri.CreateVolumeSnapshotResponse, error) {
+	return r.client.CreateVolumeSnapshot(ctx, request)
+}
+
+func (r *remoteRuntime) DeleteVolumeSnapshot(ctx context.Context, request *iri.DeleteVolumeSnapshotRequest) (*iri.DeleteVolumeSnapshotResponse, error) {
+	return r.client.DeleteVolumeSnapshot(ctx, request)
+}
+
+func (r *remoteRuntime) ListVolumeSnapshots(ctx context.Context, request *iri.ListVolumeSnapshotsRequest) (*iri.ListVolumeSnapshotsResponse, error) {
+	return r.client.ListVolumeSnapshots(ctx, request)
+}
+
 func (r *remoteRuntime) Status(ctx context.Context, request *iri.StatusRequest) (*iri.StatusResponse, error) {
 	return r.client.Status(ctx, request)
 }
