@@ -23,12 +23,14 @@ reviewers:
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-NNNN: Your short, descriptive title](#iep-nnnn-your-short-descriptive-title)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+  - [Proposal](#proposal)
+  - [Alternatives](#alternatives)
 
 ## Summary
 
