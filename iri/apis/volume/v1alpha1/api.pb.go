@@ -1548,7 +1548,7 @@ func (x *VolumeSnapshotSpec) GetVolumeId() string {
 type VolumeSnapshotStatus struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	State         VolumeSnapshotState    `protobuf:"varint,1,opt,name=state,proto3,enum=volume.v1alpha1.VolumeSnapshotState" json:"state,omitempty"`
-	RestoreSize   int64                  `protobuf:"varint,2,opt,name=restore_size,json=restoreSize,proto3" json:"restore_size,omitempty"`
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1590,9 +1590,9 @@ func (x *VolumeSnapshotStatus) GetState() VolumeSnapshotState {
 	return VolumeSnapshotState_VOLUME_SNAPSHOT_PENDING
 }
 
-func (x *VolumeSnapshotStatus) GetRestoreSize() int64 {
+func (x *VolumeSnapshotStatus) GetSize() int64 {
 	if x != nil {
-		return x.RestoreSize
+		return x.Size
 	}
 	return 0
 }
@@ -2068,10 +2068,10 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\x0eStatusResponse\x12R\n" +
 	"\x13volume_class_status\x18\x01 \x03(\v2\".volume.v1alpha1.VolumeClassStatusR\x11volumeClassStatus\"1\n" +
 	"\x12VolumeSnapshotSpec\x12\x1b\n" +
-	"\tvolume_id\x18\x01 \x01(\tR\bvolumeId\"u\n" +
+	"\tvolume_id\x18\x01 \x01(\tR\bvolumeId\"f\n" +
 	"\x14VolumeSnapshotStatus\x12:\n" +
-	"\x05state\x18\x01 \x01(\x0e2$.volume.v1alpha1.VolumeSnapshotStateR\x05state\x12!\n" +
-	"\frestore_size\x18\x02 \x01(\x03R\vrestoreSize\"\xc3\x01\n" +
+	"\x05state\x18\x01 \x01(\x0e2$.volume.v1alpha1.VolumeSnapshotStateR\x05state\x12\x12\n" +
+	"\x04size\x18\x02 \x01(\x03R\x04size\"\xc3\x01\n" +
 	"\x0eVolumeSnapshot\x129\n" +
 	"\bmetadata\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\bmetadata\x127\n" +
 	"\x04spec\x18\x02 \x01(\v2#.volume.v1alpha1.VolumeSnapshotSpecR\x04spec\x12=\n" +
