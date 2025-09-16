@@ -171,7 +171,7 @@ message VolumeSnapshotSpec {
 
 message VolumeSnapshotStatus {
   VolumeSnapshotState state = 1;
-  int64 restore_size = 2;
+  int64 size = 2;
 }
 
 message VolumeSnapshot {
