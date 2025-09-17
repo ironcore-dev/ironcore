@@ -5,8 +5,6 @@ package controllers
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -20,12 +18,13 @@ import (
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,18 +49,27 @@ type BucketReconciler struct {
 
 	BucketClassMapper bcm.BucketClassMapper
 
+	DownwardAPILabels      map[string]string
+	DownwardAPIAnnotations map[string]string
+
 	BucketPoolName   string
 	WatchFilterValue string
 
 	MaxConcurrentReconciles int
 }
 
-func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) map[string]string {
-	return map[string]string{
+func (r *BucketReconciler) iriBucketLabels(bucket *storagev1alpha1.Bucket) (map[string]string, error) {
+	labels := map[string]string{
 		bucketpoolletv1alpha1.BucketUIDLabel:       string(bucket.UID),
 		bucketpoolletv1alpha1.BucketNamespaceLabel: bucket.Namespace,
 		bucketpoolletv1alpha1.BucketNameLabel:      bucket.Name,
 	}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(bucket, r.DownwardAPILabels, bucketpoolletv1alpha1.BucketDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
 }
 
 func (r *BucketReconciler) iriBucketAnnotations(_ *storagev1alpha1.Bucket) map[string]string {
@@ -226,11 +234,15 @@ func getIRIBucketClassCapabilities(bucketClass *storagev1alpha1.BucketClass) *ir
 	}
 }
 
-func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket) *irimeta.ObjectMetadata {
-	return &irimeta.ObjectMetadata{
-		Labels:      r.iriBucketLabels(bucket),
-		Annotations: r.iriBucketAnnotations(bucket),
+func (r *BucketReconciler) prepareIRIBucketMetadata(bucket *storagev1alpha1.Bucket, errs []error) (*irimeta.ObjectMetadata, []error) {
+	labels, err := r.iriBucketLabels(bucket)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error preparing iri bucket labels: %w", err))
 	}
+	return &irimeta.ObjectMetadata{
+		Labels:      labels,
+		Annotations: r.iriBucketAnnotations(bucket),
+	}, errs
 }
 
 func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *storagev1alpha1.Bucket, bucketClassName string) (string, bool, error) {
@@ -270,7 +282,7 @@ func (r *BucketReconciler) prepareIRIBucket(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
-	metadata := r.prepareIRIBucketMetadata(bucket)
+	metadata, errs := r.prepareIRIBucketMetadata(bucket, errs)
 
 	if len(errs) > 0 {
 		return nil, false, fmt.Errorf("error(s) preparing iri bucket: %v", errs)
@@ -373,11 +385,6 @@ func (r *BucketReconciler) create(ctx context.Context, log logr.Logger, bucket *
 	return ctrl.Result{}, nil
 }
 
-func (r *BucketReconciler) bucketSecretName(bucketName string) string {
-	sum := sha256.Sum256([]byte(bucketName))
-	return hex.EncodeToString(sum[:])[:63]
-}
-
 var iriBucketStateToBucketState = map[iri.BucketState]storagev1alpha1.BucketState{
 	iri.BucketState_BUCKET_PENDING:   storagev1alpha1.BucketStatePending,
 	iri.BucketState_BUCKET_AVAILABLE: storagev1alpha1.BucketStateAvailable,
@@ -407,7 +414,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: bucket.Namespace,
-						Name:      r.bucketSecretName(bucket.Name),
+						Name:      string(bucket.UID),
 						Labels: map[string]string{
 							bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 						},
@@ -441,7 +448,7 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 	base := bucket.DeepCopy()
 	now := metav1.Now()
 
-	bucketID := poolletproviderid.MakeID(r.BucketRuntimeName, iriBucket.Metadata.Id)
+	bucketID := poolletutils.MakeID(r.BucketRuntimeName, iriBucket.Metadata.Id)
 
 	bucket.Status.Access = access
 	newState, err := r.convertIRIBucketState(iriBucket.Status.State)

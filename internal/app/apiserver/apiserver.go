@@ -9,6 +9,8 @@ import (
 	"net"
 	"time"
 
+	"k8s.io/component-base/compatibility"
+
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -41,7 +43,6 @@ import (
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
-	"k8s.io/component-base/version"
 	netutils "k8s.io/utils/net"
 )
 
@@ -204,7 +205,7 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	serverConfig := genericapiserver.NewRecommendedConfig(api.Codecs)
 
-	serverConfig.EffectiveVersion = version.NewEffectiveVersion("1.0")
+	serverConfig.EffectiveVersion = compatibility.NewEffectiveVersionFromString("1.0", "", "")
 
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(ironcoreopenapi.GetOpenAPIDefinitions, openapi.NewDefinitionNamer(api.Scheme))
 	serverConfig.OpenAPIConfig.Info.Title = "ironcore-api"

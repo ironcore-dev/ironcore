@@ -48,13 +48,25 @@ func NewFilteredMachinePoolInformer(client versioned.Interface, resyncPeriod tim
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ComputeV1alpha1().MachinePools().List(context.TODO(), options)
+				return client.ComputeV1alpha1().MachinePools().List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.ComputeV1alpha1().MachinePools().Watch(context.TODO(), options)
+				return client.ComputeV1alpha1().MachinePools().Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.ComputeV1alpha1().MachinePools().List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.ComputeV1alpha1().MachinePools().Watch(ctx, options)
 			},
 		},
 		&apicomputev1alpha1.MachinePool{},

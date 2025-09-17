@@ -76,7 +76,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.33.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths: []string{
@@ -136,7 +136,9 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 		newSrv, err := server.New(cfg, ns.Name, server.Options{
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
-				"root-machine-uid":     machinepoolletv1alpha1.MachineUIDLabel,
+				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
+				"root-nic-uid":     machinepoolletv1alpha1.NetworkInterfaceUIDLabel,
+				"root-network-uid": machinepoolletv1alpha1.NetworkUIDLabel,
 				"root-reservation-uid": machinepoolletv1alpha1.ReservationUIDLabel,
 			},
 		})

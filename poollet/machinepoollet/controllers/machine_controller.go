@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -21,16 +22,15 @@ import (
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
-	utilmaps "github.com/ironcore-dev/ironcore/utils/maps"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
-	"github.com/ironcore-dev/controller-utils/clientutils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,25 +58,18 @@ type MachineReconciler struct {
 
 	MachinePoolName string
 
-	DownwardAPILabels      map[string]string
-	DownwardAPIAnnotations map[string]string
+	MachineDownwardAPILabels      map[string]string
+	MachineDownwardAPIAnnotations map[string]string
+
+	NicDownwardAPILabels      map[string]string
+	NicDownwardAPIAnnotations map[string]string
+
+	NetworkDownwardAPILabels      map[string]string
+	NetworkDownwardAPIAnnotations map[string]string
 
 	WatchFilterValue string
 
 	MaxConcurrentReconciles int
-}
-
-func (r *MachineReconciler) machineKeyLabelSelector(machineKey client.ObjectKey) map[string]string {
-	return map[string]string{
-		v1alpha1.MachineNamespaceLabel: machineKey.Namespace,
-		v1alpha1.MachineNameLabel:      machineKey.Name,
-	}
-}
-
-func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
-	return map[string]string{
-		v1alpha1.MachineUIDLabel: string(machineUID),
-	}
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
@@ -97,9 +90,15 @@ func (r *MachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting machine %s: %w", req.NamespacedName, err)
 		}
-		return r.deleteGone(ctx, log, req.NamespacedName)
+		return r.deleteGone(ctx, log, machine)
 	}
 	return r.reconcileExists(ctx, log, machine)
+}
+
+func (r *MachineReconciler) machineUIDLabelSelector(machineUID types.UID) map[string]string {
+	return map[string]string{
+		v1alpha1.MachineUIDLabel: string(machineUID),
+	}
 }
 
 func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machine *computev1alpha1.Machine) ([]*iri.Machine, error) {
@@ -107,18 +106,9 @@ func (r *MachineReconciler) getIRIMachinesForMachine(ctx context.Context, machin
 		Filter: &iri.MachineFilter{LabelSelector: r.machineUIDLabelSelector(machine.UID)},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("error listing machines by machine uid: %w", err)
+		return nil, fmt.Errorf("error listing machines by machine uid label filter: %w", err)
 	}
-	return res.Machines, nil
-}
 
-func (r *MachineReconciler) listMachinesByMachineKey(ctx context.Context, machineKey client.ObjectKey) ([]*iri.Machine, error) {
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{LabelSelector: r.machineKeyLabelSelector(machineKey)},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing machines by machine key: %w", err)
-	}
 	return res.Machines, nil
 }
 
@@ -175,11 +165,11 @@ func (r *MachineReconciler) deleteMachines(ctx context.Context, log logr.Logger,
 	}
 }
 
-func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, machineKey client.ObjectKey) (ctrl.Result, error) {
+func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Listing machines by machine key")
-	machines, err := r.listMachinesByMachineKey(ctx, machineKey)
+	log.V(1).Info("Listing IRI machines by machine")
+	machines, err := r.getIRIMachinesForMachine(ctx, machine)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing machines: %w", err)
 	}
@@ -213,72 +203,22 @@ func (r *MachineReconciler) delete(ctx context.Context, log logr.Logger, machine
 
 	log.V(1).Info("Finalizer present")
 
-	log.V(1).Info("Deleting machines by UID")
-	ok, err := r.deleteMachinesByMachineUID(ctx, log, machine.UID)
+	log.V(1).Info("Deleting IRI machine for machine")
+	res, err := r.deleteGone(ctx, log, machine)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting machines: %w", err)
 	}
-	if !ok {
+	if !res.IsZero() {
 		log.V(1).Info("Not all machines are gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return res, nil
 	}
-
-	log.V(1).Info("Deleted iri machines by UID, removing finalizer")
+	log.V(1).Info("Deleted iri machines for machine, removing finalizer")
 	if err := clientutils.PatchRemoveFinalizer(ctx, r.Client, machine, v1alpha1.MachineFinalizer); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error removing finalizer: %w", err)
 	}
 
 	log.V(1).Info("Deleted")
 	return ctrl.Result{}, nil
-}
-
-func (r *MachineReconciler) deleteMachinesByMachineUID(ctx context.Context, log logr.Logger, machineUID types.UID) (bool, error) {
-	log.V(1).Info("Listing machines")
-	res, err := r.MachineRuntime.ListMachines(ctx, &iri.ListMachinesRequest{
-		Filter: &iri.MachineFilter{
-			LabelSelector: map[string]string{
-				v1alpha1.MachineUIDLabel: string(machineUID),
-			},
-		},
-	})
-	if err != nil {
-		return false, fmt.Errorf("error listing machines: %w", err)
-	}
-
-	log.V(1).Info("Listed machines", "NoOfMachines", len(res.Machines))
-	var (
-		errs               []error
-		deletingMachineIDs []string
-	)
-	for _, machine := range res.Machines {
-		machineID := machine.Metadata.Id
-		log := log.WithValues("MachineID", machineID)
-		log.V(1).Info("Deleting machine")
-		_, err := r.MachineRuntime.DeleteMachine(ctx, &iri.DeleteMachineRequest{
-			MachineId: machineID,
-		})
-		if err != nil {
-			if status.Code(err) != codes.NotFound {
-				errs = append(errs, fmt.Errorf("error deleting machine %s: %w", machineID, err))
-			} else {
-				log.V(1).Info("Machine is already gone")
-			}
-		} else {
-			log.V(1).Info("Issued machine deletion")
-			deletingMachineIDs = append(deletingMachineIDs, machineID)
-		}
-	}
-
-	switch {
-	case len(errs) > 0:
-		return false, fmt.Errorf("error(s) deleting machine(s): %v", errs)
-	case len(deletingMachineIDs) > 0:
-		log.V(1).Info("Machines are in deletion", "DeletingMachineIDs", deletingMachineIDs)
-		return false, nil
-	default:
-		log.V(1).Info("All machines are gone")
-		return true, nil
-	}
 }
 
 func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -332,21 +272,18 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 }
 
 func (r *MachineReconciler) iriMachineLabels(machine *computev1alpha1.Machine) (map[string]string, error) {
-	annotations := map[string]string{
+	labels := map[string]string{
 		v1alpha1.MachineUIDLabel:       string(machine.UID),
 		v1alpha1.MachineNamespaceLabel: machine.Namespace,
 		v1alpha1.MachineNameLabel:      machine.Name,
 	}
 
-	for name, fieldPath := range r.DownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
-		}
-
-		annotations[v1alpha1.DownwardAPILabel(name)] = value
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(machine, r.MachineDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
 	}
-	return annotations, nil
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
 }
 
 func (r *MachineReconciler) iriMachineAnnotations(
@@ -365,13 +302,13 @@ func (r *MachineReconciler) iriMachineAnnotations(
 		v1alpha1.NetworkInterfaceMappingAnnotation: nicMappingString,
 	}
 
-	for name, fieldPath := range r.DownwardAPIAnnotations {
+	for name, fieldPath := range r.MachineDownwardAPIAnnotations {
 		value, err := fieldpath.ExtractFieldPathAsString(machine, fieldPath)
 		if err != nil {
 			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
 		}
 
-		annotations[v1alpha1.DownwardAPIAnnotation(name)] = value
+		annotations[poolletutils.DownwardAPIAnnotation(v1alpha1.MachineDownwardAPIPrefix, name)] = value
 	}
 
 	return annotations, nil
@@ -505,7 +442,7 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 			continue
 		}
 
-		nic, ok := utilmaps.Pop(unhandledNicByUID, ref.UID)
+		nic, ok := utilsmaps.Pop(unhandledNicByUID, ref.UID)
 		if !ok {
 			continue
 		}
@@ -536,7 +473,7 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 		return err
 	}
 
-	machineID := poolletproviderid.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
+	machineID := poolletutils.MakeID(r.MachineRuntimeName, iriMachine.Metadata.Id)
 
 	state, err := r.convertIRIMachineState(iriMachine.Status.State)
 	if err != nil {
@@ -815,7 +752,7 @@ func (r *MachineReconciler) prepareIRIMachine(
 		errs = append(errs, fmt.Errorf("error preparing iri machine labels: %w", err))
 	}
 
-	annotations, err := r.iriMachineAnnotations(machine, 1, machineNicMappings)
+	annotations, err := r.iriMachineAnnotations(machine, 0, machineNicMappings)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing iri machine annotations: %w", err))
 	}

@@ -15,6 +15,17 @@ const (
 	MachineNamespaceLabel = "machinepoollet.ironcore.dev/machine-namespace"
 	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
 
+	NetworkInterfaceUIDLabel       = "machinepoollet.ironcore.dev/nic-uid"
+	NetworkInterfaceNamespaceLabel = "machinepoollet.ironcore.dev/nic-namespace"
+	NetworkInterfaceNameLabel      = "machinepoollet.ironcore.dev/nic-name"
+
+	NetworkUIDLabel       = "machinepoollet.ironcore.dev/network-uid"
+	NetworkNamespaceLabel = "machinepoollet.ironcore.dev/network-namespace"
+	NetworkNameLabel      = "machinepoollet.ironcore.dev/network-name"
+
+	NICLabelsAttributeKey     = "rawNICLabels"
+	NetworkLabelsAttributeKey = "rawNetworkLabels"
+
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
 	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
 
@@ -32,22 +43,12 @@ const (
 	ReservationGenerationAnnotation    = "machinepoollet.ironcore.dev/reservation-generation"
 	IRIReservationGenerationAnnotation = "machinepoollet.ironcore.dev/irireservation-generation"
 
-	// DownwardAPIPrefix is the prefix for any downward label.
-	DownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
+	// MachineDownwardAPIPrefix is the prefix for any downward label.
+	MachineDownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
 )
 
 func ReservationFinalizer(poolName string) string {
 	return ReservationFinalizerBase + poolName
-}
-
-// DownwardAPILabel makes a downward api label name from the given name.
-func DownwardAPILabel(name string) string {
-	return DownwardAPIPrefix + name
-}
-
-// DownwardAPIAnnotation makes a downward api annotation name from the given name.
-func DownwardAPIAnnotation(name string) string {
-	return DownwardAPIPrefix + name
 }
 
 // EncodeNetworkInterfaceMapping encodes the given network interface mapping to be used as an annotation.

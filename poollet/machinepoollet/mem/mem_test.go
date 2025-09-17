@@ -80,7 +80,10 @@ var _ = Describe("MachineEventMapper", func() {
 			MachineRuntimeVersion: fakemachine.FakeVersion,
 			MachineClassMapper:    machineClassMapper,
 			MachinePoolName:       mp.Name,
-			DownwardAPILabels: map[string]string{
+			MachineDownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
+			NicDownwardAPILabels: map[string]string{
 				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
 			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
@@ -111,6 +114,7 @@ var _ = Describe("MachineEventMapper", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),

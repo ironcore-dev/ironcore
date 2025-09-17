@@ -34,6 +34,22 @@ func ValidateMachine(machine *compute.Machine) field.ErrorList {
 func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorList {
 	var allErrs field.ErrorList
 
+	seenVolumeNames := sets.NewString()
+	newVolumeNameIndexMap := map[string]int{}
+	for _, vol := range oldMachine.Spec.Volumes {
+		seenVolumeNames.Insert(vol.Name)
+	}
+	for index, vol := range newMachine.Spec.Volumes {
+		if !seenVolumeNames.Has(vol.Name) {
+			newVolumeNameIndexMap[vol.Name] = index
+		}
+	}
+	for _, vol := range newMachine.Status.Volumes {
+		if i, ok := newVolumeNameIndexMap[vol.Name]; ok {
+			allErrs = append(allErrs, field.Duplicate(field.NewPath("spec.volume").Index(i).Child("name"), vol.Name))
+		}
+	}
+
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachine, oldMachine, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateMachineSpecUpdate(&newMachine.Spec, &oldMachine.Spec, field.NewPath("spec"))...)
 	allErrs = append(allErrs, ValidateMachine(newMachine)...)

@@ -17,7 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// ValidateLoadBalancer validates an LoadBalancer object.
+// ValidateLoadBalancer validates a LoadBalancer object.
 func ValidateLoadBalancer(loadBalancer *networking.LoadBalancer) field.ErrorList {
 	var allErrs field.ErrorList
 

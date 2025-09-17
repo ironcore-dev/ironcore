@@ -4,13 +4,19 @@
 package server_test
 
 import (
+	"encoding/json"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -36,12 +42,23 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
+		nicLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
+		}
+		networkLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+		}
+
 		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
 			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -70,6 +87,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
 		}))
+		Expect(nic.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"): "foobar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 
 		By("getting the referenced ironcore network")
 		network := &networkingv1alpha1.Network{}
@@ -82,6 +103,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
+		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 	})
 
@@ -102,12 +127,22 @@ var _ = Describe("AttachNetworkInterface", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a network interface")
+		nicLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel: "foobar",
+		}
+		networkLabels := map[string]string{
+			machinepoolletv1alpha1.NetworkUIDLabel: "bar",
+		}
 		Expect(srv.AttachNetworkInterface(ctx, &iri.AttachNetworkInterfaceRequest{
 			MachineId: machineID,
 			NetworkInterface: &iri.NetworkInterface{
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -136,6 +171,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(nic.Spec.IPs).To(Equal([]networkingv1alpha1.IPSource{
 			{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")},
 		}))
+		Expect(nic.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"): "foobar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 
 		By("getting the referenced ironcore network")
 		network := &networkingv1alpha1.Network{}
@@ -148,6 +187,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 		}))
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
+		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 		}))
 
 		By("detaching the network interface")
@@ -172,6 +215,10 @@ var _ = Describe("AttachNetworkInterface", func() {
 				Name:      "my-nic",
 				NetworkId: "network-id",
 				Ips:       []string{"10.0.0.1"},
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.NICLabelsAttributeKey:     string(mustMarshalJSON(nicLabels)),
+					machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(networkLabels)),
+				},
 			},
 		})).Error().NotTo(HaveOccurred())
 
@@ -182,5 +229,17 @@ var _ = Describe("AttachNetworkInterface", func() {
 		Expect(network.Status).To(Equal(networkingv1alpha1.NetworkStatus{
 			State: networkingv1alpha1.NetworkStateAvailable,
 		}))
+		Expect(network.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 	})
 })
+
+func mustMarshalJSON(v interface{}) string {
+	data, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}

@@ -49,13 +49,25 @@ func NewFilteredNetworkInterfaceInformer(client versioned.Interface, namespace s
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).List(context.TODO(), options)
+				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).List(context.Background(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).Watch(context.TODO(), options)
+				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).Watch(context.Background(), options)
+			},
+			ListWithContextFunc: func(ctx context.Context, options v1.ListOptions) (runtime.Object, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).List(ctx, options)
+			},
+			WatchFuncWithContext: func(ctx context.Context, options v1.ListOptions) (watch.Interface, error) {
+				if tweakListOptions != nil {
+					tweakListOptions(&options)
+				}
+				return client.NetworkingV1alpha1().NetworkInterfaces(namespace).Watch(ctx, options)
 			},
 		},
 		&apinetworkingv1alpha1.NetworkInterface{},

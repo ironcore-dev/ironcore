@@ -24,7 +24,7 @@ var (
 		Rows: tableconverter.SingleRowFrom(func(status *iri.MachineClassStatus) (api.Row, error) {
 			return api.Row{
 				status.MachineClass.Name,
-				resource.NewMilliQuantity(status.MachineClass.Capabilities.Resources[string(corev1alpha1.ResourceCPU)], resource.DecimalSI).String(),
+				resource.NewQuantity(status.MachineClass.Capabilities.Resources[string(corev1alpha1.ResourceCPU)], resource.DecimalSI).String(),
 				resource.NewQuantity(status.MachineClass.Capabilities.Resources[string(corev1alpha1.ResourceMemory)], resource.DecimalSI).String(),
 				resource.NewQuantity(status.Quantity, resource.DecimalSI).String(),
 			}, nil

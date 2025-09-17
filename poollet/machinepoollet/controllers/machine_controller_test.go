@@ -4,6 +4,7 @@
 package controllers_test
 
 import (
+	"encoding/json"
 	"fmt"
 
 	. "github.com/afritzler/protoequal"
@@ -14,8 +15,8 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -34,16 +35,21 @@ var _ = Describe("MachineController", func() {
 
 	It("Should create a machine with an ephemeral NIC and ensure claimed networkInterfaceRef matches the ephemeral NIC", func(ctx SpecContext) {
 		By("creating a network")
+		const fooAnnotationValue = "bar"
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
 				ProviderID: "foo",
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -59,6 +65,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -70,7 +77,6 @@ var _ = Describe("MachineController", func() {
 		})).Should(Succeed())
 
 		By("creating a machine")
-		const fooAnnotationValue = "bar"
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -96,6 +102,11 @@ var _ = Describe("MachineController", func() {
 						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
 							Ephemeral: &computev1alpha1.EphemeralNetworkInterfaceSource{
 								NetworkInterfaceTemplate: &networkingv1alpha1.NetworkInterfaceTemplateSpec{
+									ObjectMeta: metav1.ObjectMeta{
+										Annotations: map[string]string{
+											fooAnnotation: fooAnnotationValue,
+										},
+									},
 									Spec: networkingv1alpha1.NetworkInterfaceSpec{
 										NetworkRef: corev1.LocalObjectReference{Name: network.Name},
 										IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.11")}},
@@ -108,16 +119,31 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Machines", HaveLen(1)),
 		))
 
+		By("By getting ephemeral network interface")
+		nicName := computev1alpha1.MachineEphemeralNetworkInterfaceName(machine.Name, "primary")
+		nicKey := types.NamespacedName{
+			Namespace: ns.Name,
+			Name:      nicName,
+		}
+		nic := &networkingv1alpha1.NetworkInterface{}
+		Eventually(func(g Gomega) {
+			err := k8sClient.Get(ctx, nicKey, nic)
+			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
+			g.Expect(err).NotTo(HaveOccurred())
+		}).Should(Succeed())
+
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.MachineUIDLabel, string(machine.UID)))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -128,14 +154,32 @@ var _ = Describe("MachineController", func() {
 				Handle: "testhandle",
 			},
 		})))
+
+		By("inspecting the iri machine's network interfaces to have correct labels and other properties")
 		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.11"},
+			Attributes: map[string]string{
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+				})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),
+					machinepoolletv1alpha1.NetworkUIDLabel:       string(network.UID),
+					machinepoolletv1alpha1.NetworkNamespaceLabel: string(network.Namespace),
+					machinepoolletv1alpha1.NetworkNameLabel:      string(network.Name),
+				})),
+			},
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -174,17 +218,22 @@ var _ = Describe("MachineController", func() {
 	})
 
 	It("should create a machine", func(ctx SpecContext) {
+		const fooAnnotationValue = "bar"
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "network-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: networkingv1alpha1.NetworkSpec{
 				ProviderID: "foo",
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -196,6 +245,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "nic-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
@@ -205,6 +257,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, nic)
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -215,6 +268,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -226,7 +280,6 @@ var _ = Describe("MachineController", func() {
 		})).Should(Succeed())
 
 		By("creating a machine")
-		const fooAnnotationValue = "bar"
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -257,6 +310,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
@@ -265,7 +319,8 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.MachineUIDLabel, string(machine.UID)))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -280,10 +335,26 @@ var _ = Describe("MachineController", func() {
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
+			Attributes: map[string]string{
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+				})),
+				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),
+					machinepoolletv1alpha1.NetworkUIDLabel:       string(network.UID),
+					machinepoolletv1alpha1.NetworkNamespaceLabel: string(network.Namespace),
+					machinepoolletv1alpha1.NetworkNameLabel:      string(network.Name),
+				})),
+			},
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -342,6 +413,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the machine to be created")
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
@@ -372,6 +444,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the machine to be created")
 		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
@@ -424,23 +497,24 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
-		By("By getting ephimeral volume")
+		By("By getting ephemeral volume")
 		volumeKey := types.NamespacedName{
 			Namespace: ns.Name,
 			Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, "primary"),
 		}
-		ephimeralVolume := &storagev1alpha1.Volume{}
+		ephemeralVolume := &storagev1alpha1.Volume{}
 		Eventually(func(g Gomega) {
-			err := k8sClient.Get(ctx, volumeKey, ephimeralVolume)
+			err := k8sClient.Get(ctx, volumeKey, ephemeralVolume)
 			Expect(client.IgnoreNotFound(err)).NotTo(HaveOccurred())
 			g.Expect(err).NotTo(HaveOccurred())
 		}).Should(Succeed())
 
 		By("patching the volume to be available")
-		Eventually(UpdateStatus(ephimeralVolume, func() {
-			ephimeralVolume.Status.State = storagev1alpha1.VolumeStateAvailable
-			ephimeralVolume.Status.Access = &storagev1alpha1.VolumeAccess{
+		Eventually(UpdateStatus(ephemeralVolume, func() {
+			ephemeralVolume.Status.State = storagev1alpha1.VolumeStateAvailable
+			ephemeralVolume.Status.Access = &storagev1alpha1.VolumeAccess{
 				Driver: "test",
 				Handle: "testhandle",
 			}
@@ -453,7 +527,7 @@ var _ = Describe("MachineController", func() {
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
 
 		By("inspecting the iri machine")
-		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
@@ -466,7 +540,7 @@ var _ = Describe("MachineController", func() {
 		})))
 
 		By("waiting for the ironcore machine status to be up-to-date")
-		expectedMachineID := poolletproviderid.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
+		expectedMachineID := poolletutils.MakeID(testingmachine.FakeRuntimeName, iriMachine.Metadata.Id)
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
@@ -483,7 +557,7 @@ var _ = Describe("MachineController", func() {
 		Eventually(Object(machine)).Should(HaveField("Status.Volumes", ConsistOf(MatchFields(IgnoreExtras, Fields{
 			"Name":      Equal("primary"),
 			"State":     Equal(computev1alpha1.VolumeStatePending),
-			"VolumeRef": Equal(corev1.LocalObjectReference{Name: ephimeralVolume.Name}),
+			"VolumeRef": Equal(corev1.LocalObjectReference{Name: ephemeralVolume.Name}),
 		}))))
 	})
 
@@ -499,6 +573,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the network to be available")
 		Eventually(UpdateStatus(network, func() {
@@ -519,6 +594,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
@@ -529,6 +605,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -547,6 +624,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, secondaryVolume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("patching the secondary volume to be available")
 		Eventually(UpdateStatus(secondaryVolume, func() {
@@ -595,6 +673,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
 
 		By("waiting for the runtime to report the machine, volume and network interface")
 		Eventually(srv).Should(SatisfyAll(
@@ -650,6 +729,7 @@ var _ = Describe("MachineController", func() {
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
 		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
 
 		By("patching the volume to be available")
 		Eventually(UpdateStatus(volume, func() {
@@ -684,6 +764,7 @@ var _ = Describe("MachineController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("waiting for the runtime to report the machine with volume")
 		Eventually(srv).Should(SatisfyAll(
@@ -735,4 +816,12 @@ func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
 		return k, v
 	}
 	panic("unreachable")
+}
+
+func mustMarshalJSON(v interface{}) string {
+	data, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }

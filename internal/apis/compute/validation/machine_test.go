@@ -474,5 +474,35 @@ var _ = Describe("Machine", func() {
 			&compute.Machine{},
 			Not(ContainElement(ImmutableField("spec.machinePoolRef"))),
 		),
+		Entry("duplicate volume name",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{Name: "foo"},
+						{Name: "bar"},
+					},
+				},
+				Status: compute.MachineStatus{
+					Volumes: []compute.VolumeStatus{
+						{Name: "foo"},
+						{Name: "bar"},
+					},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{Name: "foo"},
+					},
+				},
+				Status: compute.MachineStatus{
+					Volumes: []compute.VolumeStatus{
+						{Name: "foo"},
+						{Name: "bar"},
+					},
+				},
+			},
+			ContainElement(DuplicateField("spec.volume[1].name")),
+		),
 	)
 })

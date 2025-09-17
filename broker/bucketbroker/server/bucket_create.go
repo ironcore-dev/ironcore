@@ -9,9 +9,14 @@ import (
 
 	"github.com/go-logr/logr"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
+
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/bucketbroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,10 +34,18 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 			Name: s.bucketPoolName,
 		}
 	}
+	labels := brokerutils.PrepareDownwardAPILabels(
+		bucket.GetMetadata().GetLabels(),
+		s.brokerDownwardAPILabels,
+		bucketpoolletv1alpha1.BucketDownwardAPIPrefix,
+	)
 	ironcoreBucket := &storagev1alpha1.Bucket{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.generateID(),
+			Labels: utilsmaps.AppendMap(labels, map[string]string{
+				bucketbrokerv1alpha1.ManagerLabel: bucketbrokerv1alpha1.BucketBrokerManager,
+			}),
 		},
 		Spec: storagev1alpha1.BucketSpec{
 			BucketClassRef:     &corev1.LocalObjectReference{Name: bucket.Spec.Class},
@@ -43,7 +56,6 @@ func (s *Server) getIronCoreBucketConfig(_ context.Context, bucket *iri.Bucket) 
 	if err := apiutils.SetObjectMetadata(ironcoreBucket, bucket.Metadata); err != nil {
 		return nil, err
 	}
-	apiutils.SetBucketManagerLabel(ironcoreBucket, bucketbrokerv1alpha1.BucketBrokerManager)
 
 	return &AggregateIronCoreBucket{
 		Bucket: ironcoreBucket,

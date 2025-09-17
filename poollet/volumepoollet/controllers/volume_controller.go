@@ -18,10 +18,11 @@ import (
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
-	poolletproviderid "github.com/ironcore-dev/ironcore/utils/poollet"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -52,18 +53,28 @@ type VolumeReconciler struct {
 
 	VolumeClassMapper vcm.VolumeClassMapper
 
-	VolumePoolName   string
+	VolumePoolName string
+
+	DownwardAPILabels      map[string]string
+	DownwardAPIAnnotations map[string]string
+
 	WatchFilterValue string
 
 	MaxConcurrentReconciles int
 }
 
-func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) map[string]string {
-	return map[string]string{
+func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) (map[string]string, error) {
+	labels := map[string]string{
 		volumepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
 		volumepoolletv1alpha1.VolumeNamespaceLabel: volume.Namespace,
 		volumepoolletv1alpha1.VolumeNameLabel:      volume.Name,
 	}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(volume, r.DownwardAPILabels, volumepoolletv1alpha1.VolumeDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
 }
 
 func (r *VolumeReconciler) iriVolumeAnnotations(_ *storagev1alpha1.Volume) map[string]string {
@@ -228,11 +239,15 @@ func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) *ir
 	}
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume) *irimeta.ObjectMetadata {
-	return &irimeta.ObjectMetadata{
-		Labels:      r.iriVolumeLabels(volume),
-		Annotations: r.iriVolumeAnnotations(volume),
+func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume, errs []error) (*irimeta.ObjectMetadata, []error) {
+	labels, err := r.iriVolumeLabels(volume)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error preparing iri volume labels: %w", err))
 	}
+	return &irimeta.ObjectMetadata{
+		Labels:      labels,
+		Annotations: r.iriVolumeAnnotations(volume),
+	}, errs
 }
 
 func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *storagev1alpha1.Volume, volumeClassName string) (string, bool, error) {
@@ -313,7 +328,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	}
 
 	resources := r.prepareIRIVolumeResources(volume.Spec.Resources)
-	metadata := r.prepareIRIVolumeMetadata(volume)
+	metadata, errs := r.prepareIRIVolumeMetadata(volume, errs)
 
 	if len(errs) > 0 {
 		return nil, false, fmt.Errorf("error(s) preparing iri volume: %v", errs)
@@ -511,7 +526,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	base := volume.DeepCopy()
 	now := metav1.Now()
 
-	volumeID := poolletproviderid.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
+	volumeID := poolletutils.MakeID(r.VolumeRuntimeName, iriVolume.Metadata.Id)
 
 	volume.Status.Access = access
 	newState, err := r.convertIRIVolumeState(iriVolume.Status.State)

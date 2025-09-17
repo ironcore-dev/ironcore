@@ -45,7 +45,7 @@ func (s *Server) aggregateIronCoreNetworkInterface(
 	ironcoreNetwork := &networkingv1alpha1.Network{}
 	ironcoreNetworkKey := client.ObjectKey{Namespace: s.cluster.Namespace(), Name: ironcoreNic.Spec.NetworkRef.Name}
 	if err := rd.Get(ctx, ironcoreNetworkKey, ironcoreNetwork); err != nil {
-		return nil, fmt.Errorf("error getting ironcore network %s: %w", ironcoreNic.Name, err)
+		return nil, fmt.Errorf("error getting ironcore network: %w", err)
 	}
 
 	return &AggregateIronCoreNetworkInterface{

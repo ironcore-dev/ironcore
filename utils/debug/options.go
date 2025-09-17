@@ -94,7 +94,7 @@ func (w WithLog) ApplyToPredicate(o *PredicateOptions) {
 	o.Log = w.Log
 }
 
-// WithObjectValue specifies the function to log an client.Object's value with.
+// WithObjectValue specifies the function to log a client.Object's value with.
 type WithObjectValue func(obj client.Object) any
 
 func (w WithObjectValue) ApplyToHandler(o *HandlerOptions) {

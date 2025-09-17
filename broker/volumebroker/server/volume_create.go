@@ -10,9 +10,14 @@ import (
 	"github.com/go-logr/logr"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,10 +60,19 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		}
 	}
 
+	labels := brokerutils.PrepareDownwardAPILabels(
+		volume.GetMetadata().GetLabels(),
+		s.brokerDownwardAPILabels,
+		volumepoolletv1alpha1.VolumeDownwardAPIPrefix,
+	)
+
 	ironcoreVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
 			Name:      s.idGen.Generate(),
+			Labels: utilsmaps.AppendMap(labels, map[string]string{
+				volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
+			}),
 		},
 		Spec: storagev1alpha1.VolumeSpec{
 			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
@@ -75,7 +89,6 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 	if err := apiutils.SetObjectMetadata(ironcoreVolume, volume.Metadata); err != nil {
 		return nil, err
 	}
-	apiutils.SetVolumeManagerLabel(ironcoreVolume, volumebrokerv1alpha1.VolumeBrokerManager)
 
 	return &AggregateIronCoreVolume{
 		Volume:           ironcoreVolume,

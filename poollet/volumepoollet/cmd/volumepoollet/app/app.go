@@ -62,8 +62,11 @@ type Options struct {
 	LeaderElectionNamespace  string
 	LeaderElectionKubeconfig string
 	ProbeAddr                string
+	PprofAddr                string
 
 	VolumePoolName                      string
+	VolumeDownwardAPILabels             map[string]string
+	VolumeDownwardAPIAnnotations        map[string]string
 	ProviderID                          string
 	VolumeRuntimeEndpoint               string
 	DialTimeout                         time.Duration
@@ -92,6 +95,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.EnableHTTP2, "enable-http2", false,
 		"If set, HTTP/2 will be enabled for the metrics server")
 	fs.StringVar(&o.ProbeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	fs.StringVar(&o.PprofAddr, "pprof-bind-address", "", "The address the Pprof endpoint binds to.")
 	fs.BoolVar(&o.EnableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
@@ -99,6 +103,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.LeaderElectionKubeconfig, "leader-election-kubeconfig", "", "Path pointing to a kubeconfig to use for leader election.")
 
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the volume pool to announce / watch")
+	fs.StringToStringVar(&o.VolumeDownwardAPILabels, "volume-downward-api-label", o.VolumeDownwardAPILabels, "Downward-API labels to set on IRI volume.")
+	fs.StringToStringVar(&o.VolumeDownwardAPIAnnotations, "volume-downward-api-annotation", o.VolumeDownwardAPIAnnotations, "Downward-API annotations to set on the IRI volume.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
 	fs.StringVar(&o.VolumeRuntimeEndpoint, "volume-runtime-endpoint", o.VolumeRuntimeEndpoint, "Endpoint of the remote volume runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
@@ -249,6 +255,7 @@ func Run(ctx context.Context, opts Options) error {
 		Scheme:                  scheme,
 		Metrics:                 metricsServerOptions,
 		HealthProbeBindAddress:  opts.ProbeAddr,
+		PprofBindAddress:        opts.PprofAddr,
 		LeaderElection:          opts.EnableLeaderElection,
 		LeaderElectionID:        "dfffbeaa.ironcore.dev",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
@@ -321,6 +328,8 @@ func Run(ctx context.Context, opts Options) error {
 			VolumeRuntimeName:       version.RuntimeName,
 			VolumeClassMapper:       volumeClassMapper,
 			VolumePoolName:          opts.VolumePoolName,
+			DownwardAPILabels:       opts.VolumeDownwardAPILabels,
+			DownwardAPIAnnotations:  opts.VolumeDownwardAPIAnnotations,
 			WatchFilterValue:        opts.WatchFilterValue,
 			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
 		}).SetupWithManager(mgr); err != nil {

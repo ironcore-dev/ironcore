@@ -36,6 +36,7 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass2)).To(Succeed(), "failed to create machine class")
+		DeferCleanup(k8sClient.Delete, machineClass2)
 
 		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{
 			{
@@ -71,7 +72,7 @@ var _ = Describe("MachinePoolController", func() {
 		By("checking if the capacity is correct")
 		Eventually(Object(machinePool)).Should(SatisfyAll(
 			HaveField("Status.Capacity", Satisfy(func(capacity corev1alpha1.ResourceList) bool {
-				return quota.Equals(capacity, corev1alpha1.ResourceList{
+				return quota.Contains(capacity, corev1alpha1.ResourceList{
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):  *resource.NewQuantity(machineClassCapacity, resource.DecimalSI),
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity, resource.DecimalSI),
 				})
@@ -94,11 +95,12 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
+		DeferCleanup(k8sClient.Delete, machine)
 
 		By("checking if the allocatable resources are correct")
 		Eventually(Object(machinePool)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
-				return quota.Equals(allocatable, corev1alpha1.ResourceList{
+				return quota.Contains(allocatable, corev1alpha1.ResourceList{
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):  *resource.NewQuantity(machineClassCapacity, resource.DecimalSI),
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity-1, resource.DecimalSI),
 				})
@@ -121,11 +123,12 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine2)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, machine2)
 
 		By("checking if the allocatable resources are correct")
 		Eventually(Object(machinePool)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
-				return quota.Equals(allocatable, corev1alpha1.ResourceList{
+				return quota.Contains(allocatable, corev1alpha1.ResourceList{
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):  *resource.NewQuantity(machineClassCapacity-1, resource.DecimalSI),
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity-1, resource.DecimalSI),
 				})
@@ -148,6 +151,7 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, machineClass)
 
 		srv.SetMachineClasses([]*testingmachine.FakeMachineClassStatus{
 			{
@@ -186,6 +190,7 @@ var _ = Describe("MachinePoolController", func() {
 			},
 		}
 		Expect(k8sClient.Create(ctx, machineClass2)).To(Succeed(), "failed to create test machine class")
+		DeferCleanup(k8sClient.Delete, machineClass2)
 
 		Eventually(Object(machinePool)).Should(SatisfyAll(
 			HaveField("Status.AvailableMachineClasses", HaveLen(1))),

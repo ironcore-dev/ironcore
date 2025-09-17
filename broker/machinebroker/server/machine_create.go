@@ -11,11 +11,14 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
+
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/maps"
+
+	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -47,22 +50,6 @@ func (s *Server) prepareIronCoreMachinePower(power iri.Power) (computev1alpha1.P
 	default:
 		return "", fmt.Errorf("unknown power state %v", power)
 	}
-}
-
-func (s *Server) prepareIronCoreMachineLabels(machine *iri.Machine) map[string]string {
-	labels := make(map[string]string)
-
-	for downwardAPILabelName, defaultLabelName := range s.brokerDownwardAPILabels {
-		value := machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)]
-		if value == "" {
-			value = machine.GetMetadata().GetLabels()[defaultLabelName]
-		}
-		if value != "" {
-			labels[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)] = value
-		}
-	}
-
-	return labels
 }
 
 func (s *Server) prepareIronCoreMachineAnnotations(machine *iri.Machine) (map[string]string, error) {
@@ -113,7 +100,12 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		ironcoreVolumeCfgs[i] = ironcoreVolumeCfg
 	}
 
-	labels := s.prepareIronCoreMachineLabels(machine)
+	labels := brokerutils.PrepareDownwardAPILabels(
+		machine.GetMetadata().GetLabels(),
+		s.brokerDownwardAPILabels,
+		machinepoolletv1alpha1.MachineDownwardAPIPrefix,
+	)
+	labels[machinepoolletv1alpha1.MachineUIDLabel] = machine.GetMetadata().GetLabels()[machinepoolletv1alpha1.MachineUIDLabel]
 	annotations, err := s.prepareIronCoreMachineAnnotations(machine)
 	if err != nil {
 		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)
@@ -198,7 +190,7 @@ func (s *Server) createIronCoreMachine(
 			Namespace:   s.cluster.Namespace(),
 			Name:        s.cluster.IDGen().Generate(),
 			Annotations: cfg.Annotations,
-			Labels: maps.AppendMap(cfg.Labels, map[string]string{
+			Labels: utilsmaps.AppendMap(cfg.Labels, map[string]string{
 				machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
 			}),
 		},

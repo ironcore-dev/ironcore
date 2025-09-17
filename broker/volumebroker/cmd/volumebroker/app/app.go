@@ -24,8 +24,9 @@ import (
 )
 
 type Options struct {
-	GetConfigOptions config.GetConfigOptions
-	Address          string
+	GetConfigOptions        config.GetConfigOptions
+	Address                 string
+	BrokerDownwardAPILabels map[string]string
 
 	QPS   float32
 	Burst int
@@ -38,6 +39,8 @@ type Options struct {
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	o.GetConfigOptions.BindFlags(fs)
 	fs.StringVar(&o.Address, "address", "/var/run/iri-volumebroker.sock", "Address to listen on.")
+	fs.StringToStringVar(&o.BrokerDownwardAPILabels, "broker-downward-api-label", nil, "The labels to broker via downward API. "+
+		"Example is for instance to broker \"root-volume-uid\" initially obtained via \"volumepoollet.ironcore.dev/volume-uid\".")
 
 	fs.StringVar(&o.Namespace, "namespace", o.Namespace, "Target Kubernetes namespace to use.")
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the target volume pool to pin volumes to, if any.")
@@ -86,9 +89,10 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	srv, err := server.New(cfg, server.Options{
-		Namespace:          opts.Namespace,
-		VolumePoolName:     opts.VolumePoolName,
-		VolumePoolSelector: opts.VolumePoolSelector,
+		BrokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		Namespace:               opts.Namespace,
+		VolumePoolName:          opts.VolumePoolName,
+		VolumePoolSelector:      opts.VolumePoolSelector,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating server: %w", err)

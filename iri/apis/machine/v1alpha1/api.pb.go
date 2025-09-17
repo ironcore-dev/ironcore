@@ -219,6 +219,7 @@ const (
 	MachineState_MACHINE_SUSPENDED   MachineState = 2
 	MachineState_MACHINE_TERMINATED  MachineState = 3
 	MachineState_MACHINE_TERMINATING MachineState = 4
+	MachineState_MACHINE_STOPPED     MachineState = 5
 )
 
 // Enum value maps for MachineState.
@@ -229,6 +230,7 @@ var (
 		2: "MACHINE_SUSPENDED",
 		3: "MACHINE_TERMINATED",
 		4: "MACHINE_TERMINATING",
+		5: "MACHINE_STOPPED",
 	}
 	MachineState_value = map[string]int32{
 		"MACHINE_PENDING":     0,
@@ -236,6 +238,7 @@ var (
 		"MACHINE_SUSPENDED":   2,
 		"MACHINE_TERMINATED":  3,
 		"MACHINE_TERMINATING": 4,
+		"MACHINE_STOPPED":     5,
 	}
 )
 
@@ -3153,13 +3156,14 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x0fVOLUME_ATTACHED\x10\x01*V\n" +
 	"\x15NetworkInterfaceState\x12\x1d\n" +
 	"\x19NETWORK_INTERFACE_PENDING\x10\x00\x12\x1e\n" +
-	"\x1aNETWORK_INTERFACE_ATTACHED\x10\x01*\x80\x01\n" +
+	"\x1aNETWORK_INTERFACE_ATTACHED\x10\x01*\x95\x01\n" +
 	"\fMachineState\x12\x13\n" +
 	"\x0fMACHINE_PENDING\x10\x00\x12\x13\n" +
 	"\x0fMACHINE_RUNNING\x10\x01\x12\x15\n" +
 	"\x11MACHINE_SUSPENDED\x10\x02\x12\x16\n" +
 	"\x12MACHINE_TERMINATED\x10\x03\x12\x17\n" +
-	"\x13MACHINE_TERMINATING\x10\x042\xd9\r\n" +
+	"\x13MACHINE_TERMINATING\x10\x04\x12\x13\n" +
+	"\x0fMACHINE_STOPPED\x10\x052\xd9\r\n" +
 	"\x0eMachineRuntime\x12P\n" +
 	"\aVersion\x12 .machine.v1alpha1.VersionRequest\x1a!.machine.v1alpha1.VersionResponse\"\x00\x12Y\n" +
 	"\n" +

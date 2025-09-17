@@ -5,8 +5,10 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -14,13 +16,16 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
-	"github.com/ironcore-dev/ironcore/utils/claimmanager"
-	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
+	"github.com/ironcore-dev/ironcore/utils/claimmanager"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -214,6 +219,34 @@ func (r *MachineReconciler) getNetworkInterfaceIPs(
 	return ips, true, nil
 }
 
+func (r *MachineReconciler) iriNetworkInterfaceLabels(networkinterface *networkingv1alpha1.NetworkInterface) (map[string]string, error) {
+	labels := map[string]string{
+		v1alpha1.NetworkInterfaceUIDLabel:       string(networkinterface.UID),
+		v1alpha1.NetworkInterfaceNamespaceLabel: networkinterface.Namespace,
+		v1alpha1.NetworkInterfaceNameLabel:      networkinterface.Name,
+	}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(networkinterface, r.NicDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
+}
+
+func (r *MachineReconciler) iriNetworkLabels(network *networkingv1alpha1.Network) (map[string]string, error) {
+	labels := map[string]string{
+		v1alpha1.NetworkUIDLabel:       string(network.UID),
+		v1alpha1.NetworkNamespaceLabel: network.Namespace,
+		v1alpha1.NetworkNameLabel:      network.Name,
+	}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(network, r.NetworkDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
+}
+
 func (r *MachineReconciler) prepareIRINetworkInterface(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
@@ -229,18 +262,57 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s network %s not found", nic.Name, networkKey.Name)
 		return nil, false, nil
 	}
+	nicLabels, err := r.iriNetworkInterfaceLabels(nic)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing iri networkinterface labels: %w", err)
+	}
+
+	networkLabels, err := r.iriNetworkLabels(network)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing iri network labels: %w", err)
+	}
+
+	attributes, err := r.prepareNetworkInterfaceAttributes(nic, nicLabels, networkLabels)
+	if err != nil {
+		return nil, false, err
+	}
 
 	ips, ok, err := r.getNetworkInterfaceIPs(ctx, machine, nic)
 	if err != nil || !ok {
 		return nil, false, err
 	}
-
 	return &iri.NetworkInterface{
 		Name:       machineNicName,
 		NetworkId:  network.Spec.ProviderID,
 		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
-		Attributes: nic.Spec.Attributes,
+		Attributes: attributes,
 	}, true, nil
+}
+
+func (r *MachineReconciler) prepareNetworkInterfaceAttributes(
+	nic *networkingv1alpha1.NetworkInterface,
+	nicLabels map[string]string,
+	networkLabels map[string]string,
+) (map[string]string, error) {
+	var attributes map[string]string
+	if nic.Spec.Attributes != nil {
+		attributes = maps.Clone(nic.Spec.Attributes)
+	} else {
+		attributes = make(map[string]string)
+	}
+	nicLabelsJSON, err := json.Marshal(nicLabels)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling NIC labels: %w", err)
+	}
+	attributes[v1alpha1.NICLabelsAttributeKey] = string(nicLabelsJSON)
+
+	networkLabelsJSON, err := json.Marshal(networkLabels)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling network labels: %w", err)
+	}
+	attributes[v1alpha1.NetworkLabelsAttributeKey] = string(networkLabelsJSON)
+
+	return attributes, nil
 }
 
 func (r *MachineReconciler) getExistingIRINetworkInterfacesForMachine(

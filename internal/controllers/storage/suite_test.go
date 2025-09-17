@@ -83,7 +83,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.32.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.33.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
@@ -195,6 +195,20 @@ func SetupVolumeClass() *storagev1alpha1.VolumeClass {
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceTPS:  resource.MustParse("250Mi"),
 				corev1alpha1.ResourceIOPS: resource.MustParse("15000"),
+			},
+		}
+	})
+}
+
+func SetupBucketClass() *storagev1alpha1.BucketClass {
+	return SetupObjectStruct[*storagev1alpha1.BucketClass](&k8sClient, func(bucketClass *storagev1alpha1.BucketClass) {
+		*bucketClass = storagev1alpha1.BucketClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "bucket-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceTPS:  resource.MustParse("100Mi"),
+				corev1alpha1.ResourceIOPS: resource.MustParse("100"),
 			},
 		}
 	})

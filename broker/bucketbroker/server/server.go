@@ -45,6 +45,8 @@ type Server struct {
 	client client.Client
 	iri.UnimplementedBucketRuntimeServer
 
+	brokerDownwardAPILabels map[string]string
+
 	namespace          string
 	bucketPoolName     string
 	bucketPoolSelector map[string]string
@@ -90,9 +92,14 @@ func (s *Server) setupCleaner(ctx context.Context, log logr.Logger, retErr *erro
 }
 
 type Options struct {
-	Namespace          string
-	BucketPoolName     string
-	BucketPoolSelector map[string]string
+	// BrokerDownwardAPILabels specifies which labels to broker via downward API and what the default
+	// label name is to obtain the value in case there is no value for the downward API.
+	// Example usage is e.g. to broker the root UID (map "root-bucket-uid" to bucketpoollet's
+	// "bucketpoollet.ironcore.dev/bucket-uid")
+	BrokerDownwardAPILabels map[string]string
+	Namespace               string
+	BucketPoolName          string
+	BucketPoolSelector      map[string]string
 }
 
 func setOptionsDefaults(o *Options) {
@@ -118,10 +125,11 @@ func New(cfg *rest.Config, opts Options) (*Server, error) {
 	}
 
 	return &Server{
-		client:             c,
-		namespace:          opts.Namespace,
-		bucketPoolName:     opts.BucketPoolName,
-		bucketPoolSelector: opts.BucketPoolSelector,
+		brokerDownwardAPILabels: opts.BrokerDownwardAPILabels,
+		client:                  c,
+		namespace:               opts.Namespace,
+		bucketPoolName:          opts.BucketPoolName,
+		bucketPoolSelector:      opts.BucketPoolSelector,
 	}, nil
 }
 
