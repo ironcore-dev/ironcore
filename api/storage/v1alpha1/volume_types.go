@@ -32,6 +32,7 @@ type VolumeSpec struct {
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1alpha1.ResourceList `json:"resources,omitempty"`
 	// Image is an optional image to bootstrap the volume with.
+	// To be deprecated
 	Image string `json:"image,omitempty"`
 	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
 	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecretRef,omitempty"`
@@ -42,19 +43,16 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption `json:"encryption,omitempty"`
-	// DataSource is an optional field which provides information regarding
-	// the snapshot to be used as the source for the volume restoration
-	DataSource *VolumeDataSource `json:"dataSource,omitempty"`
+	// VolumeDataSource is the source where the storage for the Volume resides at.
+	VolumeDataSource `json:",inline"`
 }
 
-// VolumeDataSource represents the source for volume
+// VolumeDataSource specifies the source to use for a Volume.
 type VolumeDataSource struct {
-	// APIGroup is the group for the resource being referenced
-	APIGroup *string `json:"apiGroup"`
-	// Kind is the type of resource being referenced
-	Kind string `json:"kind"`
-	// Name is the name of resource being referenced
-	Name string `json:"name"`
+	// VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.
+	VolumeSnapshotRef *corev1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
+	// OSImage is an optional os image to bootstrap the volume.
+	OSImage *string `json:"osimage,omitempty"`
 }
 
 // VolumeAccess represents information on how to access a volume.

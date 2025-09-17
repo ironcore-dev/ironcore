@@ -1,7 +1,7 @@
 ---
-title: Introducing VolumeSnapshot and VolumeSnapshotContent types and Restoration Paths
+title: Introducing VolumeSnapshot type and Restoration Paths
 
-iep-number: 11
+iep-number: 12
 
 creation-date: 2025-07-23
 
@@ -19,7 +19,7 @@ reviewers:
 
 ---
 
-# IEP-11: Introducing `VolumeSnapshot` and `VolumeSnapshotContent` types and Restoration Paths
+# IEP-12: Introducing `VolumeSnapshot` type and Restoration Paths
 
 ## Table of Contents
 
@@ -29,7 +29,6 @@ reviewers:
     - [Non-Goals](#non-goals)
 - [API Design](#api-design)
   - [`VolumeSnapshot` Resource](#volumesnapshot-resource)
-  - [`VolumeSnapshotContent` Resource](#volumesnapshotcontent-resource)
   - [`Volume` Resource Enhancement](#volume-resource-enhancement)
 - [`VolumeRuntime` enhancement](#volumeruntime-enhancement)
 - [Implementation Strategy](#implementation-strategy)
@@ -39,8 +38,8 @@ reviewers:
 
 We propose the introduction of new resource to the IronCore project: `VolumeSnapshot`. The `VolumeSnapshot` 
 resource would allow users to take point-in-time snapshots of the content of a `Volume`. We also propose an 
-enhancement to the `Volume` resource to provide a path for restoring from a snapshot. These new resources and 
-changes would provide users with increased capabilities for data protection and disaster recovery.
+enhancement to the `Volume` resource to provide a path for restoring from a `VolumeSnapshot`. These new resources 
+and changes would provide users with increased capabilities for data protection and disaster recovery.
 
 ## Motivation
 
@@ -49,7 +48,7 @@ A `VolumePool` is a representation of a `VolumePool` provider that materializes 
 storage implementation. A `VolumePool` provider here announces the supported `VolumeClasses` to indicate to the user
 which performance characteristics of `Volumes` this particular `VolumePool` can offer.
 There is currently no direct way to snapshot the content of a `Volume`, nor is there a method 
-for defining different types of snapshots or restoring from a snapshot, which potentially puts users' data at risk.
+for defining different types of snapshots or restoring from a snapshot, which potentially puts user's data at risk.
 
 ### Goals
 
@@ -81,7 +80,9 @@ spec:
 status:
   snapshotID: 029321790472c133de32f05944bc2543629fe4b4264dc42f8d95a87adbba265
   state: Pending/Ready/Failed
-  restoreSize: 10Gi
+  size: 10Gi
+  lastStateTransitionTime: 2025-08-20T08:24:25Z
+  
 ```  
 
 #### Fields:
@@ -92,11 +93,11 @@ status:
   - `Pending`: The snapshot resource has been created, but the snapshot has not yet been initiated.
   - `Ready`: The snapshot has been successfully created and is ready for use.
   - `Failed`: The snapshot creation has failed.
-- `status.restoreSize`: The size of the data in the snapshot. This will be populated by the system once the snapshot is ready.
+- `status.size`: The size of the data in the snapshot. This will be populated by the system once the snapshot is ready.
 
 ### Volume Resource Enhancement
 
-The `Volume` resource will have a new `dataSource` field under `spec`:
+The `Volume` resource will have 2 new volume data source inline fields as `volumeSnapshotRef` and `osimage` under `spec`:
 
 ```yaml
 apiVersion: storage.ironcore.dev/v1alpha1
@@ -107,18 +108,15 @@ metadata:
 spec:
   volumeClassRef:
     name: example-volumeclass
-  dataSource:
-    apiGroup: storage.ironcore.dev/v1alpha1
-    kind: VolumeSnapshot
+  volumeSnapshotRef:
     name: example-snapshot
+  osimage: test-image
 ```
 
 #### Fields:
 
-`dataSource`: Information regarding the snapshot to be used as the source for the restoration. Contains:
-- `apiGroup`: The group to which the referenced resource belongs, which would be `storage.ironcore.dev/v1alpha1`.
-- `kind`: Kind of the source, which should be `VolumeSnapshot`.
-- `name`: Name of the snapshot.
+- `volumeSnapshotRef`: Indicates to use the specified `VolumeSnapshot` as the data source.
+- `osimage`: It is an os image to bootstrap the volume.
 
 ## `VolumeRuntime` enhancement
 

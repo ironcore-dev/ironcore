@@ -5,12 +5,15 @@
 
 package v1alpha1
 
+import (
+	v1 "k8s.io/api/core/v1"
+)
+
 // VolumeDataSourceApplyConfiguration represents a declarative configuration of the VolumeDataSource type for use
 // with apply.
 type VolumeDataSourceApplyConfiguration struct {
-	APIGroup *string `json:"apiGroup,omitempty"`
-	Kind     *string `json:"kind,omitempty"`
-	Name     *string `json:"name,omitempty"`
+	VolumeSnapshotRef *v1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
+	OSImage           *string                  `json:"osimage,omitempty"`
 }
 
 // VolumeDataSourceApplyConfiguration constructs a declarative configuration of the VolumeDataSource type for use with
@@ -19,26 +22,18 @@ func VolumeDataSource() *VolumeDataSourceApplyConfiguration {
 	return &VolumeDataSourceApplyConfiguration{}
 }
 
-// WithAPIGroup sets the APIGroup field in the declarative configuration to the given value
+// WithVolumeSnapshotRef sets the VolumeSnapshotRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the APIGroup field is set to the value of the last call.
-func (b *VolumeDataSourceApplyConfiguration) WithAPIGroup(value string) *VolumeDataSourceApplyConfiguration {
-	b.APIGroup = &value
+// If called multiple times, the VolumeSnapshotRef field is set to the value of the last call.
+func (b *VolumeDataSourceApplyConfiguration) WithVolumeSnapshotRef(value v1.LocalObjectReference) *VolumeDataSourceApplyConfiguration {
+	b.VolumeSnapshotRef = &value
 	return b
 }
 
-// WithKind sets the Kind field in the declarative configuration to the given value
+// WithOSImage sets the OSImage field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Kind field is set to the value of the last call.
-func (b *VolumeDataSourceApplyConfiguration) WithKind(value string) *VolumeDataSourceApplyConfiguration {
-	b.Kind = &value
-	return b
-}
-
-// WithName sets the Name field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Name field is set to the value of the last call.
-func (b *VolumeDataSourceApplyConfiguration) WithName(value string) *VolumeDataSourceApplyConfiguration {
-	b.Name = &value
+// If called multiple times, the OSImage field is set to the value of the last call.
+func (b *VolumeDataSourceApplyConfiguration) WithOSImage(value string) *VolumeDataSourceApplyConfiguration {
+	b.OSImage = &value
 	return b
 }

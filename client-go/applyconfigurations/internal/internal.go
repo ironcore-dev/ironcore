@@ -1533,20 +1533,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
-- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
-  map:
-    fields:
-    - name: apiGroup
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
   map:
     fields:
@@ -1671,7 +1657,10 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
   map:
     fields:
-    - name: restoreSize
+    - name: lastStateTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: size
       type:
         namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
     - name: snapshotID
@@ -1686,9 +1675,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: claimRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
-    - name: dataSource
-      type:
-        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
     - name: encryption
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
@@ -1698,6 +1684,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: imagePullSecretRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: osimage
+      type:
+        scalar: string
     - name: resources
       type:
         map:
@@ -1723,6 +1712,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: volumeSnapshotRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeStatus
   map:
     fields:

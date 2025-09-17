@@ -8,4 +8,5 @@ spec:
     name: volume-sample
 #status:
 #  state: Pending/Ready/Failed
-#  restoreSize: 10Gi
+#  size: 10Gi
+#  lastStateTransitionTime: 2025-08-20T08:24:25Z 
