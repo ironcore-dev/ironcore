@@ -38,6 +38,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&MachineClassList{},
 		&MachinePool{},
 		&MachinePoolList{},
+		&Reservation{},
+		&ReservationList{},
 	)
 	return nil
 }

@@ -34,9 +34,22 @@ const (
 	FieldOwner       = "machinepoollet.ironcore.dev/field-owner"
 	MachineFinalizer = "machinepoollet.ironcore.dev/machine"
 
+	ReservationUIDLabel       = "machinepoollet.ironcore.dev/reservation-uid"
+	ReservationNamespaceLabel = "machinepoollet.ironcore.dev/reservation-namespace"
+	ReservationNameLabel      = "machinepoollet.ironcore.dev/reservation-name"
+
+	ReservationFinalizerBase = "machinepoollet.ironcore.dev/reservation-"
+
+	ReservationGenerationAnnotation    = "machinepoollet.ironcore.dev/reservation-generation"
+	IRIReservationGenerationAnnotation = "machinepoollet.ironcore.dev/irireservation-generation"
+
 	// MachineDownwardAPIPrefix is the prefix for any downward label.
 	MachineDownwardAPIPrefix = "downward-api.machinepoollet.ironcore.dev/"
 )
+
+func ReservationFinalizer(poolName string) string {
+	return ReservationFinalizerBase + poolName
+}
 
 // EncodeNetworkInterfaceMapping encodes the given network interface mapping to be used as an annotation.
 func EncodeNetworkInterfaceMapping(nicMapping map[string]ObjectUIDRef) (string, error) {
