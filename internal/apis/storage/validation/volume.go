@@ -10,15 +10,10 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	metav1validation "k8s.io/apimachinery/pkg/apis/meta/v1/validation"
-	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	ironcorevalidation "github.com/ironcore-dev/ironcore/internal/api/validation"
 	"github.com/ironcore-dev/ironcore/internal/apis/storage"
-)
-
-var supportedDataSourceKinds = sets.New(
-	storage.VolumeSnapshotResource,
 )
 
 func ValidateVolume(volume *storage.Volume) field.ErrorList {
@@ -82,6 +77,10 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		if spec.Tolerations != nil {
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("tolerations"), "must not specify if volume class is empty"))
 		}
+
+		if spec.OSImage != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osimage"), "must not specify if volume class is empty"))
+		}
 	}
 
 	if spec.Unclaimable {
@@ -102,15 +101,20 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 	}
 
-	if dataSource := spec.DataSource; dataSource != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(dataSource.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("dataSource", "name"), dataSource.Name, msg))
+	allErrs = append(allErrs, validateVolumeDataSource(&spec.VolumeDataSource, fldPath)...)
+
+	return allErrs
+}
+
+func validateVolumeDataSource(source *storage.VolumeDataSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if source.VolumeSnapshotRef != nil {
+		if source.OSImage != nil {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osimage"), "must only specify one volume data source"))
 		}
-		if len(dataSource.Kind) == 0 {
-			allErrs = append(allErrs, field.Required(fldPath.Child("dataSource", "kind"), "must specify data source kind"))
-		}
-		if !supportedDataSourceKinds.Has(dataSource.Kind) {
-			allErrs = append(allErrs, field.NotSupported(fldPath.Child("dataSource", "kind"), dataSource.Kind, supportedDataSourceKinds.UnsortedList()))
+		for _, msg := range apivalidation.NameIsDNSSubdomain(source.VolumeSnapshotRef.Name, false) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeSnapshotRef").Child("name"), source.VolumeSnapshotRef.Name, msg))
 		}
 	}
 

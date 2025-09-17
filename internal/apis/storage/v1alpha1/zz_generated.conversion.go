@@ -826,9 +826,8 @@ func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.Vol
 }
 
 func autoConvert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1alpha1.VolumeDataSource, out *storage.VolumeDataSource, s conversion.Scope) error {
-	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
-	out.Kind = in.Kind
-	out.Name = in.Name
+	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
+	out.OSImage = (*string)(unsafe.Pointer(in.OSImage))
 	return nil
 }
 
@@ -838,9 +837,8 @@ func Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1
 }
 
 func autoConvert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.VolumeDataSource, out *storagev1alpha1.VolumeDataSource, s conversion.Scope) error {
-	out.APIGroup = (*string)(unsafe.Pointer(in.APIGroup))
-	out.Kind = in.Kind
-	out.Name = in.Name
+	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
+	out.OSImage = (*string)(unsafe.Pointer(in.OSImage))
 	return nil
 }
 
@@ -1102,7 +1100,8 @@ func Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *stora
 func autoConvert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *storagev1alpha1.VolumeSnapshotStatus, out *storage.VolumeSnapshotStatus, s conversion.Scope) error {
 	out.SnapshotID = in.SnapshotID
 	out.State = storage.VolumeSnapshotState(in.State)
-	out.RestoreSize = (*resource.Quantity)(unsafe.Pointer(in.RestoreSize))
+	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.Size = (*resource.Quantity)(unsafe.Pointer(in.Size))
 	return nil
 }
 
@@ -1114,7 +1113,8 @@ func Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *s
 func autoConvert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in *storage.VolumeSnapshotStatus, out *storagev1alpha1.VolumeSnapshotStatus, s conversion.Scope) error {
 	out.SnapshotID = in.SnapshotID
 	out.State = storagev1alpha1.VolumeSnapshotState(in.State)
-	out.RestoreSize = (*resource.Quantity)(unsafe.Pointer(in.RestoreSize))
+	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	out.Size = (*resource.Quantity)(unsafe.Pointer(in.Size))
 	return nil
 }
 
@@ -1134,7 +1134,9 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.V
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	out.DataSource = (*storage.VolumeDataSource)(unsafe.Pointer(in.DataSource))
+	if err := Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(&in.VolumeDataSource, &out.VolumeDataSource, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1154,7 +1156,9 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	out.DataSource = (*storagev1alpha1.VolumeDataSource)(unsafe.Pointer(in.DataSource))
+	if err := Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(&in.VolumeDataSource, &out.VolumeDataSource, s); err != nil {
+		return err
+	}
 	return nil
 }
 

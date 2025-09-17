@@ -7,5 +7,7 @@ spec:
   volumeRef:
     name: volume-sample
 #status:
+#  snapshotID: volumeBroker://485030403393016897f9af4a80726e6b6586d9765d2f1c0b3d7ef40793d20cb
 #  state: Pending/Ready/Failed
-#  restoreSize: 10Gi
+#  lastStateTransitionTime: 2025-08-20T08:24:25Z
+#  size: 10Gi 

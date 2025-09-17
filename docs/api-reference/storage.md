@@ -439,7 +439,8 @@ string
 </em>
 </td>
 <td>
-<p>Image is an optional image to bootstrap the volume with.</p>
+<p>Image is an optional image to bootstrap the volume with.
+To be deprecated</p>
 </td>
 </tr>
 <tr>
@@ -495,7 +496,7 @@ VolumeEncryption
 </tr>
 <tr>
 <td>
-<code>dataSource</code><br/>
+<code>VolumeDataSource</code><br/>
 <em>
 <a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
 VolumeDataSource
@@ -503,8 +504,10 @@ VolumeDataSource
 </em>
 </td>
 <td>
-<p>DataSource is an optional field which provides information regarding
-the snapshot to be used as the source for the volume restoration</p>
+<p>
+(Members of <code>VolumeDataSource</code> are embedded into this type.)
+</p>
+<p>VolumeDataSource is the source where the storage for the Volume resides at.</p>
 </td>
 </tr>
 </table>
@@ -1500,7 +1503,7 @@ Kubernetes meta/v1.Time
 (<em>Appears on:</em><a href="#storage.ironcore.dev/v1alpha1.VolumeSpec">VolumeSpec</a>)
 </p>
 <div>
-<p>VolumeDataSource represents the source for volume</p>
+<p>VolumeDataSource specifies the source to use for a Volume.</p>
 </div>
 <table>
 <thead>
@@ -1512,35 +1515,26 @@ Kubernetes meta/v1.Time
 <tbody>
 <tr>
 <td>
-<code>apiGroup</code><br/>
+<code>volumeSnapshotRef</code><br/>
 <em>
-string
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#localobjectreference-v1-core">
+Kubernetes core/v1.LocalObjectReference
+</a>
 </em>
 </td>
 <td>
-<p>APIGroup is the group for the resource being referenced</p>
+<p>VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>kind</code><br/>
+<code>osimage</code><br/>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Kind is the type of resource being referenced</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of resource being referenced</p>
+<p>OSImage is an optional os image to bootstrap the volume.</p>
 </td>
 </tr>
 </tbody>
@@ -1868,13 +1862,13 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Failed&#34;</p></td>
-<td><p>VolumeSnapshotStateFailed means the VolumeSnapshot creation has failed</p>
+<td><p>VolumeSnapshotStateFailed reports that a VolumeSnapshot is in failed state.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>VolumeSnapshotStatePending means the VolumeSnapshot resource has been created, but the snapshot has not yet been initiated</p>
+<td><p>VolumeSnapshotStatePending reports whether a VolumeSnapshot is about to be ready.</p>
 </td>
 </tr><tr><td><p>&#34;Ready&#34;</p></td>
-<td><p>VolumeSnapshotStateReady means the VolumeSnapshot has been successfully created and is ready to use</p>
+<td><p>VolumeSnapshotStateReady reports whether a VolumeSnapshot is ready to be used.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1920,7 +1914,20 @@ VolumeSnapshotState
 </tr>
 <tr>
 <td>
-<code>restoreSize</code><br/>
+<code>lastStateTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastStateTransitionTime is the last time the State transitioned between values.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>size</code><br/>
 <em>
 <a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
 k8s.io/apimachinery/pkg/api/resource.Quantity
@@ -1928,7 +1935,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 </em>
 </td>
 <td>
-<p>RestoreSize is the size of storage required to restore from VolumeSnapshot</p>
+<p>Size is the storage size used by VolumeSnapshot</p>
 </td>
 </tr>
 </tbody>
@@ -2022,7 +2029,8 @@ string
 </em>
 </td>
 <td>
-<p>Image is an optional image to bootstrap the volume with.</p>
+<p>Image is an optional image to bootstrap the volume with.
+To be deprecated</p>
 </td>
 </tr>
 <tr>
@@ -2078,7 +2086,7 @@ VolumeEncryption
 </tr>
 <tr>
 <td>
-<code>dataSource</code><br/>
+<code>VolumeDataSource</code><br/>
 <em>
 <a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
 VolumeDataSource
@@ -2086,8 +2094,10 @@ VolumeDataSource
 </em>
 </td>
 <td>
-<p>DataSource is an optional field which provides information regarding
-the snapshot to be used as the source for the volume restoration</p>
+<p>
+(Members of <code>VolumeDataSource</code> are embedded into this type.)
+</p>
+<p>VolumeDataSource is the source where the storage for the Volume resides at.</p>
 </td>
 </tr>
 </tbody>
@@ -2326,7 +2336,8 @@ string
 </em>
 </td>
 <td>
-<p>Image is an optional image to bootstrap the volume with.</p>
+<p>Image is an optional image to bootstrap the volume with.
+To be deprecated</p>
 </td>
 </tr>
 <tr>
@@ -2382,7 +2393,7 @@ VolumeEncryption
 </tr>
 <tr>
 <td>
-<code>dataSource</code><br/>
+<code>VolumeDataSource</code><br/>
 <em>
 <a href="#storage.ironcore.dev/v1alpha1.VolumeDataSource">
 VolumeDataSource
@@ -2390,8 +2401,10 @@ VolumeDataSource
 </em>
 </td>
 <td>
-<p>DataSource is an optional field which provides information regarding
-the snapshot to be used as the source for the volume restoration</p>
+<p>
+(Members of <code>VolumeDataSource</code> are embedded into this type.)
+</p>
+<p>VolumeDataSource is the source where the storage for the Volume resides at.</p>
 </td>
 </tr>
 </table>

@@ -196,11 +196,17 @@ Kubernetes meta/v1.LabelSelector
 </tr><tr><td><p>&#34;requests.cpu&#34;</p></td>
 <td><p>ResourceRequestsCPU is the amount of requested cpu in cores.</p>
 </td>
+</tr><tr><td><p>&#34;requests.iops&#34;</p></td>
+<td><p>ResourceRequestsIOPS is the amount of requested IOPS in input/output operations per second.</p>
+</td>
 </tr><tr><td><p>&#34;requests.memory&#34;</p></td>
 <td><p>ResourceRequestsMemory is the amount of requested memory in bytes.</p>
 </td>
 </tr><tr><td><p>&#34;requests.storage&#34;</p></td>
 <td><p>ResourceRequestsStorage is the amount of requested storage in bytes.</p>
+</td>
+</tr><tr><td><p>&#34;requests.tps&#34;</p></td>
+<td><p>ResourceRequestsTPS is the amount of requested throughput per second.</p>
 </td>
 </tr><tr><td><p>&#34;storage&#34;</p></td>
 <td><p>ResourceStorage is the amount of storage, in bytes.</p>

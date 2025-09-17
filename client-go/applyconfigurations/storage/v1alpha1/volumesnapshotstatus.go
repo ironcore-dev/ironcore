@@ -8,14 +8,16 @@ package v1alpha1
 import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // VolumeSnapshotStatusApplyConfiguration represents a declarative configuration of the VolumeSnapshotStatus type for use
 // with apply.
 type VolumeSnapshotStatusApplyConfiguration struct {
-	SnapshotID  *string                              `json:"snapshotID,omitempty"`
-	State       *storagev1alpha1.VolumeSnapshotState `json:"state,omitempty"`
-	RestoreSize *resource.Quantity                   `json:"restoreSize,omitempty"`
+	SnapshotID              *string                              `json:"snapshotID,omitempty"`
+	State                   *storagev1alpha1.VolumeSnapshotState `json:"state,omitempty"`
+	LastStateTransitionTime *v1.Time                             `json:"lastStateTransitionTime,omitempty"`
+	Size                    *resource.Quantity                   `json:"size,omitempty"`
 }
 
 // VolumeSnapshotStatusApplyConfiguration constructs a declarative configuration of the VolumeSnapshotStatus type for use with
@@ -40,10 +42,18 @@ func (b *VolumeSnapshotStatusApplyConfiguration) WithState(value storagev1alpha1
 	return b
 }
 
-// WithRestoreSize sets the RestoreSize field in the declarative configuration to the given value
+// WithLastStateTransitionTime sets the LastStateTransitionTime field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the RestoreSize field is set to the value of the last call.
-func (b *VolumeSnapshotStatusApplyConfiguration) WithRestoreSize(value resource.Quantity) *VolumeSnapshotStatusApplyConfiguration {
-	b.RestoreSize = &value
+// If called multiple times, the LastStateTransitionTime field is set to the value of the last call.
+func (b *VolumeSnapshotStatusApplyConfiguration) WithLastStateTransitionTime(value v1.Time) *VolumeSnapshotStatusApplyConfiguration {
+	b.LastStateTransitionTime = &value
+	return b
+}
+
+// WithSize sets the Size field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the Size field is set to the value of the last call.
+func (b *VolumeSnapshotStatusApplyConfiguration) WithSize(value resource.Quantity) *VolumeSnapshotStatusApplyConfiguration {
+	b.Size = &value
 	return b
 }

@@ -24,8 +24,10 @@ type VolumeSnapshotStatus struct {
 	SnapshotID string
 	// State represents the storage provider state of VolumeSnapshot
 	State VolumeSnapshotState
-	// RestoreSize is the size of storage required to restore from VolumeSnapshot
-	RestoreSize *resource.Quantity
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *metav1.Time
+	// Size is the storage size used by VolumeSnapshot
+	Size *resource.Quantity
 }
 
 // VolumeSnapshotState is the state of a VolumeSnapshot

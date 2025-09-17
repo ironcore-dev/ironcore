@@ -21,8 +21,10 @@ type VolumeSnapshotStatus struct {
 	SnapshotID string `json:"snapshotID,omitempty"`
 	// State represents the storage provider state of VolumeSnapshot
 	State VolumeSnapshotState `json:"state,omitempty"`
-	// RestoreSize is the size of storage required to restore from VolumeSnapshot
-	RestoreSize *resource.Quantity `json:"restoreSize,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
+	// Size is the storage size used by VolumeSnapshot
+	Size *resource.Quantity `json:"size,omitempty"`
 }
 
 // VolumeSnapshotState is the state of a VolumeSnapshot
