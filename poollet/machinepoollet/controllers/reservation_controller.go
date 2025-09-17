@@ -14,8 +14,10 @@ import (
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -279,21 +281,18 @@ func (r *ReservationReconciler) reconcile(ctx context.Context, log logr.Logger, 
 }
 
 func (r *ReservationReconciler) iriReservationLabels(reservation *computev1alpha1.Reservation) (map[string]string, error) {
-	annotations := map[string]string{
+	labels := map[string]string{
 		v1alpha1.ReservationUIDLabel:       string(reservation.UID),
 		v1alpha1.ReservationNamespaceLabel: reservation.Namespace,
 		v1alpha1.ReservationNameLabel:      reservation.Name,
 	}
 
-	for name, fieldPath := range r.DownwardAPILabels {
-		value, err := fieldpath.ExtractFieldPathAsString(reservation, fieldPath)
-		if err != nil {
-			return nil, fmt.Errorf("error extracting downward api label %q: %w", name, err)
-		}
-
-		annotations[v1alpha1.DownwardAPILabel(name)] = value
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(reservation, r.DownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
 	}
-	return annotations, nil
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
 }
 
 func (r *ReservationReconciler) iriReservationAnnotations(
@@ -308,7 +307,7 @@ func (r *ReservationReconciler) iriReservationAnnotations(
 			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
 		}
 
-		annotations[v1alpha1.DownwardAPIAnnotation(name)] = value
+		annotations[poolletutils.DownwardAPIAnnotation(v1alpha1.MachineDownwardAPIPrefix, name)] = value
 	}
 
 	return annotations, nil

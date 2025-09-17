@@ -11,6 +11,7 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -20,22 +21,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-func prepareIronCoreLabels[T metav1alpha1.Object](obj T, brokerDownwardAPILabels map[string]string) (map[string]string, error) {
-	labels := make(map[string]string)
-
-	for downwardAPILabelName, defaultLabelName := range brokerDownwardAPILabels {
-		value := obj.GetMetadata().GetLabels()[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)]
-		if value == "" {
-			value = obj.GetMetadata().GetLabels()[defaultLabelName]
-		}
-		if value != "" {
-			labels[machinepoolletv1alpha1.DownwardAPILabel(downwardAPILabelName)] = value
-		}
-	}
-
-	return labels, nil
-}
 
 func prepareIronCoreAnnotations[T metav1alpha1.Object](obj T) (map[string]string, error) {
 	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(obj.GetMetadata().GetAnnotations())
@@ -60,10 +45,11 @@ func (s *Server) createIronCoreReservation(
 	iriReservation *iri.Reservation,
 ) (res *computev1alpha1.Reservation, retErr error) {
 
-	labels, err := prepareIronCoreLabels(iriReservation, s.brokerDownwardAPILabels)
-	if err != nil {
-		return nil, fmt.Errorf("error preparing ironcore reservation labels: %w", err)
-	}
+	labels := brokerutils.PrepareDownwardAPILabels(
+		iriReservation.GetMetadata().GetLabels(),
+		s.brokerDownwardAPILabels,
+		machinepoolletv1alpha1.MachineDownwardAPIPrefix,
+	)
 
 	annotations, err := prepareIronCoreAnnotations(iriReservation)
 	if err != nil {

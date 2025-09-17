@@ -4,6 +4,8 @@
 package controllers_test
 
 import (
+	"fmt"
+
 	_ "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
@@ -60,7 +62,7 @@ var _ = Describe("MachineController", func() {
 		_, iriReservation := GetSingleMapEntry(srv.Reservations)
 
 		By("inspecting the iri reservation")
-		Expect(iriReservation.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.DownwardAPILabel(fooDownwardAPILabel), fooAnnotationValue))
+		Expect(iriReservation.Metadata.Labels).To(HaveKeyWithValue(fmt.Sprintf("%s%s", machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 
 		By("setting the reservation state to accepted")
 		iriReservation = &testingmachine.FakeReservation{Reservation: proto.Clone(iriReservation.Reservation).(*iri.Reservation)}

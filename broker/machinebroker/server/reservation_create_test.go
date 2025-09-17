@@ -4,6 +4,8 @@
 package server_test
 
 import (
+	"fmt"
+
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
@@ -50,9 +52,9 @@ var _ = Describe("CreateReservation", func() {
 
 		By("inspecting the ironcore reservation")
 		Expect(ironcoreReservation.Labels).To(Equal(map[string]string{
-			machinepoolletv1alpha1.DownwardAPILabel("root-reservation-uid"): "foobar",
-			machinebrokerv1alpha1.CreatedLabel:                              "true",
-			machinebrokerv1alpha1.ManagerLabel:                              machinebrokerv1alpha1.ReservationBrokerManager,
+			fmt.Sprint(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-reservation-uid"): "foobar",
+			machinebrokerv1alpha1.CreatedLabel:                                                  "true",
+			machinebrokerv1alpha1.ManagerLabel:                                                  machinebrokerv1alpha1.ReservationBrokerManager,
 		}))
 		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
