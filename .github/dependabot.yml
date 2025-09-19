@@ -5,35 +5,36 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Ignore K8 packages as these are done manually
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
     ignore:
-      - dependency-name: "k8s.io/api"
-      - dependency-name: "k8s.io/apiextensions-apiserver"
-      - dependency-name: "k8s.io/apimachinery"
-      - dependency-name: "k8s.io/apiserver"
-      - dependency-name: "k8s.io/client-go"
-      - dependency-name: "k8s.io/component-base"
-      - dependency-name: "k8s.io/kube-aggregator"
-      - dependency-name: "k8s.io/kubectl"
-      - dependency-name: "sigs.k8s.io/controller-runtime"
-      - dependency-name: "k8s.io/code-generator"
+      - dependency-name: "k8s.io/*"
+      - dependency-name: "sigs.k8s.io/*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    groups:
+      gh-actions-dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "pip"
     directory: "/docs"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    groups:
+      pip-dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "docker"
-    directory: "/docs"
+    directories:
+      - "/"
+      - "/docs"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
