@@ -23,6 +23,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&storagev1alpha1.VolumeClass{}, func(obj interface{}) { SetObjectDefaults_VolumeClass(obj.(*storagev1alpha1.VolumeClass)) })
 	scheme.AddTypeDefaultingFunc(&storagev1alpha1.VolumeClassList{}, func(obj interface{}) { SetObjectDefaults_VolumeClassList(obj.(*storagev1alpha1.VolumeClassList)) })
 	scheme.AddTypeDefaultingFunc(&storagev1alpha1.VolumeList{}, func(obj interface{}) { SetObjectDefaults_VolumeList(obj.(*storagev1alpha1.VolumeList)) })
+	scheme.AddTypeDefaultingFunc(&storagev1alpha1.VolumeSnapshot{}, func(obj interface{}) { SetObjectDefaults_VolumeSnapshot(obj.(*storagev1alpha1.VolumeSnapshot)) })
+	scheme.AddTypeDefaultingFunc(&storagev1alpha1.VolumeSnapshotList{}, func(obj interface{}) { SetObjectDefaults_VolumeSnapshotList(obj.(*storagev1alpha1.VolumeSnapshotList)) })
 	return nil
 }
 
@@ -56,5 +58,16 @@ func SetObjectDefaults_VolumeList(in *storagev1alpha1.VolumeList) {
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_Volume(a)
+	}
+}
+
+func SetObjectDefaults_VolumeSnapshot(in *storagev1alpha1.VolumeSnapshot) {
+	SetDefaults_VolumeSnapshotStatus(&in.Status)
+}
+
+func SetObjectDefaults_VolumeSnapshotList(in *storagev1alpha1.VolumeSnapshotList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_VolumeSnapshot(a)
 	}
 }

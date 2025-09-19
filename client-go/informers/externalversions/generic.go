@@ -90,6 +90,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeClasses().Informer()}, nil
 	case storagev1alpha1.SchemeGroupVersion.WithResource("volumepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumePools().Informer()}, nil
+	case storagev1alpha1.SchemeGroupVersion.WithResource("volumesnapshots"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Storage().V1alpha1().VolumeSnapshots().Informer()}, nil
 
 	}
 
