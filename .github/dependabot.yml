@@ -5,7 +5,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    # Ignore K8 packages as these are done manually
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
     ignore:
       - dependency-name: "k8s.io/api"
       - dependency-name: "k8s.io/apiextensions-apiserver"
@@ -21,11 +24,19 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      gh-actions-dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
   - package-ecosystem: "pip"
     directory: "/docs"
     schedule:
       interval: "weekly"
+    groups:
+      pip-dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
   - package-ecosystem: "docker"
     directory: "/docs"
@@ -36,4 +47,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 10
