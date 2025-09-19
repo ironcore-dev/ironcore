@@ -20,7 +20,6 @@ updates:
       gh-actions-dependencies:
         patterns:
           - "*"
-    open-pull-requests-limit: 10
   - package-ecosystem: "pip"
     directory: "/docs"
     schedule:
@@ -29,7 +28,6 @@ updates:
       pip-dependencies:
         patterns:
           - "*"
-    open-pull-requests-limit: 10
   - package-ecosystem: "docker"
     directories:
       - "/"
@@ -40,4 +38,3 @@ updates:
       docker-dependencies:
         patterns:
           - "*"
-    open-pull-requests-limit: 10
