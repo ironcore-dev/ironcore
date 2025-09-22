@@ -31,6 +31,7 @@ type VolumeSpec struct {
 	// Resources is a description of the volume's resources and capacity.
 	Resources core.ResourceList
 	// Image is an optional image to bootstrap the volume with.
+	// To be deprecated
 	Image string
 	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
 	ImagePullSecretRef *corev1.LocalObjectReference
@@ -41,6 +42,16 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption
+	// VolumeDataSource is the source where the storage for the Volume resides at.
+	VolumeDataSource
+}
+
+// VolumeDataSource specifies the source to use for a Volume.
+type VolumeDataSource struct {
+	// VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.
+	VolumeSnapshotRef *corev1.LocalObjectReference
+	// OSImage is an optional os image to bootstrap the volume.
+	OSImage *string
 }
 
 // VolumeAccess represents information on how to access a volume.

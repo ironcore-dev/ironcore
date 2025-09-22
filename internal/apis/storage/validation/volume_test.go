@@ -131,6 +131,58 @@ var _ = Describe("Volume", func() {
 			},
 			Not(ContainElement(InvalidField("spec.encryption.secretRef.name"))),
 		),
+		Entry("valid volumeSnapshotRef name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeDataSource: storage.VolumeDataSource{
+						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo"},
+					},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.volumeSnapshotRef.name"))),
+		),
+		Entry("invalid volumeSnapshotRef name",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeDataSource: storage.VolumeDataSource{
+						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo*"},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volumeSnapshotRef.name")),
+		),
+		Entry("classfull: valid os image as single volume data source",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
+					VolumeDataSource: storage.VolumeDataSource{
+						OSImage: &[]string{"test-image"}[0],
+					},
+				},
+			},
+			Not(ContainElement(ForbiddenField("spec.osImage"))),
+		),
+		Entry("classless: invalid os image as volume data source",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeDataSource: storage.VolumeDataSource{
+						OSImage: &[]string{"test-image"}[0],
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.osImage")),
+		),
+		Entry("invalid os image as single volume data source",
+			&storage.Volume{
+				Spec: storage.VolumeSpec{
+					VolumeDataSource: storage.VolumeDataSource{
+						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo"},
+						OSImage:           &[]string{"test-image"}[0],
+					},
+				},
+			},
+			ContainElement(ForbiddenField("spec.osImage")),
+		),
 	)
 
 	DescribeTable("ValidateVolumeUpdate",

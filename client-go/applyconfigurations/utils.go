@@ -213,6 +213,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.VolumeClassApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeCondition"):
 		return &applyconfigurationsstoragev1alpha1.VolumeConditionApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeDataSource"):
+		return &applyconfigurationsstoragev1alpha1.VolumeDataSourceApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeEncryption"):
 		return &applyconfigurationsstoragev1alpha1.VolumeEncryptionApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumePool"):
@@ -223,6 +225,12 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.VolumePoolSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumePoolStatus"):
 		return &applyconfigurationsstoragev1alpha1.VolumePoolStatusApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshot"):
+		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotSpec"):
+		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotSpecApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSnapshotStatus"):
+		return &applyconfigurationsstoragev1alpha1.VolumeSnapshotStatusApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeSpec"):
 		return &applyconfigurationsstoragev1alpha1.VolumeSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeStatus"):

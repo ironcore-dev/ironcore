@@ -1627,6 +1627,48 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec
+      default: {}
+    - name: status
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
+      default: {}
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec
+  map:
+    fields:
+    - name: volumeRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
+  map:
+    fields:
+    - name: lastStateTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: size
+      type:
+        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+    - name: snapshotID
+      type:
+        scalar: string
+    - name: state
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec
   map:
     fields:
@@ -1642,6 +1684,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: imagePullSecretRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
+    - name: osImage
+      type:
+        scalar: string
     - name: resources
       type:
         map:
@@ -1667,6 +1712,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: volumeSnapshotRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeStatus
   map:
     fields:

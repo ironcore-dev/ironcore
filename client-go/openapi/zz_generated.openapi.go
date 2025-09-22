@@ -136,6 +136,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass":                     schema_ironcore_api_storage_v1alpha1_VolumeClass(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClassList":                 schema_ironcore_api_storage_v1alpha1_VolumeClassList(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition":                 schema_ironcore_api_storage_v1alpha1_VolumeCondition(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource":                schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption":                schema_ironcore_api_storage_v1alpha1_VolumeEncryption(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeList":                      schema_ironcore_api_storage_v1alpha1_VolumeList(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePool":                      schema_ironcore_api_storage_v1alpha1_VolumePool(ref),
@@ -143,6 +144,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolList":                  schema_ironcore_api_storage_v1alpha1_VolumePoolList(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec":                  schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus":                schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot":                  schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotList":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus":            schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec":                      schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeStatus":                    schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec":              schema_ironcore_api_storage_v1alpha1_VolumeTemplateSpec(ref),
@@ -5483,6 +5488,34 @@ func schema_ironcore_api_storage_v1alpha1_VolumeCondition(ref common.ReferenceCa
 	}
 }
 
+func schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeDataSource specifies the source to use for a Volume.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"volumeSnapshotRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"osImage": {
+						SchemaProps: spec.SchemaProps{
+							Description: "OSImage is an optional os image to bootstrap the volume.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
 func schema_ironcore_api_storage_v1alpha1_VolumeEncryption(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5826,6 +5859,165 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref common.ReferenceC
 	}
 }
 
+func schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeSnapshot is the Schema for the VolumeSnapshots API",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeSnapshotList contains a list of VolumeSnapshot",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeSnapshotSpec defines the desired state of VolumeSnapshot",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"volumeRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeRef indicates which Volume to refer for VolumeSnapshot",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"volumeRef"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/api/core/v1.LocalObjectReference"},
+	}
+}
+
+func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "VolumeSnapshotStatus defines the observed state of VolumeSnapshot",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"snapshotID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SnapshotID is the provider-specific snapshot ID in the format 'TYPE://SNAPSHOT_ID'.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"state": {
+						SchemaProps: spec.SchemaProps{
+							Description: "State represents the storage provider state of VolumeSnapshot",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastStateTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastStateTransitionTime is the last time the State transitioned between values.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+					"size": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Size is the storage size used by VolumeSnapshot",
+							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity", "k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5883,7 +6075,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Image is an optional image to bootstrap the volume with.",
+							Description: "Image is an optional image to bootstrap the volume with. To be deprecated",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5919,6 +6111,19 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 						SchemaProps: spec.SchemaProps{
 							Description: "Encryption is an optional field which provides attributes to encrypt Volume.",
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption"),
+						},
+					},
+					"volumeSnapshotRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
+						},
+					},
+					"osImage": {
+						SchemaProps: spec.SchemaProps{
+							Description: "OSImage is an optional os image to bootstrap the volume.",
+							Type:        []string{"string"},
+							Format:      "",
 						},
 					},
 				},

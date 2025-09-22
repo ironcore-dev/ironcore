@@ -9,3 +9,7 @@ spec:
   #   name: volumepool-sample
   resources:
     storage: 100Gi
+# volumeSnapshotRef:
+#   name: volume-snapshot-sample
+# osImage:
+#   name: ghcr.io/ironcore-dev/gardenlinux:latest

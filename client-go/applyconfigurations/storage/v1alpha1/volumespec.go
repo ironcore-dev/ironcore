@@ -14,16 +14,17 @@ import (
 // VolumeSpecApplyConfiguration represents a declarative configuration of the VolumeSpec type for use
 // with apply.
 type VolumeSpecApplyConfiguration struct {
-	VolumeClassRef     *v1.LocalObjectReference            `json:"volumeClassRef,omitempty"`
-	VolumePoolSelector map[string]string                   `json:"volumePoolSelector,omitempty"`
-	VolumePoolRef      *v1.LocalObjectReference            `json:"volumePoolRef,omitempty"`
-	ClaimRef           *commonv1alpha1.LocalUIDReference   `json:"claimRef,omitempty"`
-	Resources          *corev1alpha1.ResourceList          `json:"resources,omitempty"`
-	Image              *string                             `json:"image,omitempty"`
-	ImagePullSecretRef *v1.LocalObjectReference            `json:"imagePullSecretRef,omitempty"`
-	Unclaimable        *bool                               `json:"unclaimable,omitempty"`
-	Tolerations        []commonv1alpha1.Toleration         `json:"tolerations,omitempty"`
-	Encryption         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
+	VolumeClassRef                     *v1.LocalObjectReference            `json:"volumeClassRef,omitempty"`
+	VolumePoolSelector                 map[string]string                   `json:"volumePoolSelector,omitempty"`
+	VolumePoolRef                      *v1.LocalObjectReference            `json:"volumePoolRef,omitempty"`
+	ClaimRef                           *commonv1alpha1.LocalUIDReference   `json:"claimRef,omitempty"`
+	Resources                          *corev1alpha1.ResourceList          `json:"resources,omitempty"`
+	Image                              *string                             `json:"image,omitempty"`
+	ImagePullSecretRef                 *v1.LocalObjectReference            `json:"imagePullSecretRef,omitempty"`
+	Unclaimable                        *bool                               `json:"unclaimable,omitempty"`
+	Tolerations                        []commonv1alpha1.Toleration         `json:"tolerations,omitempty"`
+	Encryption                         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
+	VolumeDataSourceApplyConfiguration `json:",inline"`
 }
 
 // VolumeSpecApplyConfiguration constructs a declarative configuration of the VolumeSpec type for use with
@@ -117,5 +118,21 @@ func (b *VolumeSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1.
 // If called multiple times, the Encryption field is set to the value of the last call.
 func (b *VolumeSpecApplyConfiguration) WithEncryption(value *VolumeEncryptionApplyConfiguration) *VolumeSpecApplyConfiguration {
 	b.Encryption = value
+	return b
+}
+
+// WithVolumeSnapshotRef sets the VolumeSnapshotRef field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the VolumeSnapshotRef field is set to the value of the last call.
+func (b *VolumeSpecApplyConfiguration) WithVolumeSnapshotRef(value v1.LocalObjectReference) *VolumeSpecApplyConfiguration {
+	b.VolumeDataSourceApplyConfiguration.VolumeSnapshotRef = &value
+	return b
+}
+
+// WithOSImage sets the OSImage field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the OSImage field is set to the value of the last call.
+func (b *VolumeSpecApplyConfiguration) WithOSImage(value string) *VolumeSpecApplyConfiguration {
+	b.VolumeDataSourceApplyConfiguration.OSImage = &value
 	return b
 }
