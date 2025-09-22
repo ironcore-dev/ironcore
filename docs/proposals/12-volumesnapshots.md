@@ -97,7 +97,7 @@ status:
 
 ### Volume Resource Enhancement
 
-The `Volume` resource will have 2 new volume data source inline fields as `volumeSnapshotRef` and `osimage` under `spec`:
+The `Volume` resource will have 2 new volume data source inline fields as `volumeSnapshotRef` and `osImage` under `spec`:
 
 ```yaml
 apiVersion: storage.ironcore.dev/v1alpha1
@@ -110,13 +110,13 @@ spec:
     name: example-volumeclass
   volumeSnapshotRef:
     name: example-snapshot
-  osimage: test-image
+  osImage: test-image
 ```
 
 #### Fields:
 
 - `volumeSnapshotRef`: Indicates to use the specified `VolumeSnapshot` as the data source.
-- `osimage`: It is an os image to bootstrap the volume.
+- `osImage`: It is an os image to bootstrap the volume.
 
 ## `VolumeRuntime` enhancement
 

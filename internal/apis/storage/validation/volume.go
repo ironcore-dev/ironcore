@@ -79,7 +79,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 
 		if spec.OSImage != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osimage"), "must not specify if volume class is empty"))
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osImage"), "must not specify if volume class is empty"))
 		}
 	}
 
@@ -111,7 +111,7 @@ func validateVolumeDataSource(source *storage.VolumeDataSource, fldPath *field.P
 
 	if source.VolumeSnapshotRef != nil {
 		if source.OSImage != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osimage"), "must only specify one volume data source"))
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osImage"), "must only specify one volume data source"))
 		}
 		for _, msg := range apivalidation.NameIsDNSSubdomain(source.VolumeSnapshotRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeSnapshotRef").Child("name"), source.VolumeSnapshotRef.Name, msg))

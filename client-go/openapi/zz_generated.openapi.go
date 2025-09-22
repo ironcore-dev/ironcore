@@ -5501,7 +5501,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref common.ReferenceC
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
-					"osimage": {
+					"osImage": {
 						SchemaProps: spec.SchemaProps{
 							Description: "OSImage is an optional os image to bootstrap the volume.",
 							Type:        []string{"string"},
@@ -6119,7 +6119,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
 						},
 					},
-					"osimage": {
+					"osImage": {
 						SchemaProps: spec.SchemaProps{
 							Description: "OSImage is an optional os image to bootstrap the volume.",
 							Type:        []string{"string"},

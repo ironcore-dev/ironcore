@@ -1684,7 +1684,7 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: imagePullSecretRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: osimage
+    - name: osImage
       type:
         scalar: string
     - name: resources

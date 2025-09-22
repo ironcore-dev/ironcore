@@ -52,7 +52,7 @@ type VolumeDataSource struct {
 	// VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.
 	VolumeSnapshotRef *corev1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
 	// OSImage is an optional os image to bootstrap the volume.
-	OSImage *string `json:"osimage,omitempty"`
+	OSImage *string `json:"osImage,omitempty"`
 }
 
 // VolumeAccess represents information on how to access a volume.

@@ -13,7 +13,7 @@ import (
 // with apply.
 type VolumeDataSourceApplyConfiguration struct {
 	VolumeSnapshotRef *v1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
-	OSImage           *string                  `json:"osimage,omitempty"`
+	OSImage           *string                  `json:"osImage,omitempty"`
 }
 
 // VolumeDataSourceApplyConfiguration constructs a declarative configuration of the VolumeDataSource type for use with

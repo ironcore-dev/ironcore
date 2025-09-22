@@ -11,5 +11,5 @@ spec:
     storage: 100Gi
 # volumeSnapshotRef:
 #   name: volume-snapshot-sample
-# osimage:
+# osImage:
 #   name: ghcr.io/ironcore-dev/gardenlinux:latest

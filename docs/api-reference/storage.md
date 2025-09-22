@@ -1528,7 +1528,7 @@ Kubernetes core/v1.LocalObjectReference
 </tr>
 <tr>
 <td>
-<code>osimage</code><br/>
+<code>osImage</code><br/>
 <em>
 string
 </em>
