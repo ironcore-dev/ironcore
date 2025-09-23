@@ -142,7 +142,8 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 
 		newSrv, err := server.New(cfg, server.Options{
 			BrokerDownwardAPILabels: map[string]string{
-				"root-volume-uid": volumepoolletv1alpha1.VolumeUIDLabel,
+				"root-volume-uid":          volumepoolletv1alpha1.VolumeUIDLabel,
+				"root-volume-snapshot-uid": volumepoolletv1alpha1.VolumeSnapshotUIDLabel,
 			},
 			Namespace:      ns.Name,
 			VolumePoolName: volumePool.Name,

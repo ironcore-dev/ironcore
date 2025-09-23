@@ -18,6 +18,8 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +32,7 @@ type AggregateIronCoreVolume struct {
 	AccessSecret     *corev1.Secret
 }
 
-func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) (*AggregateIronCoreVolume, error) {
+func (s *Server) getIronCoreVolumeConfig(ctx context.Context, volume *iri.Volume) (*AggregateIronCoreVolume, error) {
 	var volumePoolRef *corev1.LocalObjectReference
 	if s.volumePoolName != "" {
 		volumePoolRef = &corev1.LocalObjectReference{
@@ -66,6 +68,34 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		volumepoolletv1alpha1.VolumeDownwardAPIPrefix,
 	)
 
+	var image string
+	image = volume.Spec.Image
+	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil && dataSource.ImageDataSource != nil {
+		image = dataSource.ImageDataSource.Image
+	}
+
+	var volumeSnapshotRef *corev1.LocalObjectReference
+	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil && dataSource.SnapshotDataSource != nil {
+		volumeSnapshot, err := s.findVolumeSnapshotBySnapshotID(ctx, dataSource.SnapshotDataSource.SnapshotId)
+		if err != nil {
+			return nil, fmt.Errorf("error finding volume snapshot by snapshot ID %s: %w", dataSource.SnapshotDataSource.SnapshotId, err)
+		}
+		if volumeSnapshot == nil {
+			return nil, status.Errorf(codes.NotFound, "volume snapshot with ID %s not found", dataSource.SnapshotDataSource.SnapshotId)
+		}
+		if volumeSnapshot.Status.State != storagev1alpha1.VolumeSnapshotStateReady {
+			switch volumeSnapshot.Status.State {
+			case storagev1alpha1.VolumeSnapshotStatePending:
+				return nil, status.Errorf(codes.FailedPrecondition, "volume snapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+			case storagev1alpha1.VolumeSnapshotStateFailed:
+				return nil, status.Errorf(codes.Internal, "volume snapshot %s has failed (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+			default:
+				return nil, status.Errorf(codes.FailedPrecondition, "volume snapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+			}
+		}
+		volumeSnapshotRef = &corev1.LocalObjectReference{Name: volumeSnapshot.Name}
+	}
+
 	ironcoreVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
@@ -81,9 +111,13 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Resources: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceStorage: *resource.NewQuantity(volume.Spec.Resources.StorageBytes, resource.DecimalSI),
 			},
-			Image:              volume.Spec.Image,
-			ImagePullSecretRef: nil, // TODO: Fill if necessary
+			Image:              image, // TODO: Remove this once the image field is deprecated
+			ImagePullSecretRef: nil,   // TODO: Fill if necessary
 			Encryption:         encryption,
+			VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				VolumeSnapshotRef: volumeSnapshotRef,
+				OSImage:           getOSImageIfPresent(image),
+			},
 		},
 	}
 	if err := apiutils.SetObjectMetadata(ironcoreVolume, volume.Metadata); err != nil {
@@ -94,6 +128,28 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		Volume:           ironcoreVolume,
 		EncryptionSecret: encryptionSecret,
 	}, nil
+}
+
+func getOSImageIfPresent(image string) *string {
+	if image == "" {
+		return nil
+	}
+	return &image
+}
+
+func (s *Server) findVolumeSnapshotBySnapshotID(ctx context.Context, snapshotID string) (*storagev1alpha1.VolumeSnapshot, error) {
+	volumeSnapshotList := &storagev1alpha1.VolumeSnapshotList{}
+	if err := s.client.List(ctx, volumeSnapshotList, client.InNamespace(s.namespace)); err != nil {
+		return nil, fmt.Errorf("error listing volume snapshots: %w", err)
+	}
+
+	for _, volumeSnapshot := range volumeSnapshotList.Items {
+		if volumeSnapshot.Status.SnapshotID == snapshotID {
+			return &volumeSnapshot, nil
+		}
+	}
+
+	return nil, nil
 }
 
 func (s *Server) createIronCoreVolume(ctx context.Context, log logr.Logger, volume *AggregateIronCoreVolume) (retErr error) {
