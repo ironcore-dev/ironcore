@@ -73,6 +73,9 @@ type Options struct {
 	VolumeRuntimeSocketDiscoveryTimeout time.Duration
 	VolumeClassMapperSyncTimeout        time.Duration
 
+	VolumeSnapshotDownwardAPILabels      map[string]string
+	VolumeSnapshotDownwardAPIAnnotations map[string]string
+
 	ChannelCapacity int
 	RelistPeriod    time.Duration
 	RelistThreshold time.Duration
@@ -105,6 +108,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.VolumePoolName, "volume-pool-name", o.VolumePoolName, "Name of the volume pool to announce / watch")
 	fs.StringToStringVar(&o.VolumeDownwardAPILabels, "volume-downward-api-label", o.VolumeDownwardAPILabels, "Downward-API labels to set on IRI volume.")
 	fs.StringToStringVar(&o.VolumeDownwardAPIAnnotations, "volume-downward-api-annotation", o.VolumeDownwardAPIAnnotations, "Downward-API annotations to set on the IRI volume.")
+	fs.StringToStringVar(&o.VolumeSnapshotDownwardAPILabels, "volume-snapshot-downward-api-label", o.VolumeSnapshotDownwardAPILabels, "Downward-API labels to set on IRI volume snapshot.")
+	fs.StringToStringVar(&o.VolumeSnapshotDownwardAPIAnnotations, "volume-snapshot-downward-api-annotation", o.VolumeSnapshotDownwardAPIAnnotations, "Downward-API annotations to set on the IRI volume snapshot.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
 	fs.StringVar(&o.VolumeRuntimeEndpoint, "volume-runtime-endpoint", o.VolumeRuntimeEndpoint, "Endpoint of the remote volume runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
@@ -307,9 +312,30 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
 	}
 
+	volumeSnapshotEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
+		res, err := volumeRuntime.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
+		if err != nil {
+			return nil, err
+		}
+		return res.VolumeSnapshots, nil
+	}, irievent.GeneratorOptions{
+		ChannelCapacity: opts.ChannelCapacity,
+		RelistPeriod:    opts.RelistPeriod,
+		RelistThreshold: opts.RelistThreshold,
+	})
+	if err := mgr.Add(volumeSnapshotEvents); err != nil {
+		return fmt.Errorf("error adding volume snapshot event generator: %w", err)
+	}
+	if err := mgr.AddHealthzCheck("volume-snapshot-events", volumeSnapshotEvents.Check); err != nil {
+		return fmt.Errorf("error adding volume snapshot event generator healthz check: %w", err)
+	}
+
 	indexer := mgr.GetFieldIndexer()
 	if err := storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer); err != nil {
 		return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumePoolRefNameField, err)
+	}
+	if err := storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer); err != nil {
+		return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumeSnapshotRefNameField, err)
 	}
 
 	onInitialized := func(ctx context.Context) error {
@@ -341,6 +367,27 @@ func Run(ctx context.Context, opts Options) error {
 			VolumeEvents: volumeEvents,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up volume annotator reconciler with manager: %w", err)
+		}
+
+		if err := (&controllers.VolumeSnapshotReconciler{
+			EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
+			Client:                  mgr.GetClient(),
+			Scheme:                  scheme,
+			VolumeRuntime:           volumeRuntime,
+			VolumeRuntimeName:       version.RuntimeName,
+			DownwardAPILabels:       opts.VolumeSnapshotDownwardAPILabels,
+			DownwardAPIAnnotations:  opts.VolumeSnapshotDownwardAPIAnnotations,
+			WatchFilterValue:        opts.WatchFilterValue,
+			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up volume snapshot reconciler with manager: %w", err)
+		}
+
+		if err := (&controllers.VolumeSnapshotAnnotatorReconciler{
+			Client:               mgr.GetClient(),
+			VolumeSnapshotEvents: volumeSnapshotEvents,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up volume snapshot annotator reconciler with manager: %w", err)
 		}
 
 		if err := (&controllers.VolumePoolReconciler{
