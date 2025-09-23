@@ -21,6 +21,10 @@ service MachineRuntime {
   rpc AttachNetworkInterface(AttachNetworkInterfaceRequest) returns (AttachNetworkInterfaceResponse);
   rpc DetachNetworkInterface(DetachNetworkInterfaceRequest) returns (DetachNetworkInterfaceResponse);
 
+  rpc ListReservations(ListReservationsRequest) returns (ListReservationsResponse) {};
+  rpc CreateReservation(CreateReservationRequest) returns (CreateReservationResponse) {};
+  rpc DeleteReservation(DeleteReservationRequest) returns (DeleteReservationResponse) {};
+
   rpc Status(StatusRequest) returns (StatusResponse);
 
   rpc Exec(ExecRequest) returns (ExecResponse);
@@ -53,6 +57,54 @@ message Machine {
   meta.v1alpha1.ObjectMetadata metadata = 1;
   MachineSpec spec = 2;
   MachineStatus status = 3;
+}
+
+message ListReservationsRequest {
+  ReservationFilter filter = 1;
+}
+
+message ListReservationsResponse {
+  repeated Reservation reservations = 1;
+}
+
+message CreateReservationRequest {
+  Reservation reservation = 1;
+}
+
+message CreateReservationResponse {
+  Reservation reservation = 1;
+}
+
+message DeleteReservationRequest {
+  string reservation_id = 1;
+}
+
+message DeleteReservationResponse {
+}
+
+message ReservationFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message Reservation {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  ReservationSpec spec = 2;
+  ReservationStatus status = 3;
+}
+
+message ReservationSpec {
+  map<string, bytes> resources = 1;
+}
+
+message ReservationStatus {
+  ReservationState state = 1;
+}
+
+enum ReservationState {
+  RESERVATION_STATE_PENDING = 0;
+  RESERVATION_STATE_ACCEPTED = 1;
+  RESERVATION_STATE_REJECTED = 2;
 }
 
 message ImageSpec {
