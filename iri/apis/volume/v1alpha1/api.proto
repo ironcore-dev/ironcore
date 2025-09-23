@@ -13,6 +13,9 @@ service VolumeRuntime {
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
+  rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
+  rpc DeleteVolumeSnapshot(DeleteVolumeSnapshotRequest) returns (DeleteVolumeSnapshotResponse) {};
+  rpc ListVolumeSnapshots(ListVolumeSnapshotsRequest) returns (ListVolumeSnapshotsResponse) {};
 
   rpc Status(StatusRequest) returns (StatusResponse) {};
 }
@@ -37,11 +40,25 @@ message EncryptionSpec {
   map<string, bytes> secret_data = 1;
 }
 
+message ImageDataSource {
+  string image = 1;
+} 
+
+message SnapshotDataSource{
+  string snapshot_id = 1;
+}
+
+message VolumeDataSource {
+  ImageDataSource image_data_source  = 1;
+  SnapshotDataSource snapshot_data_source  = 2;
+}
+
 message VolumeSpec {
   string image = 1;
   string class = 2;
   VolumeResources resources = 3;
   EncryptionSpec encryption = 4;
+  VolumeDataSource volume_data_source = 5;
 }
 
 message VolumeStatus {
@@ -140,4 +157,53 @@ message StatusRequest {
 
 message StatusResponse {
   repeated VolumeClassStatus volume_class_status = 1;
+}
+
+enum VolumeSnapshotState {
+  VOLUME_SNAPSHOT_PENDING = 0;
+  VOLUME_SNAPSHOT_READY = 1;
+  VOLUME_SNAPSHOT_FAILED = 2;
+}
+
+message VolumeSnapshotSpec {
+  string volume_id = 1;
+}
+
+message VolumeSnapshotStatus {
+  VolumeSnapshotState state = 1;
+  int64 size = 2;
+}
+
+message VolumeSnapshot {
+  meta.v1alpha1.ObjectMetadata metadata = 1;
+  VolumeSnapshotSpec spec = 2;
+  VolumeSnapshotStatus status = 3;
+}
+
+message VolumeSnapshotFilter {
+  string id = 1;
+  map<string, string> label_selector = 2;
+}
+
+message ListVolumeSnapshotsRequest {
+  VolumeSnapshotFilter filter = 1;
+}
+
+message ListVolumeSnapshotsResponse {
+  repeated VolumeSnapshot volume_snapshots = 1;
+}
+
+message CreateVolumeSnapshotRequest {
+  VolumeSnapshot volume_snapshot = 1;
+}
+
+message CreateVolumeSnapshotResponse {
+  VolumeSnapshot volume_snapshot = 1;
+}
+
+message DeleteVolumeSnapshotRequest {
+  string volume_snapshot_id = 1;
+}
+
+message DeleteVolumeSnapshotResponse {
 }
