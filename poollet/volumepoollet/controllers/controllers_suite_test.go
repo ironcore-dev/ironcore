@@ -256,6 +256,16 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 			VolumePoolName:    vp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
+		Expect((&controllers.VolumeSnapshotReconciler{
+			EventRecorder:           &record.FakeRecorder{},
+			Client:                  k8sManager.GetClient(),
+			Scheme:                  scheme.Scheme,
+			VolumeRuntime:           srv,
+			VolumeRuntimeName:       volume.FakeRuntimeName,
+			WatchFilterValue:        "",
+			MaxConcurrentReconciles: 1,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		go func() {
 			defer GinkgoRecover()
 			Expect(k8sManager.Start(mgrCtx)).To(Succeed(), "failed to start manager")
