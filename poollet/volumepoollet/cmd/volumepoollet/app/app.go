@@ -336,6 +336,18 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up volume reconciler with manager: %w", err)
 		}
 
+		if err := (&controllers.VolumeSnapshotReconciler{
+			EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
+			Client:                  mgr.GetClient(),
+			Scheme:                  scheme,
+			VolumeRuntime:           volumeRuntime,
+			VolumeRuntimeName:       version.RuntimeName,
+			WatchFilterValue:        opts.WatchFilterValue,
+			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
+		}).SetupWithManager(mgr); err != nil {
+			return fmt.Errorf("error setting up volume snapshot reconciler with manager: %w", err)
+		}
+
 		if err := (&controllers.VolumeAnnotatorReconciler{
 			Client:       mgr.GetClient(),
 			VolumeEvents: volumeEvents,
