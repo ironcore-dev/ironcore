@@ -221,13 +221,13 @@ func getIRIVolumeClassCapabilities(volumeClass *storagev1alpha1.VolumeClass) *ir
 	}
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume, errs []error) (*irimeta.ObjectMetadata, []error) {
+func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volume, iriVolumeId string, errs []error) (*irimeta.ObjectMetadata, []error) {
 	labels, err := r.iriVolumeLabels(volume)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing iri volume labels: %w", err))
 	}
 	return &irimeta.ObjectMetadata{
-		Id:          string(volume.UID),
+		Id:          iriVolumeId,
 		Labels:      labels,
 		Annotations: r.iriVolumeAnnotations(volume),
 	}, errs
@@ -286,7 +286,7 @@ func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.Reso
 	}
 }
 
-func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*iri.Volume, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, iriVolumeId string) (*iri.Volume, bool, error) {
 	var (
 		ok   = true
 		errs []error
@@ -311,7 +311,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	}
 
 	resources := r.prepareIRIVolumeResources(volume.Spec.Resources)
-	metadata, errs := r.prepareIRIVolumeMetadata(volume, errs)
+	metadata, errs := r.prepareIRIVolumeMetadata(volume, iriVolumeId, errs)
 
 	if len(errs) > 0 {
 		return nil, false, fmt.Errorf("error(s) preparing iri volume: %v", errs)
@@ -333,6 +333,17 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 
 func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
+
+	log.V(1).Info("Get version of volume runtime")
+	version, err := r.VolumeRuntime.Version(ctx, &iri.VersionRequest{})
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting volume runtime version: %w", err)
+	}
+
+	log.V(1).Info("Generate iri volume Id using version info and volume uid")
+	iriVolumeId := r.generateName(string(volume.UID), version.RuntimeName+version.RuntimeVersion)
+
+	log = log.WithValues("VolumeID", iriVolumeId)
 
 	log.V(1).Info("Ensuring finalizer")
 	modified, err := clientutils.PatchEnsureFinalizer(ctx, r.Client, volume, volumepoolletv1alpha1.VolumeFinalizer)
@@ -358,7 +369,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	log.V(1).Info("Listing volumes")
 	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
 		Filter: &iri.VolumeFilter{
-			Id: string(volume.UID),
+			Id: iriVolumeId,
 		},
 	})
 	if err != nil {
@@ -367,7 +378,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 
 	switch len(res.Volumes) {
 	case 0:
-		return r.create(ctx, log, volume)
+		return r.create(ctx, log, volume, iriVolumeId)
 	case 1:
 		iriVolume := res.Volumes[0]
 		if err := r.update(ctx, log, volume, iriVolume); err != nil {
@@ -383,11 +394,11 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	}
 }
 
-func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
+func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, iriVolumeId string) (ctrl.Result, error) {
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Preparing iri volume")
-	iriVolume, ok, err := r.prepareIRIVolume(ctx, log, volume)
+	iriVolume, ok, err := r.prepareIRIVolume(ctx, log, volume, iriVolumeId)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing iri volume: %w", err)
 	}
@@ -396,7 +407,7 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 		return ctrl.Result{}, nil
 	}
 
-	log.V(1).Info("Creating volume", "volume before ", iriVolume)
+	log.V(1).Info("Creating iri volume")
 	res, err := r.VolumeRuntime.CreateVolume(ctx, &iri.CreateVolumeRequest{
 		Volume: iriVolume,
 	})
@@ -404,18 +415,12 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 		return ctrl.Result{}, fmt.Errorf("error creating volume: %w", err)
 	}
 
-	iriVolume = res.Volume
-
-	volumeID := iriVolume.Metadata.Id
-	log = log.WithValues("VolumeID", volumeID)
-	log.V(1).Info("Created", "volume after ", iriVolume)
-
-	log.V(1).Info("Updating status")
-	if err := r.updateStatus(ctx, log, volume, iriVolume); err != nil {
+	log.V(1).Info("Updating iri volume status")
+	if err := r.updateStatus(ctx, log, volume, res.Volume); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error updating volume status: %w", err)
 	}
 
-	log.V(1).Info("Created", "volume after ", iriVolume)
+	log.V(1).Info("Created and updated iri volume status")
 	return ctrl.Result{}, nil
 }
 
@@ -437,8 +442,8 @@ func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *
 	return nil
 }
 
-func (r *VolumeReconciler) volumeSecretName(volumeName, volumeHandle string) string {
-	sum := sha256.Sum256([]byte(fmt.Sprintf("%s/%s", volumeName, volumeHandle)))
+func (r *VolumeReconciler) generateName(volumeName, suffix string) string {
+	sum := sha256.Sum256([]byte(fmt.Sprintf("%s/%s", volumeName, suffix)))
 	return hex.EncodeToString(sum[:])[:63]
 }
 
@@ -471,7 +476,7 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 					},
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: volume.Namespace,
-						Name:      r.volumeSecretName(volume.Name, iriAccess.Handle),
+						Name:      r.generateName(volume.Name, iriAccess.Handle),
 						Labels: map[string]string{
 							volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
 						},
