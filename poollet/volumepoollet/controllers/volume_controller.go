@@ -282,38 +282,22 @@ func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.Reso
 	}
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(log logr.Logger, volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
-	log.V(1).Info("Processing volume snapshot for data source")
-
-	switch volumeSnapshot.Status.State {
-	case storagev1alpha1.VolumeSnapshotStateFailed:
-		r.Eventf(volume, corev1.EventTypeWarning, events.VolumeSnapshotFailed,
-			"VolumeSnapshot %s is in failed state", volumeSnapshot.Name)
-		return nil, false, fmt.Errorf("volume snapshot %s is in failed state", volumeSnapshot.Name)
-
-	case storagev1alpha1.VolumeSnapshotStatePending:
-		log.V(1).Info("Volume snapshot is pending, waiting for state change", "snapshot", volumeSnapshot.Name)
+func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
+	if volumeSnapshot.Status.State != storagev1alpha1.VolumeSnapshotStateReady || volumeSnapshot.Status.SnapshotID == "" {
+		r.Eventf(volume, corev1.EventTypeNormal, events.VolumeSnapshotNotReady, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
 		return nil, false, nil
-
-	case storagev1alpha1.VolumeSnapshotStateReady:
-		if volumeSnapshot.Status.SnapshotID == "" {
-			log.V(1).Info("Volume snapshot is ready but has no snapshot ID, waiting for ID", "snapshot", volumeSnapshot.Name)
-			return nil, false, nil
-		}
-		return &iri.VolumeDataSource{
-			SnapshotDataSource: &iri.SnapshotDataSource{
-				SnapshotId: volumeSnapshot.Status.SnapshotID,
-			},
-		}, true, nil
-
-	default:
-		return nil, false, fmt.Errorf("unknown volume snapshot state %v", volumeSnapshot.Status.State)
 	}
+
+	return &iri.VolumeDataSource{
+		SnapshotDataSource: &iri.SnapshotDataSource{
+			SnapshotId: volumeSnapshot.Name,
+		},
+	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeDataSource(log logr.Logger, volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
+func (r *VolumeReconciler) prepareIRIVolumeDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
 	if volume.Spec.VolumeSnapshotRef != nil {
-		return r.prepareIRIVolumeSnapshotDataSource(log, volume, volumeSnapshot)
+		return r.prepareIRIVolumeSnapshotDataSource(volume, volumeSnapshot)
 	}
 
 	if volume.Spec.OSImage != nil && *volume.Spec.OSImage != "" {
@@ -445,7 +429,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	}
 
 	log.V(1).Info("Getting volume data source")
-	dataSource, dataSourceOK, err := r.prepareIRIVolumeDataSource(log, volume, volumeSnapshot)
+	dataSource, dataSourceOK, err := r.prepareIRIVolumeDataSource(volume, volumeSnapshot)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing iri volume data source: %w", err))

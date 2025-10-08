@@ -4,28 +4,17 @@
 package server
 
 import (
-	"context"
 	"fmt"
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) convertIronCoreVolumeSnapshot(ctx context.Context, ironcoreVolumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeSnapshot, error) {
+func (s *Server) convertIronCoreVolumeSnapshot(ironcoreVolumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeSnapshot, error) {
 	metadata, err := apiutils.GetObjectMetadata(ironcoreVolumeSnapshot)
 	if err != nil {
 		return nil, fmt.Errorf("error getting object metadata: %w", err)
-	}
-
-	var volumeID string
-	if ironcoreVolumeSnapshot.Spec.VolumeRef != nil {
-		volume := &storagev1alpha1.Volume{}
-		if err := s.client.Get(ctx, client.ObjectKey{Namespace: s.namespace, Name: ironcoreVolumeSnapshot.Spec.VolumeRef.Name}, volume); err != nil {
-			return nil, fmt.Errorf("error getting referenced volume %s for volume snapshot: %w", ironcoreVolumeSnapshot.Spec.VolumeRef.Name, err)
-		}
-		volumeID = volume.Status.VolumeID
 	}
 
 	state, err := s.convertIronCoreVolumeSnapshotState(ironcoreVolumeSnapshot.Status.State)
@@ -35,9 +24,6 @@ func (s *Server) convertIronCoreVolumeSnapshot(ctx context.Context, ironcoreVolu
 
 	iriVolumeSnapshot := &iri.VolumeSnapshot{
 		Metadata: metadata,
-		Spec: &iri.VolumeSnapshotSpec{
-			VolumeId: volumeID,
-		},
 		Status: &iri.VolumeSnapshotStatus{
 			State: state,
 		},
