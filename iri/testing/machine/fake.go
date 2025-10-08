@@ -51,6 +51,10 @@ type FakeMachine struct {
 	*iri.Machine
 }
 
+type FakeReservation struct {
+	*iri.Reservation
+}
+
 type FakeVolume struct {
 	iri.Volume
 }
@@ -71,6 +75,7 @@ type FakeRuntimeService struct {
 	sync.Mutex
 
 	Machines           map[string]*FakeMachine
+	Reservations       map[string]*FakeReservation
 	MachineClassStatus map[string]*FakeMachineClassStatus
 	GetExecURL         func(req *iri.ExecRequest) string
 	Events             []*FakeEvent
@@ -92,6 +97,7 @@ func (r *FakeRuntimeService) ListEvents(ctx context.Context, req *iri.ListEvents
 func NewFakeRuntimeService() *FakeRuntimeService {
 	return &FakeRuntimeService{
 		Machines:           make(map[string]*FakeMachine),
+		Reservations:       make(map[string]*FakeReservation),
 		MachineClassStatus: make(map[string]*FakeMachineClassStatus),
 		Events:             []*FakeEvent{},
 	}
@@ -328,6 +334,71 @@ func (r *FakeRuntimeService) DetachNetworkInterface(ctx context.Context, req *ir
 
 	machine.Spec.NetworkInterfaces = filtered
 	return &iri.DetachNetworkInterfaceResponse{}, nil
+}
+
+func (r *FakeRuntimeService) ListReservations(ctx context.Context, req *iri.ListReservationsRequest) (*iri.ListReservationsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	filter := req.Filter
+
+	var res []*iri.Reservation
+	for _, m := range r.Reservations {
+		if filter != nil {
+			if filter.Id != "" && filter.Id != m.Metadata.Id {
+				continue
+			}
+			if filter.LabelSelector != nil && !filterInLabels(filter.LabelSelector, m.Metadata.Labels) {
+				continue
+			}
+		}
+
+		res = append(res, m.Reservation)
+	}
+	return &iri.ListReservationsResponse{Reservations: res}, nil
+}
+
+func (r *FakeRuntimeService) SetReservations(reservations []*FakeReservation) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.Reservations = make(map[string]*FakeReservation)
+	for _, reservation := range reservations {
+		r.Reservations[reservation.Metadata.Id] = reservation
+	}
+}
+
+func (r *FakeRuntimeService) CreateReservation(ctx context.Context, req *iri.CreateReservationRequest) (*iri.CreateReservationResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	reservation := req.Reservation
+	reservation.Metadata.Id = generateID(defaultIDLength)
+	reservation.Metadata.CreatedAt = time.Now().UnixNano()
+	reservation.Status = &iri.ReservationStatus{
+		State: 0,
+	}
+
+	r.Reservations[reservation.Metadata.Id] = &FakeReservation{
+		Reservation: reservation,
+	}
+
+	return &iri.CreateReservationResponse{
+		Reservation: reservation,
+	}, nil
+}
+
+func (r *FakeRuntimeService) DeleteReservation(ctx context.Context, req *iri.DeleteReservationRequest) (*iri.DeleteReservationResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	reservationID := req.ReservationId
+	if _, ok := r.Reservations[reservationID]; !ok {
+		return nil, status.Errorf(codes.NotFound, "reservation %q not found", reservationID)
+	}
+
+	delete(r.Reservations, reservationID)
+	return &iri.DeleteReservationResponse{}, nil
 }
 
 func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest) (*iri.StatusResponse, error) {
