@@ -14,11 +14,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -104,7 +101,7 @@ var _ = Describe("CreateVolume", func() {
 					},
 					VolumeDataSource: &iri.VolumeDataSource{
 						SnapshotDataSource: &iri.SnapshotDataSource{
-							SnapshotId: "test-snapshot-id",
+							SnapshotId: "test-snapshot",
 						},
 					},
 				},
@@ -124,119 +121,4 @@ var _ = Describe("CreateVolume", func() {
 		Expect(ironcoreVolume.Spec.VolumeDataSource.VolumeSnapshotRef.Name).To(Equal("test-snapshot"))
 	})
 
-	It("should return error if snapshot is not found", func(ctx SpecContext) {
-		By("creating a volume with non-existent snapshot data source")
-		res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
-			Volume: &iri.Volume{
-				Metadata: &irimeta.ObjectMetadata{
-					Labels: map[string]string{
-						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
-					},
-				},
-				Spec: &iri.VolumeSpec{
-					Class: volumeClass.Name,
-					Resources: &iri.VolumeResources{
-						StorageBytes: 100,
-					},
-					VolumeDataSource: &iri.VolumeDataSource{
-						SnapshotDataSource: &iri.SnapshotDataSource{
-							SnapshotId: "non-existent-snapshot-id",
-						},
-					},
-				},
-			},
-		})
-
-		Expect(err).To(HaveOccurred())
-		Expect(res).To(BeNil())
-		Expect(status.Code(err)).To(Equal(codes.NotFound))
-	})
-
-	It("should return error if snapshot is in pending state", func(ctx SpecContext) {
-		By("creating a volume snapshot in pending state")
-		volumeSnapshot := &storagev1alpha1.VolumeSnapshot{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: ns.Name,
-				Name:      "pending-snapshot",
-			},
-			Spec: storagev1alpha1.VolumeSnapshotSpec{
-				VolumeRef: &corev1.LocalObjectReference{Name: "source-volume"},
-			},
-			Status: storagev1alpha1.VolumeSnapshotStatus{
-				State:      storagev1alpha1.VolumeSnapshotStatePending,
-				SnapshotID: "pending-snapshot-id",
-			},
-		}
-		Expect(k8sClient.Create(ctx, volumeSnapshot)).To(Succeed())
-
-		By("creating a volume with pending snapshot data source")
-		res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
-			Volume: &iri.Volume{
-				Metadata: &irimeta.ObjectMetadata{
-					Labels: map[string]string{
-						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
-					},
-				},
-				Spec: &iri.VolumeSpec{
-					Class: volumeClass.Name,
-					Resources: &iri.VolumeResources{
-						StorageBytes: 100,
-					},
-					VolumeDataSource: &iri.VolumeDataSource{
-						SnapshotDataSource: &iri.SnapshotDataSource{
-							SnapshotId: "pending-snapshot-id",
-						},
-					},
-				},
-			},
-		})
-
-		Expect(err).To(HaveOccurred())
-		Expect(res).To(BeNil())
-		Expect(status.Code(err)).To(Equal(codes.FailedPrecondition))
-	})
-
-	It("should return error if snapshot is in failed state", func(ctx SpecContext) {
-		By("creating a volume snapshot in failed state")
-		volumeSnapshot := &storagev1alpha1.VolumeSnapshot{
-			ObjectMeta: metav1.ObjectMeta{
-				Namespace: ns.Name,
-				Name:      "failed-snapshot",
-			},
-			Spec: storagev1alpha1.VolumeSnapshotSpec{
-				VolumeRef: &corev1.LocalObjectReference{Name: "source-volume"},
-			},
-			Status: storagev1alpha1.VolumeSnapshotStatus{
-				State:      storagev1alpha1.VolumeSnapshotStateFailed,
-				SnapshotID: "failed-snapshot-id",
-			},
-		}
-		Expect(k8sClient.Create(ctx, volumeSnapshot)).To(Succeed())
-
-		By("creating a volume with failed snapshot data source")
-		res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
-			Volume: &iri.Volume{
-				Metadata: &irimeta.ObjectMetadata{
-					Labels: map[string]string{
-						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
-					},
-				},
-				Spec: &iri.VolumeSpec{
-					Class: volumeClass.Name,
-					Resources: &iri.VolumeResources{
-						StorageBytes: 100,
-					},
-					VolumeDataSource: &iri.VolumeDataSource{
-						SnapshotDataSource: &iri.SnapshotDataSource{
-							SnapshotId: "failed-snapshot-id",
-						},
-					},
-				},
-			},
-		})
-
-		Expect(err).To(HaveOccurred())
-		Expect(res).To(BeNil())
-		Expect(status.Code(err)).To(Equal(codes.Internal))
-	})
 })

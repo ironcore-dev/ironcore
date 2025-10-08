@@ -333,7 +333,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.String()))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
 
 		By("verifying the volume is created")
 		Expect(volume).NotTo(BeNil())
@@ -447,10 +447,10 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.String()))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
 	})
 
-	It("should inherit encryption from encrypted source volume when creating from snapshot", func(ctx SpecContext) {
+	It("should inherit encryption when creating volume from snapshot of encrypted volume", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
 		encryptionDataKey := "encryptionKey"
 		encryptionData := "test-encryption-data"
@@ -576,7 +576,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.String()))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
 
 		By("verifying encryption is inherited")
 		Expect(iriVolume.Spec.Encryption).NotTo(BeNil())
@@ -842,14 +842,14 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.String()))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
 
 		By("verifying user's explicit encryption is used")
 		Expect(iriVolume.Spec.Encryption).NotTo(BeNil())
 		Expect(iriVolume.Spec.Encryption.SecretData).To(HaveKeyWithValue(userEncryptionDataKey, []byte(userEncryptionData)))
 	})
 
-	It("should fail when source volume encryption secret is not found", func(ctx SpecContext) {
+	It("should not create volume from snapshot when source volume encryption secret is not found", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
 
 		By("creating an encrypted source volume with non-existent secret")
@@ -877,7 +877,7 @@ var _ = Describe("VolumeController", func() {
 
 	})
 
-	It("should fail when source volume is not found", func(ctx SpecContext) {
+	It("should not create volume from snapshot when source volume is not found", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
 
 		By("creating a volume snapshot with non-existent source volume")
@@ -919,7 +919,7 @@ var _ = Describe("VolumeController", func() {
 		Consistently(srv).Should(HaveField("Volumes", HaveLen(0)), "No volumes created due to missing source volume")
 	})
 
-	It("should fail when volume snapshot is not found", func(ctx SpecContext) {
+	It("should not create volume from snapshot when snapshot is not found", func(ctx SpecContext) {
 		size := resource.MustParse("10Mi")
 
 		By("creating a volume with non-existent snapshot reference")

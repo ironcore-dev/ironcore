@@ -81,7 +81,7 @@ func (s *Server) listVolumeSnapshots(ctx context.Context) ([]*iri.VolumeSnapshot
 
 	var res []*iri.VolumeSnapshot
 	for _, ironcoreVolumeSnapshot := range ironcoreVolumeSnapshots {
-		volumeSnapshot, err := s.convertIronCoreVolumeSnapshot(ctx, ironcoreVolumeSnapshot)
+		volumeSnapshot, err := s.convertIronCoreVolumeSnapshot(ironcoreVolumeSnapshot)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ func (s *Server) getVolumeSnapshot(ctx context.Context, id string) (*iri.VolumeS
 		return nil, err
 	}
 
-	return s.convertIronCoreVolumeSnapshot(ctx, ironcoreVolumeSnapshot)
+	return s.convertIronCoreVolumeSnapshot(ironcoreVolumeSnapshot)
 }
 
 func (s *Server) ListVolumeSnapshots(ctx context.Context, req *iri.ListVolumeSnapshotsRequest) (*iri.ListVolumeSnapshotsResponse, error) {

@@ -7,5 +7,7 @@ const (
 	VolumeClassNotReady            = "VolumeClassNotReady"
 	VolumeEncryptionSecretNotReady = "VolumeEncryptionSecretNotReady"
 	VolumeSnapshotNotFound         = "VolumeSnapshotNotFound"
-	VolumeSnapshotFailed           = "VolumeSnapshotFailed"
+	VolumeSnapshotNotReady         = "VolumeSnapshotNotReady"
+	SourceVolumeNotFound           = "SourceVolumeNotFound"
+	SourceVolumeNotAvailable       = "SourceVolumeNotAvailable"
 )

@@ -18,11 +18,13 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -52,6 +54,7 @@ type VolumeSnapshotReconciler struct {
 	MaxConcurrentReconciles int
 }
 
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots/finalizers,verbs=update
@@ -245,7 +248,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshotMetadata(volumeSnapsh
 	}, errs
 }
 
-func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context, log logr.Logger, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeSnapshot, bool, error) {
+func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeSnapshot, bool, error) {
 
 	if volumeSnapshot.Spec.VolumeRef == nil {
 		return nil, false, fmt.Errorf("volumeRef is required")
@@ -254,14 +257,16 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	volume := &storagev1alpha1.Volume{}
 	if err := r.Get(ctx, client.ObjectKey{Namespace: volumeSnapshot.Namespace, Name: volumeSnapshot.Spec.VolumeRef.Name}, volume); err != nil {
 		if apierrors.IsNotFound(err) {
-			log.V(1).Info("Referenced volume not found")
+			r.Eventf(volumeSnapshot, corev1.EventTypeNormal, events.SourceVolumeNotFound,
+				"Source volume %s not found", volumeSnapshot.Spec.VolumeRef.Name)
 			return nil, false, nil
 		}
 		return nil, false, fmt.Errorf("error getting referenced volume: %w", err)
 	}
 
 	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
-		log.V(1).Info("Referenced volume is not available", "VolumeState", volume.Status.State)
+		r.Eventf(volumeSnapshot, corev1.EventTypeNormal, events.SourceVolumeNotAvailable,
+			"Source volume %s is not available (state: %s)", volumeSnapshot.Spec.VolumeRef.Name, volume.Status.State)
 		return nil, false, nil
 	}
 
@@ -274,7 +279,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	return &iri.VolumeSnapshot{
 		Metadata: metadata,
 		Spec: &iri.VolumeSnapshotSpec{
-			VolumeId: volume.Status.VolumeID,
+			VolumeId: volume.Name,
 		},
 	}, true, nil
 }
@@ -333,7 +338,7 @@ func (r *VolumeSnapshotReconciler) create(ctx context.Context, log logr.Logger, 
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Preparing iri volume snapshot")
-	iriVolumeSnapshot, ok, err := r.prepareIRIVolumeSnapshot(ctx, log, volumeSnapshot)
+	iriVolumeSnapshot, ok, err := r.prepareIRIVolumeSnapshot(ctx, volumeSnapshot)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing iri volume snapshot: %w", err)
 	}
