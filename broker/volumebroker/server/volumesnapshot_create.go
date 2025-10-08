@@ -15,28 +15,12 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) getIronCoreVolumeSnapshotConfig(ctx context.Context, volumeSnapshot *iri.VolumeSnapshot) (*storagev1alpha1.VolumeSnapshot, error) {
-	volumeID := volumeSnapshot.Spec.VolumeId
-	if volumeID == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "volume ID is required")
-	}
-
-	volume := &storagev1alpha1.Volume{}
-	if err := s.getManagedAndCreated(ctx, volumeID, volume); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting volume %s: %w", volumeID, err)
-		}
-		return nil, status.Errorf(codes.NotFound, "volume with ID %s not found", volumeID)
-	}
-
+func (s *Server) getIronCoreVolumeSnapshotConfig(volumeSnapshot *iri.VolumeSnapshot) (*storagev1alpha1.VolumeSnapshot, error) {
 	labels := brokerutils.PrepareDownwardAPILabels(
 		volumeSnapshot.Metadata.Labels,
 		s.brokerDownwardAPILabels,
@@ -54,7 +38,7 @@ func (s *Server) getIronCoreVolumeSnapshotConfig(ctx context.Context, volumeSnap
 		},
 		Spec: storagev1alpha1.VolumeSnapshotSpec{
 			VolumeRef: &corev1.LocalObjectReference{
-				Name: volume.Name,
+				Name: volumeSnapshot.Spec.VolumeId,
 			},
 		},
 	}
@@ -96,7 +80,7 @@ func (s *Server) CreateVolumeSnapshot(ctx context.Context, req *iri.CreateVolume
 	log := s.loggerFrom(ctx)
 
 	log.V(1).Info("Getting volume snapshot configuration")
-	ironcoreVolumeSnapshot, err := s.getIronCoreVolumeSnapshotConfig(ctx, req.VolumeSnapshot)
+	ironcoreVolumeSnapshot, err := s.getIronCoreVolumeSnapshotConfig(req.VolumeSnapshot)
 	if err != nil {
 		return nil, fmt.Errorf("error getting ironcore volume snapshot config: %w", err)
 	}
@@ -105,7 +89,7 @@ func (s *Server) CreateVolumeSnapshot(ctx context.Context, req *iri.CreateVolume
 		return nil, fmt.Errorf("error creating ironcore volume snapshot: %w", err)
 	}
 
-	v, err := s.convertIronCoreVolumeSnapshot(ctx, ironcoreVolumeSnapshot)
+	v, err := s.convertIronCoreVolumeSnapshot(ironcoreVolumeSnapshot)
 	if err != nil {
 		return nil, err
 	}
