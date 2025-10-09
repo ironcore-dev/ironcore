@@ -27,6 +27,7 @@ var _ = Describe("CreateVolume", func() {
 		res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
 			Volume: &iri.Volume{
 				Metadata: &irimeta.ObjectMetadata{
+					Id: "foo",
 					Labels: map[string]string{
 						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 					},
@@ -42,6 +43,10 @@ var _ = Describe("CreateVolume", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(res).NotTo(BeNil())
+
+		DeferCleanup(srv.DeleteVolume, &iri.DeleteVolumeRequest{
+			VolumeId: res.Volume.Metadata.Id,
+		})
 
 		By("getting the ironcore volume")
 		ironcoreVolume := &storagev1alpha1.Volume{}
