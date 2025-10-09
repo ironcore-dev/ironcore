@@ -35,6 +35,9 @@ spec:
         - --machine-downward-api-label=root-machine-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-namespace']
         - --machine-downward-api-label=root-machine-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-name']
         - --machine-downward-api-label=root-machine-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-machine-uid']
+        - --volume-downward-api-label=root-volume-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-volume-namespace']
+        - --volume-downward-api-label=root-volume-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-volume-name']
+        - --volume-downward-api-label=root-volume-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-volume-uid']
         - --nic-downward-api-label=root-nic-namespace=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-namespace']
         - --nic-downward-api-label=root-nic-name=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-name']
         - --nic-downward-api-label=root-nic-uid=metadata.labels['downward-api.machinepoollet.ironcore.dev/root-nic-uid']
@@ -86,6 +89,9 @@ spec:
         - --broker-downward-api-label=root-machine-namespace=machinepoollet.ironcore.dev/machine-namespace
         - --broker-downward-api-label=root-machine-name=machinepoollet.ironcore.dev/machine-name
         - --broker-downward-api-label=root-machine-uid=machinepoollet.ironcore.dev/machine-uid
+        - --broker-downward-api-label=root-volume-namespace=machinepoollet.ironcore.dev/volume-namespace
+        - --broker-downward-api-label=root-volume-name=machinepoollet.ironcore.dev/volume-name
+        - --broker-downward-api-label=root-volume-uid=machinepoollet.ironcore.dev/volume-uid
         - --broker-downward-api-label=root-nic-namespace=machinepoollet.ironcore.dev/nic-namespace
         - --broker-downward-api-label=root-nic-name=machinepoollet.ironcore.dev/nic-name
         - --broker-downward-api-label=root-nic-uid=machinepoollet.ironcore.dev/nic-uid

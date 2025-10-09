@@ -64,6 +64,9 @@ type MachineReconciler struct {
 	NicDownwardAPILabels      map[string]string
 	NicDownwardAPIAnnotations map[string]string
 
+	VolumeDownwardAPILabels      map[string]string
+	VolumeDownwardAPIAnnotations map[string]string
+
 	NetworkDownwardAPILabels      map[string]string
 	NetworkDownwardAPIAnnotations map[string]string
 
