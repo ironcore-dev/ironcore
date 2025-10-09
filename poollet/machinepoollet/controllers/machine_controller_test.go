@@ -61,6 +61,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
@@ -140,7 +143,6 @@ var _ = Describe("MachineController", func() {
 		}).Should(Succeed())
 
 		_, iriMachine := GetSingleMapEntry(srv.Machines)
-
 		By("inspecting the iri machine")
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel), fooAnnotationValue))
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.MachineUIDLabel, string(machine.UID)))
@@ -152,6 +154,15 @@ var _ = Describe("MachineController", func() {
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+					})),
+				},
 			},
 		})))
 
@@ -264,6 +275,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
@@ -329,6 +343,15 @@ var _ = Describe("MachineController", func() {
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+					})),
+				},
 			},
 		})))
 		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
@@ -488,6 +511,11 @@ var _ = Describe("MachineController", func() {
 						VolumeSource: computev1alpha1.VolumeSource{
 							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
 								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
+									ObjectMeta: metav1.ObjectMeta{
+										Annotations: map[string]string{
+											fooAnnotation: fooAnnotationValue,
+										},
+									},
 									Spec: storagev1alpha1.VolumeSpec{},
 								},
 							},
@@ -536,6 +564,15 @@ var _ = Describe("MachineController", func() {
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(ephemeralVolume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(ephemeralVolume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(ephemeralVolume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(ephemeralVolume.Name),
+					})),
+				},
 			},
 		})))
 
@@ -562,6 +599,7 @@ var _ = Describe("MachineController", func() {
 	})
 
 	It("should validate IRI volume update for machine", func(ctx SpecContext) {
+		const fooAnnotationValue = "bar"
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{
@@ -601,6 +639,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
@@ -620,6 +661,9 @@ var _ = Describe("MachineController", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
@@ -636,7 +680,6 @@ var _ = Describe("MachineController", func() {
 		})).Should(Succeed())
 
 		By("creating a machine")
-		const fooAnnotationValue = "bar"
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -689,6 +732,15 @@ var _ = Describe("MachineController", func() {
 				Connection: &iri.VolumeConnection{
 					Driver: "test",
 					Handle: "testhandle",
+					Attributes: map[string]string{
+						machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+							poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+							poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+							machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+							machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+							machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+						})),
+					},
 				},
 			},
 			&iri.Volume{
@@ -697,6 +749,15 @@ var _ = Describe("MachineController", func() {
 				Connection: &iri.VolumeConnection{
 					Driver: "test",
 					Handle: "testhandle",
+					Attributes: map[string]string{
+						machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+							poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+							poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(secondaryVolume.UID),
+							machinepoolletv1alpha1.VolumeUIDLabel:       string(secondaryVolume.UID),
+							machinepoolletv1alpha1.VolumeNamespaceLabel: string(secondaryVolume.Namespace),
+							machinepoolletv1alpha1.VolumeNameLabel:      string(secondaryVolume.Name),
+						})),
+					},
 				},
 			},
 		))
@@ -715,16 +776,29 @@ var _ = Describe("MachineController", func() {
 			Connection: &iri.VolumeConnection{
 				Driver: "test",
 				Handle: "testhandle",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+					})),
+				},
 			},
 		}))
 	})
 
 	It("should correctly update volume size", func(ctx SpecContext) {
+		const fooAnnotationValue = "bar"
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
 				GenerateName: "volume-",
+				Annotations: map[string]string{
+					fooAnnotation: fooAnnotationValue,
+				},
 			},
 			Spec: storagev1alpha1.VolumeSpec{},
 		}
@@ -781,6 +855,15 @@ var _ = Describe("MachineController", func() {
 				Driver:                "test",
 				Handle:                "testhandle",
 				EffectiveStorageBytes: resource.NewQuantity(1*1024*1024*1024, resource.BinarySI).Value(),
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+					})),
+				},
 			},
 		})))
 
@@ -799,8 +882,17 @@ var _ = Describe("MachineController", func() {
 			Name:   "primary",
 			Device: "oda",
 			Connection: &iri.VolumeConnection{
-				Driver:                "test",
-				Handle:                "testhandle",
+				Driver: "test",
+				Handle: "testhandle",
+				Attributes: map[string]string{
+					machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+						poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"):   string(volume.UID),
+						machinepoolletv1alpha1.VolumeUIDLabel:       string(volume.UID),
+						machinepoolletv1alpha1.VolumeNamespaceLabel: string(volume.Namespace),
+						machinepoolletv1alpha1.VolumeNameLabel:      string(volume.Name),
+					})),
+				},
 				EffectiveStorageBytes: resource.NewQuantity(2*1024*1024*1024, resource.BinarySI).Value(),
 			},
 		})))

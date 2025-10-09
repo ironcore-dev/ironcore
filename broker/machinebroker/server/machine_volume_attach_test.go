@@ -6,7 +6,10 @@ package server_test
 import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -37,6 +40,9 @@ var _ = Describe("AttachVolume", func() {
 		machineID := createMachineRes.Machine.Metadata.Id
 
 		By("attaching a volume")
+		labels := map[string]string{
+			machinepoolletv1alpha1.VolumeUIDLabel: "bar",
+		}
 		Expect(srv.AttachVolume(ctx, &iri.AttachVolumeRequest{
 			MachineId: machineID,
 			Volume: &iri.Volume{
@@ -46,6 +52,7 @@ var _ = Describe("AttachVolume", func() {
 					Driver: "ceph",
 					Handle: "mycephvolume",
 					Attributes: map[string]string{
+						machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(labels)),
 						"foo": "bar",
 					},
 					SecretData: map[string][]byte{
@@ -86,9 +93,15 @@ var _ = Describe("AttachVolume", func() {
 			"Driver": Equal("ceph"),
 			"Handle": Equal("mycephvolume"),
 			"VolumeAttributes": Equal(map[string]string{
+				machinepoolletv1alpha1.VolumeLabelsAttributeKey: string(mustMarshalJSON(labels)),
 				"foo": "bar",
 			}),
 		})))
+
+		Expect(volume.Labels).To(Equal(map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-volume-uid"): "bar",
+			machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
+		}))
 
 		By("inspecting the effective storage resource is set for volume")
 		Expect(volume.Status.Resources.Storage().String()).Should(Equal("2k"))
