@@ -15,6 +15,10 @@ const (
 	MachineNamespaceLabel = "machinepoollet.ironcore.dev/machine-namespace"
 	MachineNameLabel      = "machinepoollet.ironcore.dev/machine-name"
 
+	VolumeUIDLabel       = "machinepoollet.ironcore.dev/volume-uid"
+	VolumeNamespaceLabel = "machinepoollet.ironcore.dev/volume-namespace"
+	VolumeNameLabel      = "machinepoollet.ironcore.dev/volume-name"
+
 	NetworkInterfaceUIDLabel       = "machinepoollet.ironcore.dev/nic-uid"
 	NetworkInterfaceNamespaceLabel = "machinepoollet.ironcore.dev/nic-namespace"
 	NetworkInterfaceNameLabel      = "machinepoollet.ironcore.dev/nic-name"
@@ -25,6 +29,7 @@ const (
 
 	NICLabelsAttributeKey     = "rawNICLabels"
 	NetworkLabelsAttributeKey = "rawNetworkLabels"
+	VolumeLabelsAttributeKey  = "rawVolumeLabels"
 
 	MachineGenerationAnnotation    = "machinepoollet.ironcore.dev/machine-generation"
 	IRIMachineGenerationAnnotation = "machinepoollet.ironcore.dev/irimachine-generation"
