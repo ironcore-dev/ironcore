@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	VolumeSpecVolumeClassRefNameField = storagev1alpha1.VolumeVolumeClassRefNameField
-	VolumeSpecVolumePoolRefNameField  = storagev1alpha1.VolumeVolumePoolRefNameField
+	VolumeSpecVolumeClassRefNameField    = storagev1alpha1.VolumeVolumeClassRefNameField
+	VolumeSpecVolumePoolRefNameField     = storagev1alpha1.VolumeVolumePoolRefNameField
+	VolumeSpecVolumeSnapshotRefNameField = storagev1alpha1.VolumeVolumeSnapshotRefNameField
 )
 
 func SetupVolumeSpecVolumeClassRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
@@ -34,5 +35,15 @@ func SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx context.Context, indexer c
 			return []string{""}
 		}
 		return []string{volumePoolRef.Name}
+	})
+}
+
+func SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
+	return indexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeSnapshotRefNameField, func(obj client.Object) []string {
+		volume := obj.(*storagev1alpha1.Volume)
+		if volume.Spec.VolumeSnapshotRef != nil {
+			return []string{volume.Spec.VolumeSnapshotRef.Name}
+		}
+		return nil
 	})
 }

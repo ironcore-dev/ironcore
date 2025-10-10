@@ -15,6 +15,7 @@ import (
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -24,7 +25,7 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 
-	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
+	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -40,6 +41,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
@@ -272,22 +274,57 @@ func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *st
 	return class.Name, true, nil
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume) (*iri.EncryptionSpec, bool, error) {
-	encryption := volume.Spec.Encryption
-	if encryption == nil {
-		return nil, true, nil
+func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.ResourceList) *iri.VolumeResources {
+	storageBytes := resources.Storage().Value()
+
+	return &iri.VolumeResources{
+		StorageBytes: storageBytes,
+	}
+}
+
+func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
+	if volumeSnapshot.Status.State != storagev1alpha1.VolumeSnapshotStateReady || volumeSnapshot.Status.SnapshotID == "" {
+		r.Eventf(volume, corev1.EventTypeNormal, events.VolumeSnapshotNotReady, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+		return nil, false, nil
+	}
+
+	return &iri.VolumeDataSource{
+		SnapshotDataSource: &iri.SnapshotDataSource{
+			SnapshotId: volumeSnapshot.Name,
+		},
+	}, true, nil
+}
+
+func (r *VolumeReconciler) prepareIRIVolumeDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
+	if volume.Spec.VolumeSnapshotRef != nil {
+		return r.prepareIRIVolumeSnapshotDataSource(volume, volumeSnapshot)
+	}
+
+	if volume.Spec.OSImage != nil && *volume.Spec.OSImage != "" {
+		return &iri.VolumeDataSource{
+			ImageDataSource: &iri.ImageDataSource{
+				Image: *volume.Spec.OSImage,
+			},
+		}, true, nil
+	}
+
+	return nil, true, nil
+}
+
+func (r *VolumeReconciler) prepareIRIVolumeSpecEncryption(ctx context.Context, volume *storagev1alpha1.Volume) (*iri.EncryptionSpec, bool, error) {
+	secretName := volume.Spec.Encryption.SecretRef.Name
+	if secretName == "" {
+		return nil, false, fmt.Errorf("volume encryption secret name is empty")
 	}
 
 	encryptionSecret := &corev1.Secret{}
-	encryptionSecretKey := client.ObjectKey{Name: encryption.SecretRef.Name, Namespace: volume.Namespace}
+	encryptionSecretKey := client.ObjectKey{Name: secretName, Namespace: volume.Namespace}
 	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
-		err = fmt.Errorf("error getting volume encryption secret %s: %w", encryptionSecretKey, err)
-		if !apierrors.IsNotFound(err) {
-			return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", encryption.SecretRef.Name, err)
+		if apierrors.IsNotFound(err) {
+			r.Eventf(volume, corev1.EventTypeNormal, events.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", secretName)
+			return nil, false, nil
 		}
-
-		r.Eventf(volume, corev1.EventTypeNormal, events.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", encryption.SecretRef.Name)
-		return nil, false, nil
+		return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", secretName, err)
 	}
 
 	return &iri.EncryptionSpec{
@@ -295,12 +332,61 @@ func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volum
 	}, true, nil
 }
 
-func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.ResourceList) *iri.VolumeResources {
-	storageBytes := resources.Storage().Value()
-
-	return &iri.VolumeResources{
-		StorageBytes: storageBytes,
+func (r *VolumeReconciler) prepareIRIVolumeInheritedEncryption(ctx context.Context, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.EncryptionSpec, error) {
+	if volumeSnapshot.Spec.VolumeRef == nil {
+		return nil, nil
 	}
+
+	sourceVolume := &storagev1alpha1.Volume{}
+	sourceVolumeKey := client.ObjectKey{Namespace: volumeSnapshot.Namespace, Name: volumeSnapshot.Spec.VolumeRef.Name}
+	if err := r.Get(ctx, sourceVolumeKey, sourceVolume); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("source volume %s not found, cannot determine encryption inheritance", volumeSnapshot.Spec.VolumeRef.Name)
+		}
+		return nil, fmt.Errorf("error getting source volume %s: %w", sourceVolumeKey, err)
+	}
+
+	if sourceVolume.Spec.Encryption == nil {
+		return nil, nil
+	}
+
+	encryptionSecret := &corev1.Secret{}
+	encryptionSecretKey := client.ObjectKey{Name: sourceVolume.Spec.Encryption.SecretRef.Name, Namespace: sourceVolume.Namespace}
+	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("source volume encryption secret %s not found, cannot inherit encryption", sourceVolume.Spec.Encryption.SecretRef.Name)
+		}
+		return nil, fmt.Errorf("error getting encryption secret %s: %w", encryptionSecretKey, err)
+	}
+
+	return &iri.EncryptionSpec{
+		SecretData: encryptionSecret.Data,
+	}, nil
+}
+
+func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.EncryptionSpec, bool, error) {
+	if volume.Spec.VolumeSnapshotRef != nil {
+		inheritedEncryption, err := r.prepareIRIVolumeInheritedEncryption(ctx, volumeSnapshot)
+		if err != nil {
+			return nil, false, fmt.Errorf("error getting encryption from source volume: %w", err)
+		}
+
+		if inheritedEncryption != nil {
+			if volume.Spec.Encryption != nil {
+				return nil, false, fmt.Errorf("cannot specify encryption when creating volume from encrypted snapshot: source volume is encrypted, encryption will be inherited from source volume")
+			}
+
+			r.Eventf(volume, corev1.EventTypeNormal, "VolumeEncryptionInherited",
+				"Inheriting encryption from encrypted source volume %s", volumeSnapshot.Spec.VolumeRef.Name)
+			return inheritedEncryption, true, nil
+		}
+	}
+
+	if volume.Spec.Encryption != nil {
+		return r.prepareIRIVolumeSpecEncryption(ctx, volume)
+	}
+
+	return nil, true, nil
 }
 
 func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (*iri.Volume, bool, error) {
@@ -318,12 +404,36 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 		ok = false
 	}
 
+	var volumeSnapshot *storagev1alpha1.VolumeSnapshot
+	if volume.Spec.VolumeSnapshotRef != nil {
+		log.V(1).Info("Getting volume snapshot")
+		volumeSnapshot = &storagev1alpha1.VolumeSnapshot{}
+		volumeSnapshotKey := client.ObjectKey{Namespace: volume.Namespace, Name: volume.Spec.VolumeSnapshotRef.Name}
+		if err := r.Get(ctx, volumeSnapshotKey, volumeSnapshot); err != nil {
+			if apierrors.IsNotFound(err) {
+				r.Eventf(volume, corev1.EventTypeWarning, events.VolumeSnapshotNotFound,
+					"VolumeSnapshot %s not found", volume.Spec.VolumeSnapshotRef.Name)
+				return nil, false, fmt.Errorf("volume snapshot %s not found", volume.Spec.VolumeSnapshotRef.Name)
+			}
+			return nil, false, fmt.Errorf("error getting volume snapshot %s: %w", volume.Spec.VolumeSnapshotRef.Name, err)
+		}
+	}
+
 	log.V(1).Info("Getting encryption secret")
-	encryption, encryptionOK, err := r.prepareIRIVolumeEncryption(ctx, volume)
+	encryption, encryptionOK, err := r.prepareIRIVolumeEncryption(ctx, volume, volumeSnapshot)
 	switch {
 	case err != nil:
-		errs = append(errs, fmt.Errorf("error preparing iri volume class: %w", err))
+		errs = append(errs, fmt.Errorf("error preparing iri volume encryption: %w", err))
 	case !encryptionOK:
+		ok = false
+	}
+
+	log.V(1).Info("Getting volume data source")
+	dataSource, dataSourceOK, err := r.prepareIRIVolumeDataSource(volume, volumeSnapshot)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("error preparing iri volume data source: %w", err))
+	case !dataSourceOK:
 		ok = false
 	}
 
@@ -340,10 +450,11 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	return &iri.Volume{
 		Metadata: metadata,
 		Spec: &iri.VolumeSpec{
-			Image:      volume.Spec.Image,
-			Class:      class,
-			Resources:  resources,
-			Encryption: encryption,
+			Image:            volume.Spec.Image,
+			Class:            class,
+			Resources:        resources,
+			Encryption:       encryption,
+			VolumeDataSource: dataSource,
 		},
 	}, true, nil
 }
@@ -363,7 +474,7 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	log.V(1).Info("Finalizer is present")
 
 	log.V(1).Info("Ensuring no reconcile annotation")
-	modified, err = ironcoreclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volume)
+	modified, err = utilclient.PatchEnsureNoReconcileAnnotation(ctx, r.Client, volume)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
@@ -550,25 +661,6 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 	return nil
 }
 
-func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	log := ctrl.Log.WithName("volumepoollet")
-
-	return ctrl.NewControllerManagedBy(mgr).
-		For(
-			&storagev1alpha1.Volume{},
-			builder.WithPredicates(
-				VolumeRunsInVolumePoolPredicate(r.VolumePoolName),
-				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
-				predicates.ResourceIsNotExternallyManaged(log),
-			),
-		).
-		WithOptions(
-			controller.Options{
-				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
-			}).
-		Complete(r)
-}
-
 func VolumeRunsInVolumePool(volume *storagev1alpha1.Volume, volumePoolName string) bool {
 	volumePoolRef := volume.Spec.VolumePoolRef
 	if volumePoolRef == nil {
@@ -583,4 +675,51 @@ func VolumeRunsInVolumePoolPredicate(volumePoolName string) predicate.Predicate 
 		volume := object.(*storagev1alpha1.Volume)
 		return VolumeRunsInVolumePool(volume, volumePoolName)
 	})
+}
+
+func (r *VolumeReconciler) enqueueVolumesReferencingSnapshot() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		volumeSnapshot := obj.(*storagev1alpha1.VolumeSnapshot)
+		log := ctrl.LoggerFrom(ctx)
+
+		volumeList := &storagev1alpha1.VolumeList{}
+		if err := r.List(ctx, volumeList,
+			client.InNamespace(volumeSnapshot.Namespace),
+			client.MatchingFields{
+				storageclient.VolumeSpecVolumeSnapshotRefNameField: volumeSnapshot.Name,
+			},
+		); err != nil {
+			log.Error(err, "Error listing volumes referencing snapshot", "VolumeSnapshotKey", client.ObjectKeyFromObject(volumeSnapshot))
+			return nil
+		}
+
+		return utilclient.ReconcileRequestsFromObjectStructSlice(volumeList.Items)
+	})
+}
+
+func (r *VolumeReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	log := ctrl.Log.WithName("volumepoollet").WithName("volume")
+
+	return ctrl.NewControllerManagedBy(mgr).
+		For(
+			&storagev1alpha1.Volume{},
+			builder.WithPredicates(
+				VolumeRunsInVolumePoolPredicate(r.VolumePoolName),
+				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
+				predicates.ResourceIsNotExternallyManaged(log),
+			),
+		).
+		Watches(
+			&storagev1alpha1.VolumeSnapshot{},
+			r.enqueueVolumesReferencingSnapshot(),
+			builder.WithPredicates(
+				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
+				predicates.ResourceIsNotExternallyManaged(log),
+			),
+		).
+		WithOptions(
+			controller.Options{
+				MaxConcurrentReconciles: r.MaxConcurrentReconciles,
+			}).
+		Complete(r)
 }
