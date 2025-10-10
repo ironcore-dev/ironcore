@@ -137,6 +137,7 @@ func SetupTest() (*corev1.Namespace, *server.Server) {
 			BaseURL: baseURL,
 			BrokerDownwardAPILabels: map[string]string{
 				"root-machine-uid": machinepoolletv1alpha1.MachineUIDLabel,
+				"root-volume-uid":  machinepoolletv1alpha1.VolumeUIDLabel,
 				"root-nic-uid":     machinepoolletv1alpha1.NetworkInterfaceUIDLabel,
 				"root-network-uid": machinepoolletv1alpha1.NetworkUIDLabel,
 			},
