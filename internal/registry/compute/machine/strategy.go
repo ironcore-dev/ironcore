@@ -24,7 +24,7 @@ import (
 	apisrvstorage "k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 	"k8s.io/client-go/tools/cache"
-	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
+	"sigs.k8s.io/structured-merge-diff/v6/fieldpath"
 )
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
