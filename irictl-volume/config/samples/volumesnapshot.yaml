@@ -1,0 +1,7 @@
+metadata:
+  annotations:
+    foo: bar
+  labels:
+    bar: baz
+spec:
+  volume_id: 2992076108895c9fb7a3f46ccac649763ed3370922ed5dd33c1695cb5f770cd
