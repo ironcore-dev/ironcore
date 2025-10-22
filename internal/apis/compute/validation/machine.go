@@ -74,7 +74,7 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		allErrs = append(allErrs, field.Required(fldPath.Child("machineClassRef"), "must specify a machine class ref"))
 	}
 
-	for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.MachineClassRef.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(machineSpec.MachineClassRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("machineClassRef").Child("name"), machineSpec.MachineClassRef.Name, msg))
 	}
 
@@ -87,13 +87,13 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 	allErrs = append(allErrs, validateMachinePower(machineSpec.Power, fldPath.Child("power"))...)
 
 	if machineSpec.IgnitionRef != nil && machineSpec.IgnitionRef.Name != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.IgnitionRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(machineSpec.IgnitionRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("ignitionRef").Child("name"), machineSpec.IgnitionRef.Name, msg))
 		}
 	}
 
 	if machineSpec.ImagePullSecretRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.ImagePullSecretRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(machineSpec.ImagePullSecretRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), machineSpec.ImagePullSecretRef.Name, msg))
 		}
 	}

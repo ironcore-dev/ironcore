@@ -29,7 +29,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 	var allErrs field.ErrorList
 
 	if volumeClassRef := spec.VolumeClassRef; volumeClassRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumeClassRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(spec.VolumeClassRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeClassRef").Child("name"), spec.VolumeClassRef.Name, msg))
 		}
 
@@ -49,7 +49,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 
 		if spec.ImagePullSecretRef != nil {
-			for _, msg := range apivalidation.NameIsDNSLabel(spec.ImagePullSecretRef.Name, false) {
+			for _, msg := range apivalidation.NameIsDNSSubdomain(spec.ImagePullSecretRef.Name, false) {
 				allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), spec.ImagePullSecretRef.Name, msg))
 			}
 		}
@@ -89,14 +89,14 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 	} else {
 		if spec.ClaimRef != nil {
-			for _, msg := range apivalidation.NameIsDNSLabel(spec.ClaimRef.Name, false) {
+			for _, msg := range apivalidation.NameIsDNSSubdomain(spec.ClaimRef.Name, false) {
 				allErrs = append(allErrs, field.Invalid(fldPath.Child("claimRef").Child("name"), spec.ClaimRef.Name, msg))
 			}
 		}
 	}
 
 	if spec.Encryption != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.Encryption.SecretRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(spec.Encryption.SecretRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("encryption").Child("secretRef").Child("name"), spec.Encryption.SecretRef.Name, msg))
 		}
 	}

@@ -47,7 +47,7 @@ func validateVirtualIPSpec(spec *networking.VirtualIPSpec, fldPath *field.Path) 
 	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
 	if targetRef := spec.TargetRef; targetRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(targetRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), targetRef.Name, msg))
 		}
 	}

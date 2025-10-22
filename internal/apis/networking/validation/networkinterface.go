@@ -44,7 +44,7 @@ func ValidateNetworkInterfaceSpec(spec *networking.NetworkInterfaceSpec, nicMeta
 		allErrs = append(allErrs, field.Required(fldPath.Child("networkRef"), "must specify a network ref"))
 	}
 
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 

@@ -23,7 +23,7 @@ func validateVolumeSnapshotSpec(spec *storage.VolumeSnapshotSpec, fldPath *field
 	var allErrs field.ErrorList
 
 	if spec.VolumeRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.VolumeRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(spec.VolumeRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeRef").Child("name"), spec.VolumeRef.Name, msg))
 		}
 	}

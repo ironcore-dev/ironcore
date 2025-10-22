@@ -21,7 +21,7 @@ import (
 func ValidateNetworkPolicy(networkPolicy *networking.NetworkPolicy) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkPolicy, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(networkPolicy, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateNetworkPolicySpec(&networkPolicy.Spec, field.NewPath("spec"))...)
 
 	return allErrs
@@ -33,7 +33,7 @@ func validateNetworkPolicySpec(spec *networking.NetworkPolicySpec, fldPath *fiel
 	if spec.NetworkRef == (corev1.LocalObjectReference{}) {
 		allErrs = append(allErrs, field.Required(fldPath.Child("networkRef"), "must specify a network ref"))
 	} else {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(spec.NetworkRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 		}
 	}

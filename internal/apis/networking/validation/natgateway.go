@@ -28,7 +28,7 @@ func validateNATGatewaySpec(spec *networking.NATGatewaySpec, fldPath *field.Path
 
 	allErrs = append(allErrs, ironcorevalidation.ValidateIPFamily(spec.IPFamily, fldPath.Child("ipFamily"))...)
 
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 

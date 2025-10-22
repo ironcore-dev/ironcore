@@ -21,7 +21,7 @@ import (
 func ValidatePrefix(prefix *ipam.Prefix) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(prefix, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(prefix, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidatePrefixSpec(&prefix.Spec, field.NewPath("spec"))...)
 
 	return allErrs
