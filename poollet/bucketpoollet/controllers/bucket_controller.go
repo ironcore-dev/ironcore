@@ -421,7 +421,11 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 					},
 					Data: iriAccess.SecretData,
 				}
-				_ = ctrl.SetControllerReference(bucket, bucketSecret, r.Scheme)
+
+				if err := ctrl.SetControllerReference(bucket, bucketSecret, r.Scheme); err != nil {
+					return fmt.Errorf("error setting controller reference on bucket secret: %w", err)
+				}
+
 				if err := r.Patch(ctx, bucketSecret, client.Apply, client.FieldOwner(bucketpoolletv1alpha1.FieldOwner)); err != nil {
 					return fmt.Errorf("error applying bucket secret: %w", err)
 				}

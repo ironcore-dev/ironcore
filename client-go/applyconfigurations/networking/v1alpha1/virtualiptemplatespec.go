@@ -179,3 +179,9 @@ func (b *VirtualIPTemplateSpecApplyConfiguration) GetName() *string {
 	b.ensureObjectMetaApplyConfigurationExists()
 	return b.ObjectMetaApplyConfiguration.Name
 }
+
+// GetNamespace retrieves the value of the Namespace field in the declarative configuration.
+func (b *VirtualIPTemplateSpecApplyConfiguration) GetNamespace() *string {
+	b.ensureObjectMetaApplyConfigurationExists()
+	return b.ObjectMetaApplyConfiguration.Namespace
+}
