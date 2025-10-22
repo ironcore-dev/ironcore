@@ -31,7 +31,7 @@ func validateIPSource(ipSource networking.IPSource, idx int, ipFamily corev1.IPF
 			allErrs = append(allErrs, validateEphemeralPrefixSource(ipFamily, ephemeral, fldPath.Child("ephemeral"))...)
 			if objectMeta != nil && objectMeta.Name != "" {
 				prefixName := v1alpha1.NetworkInterfaceIPIPAMPrefixName(objectMeta.Name, idx)
-				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
+				for _, msg := range apivalidation.NameIsDNSSubdomain(prefixName, false) {
 					allErrs = append(allErrs, field.Invalid(fldPath, prefixName, fmt.Sprintf("resulting prefix name %q is invalid: %s", prefixName, msg)))
 				}
 			}
