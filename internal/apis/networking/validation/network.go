@@ -17,7 +17,7 @@ import (
 func ValidateNetwork(network *networking.Network) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(network, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(network, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateNetworkSpec(network.Namespace, network.Name, &network.Spec, field.NewPath("spec"))...)
 
 	return allErrs
@@ -113,7 +113,7 @@ func validateNetworkSpec(namespace, name string, spec *networking.NetworkSpec, f
 func validateNetworkPeering(peering networking.NetworkPeering, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	for _, msg := range apivalidation.NameIsDNSLabel(peering.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(peering.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), peering.Name, msg))
 	}
 
@@ -123,7 +123,7 @@ func validateNetworkPeering(peering networking.NetworkPeering, fldPath *field.Pa
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef", "namespace"), networkRef.Namespace, msg))
 		}
 	}
-	for _, msg := range apivalidation.NameIsDNSLabel(networkRef.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(networkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef", "name"), networkRef.Name, msg))
 	}
 
@@ -136,13 +136,13 @@ func validatePeeringClaimRef(peeringClaimRef networking.NetworkPeeringClaimRef, 
 	if len(peeringClaimRef.Name) == 0 {
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "name is required"))
 	} else {
-		for _, msg := range apivalidation.NameIsDNSLabel(peeringClaimRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(peeringClaimRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), peeringClaimRef.Name, msg))
 		}
 	}
 
 	if peeringClaimRef.Namespace != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(peeringClaimRef.Namespace, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(peeringClaimRef.Namespace, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("namespace"), peeringClaimRef.Namespace, msg))
 		}
 	}

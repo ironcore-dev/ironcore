@@ -62,7 +62,7 @@ func validatePrefixSource(src networking.PrefixSource, idx int, objectMeta *meta
 			allErrs = append(allErrs, ValidatePrefixPrefixTemplate(ephemeral.PrefixTemplate, fldPath.Child("ephemeral"))...)
 			if objectMeta != nil && objectMeta.Name != "" {
 				prefixName := networking.NetworkInterfacePrefixIPAMPrefixName(objectMeta.Name, idx)
-				for _, msg := range apivalidation.NameIsDNSLabel(prefixName, false) {
+				for _, msg := range apivalidation.NameIsDNSSubdomain(prefixName, false) {
 					allErrs = append(allErrs, field.Invalid(fldPath, prefixName, fmt.Sprintf("resulting prefix name %q is invalid: %s", prefixName, msg)))
 				}
 			}

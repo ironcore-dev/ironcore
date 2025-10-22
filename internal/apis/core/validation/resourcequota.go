@@ -14,7 +14,7 @@ import (
 func ValidateResourceQuota(resourceQuota *core.ResourceQuota) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(resourceQuota, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(resourceQuota, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateResourceQuotaSpec(&resourceQuota.Spec, field.NewPath("spec"))...)
 
 	return allErrs

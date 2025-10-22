@@ -14,7 +14,7 @@ import (
 func ValidateLoadBalancerRouting(loadBalancerRouting *networking.LoadBalancerRouting) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(loadBalancerRouting, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(loadBalancerRouting, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateLoadBalancerRouting(loadBalancerRouting)...)
 
 	return allErrs
@@ -31,7 +31,7 @@ func validateLoadBalancerRouting(loadBalancerRouting *networking.LoadBalancerRou
 		allErrs = append(allErrs, commonvalidation.ValidateIP(destination.IP.Family(), destination.IP, fldPath.Child("ip"))...)
 
 		if targetRef := destination.TargetRef; targetRef != nil {
-			for _, msg := range apivalidation.NameIsDNSLabel(targetRef.Name, false) {
+			for _, msg := range apivalidation.NameIsDNSSubdomain(targetRef.Name, false) {
 				allErrs = append(allErrs, field.Invalid(fldPath.Child("targetRef", "name"), targetRef.Name, msg))
 			}
 		}

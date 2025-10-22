@@ -36,7 +36,7 @@ func validateLoadBalancerSpec(spec *networking.LoadBalancerSpec, lbMeta *metav1.
 
 	allErrs = append(allErrs, validateNetworkInterfaceIPSources(spec.IPs, spec.IPFamilies, lbMeta, fldPath.Child("ips"))...)
 
-	for _, msg := range apivalidation.NameIsDNSLabel(spec.NetworkRef.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(spec.NetworkRef.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("networkRef").Child("name"), spec.NetworkRef.Name, msg))
 	}
 
