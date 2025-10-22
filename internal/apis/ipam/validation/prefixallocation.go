@@ -18,7 +18,7 @@ import (
 func ValidatePrefixAllocation(prefixAllocation *ipam.PrefixAllocation) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(prefixAllocation, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(prefixAllocation, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validatePrefixAllocationSpec(&prefixAllocation.Spec, field.NewPath("spec"))...)
 
 	return allErrs

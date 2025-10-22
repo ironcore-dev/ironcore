@@ -53,7 +53,7 @@ func validateOptionalRef(ref *corev1.LocalObjectReference, fldPath *field.Path) 
 		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "must specify name"))
 	}
 
-	for _, msg := range apivalidation.NameIsDNSLabel(ref.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(ref.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), ref.Name, msg))
 	}
 	return allErrs

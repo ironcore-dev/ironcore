@@ -152,13 +152,13 @@ func validatePeeringClaimRef(peeringClaimRef networking.NetworkPeeringClaimRef, 
 func validatePeeringPrefix(prefix networking.PeeringPrefix, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	for _, msg := range apivalidation.NameIsDNSLabel(prefix.Name, false) {
+	for _, msg := range apivalidation.NameIsDNSSubdomain(prefix.Name, false) {
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("name"), prefix.Name, msg))
 	}
 
 	prefixRef := prefix.PrefixRef
 	if prefixRef.Name != "" {
-		for _, msg := range apivalidation.NameIsDNSLabel(prefixRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(prefixRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("prefixRef", "name"), prefixRef.Name, msg))
 		}
 	}
