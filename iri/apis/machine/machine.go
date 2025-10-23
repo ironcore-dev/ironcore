@@ -22,6 +22,9 @@ type RuntimeService interface {
 	UpdateVolume(context.Context, *api.UpdateVolumeRequest) (*api.UpdateVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *api.AttachNetworkInterfaceRequest) (*api.AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *api.DetachNetworkInterfaceRequest) (*api.DetachNetworkInterfaceResponse, error)
+	ListReservations(context.Context, *api.ListReservationsRequest) (*api.ListReservationsResponse, error)
+	CreateReservation(context.Context, *api.CreateReservationRequest) (*api.CreateReservationResponse, error)
+	DeleteReservation(context.Context, *api.DeleteReservationRequest) (*api.DeleteReservationResponse, error)
 	Status(context.Context, *api.StatusRequest) (*api.StatusResponse, error)
 	Exec(context.Context, *api.ExecRequest) (*api.ExecResponse, error)
 }

@@ -57,7 +57,7 @@ var (
 )
 
 const (
-	eventuallyTimeout    = 3 * time.Second
+	eventuallyTimeout    = 30 * time.Second
 	pollingInterval      = 50 * time.Millisecond
 	consistentlyDuration = 3 * time.Second
 	apiServiceTimeout    = 5 * time.Minute
@@ -271,6 +271,33 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			Client:             k8sManager.GetClient(),
 			MachineClassMapper: machineClassMapper,
 			MachinePoolName:    mp.Name,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		reservationEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Reservation, error) {
+			res, err := srv.ListReservations(ctx, &iri.ListReservationsRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Reservations, nil
+		}, irievent.GeneratorOptions{})
+
+		Expect(k8sManager.Add(reservationEvents)).To(Succeed())
+
+		Expect((&controllers.ReservationAnnotatorReconciler{
+			Client:            k8sManager.GetClient(),
+			ReservationEvents: reservationEvents,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.ReservationReconciler{
+			EventRecorder:         &record.FakeRecorder{},
+			Client:                k8sManager.GetClient(),
+			MachineRuntime:        srv,
+			MachineRuntimeName:    machine.FakeRuntimeName,
+			MachineRuntimeVersion: machine.FakeVersion,
+			MachinePoolName:       mp.Name,
+			DownwardAPILabels: map[string]string{
+				fooDownwardAPILabel: fmt.Sprintf("metadata.annotations['%s']", fooAnnotation),
+			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

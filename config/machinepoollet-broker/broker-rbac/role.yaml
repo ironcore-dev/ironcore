@@ -28,6 +28,7 @@ rules:
   - compute.ironcore.dev
   resources:
   - machines
+  - reservations
   verbs:
   - create
   - delete

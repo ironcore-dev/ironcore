@@ -72,6 +72,8 @@ func PrepareDownwardAPILabels(
 		switch o := obj.(type) {
 		case *computev1alpha1.Machine:
 			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
+		case *computev1alpha1.Reservation:
+			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
 		case *networkingv1alpha1.Network:
 			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
 		case *networkingv1alpha1.NetworkInterface:

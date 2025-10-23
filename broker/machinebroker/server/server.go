@@ -34,6 +34,7 @@ var _ iri.MachineRuntimeServer = (*Server)(nil)
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=loadbalancerroutings,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=natgateways,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=natgateways/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=reservations,verbs=get;list;watch;create;update;patch;delete
 
 type BrokerLabel struct {
 	DefaultLabel     string
