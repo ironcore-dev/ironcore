@@ -562,6 +562,53 @@ var _ = Describe("MachineController", func() {
 	})
 
 	It("should validate IRI volume update for machine", func(ctx SpecContext) {
+		By("creating a machine")
+		localDiskSize := resource.MustParse("10Gi")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "primary",
+						VolumeSource: computev1alpha1.VolumeSource{
+							LocalDisk: &computev1alpha1.LocalDiskVolumeSource{
+								SizeLimit: &localDiskSize,
+								Image:     "sample-image",
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the runtime to report the machine, volume and network interface")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("inspecting the iri machine volumes")
+		Expect(iriMachine.Spec.Volumes).To(ProtoConsistOf(
+			&iri.Volume{
+				Name:   "primary",
+				Device: "oda",
+				LocalDisk: &iri.LocalDisk{
+					SizeBytes: localDiskSize.Value(),
+					Image: &iri.ImageSpec{
+						Image: "sample-image",
+					},
+				},
+			},
+		))
+	})
+
+	It("should validate IRI volume update for machine", func(ctx SpecContext) {
 		By("creating a network")
 		network := &networkingv1alpha1.Network{
 			ObjectMeta: metav1.ObjectMeta{

@@ -14,6 +14,7 @@ import (
 type VolumeSourceApplyConfiguration struct {
 	VolumeRef *v1.LocalObjectReference                 `json:"volumeRef,omitempty"`
 	EmptyDisk *EmptyDiskVolumeSourceApplyConfiguration `json:"emptyDisk,omitempty"`
+	LocalDisk *LocalDiskVolumeSourceApplyConfiguration `json:"localDisk,omitempty"`
 	Ephemeral *EphemeralVolumeSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
@@ -36,6 +37,14 @@ func (b *VolumeSourceApplyConfiguration) WithVolumeRef(value v1.LocalObjectRefer
 // If called multiple times, the EmptyDisk field is set to the value of the last call.
 func (b *VolumeSourceApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
 	b.EmptyDisk = value
+	return b
+}
+
+// WithLocalDisk sets the LocalDisk field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the LocalDisk field is set to the value of the last call.
+func (b *VolumeSourceApplyConfiguration) WithLocalDisk(value *LocalDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
+	b.LocalDisk = value
 	return b
 }
 

@@ -33,6 +33,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource":           schema_ironcore_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_ironcore_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource":           schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource":           schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine":                         schema_ironcore_api_compute_v1alpha1_Machine(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass":                    schema_ironcore_api_compute_v1alpha1_MachineClass(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClassList":                schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
@@ -836,6 +837,34 @@ func schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref common.Refer
 	}
 }
 
+func schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LocalDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"sizeLimit": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SizeLimit is the total amount of local storage required for this EmptyDisk volume. The default is nil which means that the limit is undefined.",
+							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
+						},
+					},
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Image is the optional URL providing the operating system image of the machine.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/api/resource.Quantity"},
+	}
+}
+
 func schema_ironcore_api_compute_v1alpha1_Machine(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1447,7 +1476,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Image is the optional URL providing the operating system image of the machine.",
+							Description: "Deprecated: Use LocalDisk to provide a bootable disk Image is the optional URL providing the operating system image of the machine.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -1755,8 +1784,14 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 					},
 					"emptyDisk": {
 						SchemaProps: spec.SchemaProps{
-							Description: "EmptyDisk instructs to use a Volume offered by the machine pool provider.",
+							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource"),
+						},
+					},
+					"localDisk": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LocalDisk instructs to use a Volume offered by the machine pool provider.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource"),
 						},
 					},
 					"ephemeral": {
@@ -1770,7 +1805,7 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -1789,8 +1824,14 @@ func schema_ironcore_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCallb
 					},
 					"emptyDisk": {
 						SchemaProps: spec.SchemaProps{
-							Description: "EmptyDisk instructs to use a Volume offered by the machine pool provider.",
+							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource"),
+						},
+					},
+					"localDisk": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LocalDisk instructs to use a Volume offered by the machine pool provider.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource"),
 						},
 					},
 					"ephemeral": {
@@ -1803,7 +1844,7 @@ func schema_ironcore_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 

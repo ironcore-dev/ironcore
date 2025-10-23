@@ -121,6 +121,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: volumeTemplate
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource
+  map:
+    fields:
+    - name: image
+      type:
+        scalar: string
+    - name: sizeLimit
+      type:
+        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine
   map:
     fields:
@@ -401,6 +410,9 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: ephemeral
       type:
         namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralVolumeSource
+    - name: localDisk
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource
     - name: name
       type:
         scalar: string

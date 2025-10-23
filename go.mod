@@ -1,6 +1,6 @@
 module github.com/ironcore-dev/ironcore
 
-go 1.24.0
+go 1.24.1
 
 require (
 	github.com/afritzler/protoequal v0.1.9

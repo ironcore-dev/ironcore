@@ -44,10 +44,15 @@ var _ = Describe("ListEvents", func() {
 				},
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
 					Class: machineClass.Name,
+					Volumes: []*iri.Volume{{
+						Name: "root",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					}},
 					NetworkInterfaces: []*iri.NetworkInterface{
 						{
 							Name:      "primary-nic",

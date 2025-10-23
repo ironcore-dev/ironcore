@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -24,14 +25,19 @@ var _ = Describe("DetachVolume", func() {
 			Machine: &iri.Machine{
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
 					Class: machineClass.Name,
-					Volumes: []*iri.Volume{
+					Volumes: []*iri.Volume{{
+						Name:   "root",
+						Device: "oda",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					},
 						{
 							Name:   "my-volume",
-							Device: "oda",
+							Device: "odb",
 							Connection: &iri.VolumeConnection{
 								Driver: "ceph",
 								Handle: "mycephvolume",
@@ -62,7 +68,15 @@ var _ = Describe("DetachVolume", func() {
 		Expect(k8sClient.Get(ctx, ironcoreMachineKey, ironcoreMachine)).To(Succeed())
 
 		By("inspecting the ironcore machine's volumes")
-		Expect(ironcoreMachine.Spec.Volumes).To(BeEmpty())
+		Expect(ironcoreMachine.Spec.Volumes).To(ContainElement(computev1alpha1.Volume{
+			Name:   "root",
+			Device: ptr.To("oda"),
+			VolumeSource: computev1alpha1.VolumeSource{
+				LocalDisk: &computev1alpha1.LocalDiskVolumeSource{
+					Image: "example.org/foo:latest",
+				},
+			},
+		}))
 
 		By("listing for any ironcore volume in the namespace")
 		volumeList := &storagev1alpha1.VolumeList{}

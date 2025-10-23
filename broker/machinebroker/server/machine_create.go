@@ -28,7 +28,6 @@ type IronCoreMachineConfig struct {
 	Annotations             map[string]string
 	Power                   computev1alpha1.Power
 	MachineClassName        string
-	Image                   string
 	IgnitionData            []byte
 	NetworkInterfaceConfigs []*IronCoreNetworkInterfaceConfig
 	VolumeConfigs           []*IronCoreVolumeConfig
@@ -75,11 +74,6 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		return nil, err
 	}
 
-	var ironcoreImage string
-	if image := machine.Spec.Image; image != nil {
-		ironcoreImage = image.Image
-	}
-
 	ironcoreNicCfgs := make([]*IronCoreNetworkInterfaceConfig, len(machine.Spec.NetworkInterfaces))
 	for i, nic := range machine.Spec.NetworkInterfaces {
 		ironcoreNicCfg, err := s.getIronCoreNetworkInterfaceConfig(nic)
@@ -116,7 +110,6 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		Annotations:             annotations,
 		Power:                   ironcorePower,
 		MachineClassName:        machine.Spec.Class,
-		Image:                   ironcoreImage,
 		IgnitionData:            machine.Spec.IgnitionData,
 		NetworkInterfaceConfigs: ironcoreNicCfgs,
 		VolumeConfigs:           ironcoreVolumeCfgs,
@@ -199,7 +192,6 @@ func (s *Server) createIronCoreMachine(
 			MachinePoolSelector: s.cluster.MachinePoolSelector(),
 			MachinePoolRef:      s.ironcoreMachinePoolRef(),
 			Power:               cfg.Power,
-			Image:               cfg.Image,
 			ImagePullSecretRef:  nil, // TODO: Specify as soon as available.
 			NetworkInterfaces:   ironcoreMachineNics,
 			Volumes:             ironcoreMachineVolumes,

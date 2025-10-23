@@ -61,7 +61,6 @@ rules:
   resources:
   - volumepools/status
   - volumes/status
-  - volumesnapshots/status
   verbs:
   - get
   - patch
@@ -70,7 +69,6 @@ rules:
   - storage.ironcore.dev
   resources:
   - volumes
-  - volumesnapshots
   verbs:
   - get
   - list
@@ -81,6 +79,5 @@ rules:
   - storage.ironcore.dev
   resources:
   - volumes/finalizers
-  - volumesnapshots/finalizers
   verbs:
   - update
