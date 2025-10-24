@@ -14,10 +14,10 @@ import (
 )
 
 func (s *Server) DeleteVolumeSnapshot(ctx context.Context, req *iri.DeleteVolumeSnapshotRequest) (*iri.DeleteVolumeSnapshotResponse, error) {
-	volumeSnapshotID := req.VolumeSnapshotId
+	volumeSnapshotID := req.GetVolumeSnapshotId()
 	log := s.loggerFrom(ctx, "VolumeSnapshotID", volumeSnapshotID)
 
-	ironcoreVolumeSnapshot, err := s.getIronCoreVolumeSnapshot(ctx, req.VolumeSnapshotId)
+	ironcoreVolumeSnapshot, err := s.getIronCoreVolumeSnapshot(ctx, volumeSnapshotID)
 	if err != nil {
 		return nil, err
 	}
