@@ -4,7 +4,7 @@ metadata:
   labels:
     bar: baz
 spec:
-  class: experimental
+  class: volumeclass-sample
   image: ghcr.io/ironcore-dev/ironcore-image/gardenlinux:latest
   resources:
     storage_bytes: 1073741824

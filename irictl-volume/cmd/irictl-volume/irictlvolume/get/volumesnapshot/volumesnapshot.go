@@ -30,7 +30,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 
 	cmd := &cobra.Command{
 		Use:     "volumesnapshot",
-		Aliases: common.VolumeAliases,
+		Aliases: common.VolumeSnapshotAliases,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			log := ctrl.LoggerFrom(ctx)
