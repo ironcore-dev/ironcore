@@ -66,6 +66,21 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		volumepoolletv1alpha1.VolumeDownwardAPIPrefix,
 	)
 
+	var image string
+	var volumeSnapshotRef *corev1.LocalObjectReference
+
+	image = volume.Spec.Image // TODO: Remove this once volume.Spec.Image is deprecated
+
+	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil {
+		switch {
+		case dataSource.SnapshotDataSource != nil:
+			volumeSnapshotRef = &corev1.LocalObjectReference{Name: dataSource.SnapshotDataSource.SnapshotId}
+			image = "" // TODO: Remove this once volume.Spec.Image is deprecated
+		case dataSource.ImageDataSource != nil:
+			image = dataSource.ImageDataSource.Image
+		}
+	}
+
 	ironcoreVolume := &storagev1alpha1.Volume{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: s.namespace,
@@ -81,9 +96,18 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Resources: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceStorage: *resource.NewQuantity(volume.Spec.Resources.StorageBytes, resource.DecimalSI),
 			},
-			Image:              volume.Spec.Image,
-			ImagePullSecretRef: nil, // TODO: Fill if necessary
+			Image:              image, // TODO: Remove this once volume.Spec.Image is deprecated
+			ImagePullSecretRef: nil,   // TODO: Fill if necessary
 			Encryption:         encryption,
+			VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				VolumeSnapshotRef: volumeSnapshotRef,
+				OSImage: func() *string {
+					if image == "" {
+						return nil
+					}
+					return &image
+				}(),
+			},
 		},
 	}
 	if err := apiutils.SetObjectMetadata(ironcoreVolume, volume.Metadata); err != nil {
