@@ -6,6 +6,7 @@ package delete
 import (
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/common"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/delete/volume"
+	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/delete/volumesnapshot"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 
 	cmd.AddCommand(
 		volume.Command(streams, clientFactory),
+		volumesnapshot.Command(streams, clientFactory),
 	)
 
 	return cmd
