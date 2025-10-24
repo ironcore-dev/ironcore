@@ -101,7 +101,12 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Encryption:         encryption,
 			VolumeDataSource: storagev1alpha1.VolumeDataSource{
 				VolumeSnapshotRef: volumeSnapshotRef,
-				OSImage:           getOSImageIfPresent(image),
+				OSImage: func() *string {
+					if image == "" {
+						return nil
+					}
+					return &image
+				}(),
 			},
 		},
 	}
@@ -113,13 +118,6 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		Volume:           ironcoreVolume,
 		EncryptionSecret: encryptionSecret,
 	}, nil
-}
-
-func getOSImageIfPresent(image string) *string {
-	if image == "" {
-		return nil
-	}
-	return &image
 }
 
 func (s *Server) createIronCoreVolume(ctx context.Context, log logr.Logger, volume *AggregateIronCoreVolume) (retErr error) {
