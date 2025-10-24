@@ -556,27 +556,28 @@ func (x *ImageSpec) GetImage() string {
 	return ""
 }
 
-type EmptyDisk struct {
+type LocalDisk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SizeBytes     int64                  `protobuf:"varint,1,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`
+	Image         *ImageSpec             `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *EmptyDisk) Reset() {
-	*x = EmptyDisk{}
+func (x *LocalDisk) Reset() {
+	*x = LocalDisk{}
 	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *EmptyDisk) String() string {
+func (x *LocalDisk) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EmptyDisk) ProtoMessage() {}
+func (*LocalDisk) ProtoMessage() {}
 
-func (x *EmptyDisk) ProtoReflect() protoreflect.Message {
+func (x *LocalDisk) ProtoReflect() protoreflect.Message {
 	mi := &file_machine_v1alpha1_api_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -588,16 +589,23 @@ func (x *EmptyDisk) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use EmptyDisk.ProtoReflect.Descriptor instead.
-func (*EmptyDisk) Descriptor() ([]byte, []int) {
+// Deprecated: Use LocalDisk.ProtoReflect.Descriptor instead.
+func (*LocalDisk) Descriptor() ([]byte, []int) {
 	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *EmptyDisk) GetSizeBytes() int64 {
+func (x *LocalDisk) GetSizeBytes() int64 {
 	if x != nil {
 		return x.SizeBytes
 	}
 	return 0
+}
+
+func (x *LocalDisk) GetImage() *ImageSpec {
+	if x != nil {
+		return x.Image
+	}
+	return nil
 }
 
 type VolumeConnection struct {
@@ -688,7 +696,7 @@ type Volume struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Device        string                 `protobuf:"bytes,2,opt,name=device,proto3" json:"device,omitempty"`
-	EmptyDisk     *EmptyDisk             `protobuf:"bytes,4,opt,name=empty_disk,json=emptyDisk,proto3" json:"empty_disk,omitempty"`
+	LocalDisk     *LocalDisk             `protobuf:"bytes,4,opt,name=local_disk,json=localDisk,proto3" json:"local_disk,omitempty"`
 	Connection    *VolumeConnection      `protobuf:"bytes,5,opt,name=connection,proto3" json:"connection,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -738,9 +746,9 @@ func (x *Volume) GetDevice() string {
 	return ""
 }
 
-func (x *Volume) GetEmptyDisk() *EmptyDisk {
+func (x *Volume) GetLocalDisk() *LocalDisk {
 	if x != nil {
-		return x.EmptyDisk
+		return x.LocalDisk
 	}
 	return nil
 }
@@ -823,11 +831,10 @@ func (x *NetworkInterface) GetAttributes() map[string]string {
 type MachineSpec struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Power             Power                  `protobuf:"varint,1,opt,name=power,proto3,enum=machine.v1alpha1.Power" json:"power,omitempty"`
-	Image             *ImageSpec             `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
-	Class             string                 `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`
-	IgnitionData      []byte                 `protobuf:"bytes,4,opt,name=ignition_data,json=ignitionData,proto3" json:"ignition_data,omitempty"`
-	Volumes           []*Volume              `protobuf:"bytes,5,rep,name=volumes,proto3" json:"volumes,omitempty"`
-	NetworkInterfaces []*NetworkInterface    `protobuf:"bytes,6,rep,name=network_interfaces,json=networkInterfaces,proto3" json:"network_interfaces,omitempty"`
+	Class             string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
+	IgnitionData      []byte                 `protobuf:"bytes,3,opt,name=ignition_data,json=ignitionData,proto3" json:"ignition_data,omitempty"`
+	Volumes           []*Volume              `protobuf:"bytes,4,rep,name=volumes,proto3" json:"volumes,omitempty"`
+	NetworkInterfaces []*NetworkInterface    `protobuf:"bytes,5,rep,name=network_interfaces,json=networkInterfaces,proto3" json:"network_interfaces,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -867,13 +874,6 @@ func (x *MachineSpec) GetPower() Power {
 		return x.Power
 	}
 	return Power_POWER_ON
-}
-
-func (x *MachineSpec) GetImage() *ImageSpec {
-	if x != nil {
-		return x.Image
-	}
-	return nil
 }
 
 func (x *MachineSpec) GetClass() string {
@@ -2475,10 +2475,11 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x04spec\x18\x02 \x01(\v2\x1d.machine.v1alpha1.MachineSpecR\x04spec\x127\n" +
 	"\x06status\x18\x03 \x01(\v2\x1f.machine.v1alpha1.MachineStatusR\x06status\"!\n" +
 	"\tImageSpec\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\tR\x05image\"*\n" +
-	"\tEmptyDisk\x12\x1d\n" +
+	"\x05image\x18\x01 \x01(\tR\x05image\"]\n" +
+	"\tLocalDisk\x12\x1d\n" +
 	"\n" +
-	"size_bytes\x18\x01 \x01(\x03R\tsizeBytes\"\xc5\x04\n" +
+	"size_bytes\x18\x01 \x01(\x03R\tsizeBytes\x121\n" +
+	"\x05image\x18\x02 \x01(\v2\x1b.machine.v1alpha1.ImageSpecR\x05image\"\xc5\x04\n" +
 	"\x10VolumeConnection\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x16\n" +
 	"\x06handle\x18\x02 \x01(\tR\x06handle\x12R\n" +
@@ -2502,7 +2503,7 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06device\x18\x02 \x01(\tR\x06device\x12:\n" +
 	"\n" +
-	"empty_disk\x18\x04 \x01(\v2\x1b.machine.v1alpha1.EmptyDiskR\temptyDisk\x12B\n" +
+	"local_disk\x18\x04 \x01(\v2\x1b.machine.v1alpha1.LocalDiskR\tlocalDisk\x12B\n" +
 	"\n" +
 	"connection\x18\x05 \x01(\v2\".machine.v1alpha1.VolumeConnectionR\n" +
 	"connection\"\xea\x01\n" +
@@ -2516,14 +2517,13 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb1\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xfe\x01\n" +
 	"\vMachineSpec\x12-\n" +
-	"\x05power\x18\x01 \x01(\x0e2\x17.machine.v1alpha1.PowerR\x05power\x121\n" +
-	"\x05image\x18\x02 \x01(\v2\x1b.machine.v1alpha1.ImageSpecR\x05image\x12\x14\n" +
-	"\x05class\x18\x03 \x01(\tR\x05class\x12#\n" +
-	"\rignition_data\x18\x04 \x01(\fR\fignitionData\x122\n" +
-	"\avolumes\x18\x05 \x03(\v2\x18.machine.v1alpha1.VolumeR\avolumes\x12Q\n" +
-	"\x12network_interfaces\x18\x06 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\"\xa6\x02\n" +
+	"\x05power\x18\x01 \x01(\x0e2\x17.machine.v1alpha1.PowerR\x05power\x12\x14\n" +
+	"\x05class\x18\x02 \x01(\tR\x05class\x12#\n" +
+	"\rignition_data\x18\x03 \x01(\fR\fignitionData\x122\n" +
+	"\avolumes\x18\x04 \x03(\v2\x18.machine.v1alpha1.VolumeR\avolumes\x12Q\n" +
+	"\x12network_interfaces\x18\x05 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\"\xa6\x02\n" +
 	"\rMachineStatus\x12/\n" +
 	"\x13observed_generation\x18\x01 \x01(\x03R\x12observedGeneration\x124\n" +
 	"\x05state\x18\x02 \x01(\x0e2\x1e.machine.v1alpha1.MachineStateR\x05state\x12\x1b\n" +
@@ -2669,7 +2669,7 @@ var file_machine_v1alpha1_api_proto_goTypes = []any{
 	(*MachineClassCapabilities)(nil),         // 7: machine.v1alpha1.MachineClassCapabilities
 	(*Machine)(nil),                          // 8: machine.v1alpha1.Machine
 	(*ImageSpec)(nil),                        // 9: machine.v1alpha1.ImageSpec
-	(*EmptyDisk)(nil),                        // 10: machine.v1alpha1.EmptyDisk
+	(*LocalDisk)(nil),                        // 10: machine.v1alpha1.LocalDisk
 	(*VolumeConnection)(nil),                 // 11: machine.v1alpha1.VolumeConnection
 	(*Volume)(nil),                           // 12: machine.v1alpha1.Volume
 	(*NetworkInterface)(nil),                 // 13: machine.v1alpha1.NetworkInterface
@@ -2729,14 +2729,14 @@ var file_machine_v1alpha1_api_proto_depIdxs = []int32{
 	58, // 5: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
 	14, // 6: machine.v1alpha1.Machine.spec:type_name -> machine.v1alpha1.MachineSpec
 	15, // 7: machine.v1alpha1.Machine.status:type_name -> machine.v1alpha1.MachineStatus
-	53, // 8: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
-	54, // 9: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
-	55, // 10: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
-	10, // 11: machine.v1alpha1.Volume.empty_disk:type_name -> machine.v1alpha1.EmptyDisk
-	11, // 12: machine.v1alpha1.Volume.connection:type_name -> machine.v1alpha1.VolumeConnection
-	56, // 13: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
-	0,  // 14: machine.v1alpha1.MachineSpec.power:type_name -> machine.v1alpha1.Power
-	9,  // 15: machine.v1alpha1.MachineSpec.image:type_name -> machine.v1alpha1.ImageSpec
+	9,  // 8: machine.v1alpha1.LocalDisk.image:type_name -> machine.v1alpha1.ImageSpec
+	53, // 9: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
+	54, // 10: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
+	55, // 11: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
+	10, // 12: machine.v1alpha1.Volume.local_disk:type_name -> machine.v1alpha1.LocalDisk
+	11, // 13: machine.v1alpha1.Volume.connection:type_name -> machine.v1alpha1.VolumeConnection
+	56, // 14: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
+	0,  // 15: machine.v1alpha1.MachineSpec.power:type_name -> machine.v1alpha1.Power
 	12, // 16: machine.v1alpha1.MachineSpec.volumes:type_name -> machine.v1alpha1.Volume
 	13, // 17: machine.v1alpha1.MachineSpec.network_interfaces:type_name -> machine.v1alpha1.NetworkInterface
 	3,  // 18: machine.v1alpha1.MachineStatus.state:type_name -> machine.v1alpha1.MachineState

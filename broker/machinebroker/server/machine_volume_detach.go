@@ -55,7 +55,7 @@ func (s *Server) DetachVolume(ctx context.Context, req *iri.DetachVolumeRequest)
 		if err := s.cluster.Client().Delete(ctx, ironcoreVolume); client.IgnoreNotFound(err) != nil {
 			return nil, fmt.Errorf("error deleting ironcore volume %s: %w", ironcoreVolumeName, err)
 		}
-	case ironcoreMachineVolume.EmptyDisk != nil:
+	case ironcoreMachineVolume.LocalDisk != nil:
 		log.V(1).Info("No need to clean up empty disk")
 	default:
 		return nil, fmt.Errorf("unrecognized ironcore machine volume %#v", ironcoreMachineVolume)

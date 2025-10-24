@@ -37,6 +37,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &computev1alpha1.EphemeralNetworkInterfaceSourceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("EphemeralVolumeSource"):
 		return &computev1alpha1.EphemeralVolumeSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("LocalDiskVolumeSource"):
+		return &computev1alpha1.LocalDiskVolumeSourceApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("Machine"):
 		return &computev1alpha1.MachineApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MachineClass"):

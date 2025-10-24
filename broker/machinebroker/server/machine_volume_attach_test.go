@@ -26,9 +26,15 @@ var _ = Describe("AttachVolume", func() {
 			Machine: &iri.Machine{
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
+					Volumes: []*iri.Volume{{
+						Name:   "root",
+						Device: "oda",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					}},
 					Class: machineClass.Name,
 				},
 			},
@@ -41,7 +47,7 @@ var _ = Describe("AttachVolume", func() {
 			MachineId: machineID,
 			Volume: &iri.Volume{
 				Name:   "my-volume",
-				Device: "oda",
+				Device: "odb",
 				Connection: &iri.VolumeConnection{
 					Driver: "ceph",
 					Handle: "mycephvolume",
@@ -62,9 +68,9 @@ var _ = Describe("AttachVolume", func() {
 		Expect(k8sClient.Get(ctx, ironcoreMachineKey, ironcoreMachine)).To(Succeed())
 
 		By("inspecting the ironcore machine's volumes")
-		Expect(ironcoreMachine.Spec.Volumes).To(ConsistOf(MatchAllFields(Fields{
+		Expect(ironcoreMachine.Spec.Volumes).To(ContainElement(MatchAllFields(Fields{
 			"Name":   Equal("my-volume"),
-			"Device": PointTo(Equal("oda")),
+			"Device": PointTo(Equal("odb")),
 			"VolumeSource": MatchFields(IgnoreExtras, Fields{
 				"VolumeRef": PointTo(MatchAllFields(Fields{
 					"Name": Not(BeEmpty()),
@@ -74,7 +80,7 @@ var _ = Describe("AttachVolume", func() {
 
 		By("getting the corresponding ironcore volume")
 		volume := &storagev1alpha1.Volume{}
-		volumeName := ironcoreMachine.Spec.Volumes[0].VolumeRef.Name
+		volumeName := ironcoreMachine.Spec.Volumes[1].VolumeRef.Name
 		volumeKey := client.ObjectKey{Namespace: ns.Name, Name: volumeName}
 		Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 
@@ -111,9 +117,15 @@ var _ = Describe("AttachVolume", func() {
 			Machine: &iri.Machine{
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
+					Volumes: []*iri.Volume{{
+						Name:   "root",
+						Device: "oda",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					}},
 					Class: machineClass.Name,
 				},
 			},
@@ -126,7 +138,7 @@ var _ = Describe("AttachVolume", func() {
 			MachineId: machineID,
 			Volume: &iri.Volume{
 				Name:   "my-volume",
-				Device: "oda",
+				Device: "odb",
 				Connection: &iri.VolumeConnection{
 					Driver: "ceph",
 					Handle: "mycephvolume",
@@ -149,9 +161,9 @@ var _ = Describe("AttachVolume", func() {
 		Expect(k8sClient.Get(ctx, ironcoreMachineKey, ironcoreMachine)).To(Succeed())
 
 		By("inspecting the ironcore machine's volumes")
-		Expect(ironcoreMachine.Spec.Volumes).To(ConsistOf(MatchAllFields(Fields{
+		Expect(ironcoreMachine.Spec.Volumes).To(ContainElement(MatchAllFields(Fields{
 			"Name":   Equal("my-volume"),
-			"Device": PointTo(Equal("oda")),
+			"Device": PointTo(Equal("odb")),
 			"VolumeSource": MatchFields(IgnoreExtras, Fields{
 				"VolumeRef": PointTo(MatchAllFields(Fields{
 					"Name": Not(BeEmpty()),
@@ -161,7 +173,7 @@ var _ = Describe("AttachVolume", func() {
 
 		By("getting the corresponding ironcore volume")
 		volume := &storagev1alpha1.Volume{}
-		volumeName := ironcoreMachine.Spec.Volumes[0].VolumeRef.Name
+		volumeName := ironcoreMachine.Spec.Volumes[1].VolumeRef.Name
 		volumeKey := client.ObjectKey{Namespace: ns.Name, Name: volumeName}
 		Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 

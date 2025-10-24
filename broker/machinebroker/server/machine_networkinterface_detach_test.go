@@ -23,9 +23,14 @@ var _ = Describe("DetachNetworkInterface", func() {
 			Machine: &iri.Machine{
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
+					Volumes: []*iri.Volume{{
+						Name: "root",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					}},
 					Class: machineClass.Name,
 					NetworkInterfaces: []*iri.NetworkInterface{
 						{

@@ -115,7 +115,7 @@ func (s *Server) convertIronCoreVolume(
 ) (*iri.Volume, error) {
 	var (
 		connection *iri.VolumeConnection
-		emptyDisk  *iri.EmptyDisk
+		localDisk  *iri.LocalDisk
 	)
 	switch {
 	case ironcoreMachineVolume.VolumeRef != nil:
@@ -137,22 +137,25 @@ func (s *Server) convertIronCoreVolume(
 				EffectiveStorageBytes: effectiveStorageBytes,
 			}
 		}
-	case ironcoreMachineVolume.EmptyDisk != nil:
+	case ironcoreMachineVolume.LocalDisk != nil:
 		var sizeBytes int64
-		if sizeLimit := ironcoreMachineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
+		if sizeLimit := ironcoreMachineVolume.LocalDisk.SizeLimit; sizeLimit != nil {
 			sizeBytes = sizeLimit.Value()
 		}
-		emptyDisk = &iri.EmptyDisk{
+		localDisk = &iri.LocalDisk{
 			SizeBytes: sizeBytes,
+			Image: &iri.ImageSpec{
+				Image: ironcoreMachineVolume.LocalDisk.Image,
+			},
 		}
 	default:
-		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor empty disk", ironcoreMachineVolume)
+		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor empty disk, nor local disk", ironcoreMachineVolume)
 	}
 
 	return &iri.Volume{
 		Name:       ironcoreMachineVolume.Name,
 		Device:     *ironcoreMachineVolume.Device,
-		EmptyDisk:  emptyDisk,
+		LocalDisk:  localDisk,
 		Connection: connection,
 	}, nil
 }
@@ -193,13 +196,6 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 	power, err := s.convertIronCorePowerState(aggIronCoreMachine.Machine.Spec.Power)
 	if err != nil {
 		return nil, fmt.Errorf("error converting power state: %w", err)
-	}
-
-	var imageSpec *iri.ImageSpec
-	if image := aggIronCoreMachine.Machine.Spec.Image; image != "" {
-		imageSpec = &iri.ImageSpec{
-			Image: image,
-		}
 	}
 
 	volumes := make([]*iri.Volume, len(aggIronCoreMachine.Machine.Spec.Volumes))
@@ -253,7 +249,6 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 		Metadata: metadata,
 		Spec: &iri.MachineSpec{
 			Power:             power,
-			Image:             imageSpec,
 			Class:             aggIronCoreMachine.Machine.Spec.MachineClassRef.Name,
 			IgnitionData:      ignitionData,
 			Volumes:           volumes,

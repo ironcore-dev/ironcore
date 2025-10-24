@@ -55,6 +55,14 @@ func (b *VolumeApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApp
 	return b
 }
 
+// WithLocalDisk sets the LocalDisk field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the LocalDisk field is set to the value of the last call.
+func (b *VolumeApplyConfiguration) WithLocalDisk(value *LocalDiskVolumeSourceApplyConfiguration) *VolumeApplyConfiguration {
+	b.VolumeSourceApplyConfiguration.LocalDisk = value
+	return b
+}
+
 // WithEphemeral sets the Ephemeral field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Ephemeral field is set to the value of the last call.

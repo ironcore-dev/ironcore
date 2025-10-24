@@ -98,6 +98,8 @@ type VolumeSource struct {
 	VolumeRef *corev1.LocalObjectReference
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource
+	// LocalDisk instructs to use a Volume offered by the machine pool provider.
+	LocalDisk *LocalDiskVolumeSource
 	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
 	// Volume to use.
 	Ephemeral *EphemeralVolumeSource
@@ -110,6 +112,18 @@ type EmptyDiskVolumeSource struct {
 	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
 	// The default is nil which means that the limit is undefined.
 	SizeLimit *resource.Quantity
+}
+
+// LocalDiskVolumeSource is a volume that's offered by the machine pool provider.
+// Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+// varying performance characteristics. Potentially not recoverable.
+type LocalDiskVolumeSource struct {
+	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
+	// The default is nil which means that the limit is undefined.
+	SizeLimit *resource.Quantity
+	// Image is the optional URL providing the operating system image of the machine.
+	// +optional
+	Image string
 }
 
 // NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.

@@ -31,10 +31,15 @@ var _ = Describe("CreateMachine", func() {
 				},
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
 					Class: machineClass.Name,
+					Volumes: []*iri.Volume{{
+						Name: "root",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					}},
 				},
 			},
 		})
@@ -64,7 +69,6 @@ var _ = Describe("CreateMachine", func() {
 			machinebrokerv1alpha1.LabelsAnnotation:      encodedIRILabels,
 		}))
 		Expect(ironcoreMachine.Spec.Power).To(Equal(computev1alpha1.PowerOn))
-		Expect(ironcoreMachine.Spec.Image).To(Equal("example.org/foo:latest"))
 		Expect(ironcoreMachine.Spec.MachineClassRef.Name).To(Equal(machineClass.Name))
 	})
 })
