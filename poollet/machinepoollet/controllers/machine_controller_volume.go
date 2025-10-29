@@ -5,6 +5,7 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -12,9 +13,14 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	"golang.org/x/exp/maps"
+
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/utils/claimmanager"
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -110,6 +116,39 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 	return volumes, errors.Join(errs...)
 }
 
+func (r *MachineReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) (map[string]string, error) {
+	labels := map[string]string{
+		v1alpha1.VolumeUIDLabel:       string(volume.UID),
+		v1alpha1.VolumeNamespaceLabel: volume.Namespace,
+		v1alpha1.VolumeNameLabel:      volume.Name,
+	}
+	apiLabels, err := poolletutils.PrepareDownwardAPILabels(volume, r.VolumeDownwardAPILabels, v1alpha1.MachineDownwardAPIPrefix)
+	if err != nil {
+		return nil, err
+	}
+	labels = utilsmaps.AppendMap(labels, apiLabels)
+	return labels, nil
+}
+
+func (r *MachineReconciler) prepareVolumeAttributes(
+	volAttributes map[string]string,
+	labels map[string]string,
+) (map[string]string, error) {
+	var attributes map[string]string
+	if volAttributes != nil {
+		attributes = maps.Clone(volAttributes)
+	} else {
+		attributes = make(map[string]string)
+	}
+	labelsJSON, err := json.Marshal(labels)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling volume labels: %w", err)
+	}
+	attributes[v1alpha1.VolumeLabelsAttributeKey] = string(labelsJSON)
+
+	return attributes, nil
+}
+
 func (r *MachineReconciler) prepareRemoteIRIVolume(
 	ctx context.Context,
 	machine *computev1alpha1.Machine,
@@ -166,6 +205,14 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 	if resources := volume.Status.Resources; resources != nil {
 		effectiveSize = resources.Storage().Value()
 	}
+	labels, err := r.iriVolumeLabels(volume)
+	if err != nil {
+		return nil, false, fmt.Errorf("error preparing iri volume labels: %w", err)
+	}
+	attributes, err := r.prepareVolumeAttributes(access.VolumeAttributes, labels)
+	if err != nil {
+		return nil, false, err
+	}
 
 	return &iri.Volume{
 		Name:   machineVolume.Name,
@@ -173,7 +220,7 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 		Connection: &iri.VolumeConnection{
 			Driver:                access.Driver,
 			Handle:                access.Handle,
-			Attributes:            access.VolumeAttributes,
+			Attributes:            attributes,
 			SecretData:            secretData,
 			EncryptionData:        encryptionData,
 			EffectiveStorageBytes: effectiveSize,
