@@ -59,8 +59,9 @@ message ImageSpec {
   string image = 1;
 }
 
-message EmptyDisk {
+message LocalDisk {
   int64 size_bytes = 1;
+  ImageSpec image = 2;
 }
 
 message VolumeConnection {
@@ -75,7 +76,7 @@ message VolumeConnection {
 message Volume {
   string name = 1;
   string device = 2;
-  EmptyDisk empty_disk = 4;
+  LocalDisk local_disk = 4;
   VolumeConnection connection = 5;
 }
 
@@ -93,11 +94,10 @@ enum Power {
 
 message MachineSpec {
   Power power = 1;
-  ImageSpec image = 2;
-  string class = 3;
-  bytes ignition_data = 4;
-  repeated Volume volumes = 5;
-  repeated NetworkInterface network_interfaces = 6;
+  string class = 2;
+  bytes ignition_data = 3;
+  repeated Volume volumes = 4;
+  repeated NetworkInterface network_interfaces = 5;
 }
 
 message MachineStatus {
