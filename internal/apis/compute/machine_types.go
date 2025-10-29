@@ -118,7 +118,7 @@ type EmptyDiskVolumeSource struct {
 // Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
 // varying performance characteristics. Potentially not recoverable.
 type LocalDiskVolumeSource struct {
-	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
+	// SizeLimit is the total amount of local storage required for this LocalDisk volume.
 	// The default is nil which means that the limit is undefined.
 	SizeLimit *resource.Quantity
 	// Image is the optional URL providing the operating system image of the machine.

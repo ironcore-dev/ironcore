@@ -149,7 +149,7 @@ func (s *Server) convertIronCoreVolume(
 			},
 		}
 	default:
-		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor empty disk, nor local disk", ironcoreMachineVolume)
+		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor local disk", ironcoreMachineVolume)
 	}
 
 	return &iri.Volume{

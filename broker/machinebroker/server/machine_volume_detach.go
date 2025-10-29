@@ -56,7 +56,7 @@ func (s *Server) DetachVolume(ctx context.Context, req *iri.DetachVolumeRequest)
 			return nil, fmt.Errorf("error deleting ironcore volume %s: %w", ironcoreVolumeName, err)
 		}
 	case ironcoreMachineVolume.LocalDisk != nil:
-		log.V(1).Info("No need to clean up empty disk")
+		log.V(1).Info("No need to clean up local disk")
 	default:
 		return nil, fmt.Errorf("unrecognized ironcore machine volume %#v", ironcoreMachineVolume)
 	}

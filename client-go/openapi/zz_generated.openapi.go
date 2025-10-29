@@ -846,7 +846,7 @@ func schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref common.Refer
 				Properties: map[string]spec.Schema{
 					"sizeLimit": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SizeLimit is the total amount of local storage required for this EmptyDisk volume. The default is nil which means that the limit is undefined.",
+							Description: "SizeLimit is the total amount of local storage required for this LocalDisk volume. The default is nil which means that the limit is undefined.",
 							Ref:         ref("k8s.io/apimachinery/pkg/api/resource.Quantity"),
 						},
 					},
