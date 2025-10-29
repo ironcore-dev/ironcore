@@ -17,6 +17,7 @@ import (
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/testing/volume"
+	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	utilsenvtest "github.com/ironcore-dev/ironcore/utils/envtest"
@@ -224,6 +225,7 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 
 		indexer := k8sManager.GetFieldIndexer()
 		Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer)).To(Succeed())
+		Expect(storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer)).To(Succeed())
 
 		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{
 			RelistPeriod: 2 * time.Second,
@@ -243,6 +245,21 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 			VolumePoolName:    vp.Name,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
+		volumeEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {
+			res, err := srv.ListVolumes(ctx, &iri.ListVolumesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Volumes, nil
+		}, irievent.GeneratorOptions{})
+
+		Expect(k8sManager.Add(volumeEvents)).To(Succeed())
+
+		Expect((&controllers.VolumeAnnotatorReconciler{
+			Client:       k8sManager.GetClient(),
+			VolumeEvents: volumeEvents,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
 		Expect((&controllers.VolumePoolReconciler{
 			Client:            k8sManager.GetClient(),
 			VolumeRuntime:     srv,
@@ -254,6 +271,30 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 			Client:            k8sManager.GetClient(),
 			VolumeClassMapper: volumeClassMapper,
 			VolumePoolName:    vp.Name,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		Expect((&controllers.VolumeSnapshotReconciler{
+			EventRecorder:           &record.FakeRecorder{},
+			Client:                  k8sManager.GetClient(),
+			Scheme:                  scheme.Scheme,
+			VolumeRuntime:           srv,
+			VolumeRuntimeName:       volume.FakeRuntimeName,
+			WatchFilterValue:        "",
+			MaxConcurrentReconciles: 1,
+		}).SetupWithManager(k8sManager)).To(Succeed())
+
+		volumeSnapshotEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
+			res, err := srv.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.VolumeSnapshots, nil
+		}, irievent.GeneratorOptions{})
+		Expect(k8sManager.Add(volumeSnapshotEvents)).To(Succeed())
+
+		Expect((&controllers.VolumeSnapshotAnnotatorReconciler{
+			Client:               k8sManager.GetClient(),
+			VolumeSnapshotEvents: volumeSnapshotEvents,
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

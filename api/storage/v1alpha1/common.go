@@ -6,8 +6,9 @@ package v1alpha1
 import corev1 "k8s.io/api/core/v1"
 
 const (
-	VolumeVolumePoolRefNameField  = "spec.volumePoolRef.name"
-	VolumeVolumeClassRefNameField = "spec.volumeClassRef.name"
+	VolumeVolumePoolRefNameField     = "spec.volumePoolRef.name"
+	VolumeVolumeClassRefNameField    = "spec.volumeClassRef.name"
+	VolumeVolumeSnapshotRefNameField = "spec.volumeSnapshotRef.name"
 
 	BucketBucketPoolRefNameField  = "spec.bucketPoolRef.name"
 	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
