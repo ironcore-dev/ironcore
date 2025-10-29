@@ -50,6 +50,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachineClasses().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("machinepools"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().MachinePools().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("reservations"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Compute().V1alpha1().Reservations().Informer()}, nil
 
 		// Group=core.ironcore.dev, Version=v1alpha1
 	case corev1alpha1.SchemeGroupVersion.WithResource("resourcequotas"):

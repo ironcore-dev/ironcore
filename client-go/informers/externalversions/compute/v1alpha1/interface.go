@@ -17,6 +17,8 @@ type Interface interface {
 	MachineClasses() MachineClassInformer
 	// MachinePools returns a MachinePoolInformer.
 	MachinePools() MachinePoolInformer
+	// Reservations returns a ReservationInformer.
+	Reservations() ReservationInformer
 }
 
 type version struct {
@@ -43,4 +45,9 @@ func (v *version) MachineClasses() MachineClassInformer {
 // MachinePools returns a MachinePoolInformer.
 func (v *version) MachinePools() MachinePoolInformer {
 	return &machinePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// Reservations returns a ReservationInformer.
+func (v *version) Reservations() ReservationInformer {
+	return &reservationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

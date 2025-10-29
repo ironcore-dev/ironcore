@@ -11,6 +11,7 @@ import (
 	machinestorage "github.com/ironcore-dev/ironcore/internal/registry/compute/machine/storage"
 	machineclassstore "github.com/ironcore-dev/ironcore/internal/registry/compute/machineclass/storage"
 	machinepoolstorage "github.com/ironcore-dev/ironcore/internal/registry/compute/machinepool/storage"
+	reservationstorage "github.com/ironcore-dev/ironcore/internal/registry/compute/reservation/storage"
 	ironcoreserializer "github.com/ironcore-dev/ironcore/internal/serializer"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -67,6 +68,14 @@ func (p StorageProvider) v1alpha1Storage(restOptionsGetter generic.RESTOptionsGe
 	storageMap["machines"] = machineStorage.Machine
 	storageMap["machines/status"] = machineStorage.Status
 	storageMap["machines/exec"] = machineStorage.Exec
+
+	reservationStorage, err := reservationstorage.NewStorage(restOptionsGetter)
+	if err != nil {
+		return storageMap, err
+	}
+
+	storageMap["reservation"] = reservationStorage.Reservation
+	storageMap["reservation/status"] = reservationStorage.Status
 
 	return storageMap, nil
 }

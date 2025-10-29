@@ -32,6 +32,9 @@ const (
 	MachineRuntime_UpdateVolume_FullMethodName             = "/machine.v1alpha1.MachineRuntime/UpdateVolume"
 	MachineRuntime_AttachNetworkInterface_FullMethodName   = "/machine.v1alpha1.MachineRuntime/AttachNetworkInterface"
 	MachineRuntime_DetachNetworkInterface_FullMethodName   = "/machine.v1alpha1.MachineRuntime/DetachNetworkInterface"
+	MachineRuntime_ListReservations_FullMethodName         = "/machine.v1alpha1.MachineRuntime/ListReservations"
+	MachineRuntime_CreateReservation_FullMethodName        = "/machine.v1alpha1.MachineRuntime/CreateReservation"
+	MachineRuntime_DeleteReservation_FullMethodName        = "/machine.v1alpha1.MachineRuntime/DeleteReservation"
 	MachineRuntime_Status_FullMethodName                   = "/machine.v1alpha1.MachineRuntime/Status"
 	MachineRuntime_Exec_FullMethodName                     = "/machine.v1alpha1.MachineRuntime/Exec"
 )
@@ -52,6 +55,9 @@ type MachineRuntimeClient interface {
 	UpdateVolume(ctx context.Context, in *UpdateVolumeRequest, opts ...grpc.CallOption) (*UpdateVolumeResponse, error)
 	AttachNetworkInterface(ctx context.Context, in *AttachNetworkInterfaceRequest, opts ...grpc.CallOption) (*AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(ctx context.Context, in *DetachNetworkInterfaceRequest, opts ...grpc.CallOption) (*DetachNetworkInterfaceResponse, error)
+	ListReservations(ctx context.Context, in *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error)
+	CreateReservation(ctx context.Context, in *CreateReservationRequest, opts ...grpc.CallOption) (*CreateReservationResponse, error)
+	DeleteReservation(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error)
 	Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	Exec(ctx context.Context, in *ExecRequest, opts ...grpc.CallOption) (*ExecResponse, error)
 }
@@ -184,6 +190,36 @@ func (c *machineRuntimeClient) DetachNetworkInterface(ctx context.Context, in *D
 	return out, nil
 }
 
+func (c *machineRuntimeClient) ListReservations(ctx context.Context, in *ListReservationsRequest, opts ...grpc.CallOption) (*ListReservationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListReservationsResponse)
+	err := c.cc.Invoke(ctx, MachineRuntime_ListReservations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *machineRuntimeClient) CreateReservation(ctx context.Context, in *CreateReservationRequest, opts ...grpc.CallOption) (*CreateReservationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateReservationResponse)
+	err := c.cc.Invoke(ctx, MachineRuntime_CreateReservation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *machineRuntimeClient) DeleteReservation(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteReservationResponse)
+	err := c.cc.Invoke(ctx, MachineRuntime_DeleteReservation_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *machineRuntimeClient) Status(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StatusResponse)
@@ -220,6 +256,9 @@ type MachineRuntimeServer interface {
 	UpdateVolume(context.Context, *UpdateVolumeRequest) (*UpdateVolumeResponse, error)
 	AttachNetworkInterface(context.Context, *AttachNetworkInterfaceRequest) (*AttachNetworkInterfaceResponse, error)
 	DetachNetworkInterface(context.Context, *DetachNetworkInterfaceRequest) (*DetachNetworkInterfaceResponse, error)
+	ListReservations(context.Context, *ListReservationsRequest) (*ListReservationsResponse, error)
+	CreateReservation(context.Context, *CreateReservationRequest) (*CreateReservationResponse, error)
+	DeleteReservation(context.Context, *DeleteReservationRequest) (*DeleteReservationResponse, error)
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 	Exec(context.Context, *ExecRequest) (*ExecResponse, error)
 	mustEmbedUnimplementedMachineRuntimeServer()
@@ -267,6 +306,15 @@ func (UnimplementedMachineRuntimeServer) AttachNetworkInterface(context.Context,
 }
 func (UnimplementedMachineRuntimeServer) DetachNetworkInterface(context.Context, *DetachNetworkInterfaceRequest) (*DetachNetworkInterfaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetachNetworkInterface not implemented")
+}
+func (UnimplementedMachineRuntimeServer) ListReservations(context.Context, *ListReservationsRequest) (*ListReservationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListReservations not implemented")
+}
+func (UnimplementedMachineRuntimeServer) CreateReservation(context.Context, *CreateReservationRequest) (*CreateReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateReservation not implemented")
+}
+func (UnimplementedMachineRuntimeServer) DeleteReservation(context.Context, *DeleteReservationRequest) (*DeleteReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteReservation not implemented")
 }
 func (UnimplementedMachineRuntimeServer) Status(context.Context, *StatusRequest) (*StatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
@@ -511,6 +559,60 @@ func _MachineRuntime_DetachNetworkInterface_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MachineRuntime_ListReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListReservationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineRuntimeServer).ListReservations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MachineRuntime_ListReservations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineRuntimeServer).ListReservations(ctx, req.(*ListReservationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MachineRuntime_CreateReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineRuntimeServer).CreateReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MachineRuntime_CreateReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineRuntimeServer).CreateReservation(ctx, req.(*CreateReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MachineRuntime_DeleteReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MachineRuntimeServer).DeleteReservation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MachineRuntime_DeleteReservation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MachineRuntimeServer).DeleteReservation(ctx, req.(*DeleteReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MachineRuntime_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(StatusRequest)
 	if err := dec(in); err != nil {
@@ -601,6 +703,18 @@ var MachineRuntime_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DetachNetworkInterface",
 			Handler:    _MachineRuntime_DetachNetworkInterface_Handler,
+		},
+		{
+			MethodName: "ListReservations",
+			Handler:    _MachineRuntime_ListReservations_Handler,
+		},
+		{
+			MethodName: "CreateReservation",
+			Handler:    _MachineRuntime_CreateReservation_Handler,
+		},
+		{
+			MethodName: "DeleteReservation",
+			Handler:    _MachineRuntime_DeleteReservation_Handler,
 		},
 		{
 			MethodName: "Status",
