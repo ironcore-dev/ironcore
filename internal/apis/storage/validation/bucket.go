@@ -14,7 +14,7 @@ import (
 func ValidateBucket(bucket *storage.Bucket) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(bucket, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(bucket, true, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateBucketSpec(&bucket.Spec, field.NewPath("spec"))...)
 
 	return allErrs
@@ -24,7 +24,7 @@ func validateBucketSpec(spec *storage.BucketSpec, fldPath *field.Path) field.Err
 	var allErrs field.ErrorList
 
 	if bucketClassRef := spec.BucketClassRef; bucketClassRef != nil {
-		for _, msg := range apivalidation.NameIsDNSLabel(spec.BucketClassRef.Name, false) {
+		for _, msg := range apivalidation.NameIsDNSSubdomain(spec.BucketClassRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("bucketClassRef").Child("name"), spec.BucketClassRef.Name, msg))
 		}
 
