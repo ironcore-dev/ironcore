@@ -43,7 +43,7 @@ func (s *Server) getIronCoreNetworkInterfaceConfig(iriNIC *iri.NetworkInterface)
 	var preparedNicLabels, preparedNetworkLabels map[string]string
 	attributes := iriNIC.GetAttributes()
 	if attributes != nil {
-		preparedNicLabels, preparedNetworkLabels, err = s.prepareLabelsFromAttributes(iriNIC.GetAttributes())
+		preparedNicLabels, preparedNetworkLabels, err = s.prepareLabelsFromAttributes(attributes)
 		if err != nil {
 			return nil, err
 		}
@@ -63,13 +63,13 @@ func (s *Server) prepareLabelsFromAttributes(attrs map[string]string) (map[strin
 
 	if nicLabelsString, ok := attrs[machinepoolletv1alpha1.NICLabelsAttributeKey]; ok {
 		if err := json.Unmarshal([]byte(nicLabelsString), &nicLabels); err != nil {
-			return nil, nil, fmt.Errorf("error unmarshaling labels: %w", err)
+			return nil, nil, fmt.Errorf("error unmarshaling NIC labels: %w", err)
 		}
 	}
 
 	if networkLabelsString, ok := attrs[machinepoolletv1alpha1.NetworkLabelsAttributeKey]; ok {
 		if err := json.Unmarshal([]byte(networkLabelsString), &networkLabels); err != nil {
-			return nil, nil, fmt.Errorf("error unmarshaling labels: %w", err)
+			return nil, nil, fmt.Errorf("error unmarshaling network labels: %w", err)
 		}
 	}
 	preparedNicLabels := brokerutils.PrepareDownwardAPILabels(nicLabels, s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)

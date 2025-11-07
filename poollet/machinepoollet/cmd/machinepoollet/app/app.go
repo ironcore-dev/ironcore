@@ -78,6 +78,9 @@ type Options struct {
 	MachineDownwardAPILabels      map[string]string
 	MachineDownwardAPIAnnotations map[string]string
 
+	VolumeDownwardAPILabels      map[string]string
+	VolumeDownwardAPIAnnotations map[string]string
+
 	NicDownwardAPILabels      map[string]string
 	NicDownwardAPIAnnotations map[string]string
 
@@ -126,10 +129,13 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.MachinePoolName, "machine-pool-name", o.MachinePoolName, "Name of the machine pool to announce / watch")
 	fs.StringToStringVar(&o.MachineDownwardAPILabels, "machine-downward-api-label", o.MachineDownwardAPILabels, "Downward-API labels to set on the iri machine.")
 	fs.StringToStringVar(&o.MachineDownwardAPIAnnotations, "machine-downward-api-annotation", o.MachineDownwardAPIAnnotations, "Downward-API annotations to set on the iri machine.")
+	fs.StringToStringVar(&o.VolumeDownwardAPILabels, "volume-downward-api-label", o.VolumeDownwardAPILabels, "Downward-API labels to set on the iri volume.")
+	fs.StringToStringVar(&o.VolumeDownwardAPIAnnotations, "volume-downward-api-annotation", o.VolumeDownwardAPIAnnotations, "Downward-API annotations to set on the iri volume.")
 	fs.StringToStringVar(&o.NicDownwardAPILabels, "nic-downward-api-label", o.NicDownwardAPILabels, "Downward-API labels to set on the iri nic.")
 	fs.StringToStringVar(&o.NicDownwardAPIAnnotations, "nic-downward-api-annotation", o.NicDownwardAPIAnnotations, "Downward-API annotations to set on the iri nic.")
 	fs.StringToStringVar(&o.NetworkDownwardAPILabels, "network-downward-api-label", o.NetworkDownwardAPILabels, "Downward-API labels to set on the iri network.")
 	fs.StringToStringVar(&o.NetworkDownwardAPIAnnotations, "network-downward-api-annotation", o.NetworkDownwardAPIAnnotations, "Downward-API annotations to set on the iri network.")
+
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
@@ -430,6 +436,8 @@ func Run(ctx context.Context, opts Options) error {
 			MachinePoolName:               opts.MachinePoolName,
 			MachineDownwardAPILabels:      opts.MachineDownwardAPILabels,
 			MachineDownwardAPIAnnotations: opts.MachineDownwardAPIAnnotations,
+			VolumeDownwardAPILabels:       opts.VolumeDownwardAPILabels,
+			VolumeDownwardAPIAnnotations:  opts.VolumeDownwardAPIAnnotations,
 			NicDownwardAPILabels:          opts.NicDownwardAPILabels,
 			NicDownwardAPIAnnotations:     opts.NicDownwardAPIAnnotations,
 			NetworkDownwardAPILabels:      opts.NetworkDownwardAPILabels,
