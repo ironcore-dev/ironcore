@@ -15,7 +15,7 @@ import (
 func ValidateBucketClass(bucketClass *storage.BucketClass) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(bucketClass, false, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(bucketClass, false, apivalidation.NameIsDNSSubdomain, field.NewPath("metadata"))...)
 
 	allErrs = append(allErrs, validateBucketClassCapabilities(bucketClass.Capabilities, field.NewPath("capabilities"))...)
 
