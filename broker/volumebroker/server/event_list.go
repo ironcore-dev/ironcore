@@ -40,8 +40,8 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 
 	var iriEvents []*irievent.Event
 	for _, volumeEvent := range volumeEventList.Items {
-		ironcoreVolume, err := s.getIronCoreVolume(ctx, volumeEvent.InvolvedObject.Name)
-		if err != nil {
+		ironcoreVolume := &storagev1alpha1.Volume{}
+		if err := s.getManagedAndCreated(ctx, volumeEvent.InvolvedObject.Name, ironcoreVolume); err != nil {
 			log.V(1).Info("Unable to get ironcore volume", "VolumeName", volumeEvent.InvolvedObject.Name)
 			continue
 		}
