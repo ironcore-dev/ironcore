@@ -8,6 +8,7 @@ import (
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/event"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/status"
 	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/volume"
+	"github.com/ironcore-dev/ironcore/irictl-volume/cmd/irictl-volume/irictlvolume/get/volumesnapshot"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -21,6 +22,7 @@ func Command(streams clicommon.Streams, clientFactory common.ClientFactory) *cob
 		volume.Command(streams, clientFactory),
 		status.Command(streams, clientFactory),
 		event.Command(streams, clientFactory),
+		volumesnapshot.Command(streams, clientFactory),
 	)
 
 	return cmd

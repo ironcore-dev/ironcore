@@ -6,4 +6,8 @@ package events
 const (
 	VolumeClassNotReady            = "VolumeClassNotReady"
 	VolumeEncryptionSecretNotReady = "VolumeEncryptionSecretNotReady"
+	VolumeSnapshotNotFound         = "VolumeSnapshotNotFound"
+	VolumeSnapshotNotReady         = "VolumeSnapshotNotReady"
+	SourceVolumeNotFound           = "SourceVolumeNotFound"
+	SourceVolumeNotAvailable       = "SourceVolumeNotAvailable"
 )

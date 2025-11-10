@@ -80,6 +80,8 @@ func PrepareDownwardAPILabels(
 			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
 		case *storagev1alpha1.Bucket:
 			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
+		case *storagev1alpha1.VolumeSnapshot:
+			value, err = fieldpath.ExtractFieldPathAsString(o, fieldPath)
 		default:
 			return nil, fmt.Errorf("unsupported type for downward API label extraction")
 		}

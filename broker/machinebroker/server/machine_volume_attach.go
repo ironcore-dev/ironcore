@@ -5,6 +5,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -13,8 +14,12 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common/cleaner"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+
+	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	metautils "github.com/ironcore-dev/ironcore/utils/meta"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -27,6 +32,7 @@ type IronCoreVolumeConfig struct {
 	Device    string
 	LocalDisk *IronCoreVolumeLocalDiskConfig
 	Remote    *IronCoreVolumeRemoteConfig
+	Labels    map[string]string
 }
 
 type IronCoreVolumeLocalDiskConfig struct {
@@ -70,13 +76,38 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 	default:
 		return nil, fmt.Errorf("unrecognized volume %#v", volume)
 	}
-
+	labels, err := s.prepareLabels(volume.Connection)
+	if err != nil {
+		return nil, err
+	}
 	return &IronCoreVolumeConfig{
 		Name:      volume.Name,
 		Device:    volume.Device,
 		LocalDisk: localDisk,
 		Remote:    remote,
+		Labels:    labels,
 	}, nil
+}
+
+func (s *Server) prepareLabels(conn *iri.VolumeConnection) (map[string]string, error) {
+	attrs := conn.GetAttributes()
+	if attrs == nil {
+		return nil, nil
+	}
+	return s.prepareVolumeLabelsFromAttributes(attrs)
+}
+
+func (s *Server) prepareVolumeLabelsFromAttributes(attrs map[string]string) (map[string]string, error) {
+	var labels map[string]string
+
+	if labelsString, ok := attrs[machinepoolletv1alpha1.VolumeLabelsAttributeKey]; ok {
+		if err := json.Unmarshal([]byte(labelsString), &labels); err != nil {
+			return nil, fmt.Errorf("error unmarshaling volume labels: %w", err)
+		}
+	}
+	preparedVolumeLabels := brokerutils.PrepareDownwardAPILabels(labels, s.brokerDownwardAPILabels, machinepoolletv1alpha1.MachineDownwardAPIPrefix)
+
+	return preparedVolumeLabels, nil
 }
 
 func (s *Server) createIronCoreVolume(
@@ -123,9 +154,9 @@ func (s *Server) createIronCoreVolume(
 				Annotations: map[string]string{
 					commonv1alpha1.ManagedByAnnotation: machinebrokerv1alpha1.MachineBrokerManager,
 				},
-				Labels: map[string]string{
+				Labels: utilsmaps.AppendMap(cfg.Labels, map[string]string{
 					machinebrokerv1alpha1.ManagerLabel: machinebrokerv1alpha1.MachineBrokerManager,
-				},
+				}),
 			},
 			Spec: storagev1alpha1.VolumeSpec{
 				ClaimRef: s.optionalLocalUIDReference(optIronCoreMachine),
