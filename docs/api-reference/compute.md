@@ -134,7 +134,8 @@ string
 </td>
 <td>
 <em>(Optional)</em>
-<p>Image is the optional URL providing the operating system image of the machine.</p>
+<p>Deprecated: Use LocalDisk to provide a bootable disk
+Image is the optional URL providing the operating system image of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -568,6 +569,52 @@ github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec
 </td>
 <td>
 <p>VolumeTemplate is the template definition of the storage.Volume.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.ironcore.dev/v1alpha1.LocalDiskVolumeSource">LocalDiskVolumeSource
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.VolumeSource">VolumeSource</a>)
+</p>
+<div>
+<p>LocalDiskVolumeSource is a volume that&rsquo;s offered by the machine pool provider.
+Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+varying performance characteristics. Potentially not recoverable.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>sizeLimit</code><br/>
+<em>
+<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
+k8s.io/apimachinery/pkg/api/resource.Quantity
+</a>
+</em>
+</td>
+<td>
+<p>SizeLimit is the total amount of local storage required for this LocalDisk volume.
+The default is nil which means that the limit is undefined.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Image is the optional URL providing the operating system image of the machine.</p>
 </td>
 </tr>
 </tbody>
@@ -1061,7 +1108,8 @@ string
 </td>
 <td>
 <em>(Optional)</em>
-<p>Image is the optional URL providing the operating system image of the machine.</p>
+<p>Deprecated: Use LocalDisk to provide a bootable disk
+Image is the optional URL providing the operating system image of the machine.</p>
 </td>
 </tr>
 <tr>
@@ -1573,7 +1621,21 @@ EmptyDiskVolumeSource
 </em>
 </td>
 <td>
-<p>EmptyDisk instructs to use a Volume offered by the machine pool provider.</p>
+<p>Deprecated: Use LocalDisk instead
+EmptyDisk instructs to use a Volume offered by the machine pool provider.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>localDisk</code><br/>
+<em>
+<a href="#compute.ironcore.dev/v1alpha1.LocalDiskVolumeSource">
+LocalDiskVolumeSource
+</a>
+</em>
+</td>
+<td>
+<p>LocalDisk instructs to use a Volume offered by the machine pool provider.</p>
 </td>
 </tr>
 <tr>
