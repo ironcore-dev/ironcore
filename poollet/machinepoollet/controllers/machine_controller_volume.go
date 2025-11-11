@@ -233,14 +233,20 @@ func (r *MachineReconciler) prepareLocalDiskIRIVolume(machineVolume *computev1al
 	if sizeLimit := machineVolume.LocalDisk.SizeLimit; sizeLimit != nil {
 		sizeBytes = sizeLimit.Value()
 	}
+
+	var imageSpec *iri.ImageSpec
+	if image := machineVolume.LocalDisk.Image; image != "" {
+		imageSpec = &iri.ImageSpec{
+			Image: machineVolume.LocalDisk.Image,
+		}
+	}
+
 	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
 		LocalDisk: &iri.LocalDisk{
 			SizeBytes: sizeBytes,
-			Image: &iri.ImageSpec{
-				Image: machineVolume.LocalDisk.Image,
-			},
+			Image:     imageSpec,
 		},
 	}
 }

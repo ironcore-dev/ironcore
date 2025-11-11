@@ -142,11 +142,17 @@ func (s *Server) convertIronCoreVolume(
 		if sizeLimit := ironcoreMachineVolume.LocalDisk.SizeLimit; sizeLimit != nil {
 			sizeBytes = sizeLimit.Value()
 		}
+
+		var imageSpec *iri.ImageSpec
+		if image := ironcoreMachineVolume.LocalDisk.Image; image != "" {
+			imageSpec = &iri.ImageSpec{
+				Image: ironcoreMachineVolume.LocalDisk.Image,
+			}
+		}
+
 		localDisk = &iri.LocalDisk{
 			SizeBytes: sizeBytes,
-			Image: &iri.ImageSpec{
-				Image: ironcoreMachineVolume.LocalDisk.Image,
-			},
+			Image:     imageSpec,
 		}
 	default:
 		return nil, fmt.Errorf("machine volume %#v does neither specify volume ref nor local disk", ironcoreMachineVolume)
