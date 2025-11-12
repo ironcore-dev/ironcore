@@ -228,22 +228,32 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 	}, true, nil
 }
 
-func (r *MachineReconciler) prepareEmptyDiskIRIVolume(machineVolume *computev1alpha1.Volume) *iri.Volume {
+func (r *MachineReconciler) prepareLocalDiskIRIVolume(machineVolume *computev1alpha1.Volume) *iri.Volume {
 	var sizeBytes int64
-	if sizeLimit := machineVolume.EmptyDisk.SizeLimit; sizeLimit != nil {
+	if sizeLimit := machineVolume.LocalDisk.SizeLimit; sizeLimit != nil {
 		sizeBytes = sizeLimit.Value()
 	}
+
+	var imageSpec *iri.ImageSpec
+	if image := machineVolume.LocalDisk.Image; image != "" {
+		imageSpec = &iri.ImageSpec{
+			Image: machineVolume.LocalDisk.Image,
+		}
+	}
+
 	return &iri.Volume{
 		Name:   machineVolume.Name,
 		Device: *machineVolume.Device,
-		EmptyDisk: &iri.EmptyDisk{
+		LocalDisk: &iri.LocalDisk{
 			SizeBytes: sizeBytes,
+			Image:     imageSpec,
 		},
 	}
 }
 
 func (r *MachineReconciler) prepareIRIVolumes(
 	ctx context.Context,
+	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	volumes []storagev1alpha1.Volume,
 ) ([]*iri.Volume, bool, error) {
@@ -270,12 +280,10 @@ func (r *MachineReconciler) prepareIRIVolumes(
 	}
 
 	for _, machineVolume := range machine.Spec.Volumes {
-		if machineVolume.EmptyDisk == nil {
-			continue
+		if machineVolume.LocalDisk != nil {
+			iriVolume := r.prepareLocalDiskIRIVolume(&machineVolume)
+			iriVolumes = append(iriVolumes, iriVolume)
 		}
-
-		iriVolume := r.prepareEmptyDiskIRIVolume(&machineVolume)
-		iriVolumes = append(iriVolumes, iriVolume)
 	}
 
 	if len(iriVolumes) != len(machine.Spec.Volumes) {
@@ -402,7 +410,7 @@ func (r *MachineReconciler) updateIRIVolumes(
 	iriMachine *iri.Machine,
 	volumes []storagev1alpha1.Volume,
 ) error {
-	desiredIRIVolumes, _, err := r.prepareIRIVolumes(ctx, machine, volumes)
+	desiredIRIVolumes, _, err := r.prepareIRIVolumes(ctx, log, machine, volumes)
 	if err != nil {
 		return fmt.Errorf("error preparing iri volumes: %w", err)
 	}

@@ -327,7 +327,7 @@ func (r *MachineReconciler) create(
 	log.V(1).Info("Create")
 
 	log.V(1).Info("Getting machine config")
-	iriMachine, ok, err := r.prepareIRIMachine(ctx, machine, nics, volumes)
+	iriMachine, ok, err := r.prepareIRIMachine(ctx, log, machine, nics, volumes)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error preparing iri machine: %w", err)
 	}
@@ -697,6 +697,7 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 
 func (r *MachineReconciler) prepareIRIMachine(
 	ctx context.Context,
+	log logr.Logger,
 	machine *computev1alpha1.Machine,
 	nics []networkingv1alpha1.NetworkInterface,
 	volumes []storagev1alpha1.Volume,
@@ -712,13 +713,6 @@ func (r *MachineReconciler) prepareIRIMachine(
 		errs = append(errs, fmt.Errorf("error preparing iri machine class: %w", err))
 	case !classOK:
 		ok = false
-	}
-
-	var imageSpec *iri.ImageSpec
-	if image := machine.Spec.Image; image != "" {
-		imageSpec = &iri.ImageSpec{
-			Image: image,
-		}
 	}
 
 	var ignitionData []byte
@@ -742,7 +736,7 @@ func (r *MachineReconciler) prepareIRIMachine(
 		ok = false
 	}
 
-	machineVolumes, machineVolumesOK, err := r.prepareIRIVolumes(ctx, machine, volumes)
+	machineVolumes, machineVolumesOK, err := r.prepareIRIVolumes(ctx, log, machine, volumes)
 	switch {
 	case err != nil:
 		errs = append(errs, fmt.Errorf("error preparing iri machine volumes: %w", err))
@@ -772,7 +766,6 @@ func (r *MachineReconciler) prepareIRIMachine(
 				Annotations: annotations,
 			},
 			Spec: &iri.MachineSpec{
-				Image:             imageSpec,
 				Class:             class,
 				IgnitionData:      ignitionData,
 				Volumes:           machineVolumes,

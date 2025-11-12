@@ -131,6 +131,22 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(InvalidField("spec.volume[0].emptyDisk.sizeLimit")),
 		),
+		Entry("invalid empty disk size limit quantity",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "foo",
+							Device: "oda",
+							VolumeSource: compute.VolumeSource{
+								LocalDisk: &compute.LocalDiskVolumeSource{SizeLimit: mustParseNewQuantity("-1Gi")},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volume[0].localDisk.sizeLimit")),
+		),
 		Entry("duplicate machine volume device",
 			&compute.Machine{
 				Spec: compute.MachineSpec{
@@ -473,6 +489,60 @@ var _ = Describe("Machine", func() {
 			},
 			&compute.Machine{},
 			Not(ContainElement(ImmutableField("spec.machinePoolRef"))),
+		),
+		Entry("mutate local boot disk image",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "rootdisk",
+							Device: "vda",
+							VolumeSource: compute.VolumeSource{
+								LocalDisk: &compute.LocalDiskVolumeSource{
+									Image: "newImage",
+								},
+							},
+						},
+					},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "rootdisk",
+							Device: "vda",
+							VolumeSource: compute.VolumeSource{
+								LocalDisk: &compute.LocalDiskVolumeSource{
+									Image: "oldImage",
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(ImmutableField("spec.volumes[rootdisk].localDisk.image")),
+		),
+		Entry("remove local boot disk",
+			&compute.Machine{
+				Spec: compute.MachineSpec{},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "rootdisk",
+							Device: "vda",
+							VolumeSource: compute.VolumeSource{
+								LocalDisk: &compute.LocalDiskVolumeSource{
+									Image: "image",
+								},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volumes[rootdisk].localDisk.image")),
 		),
 		Entry("duplicate volume name",
 			&compute.Machine{

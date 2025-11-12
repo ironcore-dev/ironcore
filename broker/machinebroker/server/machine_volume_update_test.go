@@ -30,14 +30,20 @@ var _ = Describe("UpdateVolume", func() {
 			Machine: &iri.Machine{
 				Spec: &iri.MachineSpec{
 					Power: iri.Power_POWER_ON,
-					Image: &iri.ImageSpec{
-						Image: "example.org/foo:latest",
-					},
 					Class: machineClass.Name,
-					Volumes: []*iri.Volume{
+
+					Volumes: []*iri.Volume{{
+						Name:   "root",
+						Device: "oda",
+						LocalDisk: &iri.LocalDisk{
+							Image: &iri.ImageSpec{
+								Image: "example.org/foo:latest",
+							},
+						},
+					},
 						{
 							Name:   "primary",
-							Device: "oda",
+							Device: "odb",
 							Connection: &iri.VolumeConnection{
 								Driver:                "test",
 								Handle:                "testhandle",
@@ -58,7 +64,7 @@ var _ = Describe("UpdateVolume", func() {
 
 		By("getting the corresponding ironcore volume")
 		volume := &storagev1alpha1.Volume{}
-		volumeName := ironcoreMachine.Spec.Volumes[0].VolumeRef.Name
+		volumeName := ironcoreMachine.Spec.Volumes[1].VolumeRef.Name
 		volumeKey := client.ObjectKey{Namespace: ns.Name, Name: volumeName}
 		Expect(k8sClient.Get(ctx, volumeKey, volume)).To(Succeed())
 
@@ -67,7 +73,7 @@ var _ = Describe("UpdateVolume", func() {
 			MachineId: machineID,
 			Volume: &iri.Volume{
 				Name:   "primary",
-				Device: "oda",
+				Device: "odb",
 				Connection: &iri.VolumeConnection{
 					Driver:                "test",
 					Handle:                "testhandle",
@@ -90,9 +96,9 @@ var _ = Describe("UpdateVolume", func() {
 		))
 
 		By("verifying machine volume is updated")
-		Eventually(Object(ironcoreMachine)).Should(HaveField("Spec.Volumes", ConsistOf(MatchFields(IgnoreExtras, Fields{
+		Eventually(Object(ironcoreMachine)).Should(HaveField("Spec.Volumes", ContainElement(MatchFields(IgnoreExtras, Fields{
 			"Name":   Equal("primary"),
-			"Device": Equal(ptr.To("oda")),
+			"Device": Equal(ptr.To("odb")),
 			"VolumeSource": Equal(computev1alpha1.VolumeSource{
 				VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
 			}),

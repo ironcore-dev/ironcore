@@ -23,6 +23,7 @@ type MachineSpec struct {
 	// Power is the desired machine power state.
 	// Defaults to PowerOn.
 	Power Power `json:"power,omitempty"`
+	// Deprecated: Use LocalDisk to provide a bootable disk
 	// Image is the optional URL providing the operating system image of the machine.
 	// +optional
 	Image string `json:"image,omitempty"`
@@ -106,8 +107,11 @@ type Volume struct {
 type VolumeSource struct {
 	// VolumeRef instructs to use the specified Volume as source for the attachment.
 	VolumeRef *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
+	// Deprecated: Use LocalDisk instead
 	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSource `json:"emptyDisk,omitempty"`
+	// LocalDisk instructs to use a Volume offered by the machine pool provider.
+	LocalDisk *LocalDiskVolumeSource `json:"localDisk,omitempty"`
 	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
 	// Volume to use.
 	Ephemeral *EphemeralVolumeSource `json:"ephemeral,omitempty"`
@@ -120,6 +124,18 @@ type EmptyDiskVolumeSource struct {
 	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
 	// The default is nil which means that the limit is undefined.
 	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
+}
+
+// LocalDiskVolumeSource is a volume that's offered by the machine pool provider.
+// Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+// varying performance characteristics. Potentially not recoverable.
+type LocalDiskVolumeSource struct {
+	// SizeLimit is the total amount of local storage required for this LocalDisk volume.
+	// The default is nil which means that the limit is undefined.
+	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
+	// Image is the optional URL providing the operating system image of the machine.
+	// +optional
+	Image string `json:"image,omitempty"`
 }
 
 // NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.

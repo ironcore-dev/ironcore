@@ -30,13 +30,14 @@ import (
 type IronCoreVolumeConfig struct {
 	Name      string
 	Device    string
-	EmptyDisk *IronCoreVolumeEmptyDiskConfig
+	LocalDisk *IronCoreVolumeLocalDiskConfig
 	Remote    *IronCoreVolumeRemoteConfig
 	Labels    map[string]string
 }
 
-type IronCoreVolumeEmptyDiskConfig struct {
+type IronCoreVolumeLocalDiskConfig struct {
 	SizeLimit *resource.Quantity
+	Image     string
 }
 
 type IronCoreVolumeRemoteConfig struct {
@@ -50,17 +51,18 @@ type IronCoreVolumeRemoteConfig struct {
 
 func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeConfig, error) {
 	var (
-		emptyDisk *IronCoreVolumeEmptyDiskConfig
+		localDisk *IronCoreVolumeLocalDiskConfig
 		remote    *IronCoreVolumeRemoteConfig
 	)
 	switch {
-	case volume.EmptyDisk != nil:
+	case volume.LocalDisk != nil:
 		var sizeLimit *resource.Quantity
-		if sizeBytes := volume.EmptyDisk.SizeBytes; sizeBytes > 0 {
+		if sizeBytes := volume.LocalDisk.SizeBytes; sizeBytes > 0 {
 			sizeLimit = resource.NewQuantity(sizeBytes, resource.DecimalSI)
 		}
-		emptyDisk = &IronCoreVolumeEmptyDiskConfig{
+		localDisk = &IronCoreVolumeLocalDiskConfig{
 			SizeLimit: sizeLimit,
+			Image:     volume.LocalDisk.Image.Image,
 		}
 	case volume.Connection != nil:
 		remote = &IronCoreVolumeRemoteConfig{
@@ -81,7 +83,7 @@ func (s *Server) getIronCoreVolumeConfig(volume *iri.Volume) (*IronCoreVolumeCon
 	return &IronCoreVolumeConfig{
 		Name:      volume.Name,
 		Device:    volume.Device,
-		EmptyDisk: emptyDisk,
+		LocalDisk: localDisk,
 		Remote:    remote,
 		Labels:    labels,
 	}, nil
@@ -236,9 +238,10 @@ func (s *Server) createIronCoreVolume(
 			AccessSecret: accessSecret,
 		}
 		ironcoreVolumeSrc.VolumeRef = &corev1.LocalObjectReference{Name: ironcoreVolume.Name}
-	case cfg.EmptyDisk != nil:
-		ironcoreVolumeSrc.EmptyDisk = &computev1alpha1.EmptyDiskVolumeSource{
-			SizeLimit: cfg.EmptyDisk.SizeLimit,
+	case cfg.LocalDisk != nil:
+		ironcoreVolumeSrc.LocalDisk = &computev1alpha1.LocalDiskVolumeSource{
+			SizeLimit: cfg.LocalDisk.SizeLimit,
+			Image:     cfg.LocalDisk.Image,
 		}
 	}
 	return &computev1alpha1.Volume{

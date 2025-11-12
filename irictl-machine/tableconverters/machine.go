@@ -16,7 +16,6 @@ var (
 	machineHeaders = []api.Header{
 		{Name: "ID"},
 		{Name: "Class"},
-		{Name: "Image"},
 		{Name: "State"},
 		{Name: "Age"},
 	}
@@ -29,7 +28,6 @@ var (
 			return api.Row{
 				machine.Metadata.Id,
 				machine.Spec.Class,
-				machine.Spec.GetImage().GetImage(),
 				machine.Status.State.String(),
 				duration.HumanDuration(time.Since(time.Unix(0, machine.Metadata.CreatedAt))),
 			}, nil

@@ -222,6 +222,14 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 			allErrs = append(allErrs, validateEmptyDiskVolumeSource(source.EmptyDisk, fldPath.Child("emptyDisk"))...)
 		}
 	}
+	if source.LocalDisk != nil {
+		if numDefs > 0 {
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("localDisk"), "must only specify one volume source"))
+		} else {
+			numDefs++
+			allErrs = append(allErrs, validateLocalDiskVolumeSource(source.LocalDisk, fldPath.Child("localDisk"))...)
+		}
+	}
 	if source.Ephemeral != nil {
 		if numDefs > 0 {
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ephemeral"), "must only specify one volume source"))
@@ -238,6 +246,16 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 }
 
 func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPath *field.Path) field.ErrorList {
+	var allErrs field.ErrorList
+
+	if sizeLimit := source.SizeLimit; sizeLimit != nil {
+		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+	}
+
+	return allErrs
+}
+
+func validateLocalDiskVolumeSource(source *compute.LocalDiskVolumeSource, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if sizeLimit := source.SizeLimit; sizeLimit != nil {
@@ -285,6 +303,37 @@ func validateMachineSpecUpdate(new, old *compute.MachineSpec, fldPath *field.Pat
 	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
 	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
 	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
+
+	newVolumesByName := map[string]compute.Volume{}
+	for _, v := range new.Volumes {
+		newVolumesByName[v.Name] = v
+	}
+
+	for _, oldVol := range old.Volumes {
+		if oldVol.LocalDisk != nil && oldVol.LocalDisk.Image != "" {
+			newVol, exists := newVolumesByName[oldVol.Name]
+			volPath := fldPath.Child("volumes").Key(oldVol.Name).Child("localDisk").Child("image")
+
+			if !exists {
+				allErrs = append(allErrs, field.Invalid(volPath, nil, "volume with an image set must not be removed"))
+				continue
+			}
+
+			if newVol.LocalDisk == nil || newVol.LocalDisk.Image == "" {
+				allErrs = append(allErrs, field.Invalid(volPath, nil, "volume with an image set must not be cleared"))
+				continue
+			}
+
+			if newVol.LocalDisk.Image != oldVol.LocalDisk.Image {
+				allErrs = append(allErrs,
+					ironcorevalidation.ValidateImmutableField(
+						newVol.LocalDisk.Image,
+						oldVol.LocalDisk.Image,
+						volPath,
+					)...)
+			}
+		}
+	}
 
 	return allErrs
 }
