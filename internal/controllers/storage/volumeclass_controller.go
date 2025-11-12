@@ -79,7 +79,7 @@ func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, vol
 	}
 	if len(volumes) > 0 {
 		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	volumes, err = r.listReferencingVolumesWithReader(ctx, r.APIReader, volumeClass)
@@ -88,7 +88,7 @@ func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, vol
 	}
 	if len(volumes) > 0 {
 		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Volume Class is not used anymore, removing finalizer")

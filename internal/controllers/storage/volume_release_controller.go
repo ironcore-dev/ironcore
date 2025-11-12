@@ -106,7 +106,7 @@ func (r *VolumeReleaseReconciler) reconcile(ctx context.Context, log logr.Logger
 			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
 		}
 		log.V(1).Info("Volume was updated, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Reconciled")

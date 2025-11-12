@@ -139,7 +139,7 @@ func (r *BucketReconciler) deleteGone(ctx context.Context, log logr.Logger, buck
 	}
 	if !ok {
 		log.V(1).Info("Not all iri buckets are gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -212,7 +212,7 @@ func (r *BucketReconciler) delete(ctx context.Context, log logr.Logger, bucket *
 	}
 	if !ok {
 		log.V(1).Info("Not all iri buckets are gone, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Deleted all iri buckets, removing finalizer")
@@ -309,7 +309,7 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -320,7 +320,7 @@ func (r *BucketReconciler) reconcile(ctx context.Context, log logr.Logger, bucke
 	}
 	if modified {
 		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Listing buckets")

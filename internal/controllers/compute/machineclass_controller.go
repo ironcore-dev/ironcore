@@ -80,7 +80,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	}
 	if len(machines) > 0 {
 		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	machines, err = r.listReferencingMachinesWithReader(ctx, r.APIReader, machineClass)
@@ -89,7 +89,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	}
 	if len(machines) > 0 {
 		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Machine class is not in use anymore, removing finalizer")

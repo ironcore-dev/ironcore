@@ -148,7 +148,7 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	}
 	if modified {
 		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Listing machine classes")

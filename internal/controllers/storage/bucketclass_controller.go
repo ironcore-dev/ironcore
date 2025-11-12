@@ -79,7 +79,7 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 	}
 	if len(buckets) > 0 {
 		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	buckets, err = r.listReferencingBucketsWithReader(ctx, r.APIReader, bucketClass)
@@ -88,7 +88,7 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 	}
 	if len(buckets) > 0 {
 		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Bucket Class is not used anymore, removing finalizer")
