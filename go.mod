@@ -10,14 +10,14 @@ require (
 	github.com/go-logr/logr v1.4.3
 	github.com/google/go-cmp v0.7.0
 	github.com/ironcore-dev/controller-utils v0.11.0
-	github.com/onsi/ginkgo/v2 v2.27.1
+	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
-	golang.org/x/sync v0.17.0
-	golang.org/x/sys v0.37.0
+	golang.org/x/sync v0.18.0
+	golang.org/x/sys v0.38.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 	k8s.io/api v0.34.1
@@ -112,7 +112,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.8.0 // indirect
-	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
