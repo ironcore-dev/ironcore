@@ -105,7 +105,7 @@ func (r *VirtualIPReleaseReconciler) reconcile(ctx context.Context, log logr.Log
 			return ctrl.Result{}, fmt.Errorf("error releasing virtual IP: %w", err)
 		}
 		log.V(1).Info("Virtual IP was updated, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Reconciled")

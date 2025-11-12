@@ -129,7 +129,7 @@ func (r *NetworkReleaseReconciler) reconcile(ctx context.Context, log logr.Logge
 			return ctrl.Result{}, fmt.Errorf("error releasing network: %w", err)
 		}
 		log.V(1).Info("Network was updated, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	log.V(1).Info("Reconciled")

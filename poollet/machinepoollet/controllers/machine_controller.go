@@ -183,7 +183,7 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 	}
 	if !ok {
 		log.V(1).Info("Not all machines are gone yet, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
@@ -234,7 +234,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 	if modified {
 		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -245,7 +245,7 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 	}
 	if modified {
 		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{Requeue: true}, nil
+		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
 	nics, err := r.getNetworkInterfacesForMachine(ctx, machine)
@@ -334,6 +334,10 @@ func (r *MachineReconciler) create(
 	if !ok {
 		log.V(1).Info("Machine is not yet ready")
 		return ctrl.Result{}, nil
+	}
+
+	if machine.Spec.Image != "" { //nolint:staticcheck
+		r.Eventf(machine, corev1.EventTypeWarning, "ImageRefDeprecated", "Image reference in spec.image is deprecated")
 	}
 
 	log.V(1).Info("Creating machine")
