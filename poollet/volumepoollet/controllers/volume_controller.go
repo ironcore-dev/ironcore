@@ -83,22 +83,6 @@ func (r *VolumeReconciler) iriVolumeAnnotations(_ *storagev1alpha1.Volume) map[s
 	return map[string]string{}
 }
 
-func (r *VolumeReconciler) listIRIVolumesByKey(ctx context.Context, volumeKey client.ObjectKey) ([]*iri.Volume, error) {
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
-		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeNamespaceLabel: volumeKey.Namespace,
-				volumepoolletv1alpha1.VolumeNameLabel:      volumeKey.Name,
-			},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error listing volumes by key: %w", err)
-	}
-	volumes := res.Volumes
-	return volumes, nil
-}
-
 func (r *VolumeReconciler) listIRIVolumesByUID(ctx context.Context, volumeUID types.UID) ([]*iri.Volume, error) {
 	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
 		Filter: &iri.VolumeFilter{
@@ -126,18 +110,18 @@ func (r *VolumeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, fmt.Errorf("error getting volume %s: %w", req.NamespacedName, err)
 		}
-		return r.deleteGone(ctx, log, req.NamespacedName)
+		return r.deleteGone(ctx, log, volume)
 	}
 	return r.reconcileExists(ctx, log, volume)
 }
 
-func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volumeKey client.ObjectKey) (ctrl.Result, error) {
+func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume) (ctrl.Result, error) {
 	log.V(1).Info("Delete gone")
 
-	log.V(1).Info("Listing iri volumes by key")
-	volumes, err := r.listIRIVolumesByKey(ctx, volumeKey)
+	log.V(1).Info("Listing iri volumes by uid")
+	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing iri volumes by key: %w", err)
+		return ctrl.Result{}, fmt.Errorf("error listing iri volumes by uid: %w", err)
 	}
 
 	ok, err := r.deleteIRIVolumes(ctx, log, volumes)
@@ -207,17 +191,12 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 
 	log.V(1).Info("Finalizer present")
 
-	log.V(1).Info("Listing volumes")
-	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
-	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("error listing volumes by uid: %w", err)
-	}
-
-	ok, err := r.deleteIRIVolumes(ctx, log, volumes)
+	log.V(1).Info("Deleting IRI volumes for volume")
+	res, err := r.deleteGone(ctx, log, volume)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error deleting iri volumes: %w", err)
 	}
-	if !ok {
+	if !res.IsZero() {
 		log.V(1).Info("Not all iri volumes are gone, requeueing")
 		return ctrl.Result{RequeueAfter: 1}, nil
 	}
@@ -484,22 +463,16 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	}
 
 	log.V(1).Info("Listing volumes")
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
-		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
-			},
-		},
-	})
+	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing volumes: %w", err)
 	}
 
-	switch len(res.Volumes) {
+	switch len(volumes) {
 	case 0:
 		return r.create(ctx, log, volume)
 	case 1:
-		iriVolume := res.Volumes[0]
+		iriVolume := volumes[0]
 		if err := r.update(ctx, log, volume, iriVolume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating volume: %w", err)
 		}
