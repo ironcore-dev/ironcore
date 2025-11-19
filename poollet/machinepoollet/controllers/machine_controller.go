@@ -521,16 +521,16 @@ func (r *MachineReconciler) computeMachineConditions(
 ) []computev1alpha1.MachineCondition {
 	var conditions []computev1alpha1.MachineCondition
 
-	conditions = append(conditions, r.ComputeMachineReadyCondition(state, now))
+	conditions = append(conditions, r.computeMachineReadyCondition(state, now))
 
 	if len(volumeStatuses) > 0 {
-		if c := r.ComputeVolumesReadyCondition(volumeStatuses, now); c.Type != "" {
+		if c := r.computeVolumesReadyCondition(volumeStatuses, now); c.Type != "" {
 			conditions = append(conditions, c)
 		}
 	}
 
 	if len(nicStatuses) > 0 {
-		if c := r.ComputeNetworkInterfacesReadyCondition(nicStatuses, now); c.Type != "" {
+		if c := r.computeNetworkInterfacesReadyCondition(nicStatuses, now); c.Type != "" {
 			conditions = append(conditions, c)
 		}
 	}
@@ -538,7 +538,7 @@ func (r *MachineReconciler) computeMachineConditions(
 	return conditions
 }
 
-func (r *MachineReconciler) ComputeMachineReadyCondition(state computev1alpha1.MachineState, now metav1.Time) computev1alpha1.MachineCondition {
+func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.MachineState, now metav1.Time) computev1alpha1.MachineCondition {
 	status, reason, message := corev1.ConditionFalse, "NotReady", "Machine is not ready"
 
 	switch state {
@@ -559,7 +559,7 @@ func (r *MachineReconciler) ComputeMachineReadyCondition(state computev1alpha1.M
 	}
 }
 
-func (r *MachineReconciler) ComputeVolumesReadyCondition(volumeStatuses []computev1alpha1.VolumeStatus, now metav1.Time) computev1alpha1.MachineCondition {
+func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []computev1alpha1.VolumeStatus, now metav1.Time) computev1alpha1.MachineCondition {
 	if len(volumeStatuses) == 0 {
 		return computev1alpha1.MachineCondition{}
 	}
@@ -584,7 +584,7 @@ func (r *MachineReconciler) ComputeVolumesReadyCondition(volumeStatuses []comput
 	}
 }
 
-func (r *MachineReconciler) ComputeNetworkInterfacesReadyCondition(nicStatuses []computev1alpha1.NetworkInterfaceStatus, now metav1.Time) computev1alpha1.MachineCondition {
+func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses []computev1alpha1.NetworkInterfaceStatus, now metav1.Time) computev1alpha1.MachineCondition {
 	if len(nicStatuses) == 0 {
 		return computev1alpha1.MachineCondition{}
 	}
