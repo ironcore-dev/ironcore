@@ -106,6 +106,16 @@ message MachineStatus {
   string image_ref = 3;
   repeated VolumeStatus volumes = 4;
   repeated NetworkInterfaceStatus network_interfaces = 5;
+  repeated Conditions machine_conditions = 6;
+}
+
+message Conditions {
+  string type = 1;
+  string status = 2;
+  string reason = 3;
+  string message = 4;
+  int64 last_transition_time = 5;
+
 }
 
 message VolumeStatus {

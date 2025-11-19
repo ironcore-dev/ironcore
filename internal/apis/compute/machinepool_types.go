@@ -85,7 +85,7 @@ type MachinePoolAddress struct {
 // MachinePoolConditionType is a type a MachinePoolCondition can have.
 type MachinePoolConditionType string
 
-// MachinePoolCondition is one of the conditions of a volume.
+// MachinePoolCondition is one of the conditions of a MachinePool.
 type MachinePoolCondition struct {
 	// Type is the type of the condition.
 	Type MachinePoolConditionType

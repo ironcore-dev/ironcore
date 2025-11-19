@@ -195,6 +195,29 @@ var _ = Describe("MachineController", func() {
 			HaveField("Status.MachineID", expectedMachineID.String()),
 			HaveField("Status.ObservedGeneration", machine.Generation),
 		))
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Status":             Equal(corev1.ConditionFalse),
+				"Reason":             Equal("Pending"),
+				"Message":            Equal("Machine is pending"),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(computev1alpha1.MachineConditionType("VolumesReady")),
+				"Status":             Equal(corev1.ConditionFalse),
+				"Reason":             Equal(fmt.Sprintf("VolumeNotReady: %s", "primary")),
+				"Message":            Equal(fmt.Sprintf("Volume %s is not attached (state: %s)", "primary", "Pending")),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(computev1alpha1.MachineConditionType("NetworkInterfacesReady")),
+				"Status":             Equal(corev1.ConditionFalse),
+				"Reason":             Equal(fmt.Sprintf("NetworkInterfaceNotReady: %s", "primary")),
+				"Message":            Equal(fmt.Sprintf("Network interface %s is not attached (state: %s)", "primary", "Pending")),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+		))
 
 		By("setting the network interface id in the machine status")
 		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
@@ -481,6 +504,17 @@ var _ = Describe("MachineController", func() {
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 		Eventually(Object(machine)).Should(HaveField("Status.State", Equal(computev1alpha1.MachineStateRunning)))
 
+		By("waiting for the machine conditions to be updated")
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Status":             Equal(corev1.ConditionTrue),
+				"Reason":             Equal("Running"),
+				"Message":            Equal("Machine is running"),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+		))
+
 		By("inspecting the machine to be terminating")
 		_, iriMachine = GetSingleMapEntry(srv.Machines)
 		iriMachine = &testingmachine.FakeMachine{Machine: proto.Clone(iriMachine.Machine).(*iri.Machine)}
@@ -489,6 +523,17 @@ var _ = Describe("MachineController", func() {
 		iriMachine.Status.State = iri.MachineState_MACHINE_TERMINATING
 		srv.SetMachines([]*testingmachine.FakeMachine{iriMachine})
 		Eventually(Object(machine)).Should(HaveField("Status.State", Equal(computev1alpha1.MachineStateTerminating)))
+
+		By("waiting for the machine conditions to be updated")
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Status":             Equal(corev1.ConditionFalse),
+				"Reason":             Equal("Terminating"),
+				"Message":            Equal("Machine is terminating or terminated"),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+		))
 	})
 
 	It("should create a machine and verify claimed volume reference with ephemeral volume", func(ctx SpecContext) {

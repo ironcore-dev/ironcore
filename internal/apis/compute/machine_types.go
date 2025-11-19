@@ -174,12 +174,31 @@ const (
 	VolumeStateAttached VolumeState = "Attached"
 )
 
+// MachineConditionType is a type a MachineCondition can have.
+type MachineConditionType string
+
+// MachineCondition is one of the conditions of a machine.
+type MachineCondition struct {
+	// Type is the type of the condition.
+	Type MachineConditionType
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time
+}
+
 // MachineStatus defines the observed state of Machine
 type MachineStatus struct {
 	// MachineID is the provider-specific machine ID in the format 'TYPE://MACHINE_ID'.
 	MachineID string
 	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
 	ObservedGeneration int64
+	// Conditions are the conditions of a machine.
+	Conditions []MachineCondition
 	// State is the infrastructure state of the machine.
 	State MachineState
 	// NetworkInterfaces is the list of network interface states for the machine.
