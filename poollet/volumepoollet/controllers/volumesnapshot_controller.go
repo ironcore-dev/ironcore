@@ -58,7 +58,6 @@ type VolumeSnapshotReconciler struct {
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumesnapshots/finalizers,verbs=update
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch
 
 func (r *VolumeSnapshotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
