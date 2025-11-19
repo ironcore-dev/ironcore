@@ -169,6 +169,28 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
       default: {}
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition
+  map:
+    fields:
+    - name: lastTransitionTime
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+    - name: message
+      type:
+        scalar: string
+      default: ""
+    - name: reason
+      type:
+        scalar: string
+      default: ""
+    - name: status
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+      default: ""
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool
   map:
     fields:
@@ -344,6 +366,12 @@ var schemaYAML = typed.YAMLObject(`types:
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineStatus
   map:
     fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition
+          elementRelationship: atomic
     - name: machineID
       type:
         scalar: string

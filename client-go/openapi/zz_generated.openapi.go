@@ -37,6 +37,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine":                         schema_ironcore_api_compute_v1alpha1_Machine(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass":                    schema_ironcore_api_compute_v1alpha1_MachineClass(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClassList":                schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition":                schema_ironcore_api_compute_v1alpha1_MachineCondition(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineExecOptions":              schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineList":                     schema_ironcore_api_compute_v1alpha1_MachineList(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool":                     schema_ironcore_api_compute_v1alpha1_MachinePool(ref),
@@ -1008,6 +1009,60 @@ func schema_ironcore_api_compute_v1alpha1_MachineClassList(ref common.ReferenceC
 	}
 }
 
+func schema_ironcore_api_compute_v1alpha1_MachineCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MachineCondition is one of the conditions of a machine.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.Time"),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Time"},
+	}
+}
+
 func schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1168,7 +1223,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolCondition(ref common.Refere
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "MachinePoolCondition is one of the conditions of a volume.",
+				Description: "MachinePoolCondition is one of the conditions of a MachinePool.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"type": {
@@ -1596,6 +1651,20 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 							Format:      "int64",
 						},
 					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions are the conditions of a machine.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition"),
+									},
+								},
+							},
+						},
+					},
 					"state": {
 						SchemaProps: spec.SchemaProps{
 							Description: "State is the infrastructure state of the machine.\n\nPossible enum values:\n - `\"Pending\"` means the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool.\n - `\"Running\"` means the machine is running on a MachinePool.\n - `\"Shutdown\"` means the machine is shut down.\n - `\"Terminated\"` means the machine has been permanently stopped and cannot be started.\n - `\"Terminating\"` means the machine that is terminating.",
@@ -1636,7 +1705,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus"},
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus"},
 	}
 }
 

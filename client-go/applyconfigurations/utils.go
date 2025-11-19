@@ -43,6 +43,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &computev1alpha1.MachineApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MachineClass"):
 		return &computev1alpha1.MachineClassApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("MachineCondition"):
+		return &computev1alpha1.MachineConditionApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MachinePool"):
 		return &computev1alpha1.MachinePoolApplyConfiguration{}
 	case v1alpha1.SchemeGroupVersion.WithKind("MachinePoolAddress"):
