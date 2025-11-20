@@ -28,6 +28,7 @@ rules:
   - storage.ironcore.dev
   resources:
   - volumes
+  - volumesnapshots
   verbs:
   - create
   - delete
