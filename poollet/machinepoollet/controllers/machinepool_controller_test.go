@@ -238,4 +238,20 @@ var _ = Describe("MachinePoolController", func() {
 			))),
 		)
 	})
+
+	It("should enforce topology labels", func(ctx SpecContext) {
+		By("patching the machine pool with incorrect topology labels")
+		Eventually(Update(machinePool, func() {
+			machinePool.Labels = map[string]string{
+				"topology.ironcore.dev/region": "wrong-region",
+				"topology.ironcore.dev/zone":   "wrong-zone",
+			}
+		})).Should(Succeed())
+
+		By("checking if the topology labels are overwritten by the reconciler")
+		Eventually(Object(machinePool)).Should(SatisfyAll(
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/region", "foo-region-1")),
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/zone", "foo-zone-1")),
+		))
+	})
 })
