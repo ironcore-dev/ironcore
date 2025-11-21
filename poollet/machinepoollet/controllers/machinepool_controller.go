@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
@@ -38,6 +39,9 @@ type MachinePoolReconciler struct {
 
 	MachineRuntime     machine.RuntimeService
 	MachineClassMapper mcm.MachineClassMapper
+
+	TopologyRegionLabel string
+	TopologyZoneLabel   string
 }
 
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch;update;patch
@@ -149,6 +153,14 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	if modified {
 		log.V(1).Info("Removed reconcile annotation, requeueing")
 		return ctrl.Result{RequeueAfter: 1}, nil
+	}
+
+	log.V(1).Info("Enforcing configured topology labels")
+	base := machinePool.DeepCopy()
+	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyRegionLabel, r.TopologyRegionLabel)
+	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyZoneLabel, r.TopologyZoneLabel)
+	if err := r.Patch(ctx, machinePool, client.MergeFrom(base)); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error patching machine pool labels: %w", err)
 	}
 
 	log.V(1).Info("Listing machine classes")

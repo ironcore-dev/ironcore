@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ironcore-dev/controller-utils/buildutils"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -167,6 +168,10 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		*mp = computev1alpha1.MachinePool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-mp-",
+				Labels: map[string]string{
+					commonv1alpha1.TopologyRegionLabel: "foo-region-1",
+					commonv1alpha1.TopologyZoneLabel:   "foo-zone-1",
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, mp)).To(Succeed(), "failed to create test machine pool")
@@ -265,10 +270,12 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&controllers.MachinePoolReconciler{
-			Client:             k8sManager.GetClient(),
-			MachineRuntime:     srv,
-			MachineClassMapper: machineClassMapper,
-			MachinePoolName:    mp.Name,
+			Client:              k8sManager.GetClient(),
+			MachineRuntime:      srv,
+			MachineClassMapper:  machineClassMapper,
+			MachinePoolName:     mp.Name,
+			TopologyRegionLabel: "foo-region-1",
+			TopologyZoneLabel:   "foo-zone-1",
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&controllers.MachinePoolAnnotatorReconciler{

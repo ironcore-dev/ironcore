@@ -87,6 +87,9 @@ type Options struct {
 	NetworkDownwardAPILabels      map[string]string
 	NetworkDownwardAPIAnnotations map[string]string
 
+	TopologyRegionLabel string
+	TopologyZoneLabel   string
+
 	ProviderID                           string
 	MachineRuntimeEndpoint               string
 	MachineRuntimeSocketDiscoveryTimeout time.Duration
@@ -135,6 +138,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVar(&o.NicDownwardAPIAnnotations, "nic-downward-api-annotation", o.NicDownwardAPIAnnotations, "Downward-API annotations to set on the iri nic.")
 	fs.StringToStringVar(&o.NetworkDownwardAPILabels, "network-downward-api-label", o.NetworkDownwardAPILabels, "Downward-API labels to set on the iri network.")
 	fs.StringToStringVar(&o.NetworkDownwardAPIAnnotations, "network-downward-api-annotation", o.NetworkDownwardAPIAnnotations, "Downward-API annotations to set on the iri network.")
+
+	fs.StringVar(&o.TopologyRegionLabel, "topology-region-label", "", "Label to use for the region topology information.")
+	fs.StringVar(&o.TopologyZoneLabel, "topology-zone-label", "", "Label to use for the zone topology information.")
 
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
@@ -456,12 +462,14 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachinePoolReconciler{
-			Client:             mgr.GetClient(),
-			MachinePoolName:    opts.MachinePoolName,
-			Addresses:          machinePoolAddresses,
-			Port:               port,
-			MachineRuntime:     machineRuntime,
-			MachineClassMapper: machineClassMapper,
+			Client:              mgr.GetClient(),
+			MachinePoolName:     opts.MachinePoolName,
+			Addresses:           machinePoolAddresses,
+			Port:                port,
+			MachineRuntime:      machineRuntime,
+			MachineClassMapper:  machineClassMapper,
+			TopologyRegionLabel: opts.TopologyRegionLabel,
+			TopologyZoneLabel:   opts.TopologyZoneLabel,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
@@ -478,10 +486,12 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	if err := (&controllers.MachinePoolInit{
-		Client:          mgr.GetClient(),
-		MachinePoolName: opts.MachinePoolName,
-		ProviderID:      opts.ProviderID,
-		OnInitialized:   onInitialized,
+		Client:              mgr.GetClient(),
+		MachinePoolName:     opts.MachinePoolName,
+		ProviderID:          opts.ProviderID,
+		TopologyRegionLabel: opts.TopologyRegionLabel,
+		TopologyZoneLabel:   opts.TopologyZoneLabel,
+		OnInitialized:       onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up machine pool init with manager: %w", err)
 	}

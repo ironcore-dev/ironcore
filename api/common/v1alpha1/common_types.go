@@ -15,6 +15,20 @@ import (
 )
 
 const (
+	// TopologyRegionLabel is a label that can be applied to MachinePool, VolumePool, and BucketPool
+	//
+	// `Machine`s, `Volume`s, and `Bucket`s can use this label for pool selection.
+	//
+	// The intent is similar to Kubernetes' topology labels (i.e. `topology.kubernetes.io/region`)
+	TopologyRegionLabel = "topology.ironcore.dev/region"
+
+	// TopologyZoneLabel is a label that can be applied to MachinePool, VolumePool, and BucketPool
+	//
+	// `Machine`s, `Volume`s, and `Bucket`s can use this label for pool selection.
+	//
+	// The intent is similar to Kubernetes' topology labels (i.e. `topology.kubernetes.io/zone`)
+	TopologyZoneLabel = "topology.ironcore.dev/zone"
+
 	// WatchLabel is a label that can be applied to any ironcore resource.
 	//
 	// Provider controllers that allow for selective reconciliation may check this label and proceed
