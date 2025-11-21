@@ -14,6 +14,7 @@ import (
 type MachineStatusApplyConfiguration struct {
 	MachineID          *string                                    `json:"machineID,omitempty"`
 	ObservedGeneration *int64                                     `json:"observedGeneration,omitempty"`
+	Conditions         []MachineConditionApplyConfiguration       `json:"conditions,omitempty"`
 	State              *computev1alpha1.MachineState              `json:"state,omitempty"`
 	NetworkInterfaces  []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
 	Volumes            []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
@@ -38,6 +39,19 @@ func (b *MachineStatusApplyConfiguration) WithMachineID(value string) *MachineSt
 // If called multiple times, the ObservedGeneration field is set to the value of the last call.
 func (b *MachineStatusApplyConfiguration) WithObservedGeneration(value int64) *MachineStatusApplyConfiguration {
 	b.ObservedGeneration = &value
+	return b
+}
+
+// WithConditions adds the given value to the Conditions field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the Conditions field.
+func (b *MachineStatusApplyConfiguration) WithConditions(values ...*MachineConditionApplyConfiguration) *MachineStatusApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithConditions")
+		}
+		b.Conditions = append(b.Conditions, *values[i])
+	}
 	return b
 }
 

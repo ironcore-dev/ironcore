@@ -4194,6 +4194,24 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource": {
+				"description": "LocalDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
+				"type": "object",
+				"properties": {
+					"image": {
+						"description": "Image is the optional URL providing the operating system image of the machine.",
+						"type": "string"
+					},
+					"sizeLimit": {
+						"description": "SizeLimit is the total amount of local storage required for this LocalDisk volume. The default is nil which means that the limit is undefined.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
+							}
+						]
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine": {
 				"description": "Machine is the Schema for the machines API",
 				"type": "object",
@@ -4317,6 +4335,46 @@
 					}
 				]
 			},
+			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition": {
+				"description": "MachineCondition is one of the conditions of a machine.",
+				"type": "object",
+				"required": [
+					"type",
+					"status",
+					"reason",
+					"message"
+				],
+				"properties": {
+					"lastTransitionTime": {
+						"description": "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.Time"
+							}
+						]
+					},
+					"message": {
+						"description": "Message is a human-readable explanation of why the condition has a certain reason / state.",
+						"type": "string",
+						"default": ""
+					},
+					"reason": {
+						"description": "Reason is a machine-readable indication of why the condition is in a certain state.",
+						"type": "string",
+						"default": ""
+					},
+					"status": {
+						"description": "Status is the status of the condition.",
+						"type": "string",
+						"default": ""
+					},
+					"type": {
+						"description": "Type is the type of the condition.",
+						"type": "string",
+						"default": ""
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList": {
 				"description": "MachineList contains a list of Machine",
 				"type": "object",
@@ -4423,7 +4481,7 @@
 				}
 			},
 			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolCondition": {
-				"description": "MachinePoolCondition is one of the conditions of a volume.",
+				"description": "MachinePoolCondition is one of the conditions of a MachinePool.",
 				"type": "object",
 				"required": [
 					"type",
@@ -4652,7 +4710,7 @@
 						]
 					},
 					"image": {
-						"description": "Image is the optional URL providing the operating system image of the machine.",
+						"description": "Deprecated: Use LocalDisk to provide a bootable disk Image is the optional URL providing the operating system image of the machine.",
 						"type": "string"
 					},
 					"imagePullSecret": {
@@ -4738,6 +4796,18 @@
 				"description": "MachineStatus defines the observed state of Machine",
 				"type": "object",
 				"properties": {
+					"conditions": {
+						"description": "Conditions are the conditions of a machine.",
+						"type": "array",
+						"items": {
+							"default": {},
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition"
+								}
+							]
+						}
+					},
 					"machineID": {
 						"description": "MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.",
 						"type": "string"
@@ -4865,7 +4935,7 @@
 						"type": "string"
 					},
 					"emptyDisk": {
-						"description": "EmptyDisk instructs to use a Volume offered by the machine pool provider.",
+						"description": "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource"
@@ -4877,6 +4947,14 @@
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralVolumeSource"
+							}
+						]
+					},
+					"localDisk": {
+						"description": "LocalDisk instructs to use a Volume offered by the machine pool provider.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource"
 							}
 						]
 					},
@@ -5257,31 +5335,6 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource": {
-				"description": "VolumeDataSource represents the source for volume",
-				"type": "object",
-				"required": [
-					"apiGroup",
-					"kind",
-					"name"
-				],
-				"properties": {
-					"apiGroup": {
-						"description": "APIGroup is the group for the resource being referenced",
-						"type": "string"
-					},
-					"kind": {
-						"description": "Kind is the type of resource being referenced",
-						"type": "string",
-						"default": ""
-					},
-					"name": {
-						"description": "Name is the name of resource being referenced",
-						"type": "string",
-						"default": ""
-					}
-				}
-			},
 			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
 				"description": "VolumeEncryption represents information to encrypt a volume.",
 				"type": "object",
@@ -5312,14 +5365,6 @@
 							}
 						]
 					},
-					"dataSource": {
-						"description": "DataSource is an optional field which provides information regarding the snapshot to be used as the source for the volume restoration",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource"
-							}
-						]
-					},
 					"encryption": {
 						"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
 						"allOf": [
@@ -5329,7 +5374,7 @@
 						]
 					},
 					"image": {
-						"description": "Image is an optional image to bootstrap the volume with.",
+						"description": "Image is an optional image to bootstrap the volume with. To be deprecated",
 						"type": "string"
 					},
 					"imagePullSecretRef": {
@@ -5339,6 +5384,10 @@
 								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 							}
 						]
+					},
+					"osImage": {
+						"description": "OSImage is an optional os image to bootstrap the volume.",
+						"type": "string"
 					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
@@ -5386,6 +5435,14 @@
 							"type": "string",
 							"default": ""
 						}
+					},
+					"volumeSnapshotRef": {
+						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
 					}
 				}
 			},
