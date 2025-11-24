@@ -50,6 +50,13 @@ const (
 	DefaultEphemeralManager = "ephemeral-manager"
 )
 
+type TopologyLabel string
+
+const (
+	TopologyLabelRegion TopologyLabel = "topology.ironcore.dev/region"
+	TopologyLabelZone   TopologyLabel = "topology.ironcore.dev/zone"
+)
+
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
 // In some instances, `key` is a required field.
 // +structType=atomic

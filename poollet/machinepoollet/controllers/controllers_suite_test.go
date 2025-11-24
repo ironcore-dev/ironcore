@@ -169,8 +169,8 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-mp-",
 				Labels: map[string]string{
-					commonv1alpha1.TopologyRegionLabel: "foo-region-1",
-					commonv1alpha1.TopologyZoneLabel:   "foo-zone-1",
+					string(commonv1alpha1.TopologyLabelRegion): "foo-region-1",
+					string(commonv1alpha1.TopologyLabelZone):   "foo-zone-1",
 				},
 			},
 		}
@@ -270,12 +270,14 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&controllers.MachinePoolReconciler{
-			Client:              k8sManager.GetClient(),
-			MachineRuntime:      srv,
-			MachineClassMapper:  machineClassMapper,
-			MachinePoolName:     mp.Name,
-			TopologyRegionLabel: "foo-region-1",
-			TopologyZoneLabel:   "foo-zone-1",
+			Client:             k8sManager.GetClient(),
+			MachineRuntime:     srv,
+			MachineClassMapper: machineClassMapper,
+			MachinePoolName:    mp.Name,
+			TopologyLabels: map[commonv1alpha1.TopologyLabel]string{
+				commonv1alpha1.TopologyLabelRegion: "foo-region-1",
+				commonv1alpha1.TopologyLabelZone:   "foo-zone-1",
+			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		Expect((&controllers.MachinePoolAnnotatorReconciler{

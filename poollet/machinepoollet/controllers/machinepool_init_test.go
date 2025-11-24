@@ -6,6 +6,7 @@ package controllers_test
 import (
 	"context"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	. "github.com/onsi/ginkgo/v2"
@@ -15,15 +16,17 @@ import (
 )
 
 var _ = Describe("MachinePoolInit", func() {
-	It("should add topology labels", func(ctx SpecContext) {
+	It("should set topology labels", func(ctx SpecContext) {
 		initializedCalled := false
 
 		mpi := &controllers.MachinePoolInit{
-			Client:              k8sClient,
-			MachinePoolName:     "test-pool",
-			ProviderID:          "provider-123",
-			TopologyRegionLabel: "foo-region-1",
-			TopologyZoneLabel:   "foo-zone-1",
+			Client:          k8sClient,
+			MachinePoolName: "test-pool",
+			ProviderID:      "provider-123",
+			TopologyLabels: map[commonv1alpha1.TopologyLabel]string{
+				commonv1alpha1.TopologyLabelRegion: "foo-region-1",
+				commonv1alpha1.TopologyLabelZone:   "foo-zone-1",
+			},
 			OnInitialized: func(ctx context.Context) error {
 				initializedCalled = true
 				return nil

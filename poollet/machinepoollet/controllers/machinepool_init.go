@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
@@ -23,6 +24,7 @@ type MachinePoolInit struct {
 
 	TopologyRegionLabel string
 	TopologyZoneLabel   string
+	TopologyLabels      map[commonv1alpha1.TopologyLabel]string
 
 	// TODO: Remove OnInitialized / OnFailed as soon as the controller-runtime provides support for pre-start hooks:
 	// https://github.com/kubernetes-sigs/controller-runtime/pull/2044
@@ -50,9 +52,7 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 		},
 	}
 
-	log.V(1).Info("Initially setting topology labels")
-	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyRegionLabel, i.TopologyRegionLabel)
-	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyZoneLabel, i.TopologyZoneLabel)
+	i.setTopologyLabels(log, machinePool)
 
 	if err := i.Patch(ctx, machinePool, client.Apply, client.ForceOwnership, client.FieldOwner(machinepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
@@ -68,6 +68,17 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 		return i.OnInitialized(ctx)
 	}
 	return nil
+}
+
+func (i *MachinePoolInit) setTopologyLabels(log logr.Logger, machinePool *computev1alpha1.MachinePool) {
+	log.V(1).Info("Initially setting topology labels")
+	for key, val := range i.TopologyLabels {
+		if machinePool.ObjectMeta.Labels == nil {
+			machinePool.ObjectMeta.Labels = make(map[string]string)
+		}
+		log.V(1).Info("Setting topology label", "Label", key, "Value", val)
+		machinePool.ObjectMeta.Labels[string(key)] = val
+	}
 }
 
 func (i *MachinePoolInit) SetupWithManager(mgr ctrl.Manager) error {

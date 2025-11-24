@@ -40,8 +40,7 @@ type MachinePoolReconciler struct {
 	MachineRuntime     machine.RuntimeService
 	MachineClassMapper mcm.MachineClassMapper
 
-	TopologyRegionLabel string
-	TopologyZoneLabel   string
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 }
 
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch;update;patch
@@ -156,11 +155,8 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 	}
 
 	log.V(1).Info("Enforcing configured topology labels")
-	base := machinePool.DeepCopy()
-	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyRegionLabel, r.TopologyRegionLabel)
-	setLabel(&machinePool.ObjectMeta, commonv1alpha1.TopologyZoneLabel, r.TopologyZoneLabel)
-	if err := r.Patch(ctx, machinePool, client.MergeFrom(base)); err != nil {
-		return ctrl.Result{}, fmt.Errorf("error patching machine pool labels: %w", err)
+	if err := r.enforceOriginalTopologyLabels(ctx, log, machinePool); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error enforcing original topology labels: %w", err)
 	}
 
 	log.V(1).Info("Listing machine classes")
@@ -184,6 +180,28 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *MachinePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) error {
+	base := machinePool.DeepCopy()
+
+	var labelsChanged bool
+
+	for key, val := range r.TopologyLabels {
+		if machinePool.ObjectMeta.Labels[string(key)] != val {
+			log.V(1).Info("Restoring topology label", "Key", key, "Value", val)
+			if machinePool.ObjectMeta.Labels == nil {
+				machinePool.ObjectMeta.Labels = make(map[string]string)
+			}
+			machinePool.ObjectMeta.Labels[string(key)] = val
+			labelsChanged = true
+		}
+	}
+	if labelsChanged {
+		return r.Patch(ctx, machinePool, client.MergeFrom(base))
+	}
+
+	return nil
 }
 
 func (r *MachinePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

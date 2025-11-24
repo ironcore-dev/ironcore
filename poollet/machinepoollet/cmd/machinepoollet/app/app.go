@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -326,6 +327,14 @@ func Run(ctx context.Context, opts Options) error {
 		})
 	}
 
+	topologyLabels := map[commonv1alpha1.TopologyLabel]string{}
+	if opts.TopologyRegionLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelRegion] = opts.TopologyRegionLabel
+	}
+	if opts.TopologyZoneLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelZone] = opts.TopologyZoneLabel
+	}
+
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
@@ -462,14 +471,13 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachinePoolReconciler{
-			Client:              mgr.GetClient(),
-			MachinePoolName:     opts.MachinePoolName,
-			Addresses:           machinePoolAddresses,
-			Port:                port,
-			MachineRuntime:      machineRuntime,
-			MachineClassMapper:  machineClassMapper,
-			TopologyRegionLabel: opts.TopologyRegionLabel,
-			TopologyZoneLabel:   opts.TopologyZoneLabel,
+			Client:             mgr.GetClient(),
+			MachinePoolName:    opts.MachinePoolName,
+			Addresses:          machinePoolAddresses,
+			Port:               port,
+			MachineRuntime:     machineRuntime,
+			MachineClassMapper: machineClassMapper,
+			TopologyLabels:     topologyLabels,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
@@ -491,6 +499,7 @@ func Run(ctx context.Context, opts Options) error {
 		ProviderID:          opts.ProviderID,
 		TopologyRegionLabel: opts.TopologyRegionLabel,
 		TopologyZoneLabel:   opts.TopologyZoneLabel,
+		TopologyLabels:      topologyLabels,
 		OnInitialized:       onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up machine pool init with manager: %w", err)
