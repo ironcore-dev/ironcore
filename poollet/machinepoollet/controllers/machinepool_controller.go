@@ -186,9 +186,7 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 func (r *MachinePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) error {
 	base := machinePool.DeepCopy()
 
-	labelsChanged := poolletutils.EnforceTopolgyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels)
-
-	if labelsChanged {
+	if labelsChanged := poolletutils.EnforceTopolgyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels); labelsChanged {
 		return r.Patch(ctx, machinePool, client.MergeFrom(base))
 	}
 
