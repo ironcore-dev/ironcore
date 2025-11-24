@@ -494,13 +494,11 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	if err := (&controllers.MachinePoolInit{
-		Client:              mgr.GetClient(),
-		MachinePoolName:     opts.MachinePoolName,
-		ProviderID:          opts.ProviderID,
-		TopologyRegionLabel: opts.TopologyRegionLabel,
-		TopologyZoneLabel:   opts.TopologyZoneLabel,
-		TopologyLabels:      topologyLabels,
-		OnInitialized:       onInitialized,
+		Client:          mgr.GetClient(),
+		MachinePoolName: opts.MachinePoolName,
+		ProviderID:      opts.ProviderID,
+		TopologyLabels:  topologyLabels,
+		OnInitialized:   onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up machine pool init with manager: %w", err)
 	}

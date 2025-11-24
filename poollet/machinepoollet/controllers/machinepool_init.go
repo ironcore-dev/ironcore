@@ -22,9 +22,7 @@ type MachinePoolInit struct {
 	MachinePoolName string
 	ProviderID      string
 
-	TopologyRegionLabel string
-	TopologyZoneLabel   string
-	TopologyLabels      map[commonv1alpha1.TopologyLabel]string
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 
 	// TODO: Remove OnInitialized / OnFailed as soon as the controller-runtime provides support for pre-start hooks:
 	// https://github.com/kubernetes-sigs/controller-runtime/pull/2044
