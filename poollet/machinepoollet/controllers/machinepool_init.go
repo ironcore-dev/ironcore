@@ -7,9 +7,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -50,7 +50,7 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 		},
 	}
 
-	i.setTopologyLabels(log, machinePool)
+	poolletutils.SetTopologyLabels(log, &machinePool.ObjectMeta, i.TopologyLabels)
 
 	if err := i.Patch(ctx, machinePool, client.Apply, client.ForceOwnership, client.FieldOwner(machinepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
@@ -66,17 +66,6 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 		return i.OnInitialized(ctx)
 	}
 	return nil
-}
-
-func (i *MachinePoolInit) setTopologyLabels(log logr.Logger, machinePool *computev1alpha1.MachinePool) {
-	log.V(1).Info("Initially setting topology labels")
-	for key, val := range i.TopologyLabels {
-		if machinePool.ObjectMeta.Labels == nil {
-			machinePool.ObjectMeta.Labels = make(map[string]string)
-		}
-		log.V(1).Info("Setting topology label", "Label", key, "Value", val)
-		machinePool.ObjectMeta.Labels[string(key)] = val
-	}
 }
 
 func (i *MachinePoolInit) SetupWithManager(mgr ctrl.Manager) error {

@@ -15,6 +15,7 @@ import (
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	"github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/quota"
@@ -185,18 +186,8 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 func (r *MachinePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) error {
 	base := machinePool.DeepCopy()
 
-	var labelsChanged bool
+	labelsChanged := poolletutils.EnforceTopolgyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels)
 
-	for key, val := range r.TopologyLabels {
-		if machinePool.ObjectMeta.Labels[string(key)] != val {
-			log.V(1).Info("Restoring topology label", "Key", key, "Value", val)
-			if machinePool.ObjectMeta.Labels == nil {
-				machinePool.ObjectMeta.Labels = make(map[string]string)
-			}
-			machinePool.ObjectMeta.Labels[string(key)] = val
-			labelsChanged = true
-		}
-	}
 	if labelsChanged {
 		return r.Patch(ctx, machinePool, client.MergeFrom(base))
 	}

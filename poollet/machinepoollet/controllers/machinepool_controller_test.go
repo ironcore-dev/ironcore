@@ -248,7 +248,7 @@ var _ = Describe("MachinePoolController", func() {
 			}
 		})).Should(Succeed())
 
-		By("checking if the reconciler resets the topology labels to its orginal values")
+		By("checking if the reconciler resets the topology labels to its original values")
 		Eventually(Object(machinePool)).Should(SatisfyAll(
 			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/region", "foo-region-1")),
 			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/zone", "foo-zone-1")),

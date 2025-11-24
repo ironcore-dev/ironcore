@@ -18,6 +18,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	corev1 "k8s.io/api/core/v1"
@@ -177,18 +178,8 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 func (r *VolumePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) error {
 	base := volumePool.DeepCopy()
 
-	var labelsChanged bool
+	labelsChanged := poolletutils.EnforceTopolgyLabels(log, &volumePool.ObjectMeta, r.TopologyLabels)
 
-	for key, val := range r.TopologyLabels {
-		if volumePool.ObjectMeta.Labels[string(key)] != val {
-			log.V(1).Info("Restoring topology label", "Key", key, "Value", val)
-			if volumePool.ObjectMeta.Labels == nil {
-				volumePool.ObjectMeta.Labels = make(map[string]string)
-			}
-			volumePool.ObjectMeta.Labels[string(key)] = val
-			labelsChanged = true
-		}
-	}
 	if labelsChanged {
 		return r.Patch(ctx, volumePool, client.MergeFrom(base))
 	}
