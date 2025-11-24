@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -66,6 +67,8 @@ type Options struct {
 	BucketDownwardAPILabels             map[string]string
 	BucketDownwardAPIAnnotations        map[string]string
 	BucketPoolName                      string
+	TopologyRegionLabel                 string
+	TopologyZoneLabel                   string
 	ProviderID                          string
 	BucketRuntimeEndpoint               string
 	DialTimeout                         time.Duration
@@ -104,6 +107,8 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVar(&o.BucketDownwardAPILabels, "bucket-downward-api-label", o.BucketDownwardAPILabels, "Downward-API labels to set on the IRI bucket.")
 	fs.StringToStringVar(&o.BucketDownwardAPIAnnotations, "bucket-downward-api-annotation", o.BucketDownwardAPIAnnotations, "Downward-API annotations to set on the IRI bucket.")
 	fs.StringVar(&o.BucketPoolName, "bucket-pool-name", o.BucketPoolName, "Name of the bucket pool to announce / watch")
+	fs.StringVar(&o.TopologyRegionLabel, "topology-region-label", "", "Label to use for the region topology information.")
+	fs.StringVar(&o.TopologyZoneLabel, "topology-zone-label", "", "Label to use for the zone topology information.")
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the bucket pool.")
 	fs.StringVar(&o.BucketRuntimeEndpoint, "bucket-runtime-endpoint", o.BucketRuntimeEndpoint, "Endpoint of the remote bucket runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the bucket runtime endpoint.")
@@ -156,6 +161,14 @@ func Command() *cobra.Command {
 func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
+
+	topologyLabels := map[commonv1alpha1.TopologyLabel]string{}
+	if opts.TopologyRegionLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelRegion] = opts.TopologyRegionLabel
+	}
+	if opts.TopologyZoneLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelZone] = opts.TopologyZoneLabel
+	}
 
 	getter, err := bucketpoolletconfig.NewGetter(opts.BucketPoolName)
 	if err != nil {
@@ -342,6 +355,7 @@ func Run(ctx context.Context, opts Options) error {
 			BucketPoolName:    opts.BucketPoolName,
 			BucketClassMapper: bucketClassMapper,
 			BucketRuntime:     bucketRuntime,
+			TopologyLabels:    topologyLabels,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up bucket pool reconciler with manager: %w", err)
 		}
@@ -353,6 +367,7 @@ func Run(ctx context.Context, opts Options) error {
 		Client:         mgr.GetClient(),
 		BucketPoolName: opts.BucketPoolName,
 		ProviderID:     opts.ProviderID,
+		TopologyLabels: topologyLabels,
 		OnInitialized:  onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up bucket pool init with manager: %w", err)

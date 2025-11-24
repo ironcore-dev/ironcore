@@ -73,4 +73,21 @@ var _ = Describe("BucketPoolController", func() {
 			})),
 		))
 	})
+
+	It("should enforce topology labels", func(ctx SpecContext) {
+		By("patching the bucket pool with incorrect topology labels")
+		Eventually(Update(bucketPool, func() {
+			if bucketPool.Labels == nil {
+				bucketPool.Labels = make(map[string]string)
+			}
+			bucketPool.Labels["topology.ironcore.dev/region"] = "wrong-region"
+			bucketPool.Labels["topology.ironcore.dev/zone"] = "wrong-zone"
+		})).Should(Succeed())
+
+		By("checking if the reconciler resets the topology labels to its original values")
+		Eventually(Object(bucketPool)).Should(SatisfyAll(
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/region", "test-region-1")),
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/zone", "test-zone-1")),
+		))
+	})
 })
