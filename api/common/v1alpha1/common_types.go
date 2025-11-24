@@ -15,20 +15,6 @@ import (
 )
 
 const (
-	// TopologyRegionLabel is a label that can be applied to MachinePool, VolumePool, and BucketPool
-	//
-	// `Machine`s, `Volume`s, and `Bucket`s can use this label for pool selection.
-	//
-	// The intent is similar to Kubernetes' topology labels (i.e. `topology.kubernetes.io/region`)
-	TopologyRegionLabel = "topology.ironcore.dev/region"
-
-	// TopologyZoneLabel is a label that can be applied to MachinePool, VolumePool, and BucketPool
-	//
-	// `Machine`s, `Volume`s, and `Bucket`s can use this label for pool selection.
-	//
-	// The intent is similar to Kubernetes' topology labels (i.e. `topology.kubernetes.io/zone`)
-	TopologyZoneLabel = "topology.ironcore.dev/zone"
-
 	// WatchLabel is a label that can be applied to any ironcore resource.
 	//
 	// Provider controllers that allow for selective reconciliation may check this label and proceed
@@ -50,11 +36,23 @@ const (
 	DefaultEphemeralManager = "ephemeral-manager"
 )
 
+// TopologyLabel represents a topology label that can be configured on machinepoollet, volumepoollet, and bucketpoollet,
+// which set them on MachinePool, VolumePool, and BucketPool resources.
+// These labels are managed exclusively by the respective poollet controllers (machinepoollet, volumepoollet, bucketpoollet).
+// Any manual changes to these labels will be overwritten by the poollet controllers.
+// The intent is similar to Kubernetes' topology labels.
 type TopologyLabel string
 
 const (
+	// TopologyLabelRegion is a label applied to MachinePool, VolumePool, and BucketPool resources.
+	// Machines, Volumes, and Buckets can use this label in their pool selectors.
+	// The intent is similar to Kubernetes' topology labels (e.g., `topology.kubernetes.io/region`).
 	TopologyLabelRegion TopologyLabel = "topology.ironcore.dev/region"
-	TopologyLabelZone   TopologyLabel = "topology.ironcore.dev/zone"
+
+	// TopologyLabelZone is a label applied to MachinePool, VolumePool, and BucketPool resources.
+	// Machines, Volumes, and Buckets can use this label in their pool selectors.
+	// The intent is similar to Kubernetes' topology labels (e.g., `topology.kubernetes.io/zone`).
+	TopologyLabelZone TopologyLabel = "topology.ironcore.dev/zone"
 )
 
 // ConfigMapKeySelector is a reference to a specific 'key' within a ConfigMap resource.
