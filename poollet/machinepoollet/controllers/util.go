@@ -10,7 +10,6 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/generic"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func FindNewIRINetworkInterfaces(desiredIRINics, existingIRINics []*iri.NetworkInterface) []*iri.NetworkInterface {
@@ -59,16 +58,4 @@ func getAndParseFromStringMap[E any](annotations map[string]string, key string, 
 	}
 
 	return e, nil
-}
-
-func setLabel(om *metav1.ObjectMeta, lblKey string, lblVal string) {
-	if len(lblVal) < 1 {
-		return
-	}
-
-	if om.Labels == nil {
-		om.Labels = make(map[string]string)
-	}
-
-	om.Labels[lblKey] = lblVal
 }
