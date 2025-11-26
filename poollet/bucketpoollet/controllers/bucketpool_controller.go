@@ -113,11 +113,9 @@ func (r *BucketPoolReconciler) reconcile(ctx context.Context, log logr.Logger, b
 func (r *BucketPoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, bucketPool *storagev1alpha1.BucketPool) error {
 	base := bucketPool.DeepCopy()
 
-	if poolletutils.EnforceTopolgyLabels(log, &bucketPool.ObjectMeta, r.TopologyLabels) {
-		return r.Patch(ctx, bucketPool, client.MergeFrom(base))
-	}
+	poolletutils.SetTopologyLabels(log, &bucketPool.ObjectMeta, r.TopologyLabels)
 
-	return nil
+	return r.Patch(ctx, bucketPool, client.MergeFrom(base))
 }
 
 func (r *BucketPoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

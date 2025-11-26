@@ -47,6 +47,7 @@ func (i *VolumePoolInit) Start(ctx context.Context) error {
 		},
 	}
 
+	log.V(1).Info("Initially setting topology labels")
 	poolletutils.SetTopologyLabels(log, &volumePool.ObjectMeta, i.TopologyLabels)
 
 	if err := i.Patch(ctx, volumePool, client.Apply, client.ForceOwnership, client.FieldOwner(volumepoolletv1alpha1.FieldOwner)); err != nil {

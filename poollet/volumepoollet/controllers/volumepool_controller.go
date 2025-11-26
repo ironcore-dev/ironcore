@@ -178,11 +178,9 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 func (r *VolumePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) error {
 	base := volumePool.DeepCopy()
 
-	if poolletutils.EnforceTopolgyLabels(log, &volumePool.ObjectMeta, r.TopologyLabels) {
-		return r.Patch(ctx, volumePool, client.MergeFrom(base))
-	}
+	poolletutils.SetTopologyLabels(log, &volumePool.ObjectMeta, r.TopologyLabels)
 
-	return nil
+	return r.Patch(ctx, volumePool, client.MergeFrom(base))
 }
 
 func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

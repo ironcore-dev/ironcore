@@ -186,11 +186,9 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 func (r *MachinePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) error {
 	base := machinePool.DeepCopy()
 
-	if poolletutils.EnforceTopolgyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels) {
-		return r.Patch(ctx, machinePool, client.MergeFrom(base))
-	}
+	poolletutils.SetTopologyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels)
 
-	return nil
+	return r.Patch(ctx, machinePool, client.MergeFrom(base))
 }
 
 func (r *MachinePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

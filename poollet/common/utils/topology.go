@@ -9,29 +9,16 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func EnforceTopolgyLabels(log logr.Logger, om *v1.ObjectMeta, labels map[commonv1alpha1.TopologyLabel]string) bool {
-	changed := false
-
-	for key, val := range labels {
-		if om.Labels[string(key)] != val {
-			log.V(1).Info("Restoring topology label", "Key", key, "Value", val)
-			if om.Labels == nil {
-				om.Labels = make(map[string]string)
-			}
-			om.Labels[string(key)] = val
-			changed = true
-		}
+func SetTopologyLabels(log logr.Logger, om *v1.ObjectMeta, labels map[commonv1alpha1.TopologyLabel]string) {
+	if len(labels) == 0 {
+		return
 	}
 
-	return changed
-}
+	if om.Labels == nil {
+		om.Labels = make(map[string]string)
+	}
 
-func SetTopologyLabels(log logr.Logger, om *v1.ObjectMeta, labels map[commonv1alpha1.TopologyLabel]string) {
-	log.V(1).Info("Initially setting topology labels")
 	for key, val := range labels {
-		if om.Labels == nil {
-			om.Labels = make(map[string]string)
-		}
 		log.V(1).Info("Setting topology label", "Label", key, "Value", val)
 		om.Labels[string(key)] = val
 	}

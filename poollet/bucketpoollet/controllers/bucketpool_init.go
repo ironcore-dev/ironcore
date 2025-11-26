@@ -47,6 +47,7 @@ func (i *BucketPoolInit) Start(ctx context.Context) error {
 		},
 	}
 
+	log.V(1).Info("Initially setting topology labels")
 	poolletutils.SetTopologyLabels(log, &bucketPool.ObjectMeta, i.TopologyLabels)
 
 	if err := i.Patch(ctx, bucketPool, client.Apply, client.ForceOwnership, client.FieldOwner(bucketpoolletv1alpha1.FieldOwner)); err != nil {
