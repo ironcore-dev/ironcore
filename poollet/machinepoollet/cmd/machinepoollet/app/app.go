@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -87,6 +88,9 @@ type Options struct {
 	NetworkDownwardAPILabels      map[string]string
 	NetworkDownwardAPIAnnotations map[string]string
 
+	TopologyRegionLabel string
+	TopologyZoneLabel   string
+
 	ProviderID                           string
 	MachineRuntimeEndpoint               string
 	MachineRuntimeSocketDiscoveryTimeout time.Duration
@@ -135,6 +139,9 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVar(&o.NicDownwardAPIAnnotations, "nic-downward-api-annotation", o.NicDownwardAPIAnnotations, "Downward-API annotations to set on the iri nic.")
 	fs.StringToStringVar(&o.NetworkDownwardAPILabels, "network-downward-api-label", o.NetworkDownwardAPILabels, "Downward-API labels to set on the iri network.")
 	fs.StringToStringVar(&o.NetworkDownwardAPIAnnotations, "network-downward-api-annotation", o.NetworkDownwardAPIAnnotations, "Downward-API annotations to set on the iri network.")
+
+	fs.StringVar(&o.TopologyRegionLabel, "topology-region-label", "", "Label to use for the region topology information.")
+	fs.StringVar(&o.TopologyZoneLabel, "topology-zone-label", "", "Label to use for the zone topology information.")
 
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the machine pool.")
 	fs.StringVar(&o.MachineRuntimeEndpoint, "machine-runtime-endpoint", o.MachineRuntimeEndpoint, "Endpoint of the remote machine runtime service.")
@@ -320,6 +327,14 @@ func Run(ctx context.Context, opts Options) error {
 		})
 	}
 
+	topologyLabels := map[commonv1alpha1.TopologyLabel]string{}
+	if opts.TopologyRegionLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelRegion] = opts.TopologyRegionLabel
+	}
+	if opts.TopologyZoneLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelZone] = opts.TopologyZoneLabel
+	}
+
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Logger:                  logger,
 		Scheme:                  scheme,
@@ -462,6 +477,7 @@ func Run(ctx context.Context, opts Options) error {
 			Port:               port,
 			MachineRuntime:     machineRuntime,
 			MachineClassMapper: machineClassMapper,
+			TopologyLabels:     topologyLabels,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
@@ -481,6 +497,7 @@ func Run(ctx context.Context, opts Options) error {
 		Client:          mgr.GetClient(),
 		MachinePoolName: opts.MachinePoolName,
 		ProviderID:      opts.ProviderID,
+		TopologyLabels:  topologyLabels,
 		OnInitialized:   onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up machine pool init with manager: %w", err)

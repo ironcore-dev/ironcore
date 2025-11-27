@@ -4,16 +4,23 @@
 package controllers_test
 
 import (
+	"time"
+
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/testing/volume"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
+	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	"github.com/ironcore-dev/ironcore/utils/quota"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
@@ -282,6 +289,51 @@ var _ = Describe("VolumePoolController", func() {
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, expandableVolumeClass.Name): resource.MustParse("40Gi"),
 				})
 			})),
+		))
+	})
+
+	It("should enforce topology labels", func(ctx SpecContext) {
+		By("creating a volume pool with topology labels")
+		topologyVolumePool := &storagev1alpha1.VolumePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-topology-vp-",
+				Labels: map[string]string{
+					"topology.ironcore.dev/region": "test-region-1",
+					"topology.ironcore.dev/zone":   "test-zone-1",
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, topologyVolumePool)).To(Succeed(), "failed to create topology volume pool")
+		DeferCleanup(k8sClient.Delete, topologyVolumePool)
+
+		By("setting up a reconciler with topology labels")
+		topologyReconciler := &controllers.VolumePoolReconciler{
+			Client:            k8sClient,
+			VolumeRuntime:     srv,
+			VolumeClassMapper: vcm.NewGeneric(srv, vcm.GenericOptions{RelistPeriod: 2 * time.Second}),
+			VolumePoolName:    topologyVolumePool.Name,
+			TopologyLabels: map[commonv1alpha1.TopologyLabel]string{
+				commonv1alpha1.TopologyLabelRegion: "test-region-1",
+				commonv1alpha1.TopologyLabelZone:   "test-zone-1",
+			},
+		}
+
+		By("patching the volume pool with incorrect topology labels")
+		Eventually(Update(topologyVolumePool, func() {
+			topologyVolumePool.Labels = map[string]string{
+				"topology.ironcore.dev/region": "wrong-region",
+				"topology.ironcore.dev/zone":   "wrong-zone",
+			}
+		})).Should(Succeed())
+
+		By("manually triggering reconciliation")
+		_, err := topologyReconciler.Reconcile(ctx, ctrl.Request{NamespacedName: client.ObjectKey{Name: topologyVolumePool.Name}})
+		Expect(err).NotTo(HaveOccurred())
+
+		By("checking if the reconciler resets the topology labels to its original values")
+		Eventually(Object(topologyVolumePool)).Should(SatisfyAll(
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/region", "test-region-1")),
+			HaveField("ObjectMeta.Labels", HaveKeyWithValue("topology.ironcore.dev/zone", "test-zone-1")),
 		))
 	})
 })

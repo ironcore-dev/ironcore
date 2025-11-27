@@ -9,9 +9,11 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iriBucket "github.com/ironcore-dev/ironcore/iri/apis/bucket"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -25,6 +27,8 @@ type BucketPoolReconciler struct {
 	BucketPoolName    string
 	BucketRuntime     iriBucket.RuntimeService
 	BucketClassMapper bcm.BucketClassMapper
+
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 }
 
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=bucketpools,verbs=get;list;watch;update;patch
@@ -70,6 +74,11 @@ func (r *BucketPoolReconciler) supportsBucketClass(ctx context.Context, bucketCl
 func (r *BucketPoolReconciler) reconcile(ctx context.Context, log logr.Logger, bucketPool *storagev1alpha1.BucketPool) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
+	log.V(1).Info("Enforcing configured topology labels")
+	if err := r.enforceOriginalTopologyLabels(ctx, log, bucketPool); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error enforcing original topology labels: %w", err)
+	}
+
 	log.V(1).Info("Listing bucket classes")
 	bucketClassList := &storagev1alpha1.BucketClassList{}
 	if err := r.List(ctx, bucketClassList); err != nil {
@@ -99,6 +108,14 @@ func (r *BucketPoolReconciler) reconcile(ctx context.Context, log logr.Logger, b
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *BucketPoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, bucketPool *storagev1alpha1.BucketPool) error {
+	base := bucketPool.DeepCopy()
+
+	poolletutils.SetTopologyLabels(log, &bucketPool.ObjectMeta, r.TopologyLabels)
+
+	return r.Patch(ctx, bucketPool, client.MergeFrom(base))
 }
 
 func (r *BucketPoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

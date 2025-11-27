@@ -393,6 +393,34 @@ When specified, allowed values are NoSchedule.</p>
 <td></td>
 </tr></tbody>
 </table>
+<h3 id="common.ironcore.dev/v1alpha1.TopologyLabel">TopologyLabel
+(<code>string</code> alias)</h3>
+<div>
+<p>TopologyLabel represents a topology label that can be configured on machinepoollet, volumepoollet, and bucketpoollet,
+which set them on MachinePool, VolumePool, and BucketPool resources.
+These labels are managed exclusively by the respective poollet controllers (machinepoollet, volumepoollet, bucketpoollet).
+Any manual changes to these labels will be overwritten by the poollet controllers.
+The intent is similar to Kubernetes&rsquo; topology labels.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;topology.ironcore.dev/region&#34;</p></td>
+<td><p>TopologyLabelRegion is a label applied to MachinePool, VolumePool, and BucketPool resources.
+Machines, Volumes, and Buckets can use this label in their pool selectors.
+The intent is similar to Kubernetes&rsquo; topology labels (e.g., <code>topology.kubernetes.io/region</code>).</p>
+</td>
+</tr><tr><td><p>&#34;topology.ironcore.dev/zone&#34;</p></td>
+<td><p>TopologyLabelZone is a label applied to MachinePool, VolumePool, and BucketPool resources.
+Machines, Volumes, and Buckets can use this label in their pool selectors.
+The intent is similar to Kubernetes&rsquo; topology labels (e.g., <code>topology.kubernetes.io/zone</code>).</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="common.ironcore.dev/v1alpha1.UIDReference">UIDReference
 </h3>
 <div>

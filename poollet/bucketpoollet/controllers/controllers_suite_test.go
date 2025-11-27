@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
@@ -158,6 +159,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *storagev1alph
 		*bp = storagev1alpha1.BucketPool{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-bp-",
+				Labels: map[string]string{
+					string(commonv1alpha1.TopologyLabelRegion): "test-region-1",
+					string(commonv1alpha1.TopologyLabelZone):   "test-zone-1",
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, bp)).To(Succeed(), "failed to create test bucket pool")
@@ -239,6 +244,10 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *storagev1alph
 			BucketRuntime:     srv,
 			BucketClassMapper: bucketClassMapper,
 			BucketPoolName:    bp.Name,
+			TopologyLabels: map[commonv1alpha1.TopologyLabel]string{
+				commonv1alpha1.TopologyLabelRegion: "test-region-1",
+				commonv1alpha1.TopologyLabelZone:   "test-zone-1",
+			},
 		}).SetupWithManager(k8sManager)).To(Succeed())
 
 		go func() {

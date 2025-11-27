@@ -7,7 +7,9 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -19,6 +21,8 @@ type VolumePoolInit struct {
 
 	VolumePoolName string
 	ProviderID     string
+
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 
 	OnInitialized func(ctx context.Context) error
 	OnFailed      func(ctx context.Context, reason error) error
@@ -42,6 +46,10 @@ func (i *VolumePoolInit) Start(ctx context.Context) error {
 			ProviderID: i.ProviderID,
 		},
 	}
+
+	log.V(1).Info("Initially setting topology labels")
+	poolletutils.SetTopologyLabels(log, &volumePool.ObjectMeta, i.TopologyLabels)
+
 	if err := i.Patch(ctx, volumePool, client.Apply, client.ForceOwnership, client.FieldOwner(volumepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
 			log.V(1).Info("Failed applying, calling OnFailed callback", "Error", err)

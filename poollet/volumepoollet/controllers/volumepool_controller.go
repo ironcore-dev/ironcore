@@ -14,9 +14,11 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	corev1 "k8s.io/api/core/v1"
@@ -32,6 +34,8 @@ type VolumePoolReconciler struct {
 	VolumePoolName    string
 	VolumeRuntime     volume.RuntimeService
 	VolumeClassMapper vcm.VolumeClassMapper
+
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 }
 
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch;update;patch
@@ -143,6 +147,11 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
+	log.V(1).Info("Enforcing configured topology labels")
+	if err := r.enforceOriginalTopologyLabels(ctx, log, volumePool); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error enforcing original topology labels: %w", err)
+	}
+
 	log.V(1).Info("Listing volume classes")
 	volumeClassList := &storagev1alpha1.VolumeClassList{}
 	if err := r.List(ctx, volumeClassList); err != nil {
@@ -164,6 +173,14 @@ func (r *VolumePoolReconciler) reconcile(ctx context.Context, log logr.Logger, v
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *VolumePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, volumePool *storagev1alpha1.VolumePool) error {
+	base := volumePool.DeepCopy()
+
+	poolletutils.SetTopologyLabels(log, &volumePool.ObjectMeta, r.TopologyLabels)
+
+	return r.Patch(ctx, volumePool, client.MergeFrom(base))
 }
 
 func (r *VolumePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

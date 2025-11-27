@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -64,9 +65,13 @@ type Options struct {
 	ProbeAddr                string
 	PprofAddr                string
 
-	VolumePoolName                      string
-	VolumeDownwardAPILabels             map[string]string
-	VolumeDownwardAPIAnnotations        map[string]string
+	VolumePoolName               string
+	VolumeDownwardAPILabels      map[string]string
+	VolumeDownwardAPIAnnotations map[string]string
+
+	TopologyRegionLabel string
+	TopologyZoneLabel   string
+
 	ProviderID                          string
 	VolumeRuntimeEndpoint               string
 	DialTimeout                         time.Duration
@@ -110,6 +115,10 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringToStringVar(&o.VolumeDownwardAPIAnnotations, "volume-downward-api-annotation", o.VolumeDownwardAPIAnnotations, "Downward-API annotations to set on the IRI volume.")
 	fs.StringToStringVar(&o.VolumeSnapshotDownwardAPILabels, "volume-snapshot-downward-api-label", o.VolumeSnapshotDownwardAPILabels, "Downward-API labels to set on IRI volume snapshot.")
 	fs.StringToStringVar(&o.VolumeSnapshotDownwardAPIAnnotations, "volume-snapshot-downward-api-annotation", o.VolumeSnapshotDownwardAPIAnnotations, "Downward-API annotations to set on the IRI volume snapshot.")
+
+	fs.StringVar(&o.TopologyRegionLabel, "topology-region-label", "", "Label to use for the region topology information.")
+	fs.StringVar(&o.TopologyZoneLabel, "topology-zone-label", "", "Label to use for the zone topology information.")
+
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
 	fs.StringVar(&o.VolumeRuntimeEndpoint, "volume-runtime-endpoint", o.VolumeRuntimeEndpoint, "Endpoint of the remote volume runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
@@ -162,6 +171,14 @@ func Command() *cobra.Command {
 func Run(ctx context.Context, opts Options) error {
 	logger := ctrl.LoggerFrom(ctx)
 	setupLog := ctrl.Log.WithName("setup")
+
+	topologyLabels := map[commonv1alpha1.TopologyLabel]string{}
+	if opts.TopologyRegionLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelRegion] = opts.TopologyRegionLabel
+	}
+	if opts.TopologyZoneLabel != "" {
+		topologyLabels[commonv1alpha1.TopologyLabelZone] = opts.TopologyZoneLabel
+	}
 
 	getter, err := volumepoolletconfig.NewGetter(opts.VolumePoolName)
 	if err != nil {
@@ -395,6 +412,7 @@ func Run(ctx context.Context, opts Options) error {
 			VolumePoolName:    opts.VolumePoolName,
 			VolumeClassMapper: volumeClassMapper,
 			VolumeRuntime:     volumeRuntime,
+			TopologyLabels:    topologyLabels,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up volume pool reconciler with manager: %w", err)
 		}
@@ -414,6 +432,7 @@ func Run(ctx context.Context, opts Options) error {
 		Client:         mgr.GetClient(),
 		VolumePoolName: opts.VolumePoolName,
 		ProviderID:     opts.ProviderID,
+		TopologyLabels: topologyLabels,
 		OnInitialized:  onInitialized,
 	}).SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("error setting up volume pool init with manager: %w", err)

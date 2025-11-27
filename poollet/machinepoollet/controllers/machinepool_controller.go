@@ -9,11 +9,13 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	"github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	"github.com/ironcore-dev/ironcore/utils/quota"
@@ -38,6 +40,8 @@ type MachinePoolReconciler struct {
 
 	MachineRuntime     machine.RuntimeService
 	MachineClassMapper mcm.MachineClassMapper
+
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 }
 
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch;update;patch
@@ -151,6 +155,11 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 		return ctrl.Result{RequeueAfter: 1}, nil
 	}
 
+	log.V(1).Info("Enforcing configured topology labels")
+	if err := r.enforceOriginalTopologyLabels(ctx, log, machinePool); err != nil {
+		return ctrl.Result{}, fmt.Errorf("error enforcing original topology labels: %w", err)
+	}
+
 	log.V(1).Info("Listing machine classes")
 	machineClassList := &computev1alpha1.MachineClassList{}
 	if err := r.List(ctx, machineClassList); err != nil {
@@ -172,6 +181,14 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 
 	log.V(1).Info("Reconciled")
 	return ctrl.Result{}, nil
+}
+
+func (r *MachinePoolReconciler) enforceOriginalTopologyLabels(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) error {
+	base := machinePool.DeepCopy()
+
+	poolletutils.SetTopologyLabels(log, &machinePool.ObjectMeta, r.TopologyLabels)
+
+	return r.Patch(ctx, machinePool, client.MergeFrom(base))
 }
 
 func (r *MachinePoolReconciler) SetupWithManager(mgr ctrl.Manager) error {

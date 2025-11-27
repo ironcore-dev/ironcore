@@ -7,7 +7,9 @@ import (
 	"context"
 	"fmt"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -19,6 +21,8 @@ type MachinePoolInit struct {
 
 	MachinePoolName string
 	ProviderID      string
+
+	TopologyLabels map[commonv1alpha1.TopologyLabel]string
 
 	// TODO: Remove OnInitialized / OnFailed as soon as the controller-runtime provides support for pre-start hooks:
 	// https://github.com/kubernetes-sigs/controller-runtime/pull/2044
@@ -45,6 +49,10 @@ func (i *MachinePoolInit) Start(ctx context.Context) error {
 			ProviderID: i.ProviderID,
 		},
 	}
+
+	log.V(1).Info("Initially setting topology labels")
+	poolletutils.SetTopologyLabels(log, &machinePool.ObjectMeta, i.TopologyLabels)
+
 	if err := i.Patch(ctx, machinePool, client.Apply, client.ForceOwnership, client.FieldOwner(machinepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
 			log.V(1).Info("Failed applying, calling OnFailed callback", "Error", err)
