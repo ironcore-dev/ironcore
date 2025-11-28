@@ -6,6 +6,7 @@ API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compu
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineSpec,NetworkInterfaces
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineSpec,Tolerations
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineSpec,Volumes
+API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineStatus,Conditions
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineStatus,NetworkInterfaces
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/compute/v1alpha1,MachineStatus,Volumes
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/core/v1alpha1,ResourceScopeSelector,MatchExpressions

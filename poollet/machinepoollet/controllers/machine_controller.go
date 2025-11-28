@@ -504,11 +504,109 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 	machine.Status.ObservedGeneration = generation
 	machine.Status.Volumes = volumeStatuses
 	machine.Status.NetworkInterfaces = nicStatuses
+	machine.Status.Conditions = r.computeMachineConditions(state, volumeStatuses, nicStatuses, now)
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
 	}
 	return nil
+}
+
+// computeMachineConditions computes the conditions for the machine based on its current state.
+func (r *MachineReconciler) computeMachineConditions(
+	state computev1alpha1.MachineState,
+	volumeStatuses []computev1alpha1.VolumeStatus,
+	nicStatuses []computev1alpha1.NetworkInterfaceStatus,
+	now metav1.Time,
+) []computev1alpha1.MachineCondition {
+	var conditions []computev1alpha1.MachineCondition
+
+	conditions = append(conditions, r.computeMachineReadyCondition(state, now))
+
+	if len(volumeStatuses) > 0 {
+		if c := r.computeVolumesReadyCondition(volumeStatuses, now); c.Type != "" {
+			conditions = append(conditions, c)
+		}
+	}
+
+	if len(nicStatuses) > 0 {
+		if c := r.computeNetworkInterfacesReadyCondition(nicStatuses, now); c.Type != "" {
+			conditions = append(conditions, c)
+		}
+	}
+
+	return conditions
+}
+
+func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.MachineState, now metav1.Time) computev1alpha1.MachineCondition {
+	status, reason, message := corev1.ConditionFalse, "NotReady", "Machine is not ready"
+
+	switch state {
+	case computev1alpha1.MachineStateRunning:
+		status, reason, message = corev1.ConditionTrue, "Running", "Machine is running"
+	case computev1alpha1.MachineStatePending:
+		status, reason, message = corev1.ConditionFalse, "Pending", "Machine is pending"
+	case computev1alpha1.MachineStateTerminating, computev1alpha1.MachineStateTerminated:
+		status, reason, message = corev1.ConditionFalse, "Terminating", "Machine is terminating or terminated"
+	}
+
+	return computev1alpha1.MachineCondition{
+		Type:               "Ready",
+		Status:             status,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: now,
+	}
+}
+
+func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []computev1alpha1.VolumeStatus, now metav1.Time) computev1alpha1.MachineCondition {
+	if len(volumeStatuses) == 0 {
+		return computev1alpha1.MachineCondition{}
+	}
+
+	status, reason, message := corev1.ConditionTrue, "VolumesReady", "All volumes are ready"
+
+	for _, vs := range volumeStatuses {
+		if vs.State != computev1alpha1.VolumeStateAttached {
+			status = corev1.ConditionFalse
+			reason = fmt.Sprintf("VolumeNotReady: %s", vs.Name)
+			message = fmt.Sprintf("Volume %s is not attached (state: %s)", vs.Name, vs.State)
+			break
+		}
+	}
+
+	return computev1alpha1.MachineCondition{
+		Type:               computev1alpha1.MachineConditionType("VolumesReady"),
+		Status:             status,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: now,
+	}
+}
+
+func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses []computev1alpha1.NetworkInterfaceStatus, now metav1.Time) computev1alpha1.MachineCondition {
+	if len(nicStatuses) == 0 {
+		return computev1alpha1.MachineCondition{}
+	}
+
+	status, reason, message := corev1.ConditionTrue, "NetworkInterfacesReady", "All network interfaces are ready"
+
+	for _, nicStatus := range nicStatuses {
+		if nicStatus.State != computev1alpha1.NetworkInterfaceStateAttached {
+			status = corev1.ConditionFalse
+			reason = fmt.Sprintf("NetworkInterfaceNotReady: %s", nicStatus.Name)
+			message = fmt.Sprintf("Network interface %s is not attached (state: %s)", nicStatus.Name, nicStatus.State)
+			break
+		}
+	}
+
+	return computev1alpha1.MachineCondition{
+		Type:               computev1alpha1.MachineConditionType("NetworkInterfacesReady"),
+		Status:             status,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: now,
+	}
 }
 
 func (r *MachineReconciler) prepareIRIPower(power computev1alpha1.Power) (iri.Power, error) {
