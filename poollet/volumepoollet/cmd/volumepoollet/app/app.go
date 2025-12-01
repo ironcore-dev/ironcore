@@ -12,9 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-
+	"github.com/ironcore-dev/controller-utils/cmdutils/switches"
+	"github.com/ironcore-dev/controller-utils/configutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -28,8 +27,8 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vem"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-
-	"github.com/ironcore-dev/controller-utils/configutils"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -42,6 +41,11 @@ import (
 )
 
 var scheme = runtime.NewScheme()
+
+const (
+	volumeController         = "volume"
+	volumeSnapshotController = "volumesnapshot"
+)
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
@@ -84,6 +88,8 @@ type Options struct {
 	ChannelCapacity int
 	RelistPeriod    time.Duration
 	RelistThreshold time.Duration
+
+	Switches *switches.Switches
 
 	WatchFilterValue string
 
@@ -132,6 +138,18 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.WatchFilterValue, "watch-filter", "", "Value to filter for while watching.")
 
 	fs.IntVar(&o.MaxConcurrentReconciles, "max-concurrent-reconciles", 1, "Maximum number of concurrent reconciles.")
+
+	o.Switches = switches.New(
+		volumeController,
+		volumeSnapshotController,
+	)
+	fs.Var(o.Switches, "controllers",
+		fmt.Sprintf("Controllers to enable. All controllers: %v. Disabled-by-default controllers: %v",
+			o.Switches.All(),
+			o.Switches.DisabledByDefault(),
+		),
+	)
+
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -302,88 +320,100 @@ func Run(ctx context.Context, opts Options) error {
 	if err != nil {
 		return fmt.Errorf("error getting volume runtime version: %w", err)
 	}
-	volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
-	if err := mgr.Add(volumeClassMapper); err != nil {
-		return fmt.Errorf("error adding volume class mapper: %w", err)
-	}
-	volumeEventMapper := vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorderFor("volume-cluster-events"), vem.VolumeEventMapperOptions{})
-	if err := mgr.Add(volumeEventMapper); err != nil {
-		return fmt.Errorf("error adding volume event mapper: %w", err)
-	}
-
-	volumeEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {
-		res, err := volumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.Volumes, nil
-	}, irievent.GeneratorOptions{
-		ChannelCapacity: opts.ChannelCapacity,
-		RelistPeriod:    opts.RelistPeriod,
-		RelistThreshold: opts.RelistThreshold,
-	})
-	if err := mgr.Add(volumeEvents); err != nil {
-		return fmt.Errorf("error adding volume event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
-		return fmt.Errorf("error adding volume event generator healthz check: %w", err)
-	}
-
-	volumeSnapshotEvents := irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
-		res, err := volumeRuntime.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
-		if err != nil {
-			return nil, err
-		}
-		return res.VolumeSnapshots, nil
-	}, irievent.GeneratorOptions{
-		ChannelCapacity: opts.ChannelCapacity,
-		RelistPeriod:    opts.RelistPeriod,
-		RelistThreshold: opts.RelistThreshold,
-	})
-	if err := mgr.Add(volumeSnapshotEvents); err != nil {
-		return fmt.Errorf("error adding volume snapshot event generator: %w", err)
-	}
-	if err := mgr.AddHealthzCheck("volume-snapshot-events", volumeSnapshotEvents.Check); err != nil {
-		return fmt.Errorf("error adding volume snapshot event generator healthz check: %w", err)
-	}
 
 	indexer := mgr.GetFieldIndexer()
-	if err := storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumePoolRefNameField, err)
+
+	var volumeClassMapper vcm.VolumeClassMapper
+	var volumeEventMapper *vem.VolumeEventMapper
+	var volumeEvents irievent.Generator[*iri.Volume]
+	if opts.Switches.Enabled(volumeController) {
+		volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
+		if err := mgr.Add(volumeClassMapper); err != nil {
+			return fmt.Errorf("error adding volume class mapper: %w", err)
+		}
+		volumeEventMapper = vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorderFor("volume-cluster-events"), vem.VolumeEventMapperOptions{})
+		if err := mgr.Add(volumeEventMapper); err != nil {
+			return fmt.Errorf("error adding volume event mapper: %w", err)
+		}
+
+		volumeEvents = irievent.NewGenerator(func(ctx context.Context) ([]*iri.Volume, error) {
+			res, err := volumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.Volumes, nil
+		}, irievent.GeneratorOptions{
+			ChannelCapacity: opts.ChannelCapacity,
+			RelistPeriod:    opts.RelistPeriod,
+			RelistThreshold: opts.RelistThreshold,
+		})
+		if err := mgr.Add(volumeEvents); err != nil {
+			return fmt.Errorf("error adding volume event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("volume-events", volumeEvents.Check); err != nil {
+			return fmt.Errorf("error adding volume event generator healthz check: %w", err)
+		}
+
+		if err := storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer); err != nil {
+			return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumePoolRefNameField, err)
+		}
 	}
-	if err := storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer); err != nil {
-		return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumeSnapshotRefNameField, err)
+
+	var volumeSnapshotEvents irievent.Generator[*iri.VolumeSnapshot]
+	if opts.Switches.Enabled(volumeController) {
+		volumeSnapshotEvents = irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
+			res, err := volumeRuntime.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
+			if err != nil {
+				return nil, err
+			}
+			return res.VolumeSnapshots, nil
+		}, irievent.GeneratorOptions{
+			ChannelCapacity: opts.ChannelCapacity,
+			RelistPeriod:    opts.RelistPeriod,
+			RelistThreshold: opts.RelistThreshold,
+		})
+		if err := mgr.Add(volumeSnapshotEvents); err != nil {
+			return fmt.Errorf("error adding volume snapshot event generator: %w", err)
+		}
+		if err := mgr.AddHealthzCheck("volume-snapshot-events", volumeSnapshotEvents.Check); err != nil {
+			return fmt.Errorf("error adding volume snapshot event generator healthz check: %w", err)
+		}
+		if err := storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer); err != nil {
+			return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumeSnapshotRefNameField, err)
+		}
 	}
 
 	onInitialized := func(ctx context.Context) error {
-		volumeClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.VolumeClassMapperSyncTimeout)
-		defer cancel()
+		if opts.Switches.Enabled(volumeController) {
+			volumeClassMapperSyncCtx, cancel := context.WithTimeout(ctx, opts.VolumeClassMapperSyncTimeout)
+			defer cancel()
 
-		if err := volumeClassMapper.WaitForSync(volumeClassMapperSyncCtx); err != nil {
-			return fmt.Errorf("error waiting for volume class mapper to sync: %w", err)
-		}
+			if err := volumeClassMapper.WaitForSync(volumeClassMapperSyncCtx); err != nil {
+				return fmt.Errorf("error waiting for volume class mapper to sync: %w", err)
+			}
 
-		if err := (&controllers.VolumeReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("volumes"),
-			Client:                  mgr.GetClient(),
-			Scheme:                  scheme,
-			VolumeRuntime:           volumeRuntime,
-			VolumeRuntimeName:       version.RuntimeName,
-			VolumeClassMapper:       volumeClassMapper,
-			VolumePoolName:          opts.VolumePoolName,
-			DownwardAPILabels:       opts.VolumeDownwardAPILabels,
-			DownwardAPIAnnotations:  opts.VolumeDownwardAPIAnnotations,
-			WatchFilterValue:        opts.WatchFilterValue,
-			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume reconciler with manager: %w", err)
-		}
+			if err := (&controllers.VolumeReconciler{
+				EventRecorder:           mgr.GetEventRecorderFor("volumes"),
+				Client:                  mgr.GetClient(),
+				Scheme:                  scheme,
+				VolumeRuntime:           volumeRuntime,
+				VolumeRuntimeName:       version.RuntimeName,
+				VolumeClassMapper:       volumeClassMapper,
+				VolumePoolName:          opts.VolumePoolName,
+				DownwardAPILabels:       opts.VolumeDownwardAPILabels,
+				DownwardAPIAnnotations:  opts.VolumeDownwardAPIAnnotations,
+				WatchFilterValue:        opts.WatchFilterValue,
+				MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume reconciler with manager: %w", err)
+			}
 
-		if err := (&controllers.VolumeAnnotatorReconciler{
-			Client:       mgr.GetClient(),
-			VolumeEvents: volumeEvents,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume annotator reconciler with manager: %w", err)
+			if err := (&controllers.VolumeAnnotatorReconciler{
+				Client:       mgr.GetClient(),
+				VolumeEvents: volumeEvents,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume annotator reconciler with manager: %w", err)
+			}
 		}
 
 		if err := (&controllers.VolumeSnapshotReconciler{
