@@ -12,6 +12,7 @@ BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # LDFLAGS for the build targets
+LDFLAGS ?= -s -w
 VERSION=$(shell git describe --tags --abbrev=0)
 COMMIT=$(shell git log -n1 --format="%h")
 MACHINEBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/machinebroker/version.Version
@@ -199,7 +200,7 @@ docker-build-machinepoollet: ## Build machinepoollet image.
 
 .PHONY: docker-build-machinebroker
 docker-build-machinebroker: ## Build machinebroker image.
-	docker build --build-arg LDFLAGS="-X $(MACHINEBROKER_VERSION)=$(VERSION) -X $(MACHINEBROKER_COMMIT)=$(COMMIT)" --target machinebroker -t ${MACHINEBROKER_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(MACHINEBROKER_VERSION)=$(VERSION) -X $(MACHINEBROKER_COMMIT)=$(COMMIT)" --target machinebroker -t ${MACHINEBROKER_IMG} .
 
 .PHONY: docker-build-irictl-machine
 docker-build-irictl-machine: ## Build irictl-machine image.
@@ -211,7 +212,7 @@ docker-build-volumepoollet: ## Build volumepoollet image.
 
 .PHONY: docker-build-volumebroker
 docker-build-volumebroker: ## Build volumebroker image.
-	docker build --build-arg LDFLAGS="-X $(VOLUMEBROKER_VERSION)=$(VERSION) -X $(VOLUMEBROKER_COMMIT)=$(COMMIT)" --target volumebroker -t ${VOLUMEBROKER_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(VOLUMEBROKER_VERSION)=$(VERSION) -X $(VOLUMEBROKER_COMMIT)=$(COMMIT)" --target volumebroker -t ${VOLUMEBROKER_IMG} .
 
 .PHONY: docker-build-irictl-volume
 docker-build-irictl-volume: ## Build irictl-volume image.
@@ -219,7 +220,7 @@ docker-build-irictl-volume: ## Build irictl-volume image.
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --build-arg LDFLAGS="-X $(BUCKETBROKER_VERSION)=$(VERSION) -X $(BUCKETBROKER_COMMIT)=$(COMMIT)" --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(BUCKETBROKER_VERSION)=$(VERSION) -X $(BUCKETBROKER_COMMIT)=$(COMMIT)" --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
 
 .PHONY: docker-build-bucketbroker
 docker-build-bucketbroker: ## Build bucketbroker image.
