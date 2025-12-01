@@ -5581,13 +5581,6 @@ func schema_ironcore_api_storage_v1alpha1_VolumeCondition(ref common.ReferenceCa
 							Format:      "",
 						},
 					},
-					"observedGeneration": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
 					"lastTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",

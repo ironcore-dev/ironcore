@@ -1559,9 +1559,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: message
       type:
         scalar: string
-    - name: observedGeneration
-      type:
-        scalar: numeric
     - name: reason
       type:
         scalar: string

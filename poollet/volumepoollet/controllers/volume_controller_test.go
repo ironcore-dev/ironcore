@@ -14,6 +14,8 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
+
 	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -62,7 +64,16 @@ var _ = Describe("VolumeController", func() {
 		Eventually(srv).Should(SatisfyAll(
 			HaveField("Volumes", HaveLen(1)),
 		))
-
+		By("waiting for the volume conditions to be updated")
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(storagev1alpha1.VolumeConditionType("Ready")),
+				"Status":             Equal(corev1.ConditionFalse),
+				"Reason":             Equal("Pending"),
+				"Message":            Equal("Volume is pending"),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
+		))
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
 		Expect(iriVolume.Spec.Image).To(Equal(""))
@@ -96,6 +107,17 @@ var _ = Describe("VolumeController", func() {
 			HaveField("Status.Access.SecretRef", Not(BeNil())),
 			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(MonitorsKey, volumeMonitors)),
 			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(ImageKey, volumeImage)),
+		))
+
+		By("waiting for the volume conditions to be updated")
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
+				"Type":               Equal(storagev1alpha1.VolumeConditionType("Ready")),
+				"Status":             Equal(corev1.ConditionTrue),
+				"Reason":             Equal("Available"),
+				"Message":            Equal("Volume is available"),
+				"LastTransitionTime": Not(BeNil()),
+			}))),
 		))
 
 		Expect(volume.Status.Resources.Storage().Value()).Should(Equal(size.Value()))

@@ -18,7 +18,6 @@ type VolumeConditionApplyConfiguration struct {
 	Status             *v1.ConditionStatus                  `json:"status,omitempty"`
 	Reason             *string                              `json:"reason,omitempty"`
 	Message            *string                              `json:"message,omitempty"`
-	ObservedGeneration *int64                               `json:"observedGeneration,omitempty"`
 	LastTransitionTime *metav1.Time                         `json:"lastTransitionTime,omitempty"`
 }
 
@@ -57,14 +56,6 @@ func (b *VolumeConditionApplyConfiguration) WithReason(value string) *VolumeCond
 // If called multiple times, the Message field is set to the value of the last call.
 func (b *VolumeConditionApplyConfiguration) WithMessage(value string) *VolumeConditionApplyConfiguration {
 	b.Message = &value
-	return b
-}
-
-// WithObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ObservedGeneration field is set to the value of the last call.
-func (b *VolumeConditionApplyConfiguration) WithObservedGeneration(value int64) *VolumeConditionApplyConfiguration {
-	b.ObservedGeneration = &value
 	return b
 }
 
