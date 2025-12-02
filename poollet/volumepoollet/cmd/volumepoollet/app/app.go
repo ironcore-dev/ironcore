@@ -327,6 +327,7 @@ func Run(ctx context.Context, opts Options) error {
 	var volumeEventMapper *vem.VolumeEventMapper
 	var volumeEvents irievent.Generator[*iri.Volume]
 	if opts.Switches.Enabled(volumeController) {
+		setupLog.V(1).Info("Volume controller enabled")
 		volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
 		if err := mgr.Add(volumeClassMapper); err != nil {
 			return fmt.Errorf("error adding volume class mapper: %w", err)
@@ -361,6 +362,7 @@ func Run(ctx context.Context, opts Options) error {
 
 	var volumeSnapshotEvents irievent.Generator[*iri.VolumeSnapshot]
 	if opts.Switches.Enabled(volumeController) {
+		setupLog.V(1).Info("Volume Snapshot controller enabled")
 		volumeSnapshotEvents = irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
 			res, err := volumeRuntime.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
 			if err != nil {

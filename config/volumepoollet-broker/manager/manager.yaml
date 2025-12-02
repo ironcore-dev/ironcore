@@ -38,6 +38,7 @@ spec:
             - --volume-snapshot-downward-api-label=root-volume-snapshot-namespace=metadata.labels['downward-api.volumepoollet.ironcore.dev/volume-snapshot-root-volume-snapshot-namespace']
             - --volume-snapshot-downward-api-label=root-volume-snapshot-name=metadata.labels['downward-api.volumepoollet.ironcore.dev/volume-snapshot-root-volume-snapshot-name']
             - --volume-snapshot-downward-api-label=root-volume-snapshot-uid=metadata.labels['downward-api.volumepoollet.ironcore.dev/volume-snapshot-root-volume-snapshot-uid']
+            - --controllers=*
           image: volumepoollet:latest
           name: manager
           securityContext:
