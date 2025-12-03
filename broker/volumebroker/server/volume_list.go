@@ -7,14 +7,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ironcore-dev/controller-utils/metautils"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -202,4 +206,38 @@ func (s *Server) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (
 	return &iri.ListVolumesResponse{
 		Volumes: volumes,
 	}, nil
+}
+
+func (s *Server) SetVolumeUIDLabelToAllVolumes(ctx context.Context) error {
+	volumeList := &storagev1alpha1.VolumeList{}
+	log := ctrl.LoggerFrom(ctx)
+	log.Info("Listing brokered volumes")
+	if err := s.listManagedAndCreated(ctx, volumeList, nil); err != nil {
+		return fmt.Errorf("error listing ironcore volumes: %w", err)
+	}
+
+	for i := range volumeList.Items {
+		volume := &volumeList.Items[i]
+		labels, err := apiutils.GetLabelsAnnotation(volume)
+		if err != nil {
+			return fmt.Errorf("failed to get labels annotation: %w", err)
+		}
+		if labels == nil {
+			log.Info("Labels are nil", "name", volume.Name, "namespace", volume.Namespace)
+			continue
+		}
+
+		volumeUid := labels[volumepoolletv1alpha1.VolumeUIDLabel]
+		if volumeUid == "" {
+			log.Info("Volume uid label is empty", "name", volume.Name, "namespace", volume.Namespace)
+			continue
+		}
+		log.Info("Setting volume uid label for", "name", volume.Name, "namespace", volume.Namespace, "labelKey", volumepoolletv1alpha1.VolumeUIDLabel, "labelValue", volumeUid)
+		base := volume.DeepCopy()
+		metautils.SetLabel(volume, volumepoolletv1alpha1.VolumeUIDLabel, volumeUid)
+		if err := s.client.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
+			return fmt.Errorf("error patching volume uid label: %w", err)
+		}
+	}
+	return nil
 }
