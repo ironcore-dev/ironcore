@@ -328,7 +328,7 @@ func Run(ctx context.Context, opts Options) error {
 	var volumeEvents irievent.Generator[*iri.Volume]
 	if opts.Switches.Enabled(volumeController) {
 		setupLog.V(1).Info("Volume controller enabled")
-		volumeClassMapper := vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
+		volumeClassMapper = vcm.NewGeneric(volumeRuntime, vcm.GenericOptions{})
 		if err := mgr.Add(volumeClassMapper); err != nil {
 			return fmt.Errorf("error adding volume class mapper: %w", err)
 		}
@@ -361,8 +361,8 @@ func Run(ctx context.Context, opts Options) error {
 	}
 
 	var volumeSnapshotEvents irievent.Generator[*iri.VolumeSnapshot]
-	if opts.Switches.Enabled(volumeController) {
-		setupLog.V(1).Info("Volume Snapshot controller enabled")
+	if opts.Switches.Enabled(volumeSnapshotController) {
+		setupLog.V(1).Info("VolumeSnapshot controller enabled")
 		volumeSnapshotEvents = irievent.NewGenerator(func(ctx context.Context) ([]*iri.VolumeSnapshot, error) {
 			res, err := volumeRuntime.ListVolumeSnapshots(ctx, &iri.ListVolumeSnapshotsRequest{})
 			if err != nil {
@@ -416,45 +416,46 @@ func Run(ctx context.Context, opts Options) error {
 			}).SetupWithManager(mgr); err != nil {
 				return fmt.Errorf("error setting up volume annotator reconciler with manager: %w", err)
 			}
+
+			if err := (&controllers.VolumePoolReconciler{
+				Client:            mgr.GetClient(),
+				VolumePoolName:    opts.VolumePoolName,
+				VolumeClassMapper: volumeClassMapper,
+				VolumeRuntime:     volumeRuntime,
+				TopologyLabels:    topologyLabels,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume pool reconciler with manager: %w", err)
+			}
+
+			if err := (&controllers.VolumePoolAnnotatorReconciler{
+				Client:            mgr.GetClient(),
+				VolumeClassMapper: volumeClassMapper,
+				VolumePoolName:    opts.VolumePoolName,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume pool annotator reconciler with manager: %w", err)
+			}
 		}
 
-		if err := (&controllers.VolumeSnapshotReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
-			Client:                  mgr.GetClient(),
-			Scheme:                  scheme,
-			VolumeRuntime:           volumeRuntime,
-			VolumeRuntimeName:       version.RuntimeName,
-			DownwardAPILabels:       opts.VolumeSnapshotDownwardAPILabels,
-			DownwardAPIAnnotations:  opts.VolumeSnapshotDownwardAPIAnnotations,
-			WatchFilterValue:        opts.WatchFilterValue,
-			MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume snapshot reconciler with manager: %w", err)
-		}
-
-		if err := (&controllers.VolumeSnapshotAnnotatorReconciler{
-			Client:               mgr.GetClient(),
-			VolumeSnapshotEvents: volumeSnapshotEvents,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume snapshot annotator reconciler with manager: %w", err)
-		}
-
-		if err := (&controllers.VolumePoolReconciler{
-			Client:            mgr.GetClient(),
-			VolumePoolName:    opts.VolumePoolName,
-			VolumeClassMapper: volumeClassMapper,
-			VolumeRuntime:     volumeRuntime,
-			TopologyLabels:    topologyLabels,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume pool reconciler with manager: %w", err)
-		}
-
-		if err := (&controllers.VolumePoolAnnotatorReconciler{
-			Client:            mgr.GetClient(),
-			VolumeClassMapper: volumeClassMapper,
-			VolumePoolName:    opts.VolumePoolName,
-		}).SetupWithManager(mgr); err != nil {
-			return fmt.Errorf("error setting up volume pool annotator reconciler with manager: %w", err)
+		if opts.Switches.Enabled(volumeSnapshotController) {
+			if err := (&controllers.VolumeSnapshotAnnotatorReconciler{
+				Client:               mgr.GetClient(),
+				VolumeSnapshotEvents: volumeSnapshotEvents,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume snapshot annotator reconciler with manager: %w", err)
+			}
+			if err := (&controllers.VolumeSnapshotReconciler{
+				EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
+				Client:                  mgr.GetClient(),
+				Scheme:                  scheme,
+				VolumeRuntime:           volumeRuntime,
+				VolumeRuntimeName:       version.RuntimeName,
+				DownwardAPILabels:       opts.VolumeSnapshotDownwardAPILabels,
+				DownwardAPIAnnotations:  opts.VolumeSnapshotDownwardAPIAnnotations,
+				WatchFilterValue:        opts.WatchFilterValue,
+				MaxConcurrentReconciles: opts.MaxConcurrentReconciles,
+			}).SetupWithManager(mgr); err != nil {
+				return fmt.Errorf("error setting up volume snapshot reconciler with manager: %w", err)
+			}
 		}
 
 		return nil
