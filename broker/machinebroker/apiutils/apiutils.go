@@ -9,6 +9,8 @@ import (
 	"fmt"
 
 	"github.com/ironcore-dev/controller-utils/metautils"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
+
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -94,22 +96,6 @@ func PatchCreated(ctx context.Context, c client.Client, o client.Object) error {
 	return nil
 }
 
-func EncodeLabelsAnnotation(labels map[string]string) (string, error) {
-	data, err := json.Marshal(labels)
-	if err != nil {
-		return "", fmt.Errorf("error mashalling labels: %w", err)
-	}
-	return string(data), nil
-}
-
-func DecodeLabelsAnnotations(data string) (map[string]string, error) {
-	var labels map[string]string
-	if err := json.Unmarshal([]byte(data), &labels); err != nil {
-		return nil, fmt.Errorf("error unmarshalling labels: %w", err)
-	}
-	return labels, nil
-}
-
 func SetLabelsAnnotation(o metav1.Object, labels map[string]string) error {
 	data, err := json.Marshal(labels)
 	if err != nil {
@@ -125,27 +111,11 @@ func GetLabelsAnnotation(o metav1.Object) (map[string]string, error) {
 		return nil, fmt.Errorf("object has no labels at %s", machinebrokerv1alpha1.LabelsAnnotation)
 	}
 
-	return DecodeLabelsAnnotations(data)
-}
-
-func EncodeAnnotationsAnnotation(annotations map[string]string) (string, error) {
-	data, err := json.Marshal(annotations)
-	if err != nil {
-		return "", fmt.Errorf("error marshalling annotations: %w", err)
-	}
-	return string(data), nil
-}
-
-func DecodeAnnotationsAnnotation(data string) (map[string]string, error) {
-	var annotations map[string]string
-	if err := json.Unmarshal([]byte(data), &annotations); err != nil {
-		return nil, fmt.Errorf("error unmarshalling annotations: %w", err)
-	}
-	return annotations, nil
+	return brokerutils.DecodeLabelsAnnotations(data)
 }
 
 func SetAnnotationsAnnotation(o metav1.Object, annotations map[string]string) error {
-	annotation, err := EncodeAnnotationsAnnotation(annotations)
+	annotation, err := brokerutils.EncodeAnnotationsAnnotation(annotations)
 	if err != nil {
 		return err
 	}
@@ -160,7 +130,7 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 		return nil, fmt.Errorf("object has no annotations at %s", machinebrokerv1alpha1.AnnotationsAnnotation)
 	}
 
-	return DecodeAnnotationsAnnotation(data)
+	return brokerutils.DecodeAnnotationsAnnotation(data)
 }
 
 func IsManagedBy(o metav1.Object, manager string) bool {

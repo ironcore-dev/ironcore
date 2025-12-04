@@ -69,6 +69,10 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(iriVolume.Spec.Encryption).To(BeNil())
 		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
+		Expect(iriVolume.Metadata.Annotations).To(Equal(map[string]string{
+			volumepoolletv1alpha1.IRIVolumeGenerationAnnotation: "0",
+			volumepoolletv1alpha1.VolumeGenerationAnnotation:    "0",
+		}))
 
 		iriVolume = &testingvolume.FakeVolume{Volume: proto.Clone(iriVolume.Volume).(*iri.Volume)}
 		iriVolume.Status.Access = &iri.VolumeAccess{

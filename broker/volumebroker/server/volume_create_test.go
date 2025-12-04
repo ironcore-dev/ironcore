@@ -5,7 +5,7 @@ package server_test
 
 import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -31,6 +31,10 @@ var _ = Describe("CreateVolume", func() {
 					Labels: map[string]string{
 						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 					},
+					Annotations: map[string]string{
+						volumepoolletv1alpha1.IRIVolumeGenerationAnnotation: "1",
+						volumepoolletv1alpha1.VolumeGenerationAnnotation:    "1",
+					},
 				},
 				Spec: &iri.VolumeSpec{
 					Class: volumeClass.Name,
@@ -55,9 +59,13 @@ var _ = Describe("CreateVolume", func() {
 			volumebrokerv1alpha1.CreatedLabel: "true",
 			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 		}))
-		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		encodedIRIAnnotations, err := brokerutils.EncodeAnnotationsAnnotation(map[string]string{
+			volumepoolletv1alpha1.IRIVolumeGenerationAnnotation: "1",
+			volumepoolletv1alpha1.VolumeGenerationAnnotation:    "1",
+		},
+		)
 		Expect(err).NotTo(HaveOccurred())
-		encodedIRILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+		encodedIRILabels, err := brokerutils.EncodeLabelsAnnotation(map[string]string{
 			volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 		})
 		Expect(err).NotTo(HaveOccurred())

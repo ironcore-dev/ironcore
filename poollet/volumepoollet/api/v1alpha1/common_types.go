@@ -19,5 +19,8 @@ const (
 
 	VolumeDownwardAPIPrefix = "downward-api.volumepoollet.ironcore.dev/"
 
+	VolumeGenerationAnnotation    = "volumepoollet.ironcore.dev/volume-generation"
+	IRIVolumeGenerationAnnotation = "volumepoollet.ironcore.dev/irivolume-generation"
+
 	VolumeSnapshotDownwardAPIPrefix = "downward-api.volumepoollet.ironcore.dev/volume-snapshot-"
 )

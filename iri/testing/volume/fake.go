@@ -257,3 +257,17 @@ func (r *FakeRuntimeService) Status(ctx context.Context, req *iri.StatusRequest)
 	}
 	return &iri.StatusResponse{VolumeClassStatus: res}, nil
 }
+
+func (r *FakeRuntimeService) UpdateVolumeAnnotations(ctx context.Context, req *iri.UpdateVolumeAnnotationsRequest) (*iri.UpdateVolumeAnnotationsResponse, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	volumeID := req.VolumeId
+	volume, ok := r.Volumes[volumeID]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "volume %q not found", volumeID)
+	}
+
+	volume.Metadata.Annotations = req.Annotations
+	return &iri.UpdateVolumeAnnotationsResponse{}, nil
+}

@@ -40,6 +40,10 @@ func (r *remoteRuntime) ListVolumes(ctx context.Context, request *iri.ListVolume
 	return r.client.ListVolumes(ctx, request)
 }
 
+func (r *remoteRuntime) UpdateVolumeAnnotations(ctx context.Context, req *iri.UpdateVolumeAnnotationsRequest) (*iri.UpdateVolumeAnnotationsResponse, error) {
+	return r.client.UpdateVolumeAnnotations(ctx, req)
+}
+
 func (r *remoteRuntime) CreateVolume(ctx context.Context, request *iri.CreateVolumeRequest) (*iri.CreateVolumeResponse, error) {
 	return r.client.CreateVolume(ctx, request)
 }
