@@ -5,6 +5,8 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
@@ -75,4 +77,36 @@ func PrepareDownwardAPILabels(
 		}
 	}
 	return preparedLabels
+}
+
+func EncodeAnnotationsAnnotation(annotations map[string]string) (string, error) {
+	data, err := json.Marshal(annotations)
+	if err != nil {
+		return "", fmt.Errorf("error marshalling annotations: %w", err)
+	}
+	return string(data), nil
+}
+
+func DecodeAnnotationsAnnotation(data string) (map[string]string, error) {
+	var annotations map[string]string
+	if err := json.Unmarshal([]byte(data), &annotations); err != nil {
+		return nil, fmt.Errorf("error unmarshalling annotations: %w", err)
+	}
+	return annotations, nil
+}
+
+func EncodeLabelsAnnotation(labels map[string]string) (string, error) {
+	data, err := json.Marshal(labels)
+	if err != nil {
+		return "", fmt.Errorf("error mashalling labels: %w", err)
+	}
+	return string(data), nil
+}
+
+func DecodeLabelsAnnotations(data string) (map[string]string, error) {
+	var labels map[string]string
+	if err := json.Unmarshal([]byte(data), &labels); err != nil {
+		return nil, fmt.Errorf("error unmarshalling labels: %w", err)
+	}
+	return labels, nil
 }

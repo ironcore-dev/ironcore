@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/ironcore-dev/controller-utils/metautils"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -100,12 +101,8 @@ func GetLabelsAnnotation(o metav1.Object) (map[string]string, error) {
 		return nil, fmt.Errorf("object has no labels at %s", volumebrokerv1alpha1.LabelsAnnotation)
 	}
 
-	var labels map[string]string
-	if err := json.Unmarshal([]byte(data), &labels); err != nil {
-		return nil, err
-	}
+	return brokerutils.DecodeLabelsAnnotations(data)
 
-	return labels, nil
 }
 
 func SetAnnotationsAnnotation(o metav1.Object, annotations map[string]string) error {
@@ -122,13 +119,7 @@ func GetAnnotationsAnnotation(o metav1.Object) (map[string]string, error) {
 	if !ok {
 		return nil, fmt.Errorf("object has no annotations at %s", volumebrokerv1alpha1.AnnotationsAnnotation)
 	}
-
-	var annotations map[string]string
-	if err := json.Unmarshal([]byte(data), &annotations); err != nil {
-		return nil, err
-	}
-
-	return annotations, nil
+	return brokerutils.DecodeAnnotationsAnnotation(data)
 }
 
 func IsManagedBy(o metav1.Object, manager string) bool {

@@ -12,6 +12,7 @@ import (
 type RuntimeService interface {
 	Version(context.Context, *api.VersionRequest) (*api.VersionResponse, error)
 	ListEvents(context.Context, *api.ListEventsRequest) (*api.ListEventsResponse, error)
+	UpdateVolumeAnnotations(context.Context, *api.UpdateVolumeAnnotationsRequest) (*api.UpdateVolumeAnnotationsResponse, error)
 	ListVolumes(context.Context, *api.ListVolumesRequest) (*api.ListVolumesResponse, error)
 	CreateVolume(context.Context, *api.CreateVolumeRequest) (*api.CreateVolumeResponse, error)
 	ExpandVolume(context.Context, *api.ExpandVolumeRequest) (*api.ExpandVolumeResponse, error)

@@ -11,6 +11,7 @@ service VolumeRuntime {
   rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {};
   rpc ListVolumes(ListVolumesRequest) returns (ListVolumesResponse) {};
   rpc CreateVolume(CreateVolumeRequest) returns (CreateVolumeResponse) {};
+  rpc UpdateVolumeAnnotations(UpdateVolumeAnnotationsRequest) returns (UpdateVolumeAnnotationsResponse) {};
   rpc ExpandVolume(ExpandVolumeRequest) returns (ExpandVolumeResponse) {};
   rpc DeleteVolume(DeleteVolumeRequest) returns (DeleteVolumeResponse) {};
   rpc CreateVolumeSnapshot(CreateVolumeSnapshotRequest) returns (CreateVolumeSnapshotResponse) {};
@@ -127,6 +128,14 @@ message ListVolumesRequest {
 
 message ListVolumesResponse {
   repeated Volume volumes = 1;
+}
+
+message UpdateVolumeAnnotationsRequest {
+  string volume_id = 1;
+  map<string, string> annotations = 2;
+}
+
+message UpdateVolumeAnnotationsResponse {
 }
 
 message CreateVolumeRequest {

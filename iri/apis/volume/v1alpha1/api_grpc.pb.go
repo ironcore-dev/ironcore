@@ -20,16 +20,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	VolumeRuntime_Version_FullMethodName              = "/volume.v1alpha1.VolumeRuntime/Version"
-	VolumeRuntime_ListEvents_FullMethodName           = "/volume.v1alpha1.VolumeRuntime/ListEvents"
-	VolumeRuntime_ListVolumes_FullMethodName          = "/volume.v1alpha1.VolumeRuntime/ListVolumes"
-	VolumeRuntime_CreateVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/CreateVolume"
-	VolumeRuntime_ExpandVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/ExpandVolume"
-	VolumeRuntime_DeleteVolume_FullMethodName         = "/volume.v1alpha1.VolumeRuntime/DeleteVolume"
-	VolumeRuntime_CreateVolumeSnapshot_FullMethodName = "/volume.v1alpha1.VolumeRuntime/CreateVolumeSnapshot"
-	VolumeRuntime_DeleteVolumeSnapshot_FullMethodName = "/volume.v1alpha1.VolumeRuntime/DeleteVolumeSnapshot"
-	VolumeRuntime_ListVolumeSnapshots_FullMethodName  = "/volume.v1alpha1.VolumeRuntime/ListVolumeSnapshots"
-	VolumeRuntime_Status_FullMethodName               = "/volume.v1alpha1.VolumeRuntime/Status"
+	VolumeRuntime_Version_FullMethodName                 = "/volume.v1alpha1.VolumeRuntime/Version"
+	VolumeRuntime_ListEvents_FullMethodName              = "/volume.v1alpha1.VolumeRuntime/ListEvents"
+	VolumeRuntime_ListVolumes_FullMethodName             = "/volume.v1alpha1.VolumeRuntime/ListVolumes"
+	VolumeRuntime_CreateVolume_FullMethodName            = "/volume.v1alpha1.VolumeRuntime/CreateVolume"
+	VolumeRuntime_UpdateVolumeAnnotations_FullMethodName = "/volume.v1alpha1.VolumeRuntime/UpdateVolumeAnnotations"
+	VolumeRuntime_ExpandVolume_FullMethodName            = "/volume.v1alpha1.VolumeRuntime/ExpandVolume"
+	VolumeRuntime_DeleteVolume_FullMethodName            = "/volume.v1alpha1.VolumeRuntime/DeleteVolume"
+	VolumeRuntime_CreateVolumeSnapshot_FullMethodName    = "/volume.v1alpha1.VolumeRuntime/CreateVolumeSnapshot"
+	VolumeRuntime_DeleteVolumeSnapshot_FullMethodName    = "/volume.v1alpha1.VolumeRuntime/DeleteVolumeSnapshot"
+	VolumeRuntime_ListVolumeSnapshots_FullMethodName     = "/volume.v1alpha1.VolumeRuntime/ListVolumeSnapshots"
+	VolumeRuntime_Status_FullMethodName                  = "/volume.v1alpha1.VolumeRuntime/Status"
 )
 
 // VolumeRuntimeClient is the client API for VolumeRuntime service.
@@ -40,6 +41,7 @@ type VolumeRuntimeClient interface {
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error)
 	ListVolumes(ctx context.Context, in *ListVolumesRequest, opts ...grpc.CallOption) (*ListVolumesResponse, error)
 	CreateVolume(ctx context.Context, in *CreateVolumeRequest, opts ...grpc.CallOption) (*CreateVolumeResponse, error)
+	UpdateVolumeAnnotations(ctx context.Context, in *UpdateVolumeAnnotationsRequest, opts ...grpc.CallOption) (*UpdateVolumeAnnotationsResponse, error)
 	ExpandVolume(ctx context.Context, in *ExpandVolumeRequest, opts ...grpc.CallOption) (*ExpandVolumeResponse, error)
 	DeleteVolume(ctx context.Context, in *DeleteVolumeRequest, opts ...grpc.CallOption) (*DeleteVolumeResponse, error)
 	CreateVolumeSnapshot(ctx context.Context, in *CreateVolumeSnapshotRequest, opts ...grpc.CallOption) (*CreateVolumeSnapshotResponse, error)
@@ -90,6 +92,16 @@ func (c *volumeRuntimeClient) CreateVolume(ctx context.Context, in *CreateVolume
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateVolumeResponse)
 	err := c.cc.Invoke(ctx, VolumeRuntime_CreateVolume_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *volumeRuntimeClient) UpdateVolumeAnnotations(ctx context.Context, in *UpdateVolumeAnnotationsRequest, opts ...grpc.CallOption) (*UpdateVolumeAnnotationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateVolumeAnnotationsResponse)
+	err := c.cc.Invoke(ctx, VolumeRuntime_UpdateVolumeAnnotations_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +176,7 @@ type VolumeRuntimeServer interface {
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
 	ListVolumes(context.Context, *ListVolumesRequest) (*ListVolumesResponse, error)
 	CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error)
+	UpdateVolumeAnnotations(context.Context, *UpdateVolumeAnnotationsRequest) (*UpdateVolumeAnnotationsResponse, error)
 	ExpandVolume(context.Context, *ExpandVolumeRequest) (*ExpandVolumeResponse, error)
 	DeleteVolume(context.Context, *DeleteVolumeRequest) (*DeleteVolumeResponse, error)
 	CreateVolumeSnapshot(context.Context, *CreateVolumeSnapshotRequest) (*CreateVolumeSnapshotResponse, error)
@@ -191,6 +204,9 @@ func (UnimplementedVolumeRuntimeServer) ListVolumes(context.Context, *ListVolume
 }
 func (UnimplementedVolumeRuntimeServer) CreateVolume(context.Context, *CreateVolumeRequest) (*CreateVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateVolume not implemented")
+}
+func (UnimplementedVolumeRuntimeServer) UpdateVolumeAnnotations(context.Context, *UpdateVolumeAnnotationsRequest) (*UpdateVolumeAnnotationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateVolumeAnnotations not implemented")
 }
 func (UnimplementedVolumeRuntimeServer) ExpandVolume(context.Context, *ExpandVolumeRequest) (*ExpandVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExpandVolume not implemented")
@@ -299,6 +315,24 @@ func _VolumeRuntime_CreateVolume_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VolumeRuntimeServer).CreateVolume(ctx, req.(*CreateVolumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VolumeRuntime_UpdateVolumeAnnotations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVolumeAnnotationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VolumeRuntimeServer).UpdateVolumeAnnotations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VolumeRuntime_UpdateVolumeAnnotations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VolumeRuntimeServer).UpdateVolumeAnnotations(ctx, req.(*UpdateVolumeAnnotationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -433,6 +467,10 @@ var VolumeRuntime_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateVolume",
 			Handler:    _VolumeRuntime_CreateVolume_Handler,
+		},
+		{
+			MethodName: "UpdateVolumeAnnotations",
+			Handler:    _VolumeRuntime_UpdateVolumeAnnotations_Handler,
 		},
 		{
 			MethodName: "ExpandVolume",

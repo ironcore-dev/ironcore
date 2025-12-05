@@ -52,12 +52,12 @@ func (s *Server) prepareIronCoreMachinePower(power iri.Power) (computev1alpha1.P
 }
 
 func (s *Server) prepareIronCoreMachineAnnotations(machine *iri.Machine) (map[string]string, error) {
-	annotationsValue, err := apiutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
+	annotationsValue, err := brokerutils.EncodeAnnotationsAnnotation(machine.GetMetadata().GetAnnotations())
 	if err != nil {
 		return nil, fmt.Errorf("error encoding annotations: %w", err)
 	}
 
-	labelsValue, err := apiutils.EncodeLabelsAnnotation(machine.GetMetadata().GetLabels())
+	labelsValue, err := brokerutils.EncodeLabelsAnnotation(machine.GetMetadata().GetLabels())
 	if err != nil {
 		return nil, fmt.Errorf("error encoding labels: %w", err)
 	}

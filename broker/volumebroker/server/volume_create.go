@@ -66,6 +66,11 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		volumepoolletv1alpha1.VolumeDownwardAPIPrefix,
 	)
 
+	annotations, err := s.prepareIronCoreVolumeAnnotations(volume)
+	if err != nil {
+		return nil, fmt.Errorf("error preparing ironcore volume annotations: %w", err)
+	}
+
 	var image string
 	var volumeSnapshotRef *corev1.LocalObjectReference
 
@@ -88,6 +93,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Labels: utilsmaps.AppendMap(labels, map[string]string{
 				volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 			}),
+			Annotations: annotations,
 		},
 		Spec: storagev1alpha1.VolumeSpec{
 			VolumeClassRef:     &corev1.LocalObjectReference{Name: volume.Spec.Class},
@@ -117,6 +123,23 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 	return &AggregateIronCoreVolume{
 		Volume:           ironcoreVolume,
 		EncryptionSecret: encryptionSecret,
+	}, nil
+}
+
+func (s *Server) prepareIronCoreVolumeAnnotations(volume *iri.Volume) (map[string]string, error) {
+	annotationsValue, err := brokerutils.EncodeAnnotationsAnnotation(volume.GetMetadata().GetAnnotations())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding annotations: %w", err)
+	}
+
+	labelsValue, err := brokerutils.EncodeLabelsAnnotation(volume.GetMetadata().GetLabels())
+	if err != nil {
+		return nil, fmt.Errorf("error encoding labels: %w", err)
+	}
+
+	return map[string]string{
+		volumebrokerv1alpha1.AnnotationsAnnotation: annotationsValue,
+		volumebrokerv1alpha1.LabelsAnnotation:      labelsValue,
 	}, nil
 }
 

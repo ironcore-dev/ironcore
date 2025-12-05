@@ -6,7 +6,7 @@ package server_test
 import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	bucketbrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/bucketbroker/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
@@ -51,9 +51,9 @@ var _ = Describe("CreateBucket", func() {
 			bucketbrokerv1alpha1.CreatedLabel: "true",
 			bucketbrokerv1alpha1.ManagerLabel: bucketbrokerv1alpha1.BucketBrokerManager,
 		}))
-		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		encodedIRIAnnotations, err := brokerutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
-		encodedIRILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+		encodedIRILabels, err := brokerutils.EncodeLabelsAnnotation(map[string]string{
 			bucketpoolletv1alpha1.BucketUIDLabel: "foobar",
 		})
 		Expect(err).NotTo(HaveOccurred())

@@ -9,7 +9,7 @@ import (
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -76,9 +76,9 @@ var _ = Describe("CreateVolumeSnapshot", func() {
 			volumebrokerv1alpha1.CreatedLabel: "true",
 			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 		}))
-		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		encodedIRIAnnotations, err := brokerutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
-		encodedIRILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+		encodedIRILabels, err := brokerutils.EncodeLabelsAnnotation(map[string]string{
 			volumepoolletv1alpha1.VolumeSnapshotUIDLabel: "foobar",
 		})
 		Expect(err).NotTo(HaveOccurred())

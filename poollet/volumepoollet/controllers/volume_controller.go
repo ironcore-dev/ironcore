@@ -8,6 +8,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"maps"
+	"strconv"
 
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc/codes"
@@ -36,6 +38,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -77,10 +80,6 @@ func (r *VolumeReconciler) iriVolumeLabels(volume *storagev1alpha1.Volume) (map[
 	}
 	labels = utilsmaps.AppendMap(labels, apiLabels)
 	return labels, nil
-}
-
-func (r *VolumeReconciler) iriVolumeAnnotations(_ *storagev1alpha1.Volume) map[string]string {
-	return map[string]string{}
 }
 
 func (r *VolumeReconciler) listIRIVolumesByKey(ctx context.Context, volumeKey client.ObjectKey) ([]*iri.Volume, error) {
@@ -246,9 +245,14 @@ func (r *VolumeReconciler) prepareIRIVolumeMetadata(volume *storagev1alpha1.Volu
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error preparing iri volume labels: %w", err))
 	}
+	annotations, aerr := r.iriVolumeAnnotations(volume, 0)
+	if aerr != nil {
+		errs = append(errs, fmt.Errorf("error preparing iri volume annotations: %w", aerr))
+	}
+
 	return &irimeta.ObjectMetadata{
 		Labels:      labels,
-		Annotations: r.iriVolumeAnnotations(volume),
+		Annotations: annotations,
 	}, errs
 }
 
@@ -550,6 +554,8 @@ func (r *VolumeReconciler) create(ctx context.Context, log logr.Logger, volume *
 }
 
 func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *storagev1alpha1.Volume, iriVolume *iri.Volume) error {
+	log.V(1).Info("Updating existing volume")
+
 	storageBytes := volume.Spec.Resources.Storage().Value()
 	oldStorageBytes := iriVolume.Spec.Resources.StorageBytes
 	if storageBytes != oldStorageBytes {
@@ -564,7 +570,62 @@ func (r *VolumeReconciler) update(ctx context.Context, log logr.Logger, volume *
 		}
 	}
 
+	log.V(1).Info("Updating annotations")
+	if err := r.updateIRIAnnotations(ctx, log, volume, iriVolume); err != nil {
+		return fmt.Errorf("error updating annotations: %w", err)
+	}
+
+	log.V(1).Info("Updated existing volume")
 	return nil
+}
+
+func (r *VolumeReconciler) updateIRIAnnotations(
+	ctx context.Context,
+	log logr.Logger,
+	volume *storagev1alpha1.Volume,
+	iriVolume *iri.Volume,
+) error {
+	desiredAnnotations, err := r.iriVolumeAnnotations(volume, iriVolume.GetMetadata().GetGeneration())
+	if err != nil {
+		return fmt.Errorf("error getting iri volume annotations: %w", err)
+	}
+
+	actualAnnotations := iriVolume.Metadata.Annotations
+
+	if maps.Equal(desiredAnnotations, actualAnnotations) {
+		log.V(1).Info("Annotations are up-to-date", "Annotations", desiredAnnotations)
+		return nil
+	}
+
+	if _, err := r.VolumeRuntime.UpdateVolumeAnnotations(ctx, &iri.UpdateVolumeAnnotationsRequest{
+		VolumeId:    iriVolume.Metadata.Id,
+		Annotations: desiredAnnotations,
+	}); err != nil {
+		return fmt.Errorf("error updating volume annotations: %w", err)
+	}
+	return nil
+}
+
+func (r *VolumeReconciler) iriVolumeAnnotations(
+	volume *storagev1alpha1.Volume,
+	iriVolumeGeneration int64,
+) (map[string]string, error) {
+
+	annotations := map[string]string{
+		volumepoolletv1alpha1.VolumeGenerationAnnotation:    strconv.FormatInt(volume.Generation, 10),
+		volumepoolletv1alpha1.IRIVolumeGenerationAnnotation: strconv.FormatInt(iriVolumeGeneration, 10),
+	}
+
+	for name, fieldPath := range r.DownwardAPIAnnotations {
+		value, err := fieldpath.ExtractFieldPathAsString(volume, fieldPath)
+		if err != nil {
+			return nil, fmt.Errorf("error extracting downward api annotation %q: %w", name, err)
+		}
+
+		annotations[poolletutils.DownwardAPIAnnotation(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, name)] = value
+	}
+
+	return annotations, nil
 }
 
 func (r *VolumeReconciler) volumeSecretName(volumeName, volumeHandle string) string {

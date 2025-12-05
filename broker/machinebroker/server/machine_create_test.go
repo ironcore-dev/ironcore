@@ -5,8 +5,8 @@ package server_test
 
 import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	machinebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/machinebroker/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/broker/machinebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
@@ -58,9 +58,9 @@ var _ = Describe("CreateMachine", func() {
 			machinebrokerv1alpha1.ManagerLabel:     machinebrokerv1alpha1.MachineBrokerManager,
 			machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 		}))
-		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
+		encodedIRIAnnotations, err := brokerutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
-		encodedIRILabels, err := apiutils.EncodeLabelsAnnotation(map[string]string{
+		encodedIRILabels, err := brokerutils.EncodeLabelsAnnotation(map[string]string{
 			machinepoolletv1alpha1.MachineUIDLabel: "foobar",
 		})
 		Expect(err).NotTo(HaveOccurred())
