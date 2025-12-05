@@ -8,6 +8,7 @@ import (
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/event"
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/machine"
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/status"
+	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/get/version"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
 	"github.com/spf13/cobra"
 )
@@ -21,6 +22,7 @@ func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Com
 		machine.Command(streams, clientFactory),
 		status.Command(streams, clientFactory),
 		event.Command(streams, clientFactory),
+		version.Command(streams, clientFactory),
 	)
 
 	return cmd

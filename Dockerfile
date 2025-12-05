@@ -25,6 +25,7 @@ COPY utils/ utils/
 
 ARG TARGETOS
 ARG TARGETARCH
+ARG LDFLAGS
 
 RUN mkdir bin
 
@@ -51,7 +52,7 @@ FROM builder AS machinebroker-builder
 # TODO: Remove irictl-machine once debug containers are more broadly available.
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinebroker ./broker/machinebroker/cmd/machinebroker/main.go && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/machinebroker ./broker/machinebroker/cmd/machinebroker/main.go && \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-machine ./irictl-machine/cmd/irictl-machine/main.go
 
 FROM builder AS irictl-machine-builder
@@ -72,7 +73,7 @@ FROM builder AS volumebroker-builder
 # TODO: Remove irictl-volume once debug containers are more broadly available.
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumebroker ./broker/volumebroker/cmd/volumebroker/main.go && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/volumebroker ./broker/volumebroker/cmd/volumebroker/main.go && \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-volume ./irictl-volume/cmd/irictl-volume/main.go
 
 FROM builder AS irictl-volume-builder
@@ -93,7 +94,7 @@ FROM builder AS bucketbroker-builder
 # TODO: Remove irictl-bucket once debug containers are more broadly available.
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
+    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-bucket ./irictl-bucket/cmd/irictl-bucket/main.go
 
 FROM builder AS irictl-bucket-builder
