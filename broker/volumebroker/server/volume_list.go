@@ -7,32 +7,42 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ironcore-dev/controller-utils/metautils"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/common"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func (s *Server) listManagedAndCreated(ctx context.Context, list client.ObjectList) error {
-	return s.client.List(ctx, list,
+func (s *Server) listManagedAndCreated(ctx context.Context, ironcoreVolumeList *storagev1alpha1.VolumeList, filter *iri.VolumeFilter) error {
+	matchingLabels := client.MatchingLabels{
+		volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
+		volumebrokerv1alpha1.CreatedLabel: "true",
+	}
+
+	if filter != nil && filter.LabelSelector != nil {
+		for k := range filter.LabelSelector {
+			matchingLabels[k] = filter.LabelSelector[k]
+		}
+	}
+
+	return s.client.List(ctx, ironcoreVolumeList,
 		client.InNamespace(s.namespace),
-		client.MatchingLabels{
-			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
-			volumebrokerv1alpha1.CreatedLabel: "true",
-		},
+		matchingLabels,
 	)
 }
 
-func (s *Server) listAggregateIronCoreVolumes(ctx context.Context) ([]AggregateIronCoreVolume, error) {
+func (s *Server) listAggregateIronCoreVolumes(ctx context.Context, filter *iri.VolumeFilter) ([]AggregateIronCoreVolume, error) {
 	ironcoreVolumeList := &storagev1alpha1.VolumeList{}
-	if err := s.listManagedAndCreated(ctx, ironcoreVolumeList); err != nil {
+	if err := s.listManagedAndCreated(ctx, ironcoreVolumeList, filter); err != nil {
 		return nil, fmt.Errorf("error listing ironcore volumes: %w", err)
 	}
 
@@ -132,21 +142,6 @@ func (s *Server) aggregateIronCoreVolume(
 	}, nil
 }
 
-func (s *Server) getIronCoreVolume(ctx context.Context, id string) (*storagev1alpha1.Volume, error) {
-	ironcoreVolume := &storagev1alpha1.Volume{}
-	ironcoreVolumeKey := client.ObjectKey{Namespace: s.namespace, Name: id}
-	if err := s.client.Get(ctx, ironcoreVolumeKey, ironcoreVolume); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return nil, fmt.Errorf("error getting ironcore volume %s: %w", id, err)
-		}
-		return nil, status.Errorf(codes.NotFound, "volume %s not found", id)
-	}
-	if !apiutils.IsManagedBy(ironcoreVolume, volumebrokerv1alpha1.VolumeBrokerManager) || !apiutils.IsCreated(ironcoreVolume) {
-		return nil, status.Errorf(codes.NotFound, "volume %s not found", id)
-	}
-	return ironcoreVolume, nil
-}
-
 func (s *Server) getAggregateIronCoreVolume(ctx context.Context, id string) (*AggregateIronCoreVolume, error) {
 	ironcoreVolume := &storagev1alpha1.Volume{}
 	if err := s.getManagedAndCreated(ctx, id, ironcoreVolume); err != nil {
@@ -159,8 +154,8 @@ func (s *Server) getAggregateIronCoreVolume(ctx context.Context, id string) (*Ag
 	return s.aggregateIronCoreVolume(ironcoreVolume, s.clientGetSecretFunc(ctx))
 }
 
-func (s *Server) listVolumes(ctx context.Context) ([]*iri.Volume, error) {
-	ironcoreVolumes, err := s.listAggregateIronCoreVolumes(ctx)
+func (s *Server) listVolumes(ctx context.Context, filter *iri.VolumeFilter) ([]*iri.Volume, error) {
+	ironcoreVolumes, err := s.listAggregateIronCoreVolumes(ctx, filter)
 	if err != nil {
 		return nil, fmt.Errorf("error listing volumes: %w", err)
 	}
@@ -175,25 +170,6 @@ func (s *Server) listVolumes(ctx context.Context) ([]*iri.Volume, error) {
 		res = append(res, volume)
 	}
 	return res, nil
-}
-
-func (s *Server) filterVolumes(volumes []*iri.Volume, filter *iri.VolumeFilter) []*iri.Volume {
-	if filter == nil {
-		return volumes
-	}
-
-	var (
-		res []*iri.Volume
-		sel = labels.SelectorFromSet(filter.LabelSelector)
-	)
-	for _, iriVolume := range volumes {
-		if !sel.Matches(labels.Set(iriVolume.Metadata.Labels)) {
-			continue
-		}
-
-		res = append(res, iriVolume)
-	}
-	return res
 }
 
 func (s *Server) getVolume(ctx context.Context, id string) (*iri.Volume, error) {
@@ -222,14 +198,46 @@ func (s *Server) ListVolumes(ctx context.Context, req *iri.ListVolumesRequest) (
 		}, nil
 	}
 
-	volumes, err := s.listVolumes(ctx)
+	volumes, err := s.listVolumes(ctx, req.Filter)
 	if err != nil {
 		return nil, err
 	}
 
-	volumes = s.filterVolumes(volumes, req.Filter)
-
 	return &iri.ListVolumesResponse{
 		Volumes: volumes,
 	}, nil
+}
+
+func (s *Server) SetVolumeUIDLabelToAllVolumes(ctx context.Context) error {
+	volumeList := &storagev1alpha1.VolumeList{}
+	log := ctrl.LoggerFrom(ctx)
+	log.Info("listing brokered volumes")
+	if err := s.listManagedAndCreated(ctx, volumeList, nil); err != nil {
+		return fmt.Errorf("error listing ironcore volumes: %w", err)
+	}
+
+	for i := range volumeList.Items {
+		volume := &volumeList.Items[i]
+		labels, err := apiutils.GetLabelsAnnotation(volume)
+		if err != nil {
+			return fmt.Errorf("failed to get labels annotation: %w", err)
+		}
+		if labels == nil {
+			log.Info("labels are nil", "name", volume.Name, "namespace", volume.Namespace)
+			continue
+		}
+
+		volumeUid := labels[volumepoolletv1alpha1.VolumeUIDLabel]
+		if volumeUid == "" {
+			log.Info("volume uid label is empty", "name", volume.Name, "namespace", volume.Namespace)
+			continue
+		}
+		log.Info("Setting volume uid label for", "name", volume.Name, "namespace", volume.Namespace, "labelKey", volumepoolletv1alpha1.VolumeUIDLabel, "labelValue", volumeUid)
+		base := volume.DeepCopy()
+		metautils.SetLabel(volume, volumepoolletv1alpha1.VolumeUIDLabel, volumeUid)
+		if err := s.client.Patch(ctx, volume, client.MergeFrom(base)); err != nil {
+			return fmt.Errorf("error patching volume uid label: %w", err)
+		}
+	}
+	return nil
 }
