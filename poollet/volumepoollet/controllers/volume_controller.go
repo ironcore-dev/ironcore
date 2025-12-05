@@ -654,11 +654,37 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 			corev1alpha1.ResourceStorage: *resource.NewQuantity(iriVolume.Status.Resources.StorageBytes, resource.DecimalSI),
 		}
 	}
-
+	volume.Status.Conditions = r.computeVolumeConditions(newState, now)
 	if err := r.Status().Patch(ctx, volume, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching volume status: %w", err)
 	}
 	return nil
+}
+
+func (r *VolumeReconciler) computeVolumeConditions(state storagev1alpha1.VolumeState, now metav1.Time) []storagev1alpha1.VolumeCondition {
+	status, reason, message := corev1.ConditionFalse, "NotReady", "Volume is not ready"
+	var conditions []storagev1alpha1.VolumeCondition
+	switch state {
+	case storagev1alpha1.VolumeStateAvailable:
+		status, reason, message = corev1.ConditionTrue, "Available", "Volume is available"
+	case storagev1alpha1.VolumeStatePending:
+		status, reason, message = corev1.ConditionFalse, "Pending", "Volume is pending"
+	case storagev1alpha1.VolumeStateError:
+		status, reason, message = corev1.ConditionFalse, "Error", "Volume is in error state"
+	}
+
+	conditions = append(conditions, r.makeVolumeCondition(status, reason, message, now))
+	return conditions
+}
+
+func (r *VolumeReconciler) makeVolumeCondition(status corev1.ConditionStatus, reason, message string, now metav1.Time) storagev1alpha1.VolumeCondition {
+	return storagev1alpha1.VolumeCondition{
+		Type:               "Ready",
+		Status:             status,
+		Reason:             reason,
+		Message:            message,
+		LastTransitionTime: now,
+	}
 }
 
 func VolumeRunsInVolumePool(volume *storagev1alpha1.Volume, volumePoolName string) bool {

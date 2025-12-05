@@ -99,8 +99,6 @@ type VolumeCondition struct {
 	Reason string
 	// Message is a human-readable explanation of why the condition has a certain reason / state.
 	Message string
-	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
-	ObservedGeneration int64
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time
 }

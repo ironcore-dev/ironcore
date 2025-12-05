@@ -65,6 +65,15 @@ message VolumeStatus {
   VolumeState state = 1;
   VolumeAccess access = 2;
   VolumeResources resources = 3;
+  repeated Conditions volume_conditions = 4;
+}
+
+message Conditions {
+  string type = 1;
+  string status = 2;
+  string reason = 3;
+  string message = 4;
+  int64 last_transition_time = 5;
 }
 
 message Volume {
