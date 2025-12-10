@@ -565,14 +565,30 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 	}
 
 	status, reason, message := corev1.ConditionTrue, "VolumesReady", "All volumes are ready"
+	var lastTransitionTime *metav1.Time
 
 	for _, vs := range volumeStatuses {
 		if vs.State != computev1alpha1.VolumeStateAttached {
 			status = corev1.ConditionFalse
 			reason = fmt.Sprintf("VolumeNotReady: %s", vs.Name)
 			message = fmt.Sprintf("Volume %s is not attached (state: %s)", vs.Name, vs.State)
+			lastTransitionTime = vs.LastStateTransitionTime
 			break
 		}
+	}
+
+	if status == corev1.ConditionTrue {
+		for _, vs := range volumeStatuses {
+			if vs.LastStateTransitionTime != nil {
+				lastTransitionTime = vs.LastStateTransitionTime
+				break
+			}
+		}
+	}
+
+	transitionTime := now
+	if lastTransitionTime != nil {
+		transitionTime = *lastTransitionTime
 	}
 
 	return computev1alpha1.MachineCondition{
@@ -580,7 +596,7 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
-		LastTransitionTime: now,
+		LastTransitionTime: transitionTime,
 	}
 }
 
@@ -590,14 +606,30 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 	}
 
 	status, reason, message := corev1.ConditionTrue, "NetworkInterfacesReady", "All network interfaces are ready"
+	var lastTransitionTime *metav1.Time
 
 	for _, nicStatus := range nicStatuses {
 		if nicStatus.State != computev1alpha1.NetworkInterfaceStateAttached {
 			status = corev1.ConditionFalse
 			reason = fmt.Sprintf("NetworkInterfaceNotReady: %s", nicStatus.Name)
 			message = fmt.Sprintf("Network interface %s is not attached (state: %s)", nicStatus.Name, nicStatus.State)
+			lastTransitionTime = nicStatus.LastStateTransitionTime
 			break
 		}
+	}
+
+	if status == corev1.ConditionTrue {
+		for _, nicStatus := range nicStatuses {
+			if nicStatus.LastStateTransitionTime != nil {
+				lastTransitionTime = nicStatus.LastStateTransitionTime
+				break
+			}
+		}
+	}
+
+	transitionTime := now
+	if lastTransitionTime != nil {
+		transitionTime = *lastTransitionTime
 	}
 
 	return computev1alpha1.MachineCondition{
@@ -605,7 +637,7 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
-		LastTransitionTime: now,
+		LastTransitionTime: transitionTime,
 	}
 }
 
