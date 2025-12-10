@@ -1489,6 +1489,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource
+  map:
+    fields:
+    - name: architecture
+      type:
+        scalar: string
+    - name: image
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume
   map:
     fields:
@@ -1726,7 +1735,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: io.k8s.api.core.v1.LocalObjectReference
     - name: osImage
       type:
-        scalar: string
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource
     - name: resources
       type:
         map:

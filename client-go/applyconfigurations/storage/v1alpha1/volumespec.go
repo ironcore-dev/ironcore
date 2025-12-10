@@ -132,7 +132,7 @@ func (b *VolumeSpecApplyConfiguration) WithVolumeSnapshotRef(value v1.LocalObjec
 // WithOSImage sets the OSImage field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the OSImage field is set to the value of the last call.
-func (b *VolumeSpecApplyConfiguration) WithOSImage(value string) *VolumeSpecApplyConfiguration {
-	b.VolumeDataSourceApplyConfiguration.OSImage = &value
+func (b *VolumeSpecApplyConfiguration) WithOSImage(value *OSDataSourceApplyConfiguration) *VolumeSpecApplyConfiguration {
+	b.VolumeDataSourceApplyConfiguration.OSImage = value
 	return b
 }

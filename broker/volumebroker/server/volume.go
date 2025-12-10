@@ -5,6 +5,7 @@ package server
 
 import (
 	"fmt"
+	"k8s.io/utils/ptr"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -41,10 +42,11 @@ func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume)
 	return &iri.Volume{
 		Metadata: metadata,
 		Spec: &iri.VolumeSpec{
-			Image:      volume.Volume.Spec.Image,
-			Class:      volume.Volume.Spec.VolumeClassRef.Name,
-			Resources:  resources,
-			Encryption: s.convertIronCoreVolumeEncryption(volume),
+			Image:            volume.Volume.Spec.Image,
+			Class:            volume.Volume.Spec.VolumeClassRef.Name,
+			Resources:        resources,
+			Encryption:       s.convertIronCoreVolumeEncryption(volume),
+			VolumeDataSource: s.convertIronCoreVolumeDataSource(volume),
 		},
 		Status: &iri.VolumeStatus{
 			State:  state,
@@ -87,6 +89,29 @@ func (s *Server) convertIronCoreVolumeEncryption(volume *AggregateIronCoreVolume
 
 	return &iri.EncryptionSpec{
 		SecretData: volume.EncryptionSecret.Data,
+	}
+}
+
+func (s *Server) convertIronCoreVolumeDataSource(volume *AggregateIronCoreVolume) *iri.VolumeDataSource {
+	var imageDataSource *iri.ImageDataSource
+	var snapshotDataSource *iri.SnapshotDataSource
+
+	if osImage := volume.Volume.Spec.VolumeDataSource.OSImage; osImage != nil {
+		imageDataSource = &iri.ImageDataSource{
+			Image:        osImage.Image,
+			Architecture: ptr.Deref(osImage.Architecture, ""),
+		}
+	}
+
+	if snapshot := volume.Volume.Spec.VolumeDataSource.VolumeSnapshotRef; snapshot != nil {
+		snapshotDataSource = &iri.SnapshotDataSource{
+			SnapshotId: snapshot.Name,
+		}
+	}
+
+	return &iri.VolumeDataSource{
+		ImageDataSource:    imageDataSource,
+		SnapshotDataSource: snapshotDataSource,
 	}
 }
 

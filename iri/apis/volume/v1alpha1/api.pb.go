@@ -333,6 +333,7 @@ func (x *EncryptionSpec) GetSecretData() map[string][]byte {
 type ImageDataSource struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Image         string                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+	Architecture  string                 `protobuf:"bytes,2,opt,name=architecture,proto3" json:"architecture,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -370,6 +371,13 @@ func (*ImageDataSource) Descriptor() ([]byte, []int) {
 func (x *ImageDataSource) GetImage() string {
 	if x != nil {
 		return x.Image
+	}
+	return ""
+}
+
+func (x *ImageDataSource) GetArchitecture() string {
+	if x != nil {
+		return x.Architecture
 	}
 	return ""
 }
@@ -1991,9 +1999,10 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"secretData\x1a=\n" +
 	"\x0fSecretDataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"'\n" +
+	"\x05value\x18\x02 \x01(\fR\x05value:\x028\x01\"K\n" +
 	"\x0fImageDataSource\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\tR\x05image\"5\n" +
+	"\x05image\x18\x01 \x01(\tR\x05image\x12\"\n" +
+	"\farchitecture\x18\x02 \x01(\tR\farchitecture\"5\n" +
 	"\x12SnapshotDataSource\x12\x1f\n" +
 	"\vsnapshot_id\x18\x01 \x01(\tR\n" +
 	"snapshotId\"\xb7\x01\n" +

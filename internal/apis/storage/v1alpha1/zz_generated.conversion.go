@@ -827,7 +827,14 @@ func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.Vol
 
 func autoConvert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1alpha1.VolumeDataSource, out *storage.VolumeDataSource, s conversion.Scope) error {
 	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
-	out.OSImage = (*string)(unsafe.Pointer(in.OSImage))
+	if in.OSImage != nil {
+		in, out := &in.OSImage, &out.OSImage
+		*out = new(string)
+		// FIXME: Provide conversion function to convert storagev1alpha1.OSDataSource to string
+		compileErrorOnMissingConversion()
+	} else {
+		out.OSImage = nil
+	}
 	return nil
 }
 
@@ -838,7 +845,13 @@ func Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1
 
 func autoConvert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.VolumeDataSource, out *storagev1alpha1.VolumeDataSource, s conversion.Scope) error {
 	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
-	out.OSImage = (*string)(unsafe.Pointer(in.OSImage))
+	if in.OSImage != nil {
+		in, out := &in.OSImage, &out.OSImage
+		*out = new(storagev1alpha1.OSDataSource)
+		**out = storagev1alpha1.OSDataSource(**in)
+	} else {
+		out.OSImage = nil
+	}
 	return nil
 }
 
@@ -869,7 +882,17 @@ func Convert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.V
 
 func autoConvert_v1alpha1_VolumeList_To_storage_VolumeList(in *storagev1alpha1.VolumeList, out *storage.VolumeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]storage.Volume)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]storage.Volume, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_Volume_To_storage_Volume(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -880,7 +903,17 @@ func Convert_v1alpha1_VolumeList_To_storage_VolumeList(in *storagev1alpha1.Volum
 
 func autoConvert_storage_VolumeList_To_v1alpha1_VolumeList(in *storage.VolumeList, out *storagev1alpha1.VolumeList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]storagev1alpha1.Volume)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]storagev1alpha1.Volume, len(*in))
+		for i := range *in {
+			if err := Convert_storage_Volume_To_v1alpha1_Volume(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 

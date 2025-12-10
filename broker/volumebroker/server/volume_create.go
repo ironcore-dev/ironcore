@@ -6,6 +6,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/ptr"
 
 	"github.com/go-logr/logr"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
@@ -68,7 +69,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 
 	var image string
 	var volumeSnapshotRef *corev1.LocalObjectReference
-
+	var osImageDataSource *storagev1alpha1.OSDataSource
 	image = volume.Spec.Image // TODO: Remove this once volume.Spec.Image is deprecated
 
 	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil {
@@ -77,6 +78,15 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			volumeSnapshotRef = &corev1.LocalObjectReference{Name: dataSource.SnapshotDataSource.SnapshotId}
 			image = "" // TODO: Remove this once volume.Spec.Image is deprecated
 		case dataSource.ImageDataSource != nil:
+			var architecture *string
+			if dataSource.ImageDataSource.Architecture != "" {
+				architecture = ptr.To(dataSource.ImageDataSource.Architecture)
+			}
+
+			osImageDataSource = &storagev1alpha1.OSDataSource{
+				Image:        dataSource.ImageDataSource.Image,
+				Architecture: architecture,
+			}
 			image = dataSource.ImageDataSource.Image
 		}
 	}
@@ -101,12 +111,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Encryption:         encryption,
 			VolumeDataSource: storagev1alpha1.VolumeDataSource{
 				VolumeSnapshotRef: volumeSnapshotRef,
-				OSImage: func() *string {
-					if image == "" {
-						return nil
-					}
-					return &image
-				}(),
+				OSImage:           osImageDataSource,
 			},
 		},
 	}
