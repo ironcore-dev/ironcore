@@ -25,9 +25,6 @@ BUCKETBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/bucketbroker/versi
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.34.0
 
-# Docker image name for the mkdocs based local development setup
-IMAGE=ironcore/documentation
-
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -143,15 +140,6 @@ docs: gen-crd-api-reference-docs ## Run go generate to generate API reference do
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/networking/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/networking.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/ipam/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
-
-.PHONY: start-docs
-start-docs: ## Start the local mkdocs based development environment.
-	docker build -t $(IMAGE) -f docs/Dockerfile . --load
-	docker run -p 8000:8000 -v `pwd`/:/docs $(IMAGE)
-
-.PHONY: clean-docs
-clean-docs: ## Remove all local mkdocs Docker images (cleanup).
-	docker container prune --force --filter "label=project=ironcore_documentation"
 
 .PHONY: test
 test: manifests generate proto fmt vet test-only ## Run tests.
