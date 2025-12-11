@@ -12,6 +12,7 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -89,7 +90,8 @@ var _ = Describe("ListVolumes", func() {
 			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
 		}))
 
-		Expect(srv.SetVolumeUIDLabelToAllVolumes(ctx)).NotTo(HaveOccurred())
+		log := ctrl.LoggerFrom(ctx)
+		Expect(srv.SetVolumeUIDLabelToAllVolumes(ctx, log)).NotTo(HaveOccurred())
 
 		By("getting the ironcore volume")
 		Expect(k8sClient.Get(ctx, ironcoreVolumeKey, ironcoreVolume)).To(Succeed())
