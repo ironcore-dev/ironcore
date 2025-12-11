@@ -65,6 +65,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 		s.brokerDownwardAPILabels,
 		volumepoolletv1alpha1.VolumeDownwardAPIPrefix,
 	)
+	labels[volumepoolletv1alpha1.VolumeUIDLabel] = volume.GetMetadata().GetLabels()[volumepoolletv1alpha1.VolumeUIDLabel]
 
 	var image string
 	var volumeSnapshotRef *corev1.LocalObjectReference
