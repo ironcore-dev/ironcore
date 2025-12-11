@@ -35,7 +35,6 @@ path = [
     "iri/apis/volume/v1alpha1/api.proto",
     "irictl-machine/config/samples/**",
     "irictl-volume/config/samples/**",
-    "mkdocs.yml",
     "models-schema/main.go.tmpl",
     "poollet/machinepoollet/addresses/testdata/addresses.yaml",
     "REUSE.toml"
