@@ -504,7 +504,8 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 	machine.Status.ObservedGeneration = generation
 	machine.Status.Volumes = volumeStatuses
 	machine.Status.NetworkInterfaces = nicStatuses
-	machine.Status.Conditions = r.computeMachineConditions(state, volumeStatuses, nicStatuses, now)
+	computedConds := r.computeMachineConditions(state, volumeStatuses, nicStatuses, now)
+	machine.Status.Conditions = r.mergeMachineConditions(machine.Status.Conditions, computedConds)
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -551,7 +552,7 @@ func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.M
 	}
 
 	return computev1alpha1.MachineCondition{
-		Type:               "Ready",
+		Type:               "MachineReady",
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
@@ -565,14 +566,35 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 	}
 
 	status, reason, message := corev1.ConditionTrue, "VolumesReady", "All volumes are ready"
+	var lastTransitionTime *metav1.Time
 
 	for _, vs := range volumeStatuses {
+		volume := &vs.VolumeRef
+		volName := volume.Name
+		if volName == "" { //if local-disk volume is used, where no actual volume resource exists
+			volName = vs.Name
+		}
 		if vs.State != computev1alpha1.VolumeStateAttached {
 			status = corev1.ConditionFalse
-			reason = fmt.Sprintf("VolumeNotReady: %s", vs.Name)
-			message = fmt.Sprintf("Volume %s is not attached (state: %s)", vs.Name, vs.State)
+			reason = fmt.Sprintf("VolumeNotReady: %s", volName)
+			message = fmt.Sprintf("Volume %s is not attached (state: %s)", volName, vs.State)
+			lastTransitionTime = vs.LastStateTransitionTime
 			break
 		}
+	}
+
+	if status == corev1.ConditionTrue {
+		for _, vs := range volumeStatuses {
+			if vs.LastStateTransitionTime != nil {
+				lastTransitionTime = vs.LastStateTransitionTime
+				break
+			}
+		}
+	}
+
+	transitionTime := now
+	if lastTransitionTime != nil {
+		transitionTime = *lastTransitionTime
 	}
 
 	return computev1alpha1.MachineCondition{
@@ -580,7 +602,7 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
-		LastTransitionTime: now,
+		LastTransitionTime: transitionTime,
 	}
 }
 
@@ -590,14 +612,31 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 	}
 
 	status, reason, message := corev1.ConditionTrue, "NetworkInterfacesReady", "All network interfaces are ready"
+	var lastTransitionTime *metav1.Time
 
 	for _, nicStatus := range nicStatuses {
+		nic := &nicStatus.NetworkInterfaceRef
 		if nicStatus.State != computev1alpha1.NetworkInterfaceStateAttached {
 			status = corev1.ConditionFalse
-			reason = fmt.Sprintf("NetworkInterfaceNotReady: %s", nicStatus.Name)
-			message = fmt.Sprintf("Network interface %s is not attached (state: %s)", nicStatus.Name, nicStatus.State)
+			reason = fmt.Sprintf("NetworkInterfaceNotReady: %s", nic.Name)
+			message = fmt.Sprintf("Network interface %s is not attached (state: %s)", nic.Name, nicStatus.State)
+			lastTransitionTime = nicStatus.LastStateTransitionTime
 			break
 		}
+	}
+
+	if status == corev1.ConditionTrue {
+		for _, nicStatus := range nicStatuses {
+			if nicStatus.LastStateTransitionTime != nil {
+				lastTransitionTime = nicStatus.LastStateTransitionTime
+				break
+			}
+		}
+	}
+
+	transitionTime := now
+	if lastTransitionTime != nil {
+		transitionTime = *lastTransitionTime
 	}
 
 	return computev1alpha1.MachineCondition{
@@ -605,8 +644,30 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
-		LastTransitionTime: now,
+		LastTransitionTime: transitionTime,
 	}
+}
+
+func (r *MachineReconciler) mergeMachineConditions(
+	existing []computev1alpha1.MachineCondition,
+	current []computev1alpha1.MachineCondition,
+) []computev1alpha1.MachineCondition {
+	updated := append([]computev1alpha1.MachineCondition{}, existing...)
+
+	lastStatus := make(map[string]corev1.ConditionStatus, len(existing))
+	for _, c := range existing {
+		lastStatus[string(c.Type)] = c.Status
+	}
+
+	for _, newCond := range current {
+		conditionType := string(newCond.Type)
+		if prev, ok := lastStatus[conditionType]; !ok || prev != newCond.Status {
+			updated = append(updated, newCond)
+			lastStatus[conditionType] = newCond.Status
+		}
+	}
+
+	return updated
 }
 
 func (r *MachineReconciler) prepareIRIPower(power computev1alpha1.Power) (iri.Power, error) {
