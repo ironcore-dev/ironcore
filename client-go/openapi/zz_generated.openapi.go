@@ -133,6 +133,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec":                      schema_ironcore_api_storage_v1alpha1_BucketSpec(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus":                    schema_ironcore_api_storage_v1alpha1_BucketStatus(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketTemplateSpec":              schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref),
+		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource":                    schema_ironcore_api_storage_v1alpha1_OSDataSource(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume":                          schema_ironcore_api_storage_v1alpha1_Volume(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess":                    schema_ironcore_api_storage_v1alpha1_VolumeAccess(ref),
 		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass":                     schema_ironcore_api_storage_v1alpha1_VolumeClass(ref),
@@ -5338,6 +5339,32 @@ func schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref common.Referenc
 	}
 }
 
+func schema_ironcore_api_storage_v1alpha1_OSDataSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"image": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Image is an optional image to bootstrap the volume with.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"architecture": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Architecture defines the architecture of the OS which should be used",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_ironcore_api_storage_v1alpha1_Volume(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5618,16 +5645,15 @@ func schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref common.ReferenceC
 					},
 					"osImage": {
 						SchemaProps: spec.SchemaProps{
-							Description: "OSImage is an optional os image to bootstrap the volume.",
-							Type:        []string{"string"},
-							Format:      "",
+							Description: "OSImage defines an optional os image to bootstrap the volume.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
@@ -6228,24 +6254,18 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption"),
 						},
 					},
-					"volumeSnapshotRef": {
+					"dataSource": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"osImage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "OSImage is an optional os image to bootstrap the volume.",
-							Type:        []string{"string"},
-							Format:      "",
+							Description: "DataSource contains the content to prepopulate the Volume with.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 

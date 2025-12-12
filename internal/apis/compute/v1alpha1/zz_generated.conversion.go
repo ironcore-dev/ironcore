@@ -398,7 +398,14 @@ func Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetwor
 }
 
 func autoConvert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *computev1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeTemplate = (*storage.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
+	if in.VolumeTemplate != nil {
+		in, out := &in.VolumeTemplate, &out.VolumeTemplate
+		*out = new(storage.VolumeTemplateSpec)
+		// FIXME: Provide conversion function to convert storagev1alpha1.VolumeTemplateSpec to storage.VolumeTemplateSpec
+		compileErrorOnMissingConversion()
+	} else {
+		out.VolumeTemplate = nil
+	}
 	return nil
 }
 
@@ -408,7 +415,14 @@ func Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in 
 }
 
 func autoConvert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *computev1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeTemplate = (*storagev1alpha1.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
+	if in.VolumeTemplate != nil {
+		in, out := &in.VolumeTemplate, &out.VolumeTemplate
+		*out = new(storagev1alpha1.VolumeTemplateSpec)
+		// FIXME: Provide conversion function to convert storage.VolumeTemplateSpec to storagev1alpha1.VolumeTemplateSpec
+		compileErrorOnMissingConversion()
+	} else {
+		out.VolumeTemplate = nil
+	}
 	return nil
 }
 
@@ -1013,7 +1027,15 @@ func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *computev1alph
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.EmptyDisk = (*compute.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
 	out.LocalDisk = (*compute.LocalDiskVolumeSource)(unsafe.Pointer(in.LocalDisk))
-	out.Ephemeral = (*compute.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	if in.Ephemeral != nil {
+		in, out := &in.Ephemeral, &out.Ephemeral
+		*out = new(compute.EphemeralVolumeSource)
+		if err := Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.Ephemeral = nil
+	}
 	return nil
 }
 
@@ -1026,7 +1048,15 @@ func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.Volum
 	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
 	out.EmptyDisk = (*computev1alpha1.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
 	out.LocalDisk = (*computev1alpha1.LocalDiskVolumeSource)(unsafe.Pointer(in.LocalDisk))
-	out.Ephemeral = (*computev1alpha1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	if in.Ephemeral != nil {
+		in, out := &in.Ephemeral, &out.Ephemeral
+		*out = new(computev1alpha1.EphemeralVolumeSource)
+		if err := Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(*in, *out, s); err != nil {
+			return err
+		}
+	} else {
+		out.Ephemeral = nil
+	}
 	return nil
 }
 

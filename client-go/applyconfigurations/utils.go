@@ -209,6 +209,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &applyconfigurationsstoragev1alpha1.BucketSpecApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("BucketStatus"):
 		return &applyconfigurationsstoragev1alpha1.BucketStatusApplyConfiguration{}
+	case storagev1alpha1.SchemeGroupVersion.WithKind("OSDataSource"):
+		return &applyconfigurationsstoragev1alpha1.OSDataSourceApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("Volume"):
 		return &applyconfigurationsstoragev1alpha1.VolumeApplyConfiguration{}
 	case storagev1alpha1.SchemeGroupVersion.WithKind("VolumeAccess"):

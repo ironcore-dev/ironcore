@@ -42,6 +42,7 @@ message EncryptionSpec {
 
 message ImageDataSource {
   string image = 1;
+  string architecture = 2;
 } 
 
 message SnapshotDataSource{

@@ -12,6 +12,7 @@ import (
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"k8s.io/utils/ptr"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -300,10 +301,11 @@ func (r *VolumeReconciler) prepareIRIVolumeDataSource(volume *storagev1alpha1.Vo
 		return r.prepareIRIVolumeSnapshotDataSource(volume, volumeSnapshot)
 	}
 
-	if volume.Spec.OSImage != nil && *volume.Spec.OSImage != "" {
+	if osImage := volume.Spec.OSImage; osImage != nil {
 		return &iri.VolumeDataSource{
 			ImageDataSource: &iri.ImageDataSource{
-				Image: *volume.Spec.OSImage,
+				Image:        osImage.Image,
+				Architecture: ptr.Deref(osImage.Architecture, ""),
 			},
 		}, true, nil
 	}

@@ -1489,6 +1489,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: state
       type:
         scalar: string
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource
+  map:
+    fields:
+    - name: architecture
+      type:
+        scalar: string
+    - name: image
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume
   map:
     fields:
@@ -1573,6 +1582,15 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
+  map:
+    fields:
+    - name: osImage
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource
+    - name: volumeSnapshotRef
+      type:
+        namedType: io.k8s.api.core.v1.LocalObjectReference
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
   map:
     fields:
@@ -1715,6 +1733,10 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: claimRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
+    - name: dataSource
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource
+      default: {}
     - name: encryption
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
@@ -1724,9 +1746,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: imagePullSecretRef
       type:
         namedType: io.k8s.api.core.v1.LocalObjectReference
-    - name: osImage
-      type:
-        scalar: string
     - name: resources
       type:
         map:
@@ -1752,9 +1771,6 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
-    - name: volumeSnapshotRef
-      type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeStatus
   map:
     fields:

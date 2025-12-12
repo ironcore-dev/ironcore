@@ -12,8 +12,8 @@ import (
 // VolumeDataSourceApplyConfiguration represents a declarative configuration of the VolumeDataSource type for use
 // with apply.
 type VolumeDataSourceApplyConfiguration struct {
-	VolumeSnapshotRef *v1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
-	OSImage           *string                  `json:"osImage,omitempty"`
+	VolumeSnapshotRef *v1.LocalObjectReference        `json:"volumeSnapshotRef,omitempty"`
+	OSImage           *OSDataSourceApplyConfiguration `json:"osImage,omitempty"`
 }
 
 // VolumeDataSourceApplyConfiguration constructs a declarative configuration of the VolumeDataSource type for use with
@@ -33,7 +33,7 @@ func (b *VolumeDataSourceApplyConfiguration) WithVolumeSnapshotRef(value v1.Loca
 // WithOSImage sets the OSImage field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the OSImage field is set to the value of the last call.
-func (b *VolumeDataSourceApplyConfiguration) WithOSImage(value string) *VolumeDataSourceApplyConfiguration {
-	b.OSImage = &value
+func (b *VolumeDataSourceApplyConfiguration) WithOSImage(value *OSDataSourceApplyConfiguration) *VolumeDataSourceApplyConfiguration {
+	b.OSImage = value
 	return b
 }
