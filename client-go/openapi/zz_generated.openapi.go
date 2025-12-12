@@ -5645,7 +5645,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref common.ReferenceC
 					},
 					"osImage": {
 						SchemaProps: spec.SchemaProps{
-							Description: "OS defines an optional os image to bootstrap the volume.",
+							Description: "OSImage defines an optional os image to bootstrap the volume.",
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource"),
 						},
 					},
@@ -6254,23 +6254,18 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption"),
 						},
 					},
-					"volumeSnapshotRef": {
+					"dataSource": {
 						SchemaProps: spec.SchemaProps{
-							Description: "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-							Ref:         ref("k8s.io/api/core/v1.LocalObjectReference"),
-						},
-					},
-					"osImage": {
-						SchemaProps: spec.SchemaProps{
-							Description: "OS defines an optional os image to bootstrap the volume.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource"),
+							Description: "DataSource contains the content to prepopulate the Volume with.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", "k8s.io/api/core/v1.LocalObjectReference", "k8s.io/apimachinery/pkg/api/resource.Quantity"},
 	}
 }
 

@@ -6,13 +6,13 @@ package server
 import (
 	"context"
 	"fmt"
-	"k8s.io/utils/ptr"
 
 	"github.com/go-logr/logr"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	"k8s.io/utils/ptr"
 
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -109,7 +109,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Image:              image, // TODO: Remove this once volume.Spec.Image is deprecated
 			ImagePullSecretRef: nil,   // TODO: Fill if necessary
 			Encryption:         encryption,
-			VolumeDataSource: storagev1alpha1.VolumeDataSource{
+			DataSource: storagev1alpha1.VolumeDataSource{
 				VolumeSnapshotRef: volumeSnapshotRef,
 				OSImage:           osImageDataSource,
 			},

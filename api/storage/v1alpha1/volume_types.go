@@ -43,17 +43,15 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption `json:"encryption,omitempty"`
-	// VolumeDataSource is the source where the storage for the Volume resides at.
-
-	//TODO should that be inlined?
-	VolumeDataSource `json:",inline"`
+	// DataSource contains the content to prepopulate the Volume with.
+	DataSource VolumeDataSource `json:"dataSource,omitempty"`
 }
 
 // VolumeDataSource specifies the source to use for a Volume.
 type VolumeDataSource struct {
 	// VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.
 	VolumeSnapshotRef *corev1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
-	// OS defines an optional os image to bootstrap the volume.
+	// OSImage defines an optional os image to bootstrap the volume.
 	OSImage *OSDataSource `json:"osImage,omitempty"`
 }
 

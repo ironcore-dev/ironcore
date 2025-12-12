@@ -5,12 +5,12 @@ package server
 
 import (
 	"fmt"
-	"k8s.io/utils/ptr"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"k8s.io/utils/ptr"
 )
 
 func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume) (*iri.Volume, error) {
@@ -96,14 +96,14 @@ func (s *Server) convertIronCoreVolumeDataSource(volume *AggregateIronCoreVolume
 	var imageDataSource *iri.ImageDataSource
 	var snapshotDataSource *iri.SnapshotDataSource
 
-	if osImage := volume.Volume.Spec.VolumeDataSource.OSImage; osImage != nil {
+	if osImage := volume.Volume.Spec.DataSource.OSImage; osImage != nil {
 		imageDataSource = &iri.ImageDataSource{
 			Image:        osImage.Image,
 			Architecture: ptr.Deref(osImage.Architecture, ""),
 		}
 	}
 
-	if snapshot := volume.Volume.Spec.VolumeDataSource.VolumeSnapshotRef; snapshot != nil {
+	if snapshot := volume.Volume.Spec.DataSource.VolumeSnapshotRef; snapshot != nil {
 		snapshotDataSource = &iri.SnapshotDataSource{
 			SnapshotId: snapshot.Name,
 		}

@@ -117,8 +117,8 @@ var _ = Describe("CreateVolume", func() {
 		Expect(k8sClient.Get(ctx, ironcoreVolumeKey, ironcoreVolume)).To(Succeed())
 
 		By("verifying the volume has the correct snapshot reference")
-		Expect(ironcoreVolume.Spec.VolumeDataSource.VolumeSnapshotRef).NotTo(BeNil())
-		Expect(ironcoreVolume.Spec.VolumeDataSource.VolumeSnapshotRef.Name).To(Equal("test-snapshot"))
+		Expect(ironcoreVolume.Spec.DataSource.VolumeSnapshotRef).NotTo(BeNil())
+		Expect(ironcoreVolume.Spec.DataSource.VolumeSnapshotRef.Name).To(Equal("test-snapshot"))
 	})
 
 })

@@ -309,7 +309,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 			},
@@ -408,7 +408,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 			},
@@ -552,7 +552,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 			},
@@ -699,7 +699,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 				Encryption: &storagev1alpha1.VolumeEncryption{
@@ -815,7 +815,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 				Encryption: &storagev1alpha1.VolumeEncryption{
@@ -905,7 +905,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: volumeSnapshot.Name},
 				},
 			},
@@ -934,7 +934,7 @@ var _ = Describe("VolumeController", func() {
 				Resources: corev1alpha1.ResourceList{
 					corev1alpha1.ResourceStorage: size,
 				},
-				VolumeDataSource: storagev1alpha1.VolumeDataSource{
+				DataSource: storagev1alpha1.VolumeDataSource{
 					VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "non-existent-snapshot"},
 				},
 			},
