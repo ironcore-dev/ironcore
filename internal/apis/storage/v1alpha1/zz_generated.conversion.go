@@ -1167,7 +1167,7 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.V
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	if err := Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(&in.VolumeDataSource, &out.VolumeDataSource, s); err != nil {
+	if err := Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(&in.DataSource, &out.DataSource, s); err != nil {
 		return err
 	}
 	return nil
@@ -1189,7 +1189,7 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	if err := Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(&in.VolumeDataSource, &out.VolumeDataSource, s); err != nil {
+	if err := Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(&in.DataSource, &out.DataSource, s); err != nil {
 		return err
 	}
 	return nil

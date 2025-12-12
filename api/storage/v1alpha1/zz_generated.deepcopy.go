@@ -902,7 +902,7 @@ func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 		*out = new(VolumeEncryption)
 		**out = **in
 	}
-	in.VolumeDataSource.DeepCopyInto(&out.VolumeDataSource)
+	in.DataSource.DeepCopyInto(&out.DataSource)
 	return
 }
 

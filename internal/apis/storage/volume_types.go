@@ -42,8 +42,8 @@ type VolumeSpec struct {
 	Tolerations []commonv1alpha1.Toleration
 	// Encryption is an optional field which provides attributes to encrypt Volume.
 	Encryption *VolumeEncryption
-	// VolumeDataSource is the source where the storage for the Volume resides at.
-	VolumeDataSource
+	// DataSource contains the content to prepopulate the Volume with.
+	DataSource VolumeDataSource `json:"dataSource,omitempty"`
 }
 
 // VolumeDataSource specifies the source to use for a Volume.
