@@ -11,11 +11,19 @@ BUCKETPOOLLET_IMG ?= bucketpoollet:latest
 BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
+# LDFLAGS for the build targets
+LDFLAGS ?= -s -w
+VERSION=$(shell git describe --tags --abbrev=0)
+COMMIT=$(shell git log -n1 --format="%h")
+MACHINEBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/machinebroker/version.Version
+MACHINEBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/machinebroker/version.Commit
+VOLUMEBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/volumebroker/version.Version
+VOLUMEBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/volumebroker/version.Commit
+BUCKETBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Version
+BUCKETBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Commit
+
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.34.0
-
-# Docker image name for the mkdocs based local development setup
-IMAGE=ironcore/documentation
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -133,15 +141,6 @@ docs: gen-crd-api-reference-docs ## Run go generate to generate API reference do
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/ipam/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/ipam.md
 	$(GEN_CRD_API_REFERENCE_DOCS) -api-dir ./api/compute/v1alpha1 -config ./hack/api-reference/config.json -template-dir ./hack/api-reference/template -out-file ./docs/api-reference/compute.md
 
-.PHONY: start-docs
-start-docs: ## Start the local mkdocs based development environment.
-	docker build -t $(IMAGE) -f docs/Dockerfile . --load
-	docker run -p 8000:8000 -v `pwd`/:/docs $(IMAGE)
-
-.PHONY: clean-docs
-clean-docs: ## Remove all local mkdocs Docker images (cleanup).
-	docker container prune --force --filter "label=project=ironcore_documentation"
-
 .PHONY: test
 test: manifests generate proto fmt vet test-only ## Run tests.
 
@@ -189,7 +188,7 @@ docker-build-machinepoollet: ## Build machinepoollet image.
 
 .PHONY: docker-build-machinebroker
 docker-build-machinebroker: ## Build machinebroker image.
-	docker build --target machinebroker -t ${MACHINEBROKER_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(MACHINEBROKER_VERSION)=$(VERSION) -X $(MACHINEBROKER_COMMIT)=$(COMMIT)" --target machinebroker -t ${MACHINEBROKER_IMG} .
 
 .PHONY: docker-build-irictl-machine
 docker-build-irictl-machine: ## Build irictl-machine image.
@@ -201,7 +200,7 @@ docker-build-volumepoollet: ## Build volumepoollet image.
 
 .PHONY: docker-build-volumebroker
 docker-build-volumebroker: ## Build volumebroker image.
-	docker build --target volumebroker -t ${VOLUMEBROKER_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(VOLUMEBROKER_VERSION)=$(VERSION) -X $(VOLUMEBROKER_COMMIT)=$(COMMIT)" --target volumebroker -t ${VOLUMEBROKER_IMG} .
 
 .PHONY: docker-build-irictl-volume
 docker-build-irictl-volume: ## Build irictl-volume image.
@@ -209,7 +208,7 @@ docker-build-irictl-volume: ## Build irictl-volume image.
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
+	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(BUCKETBROKER_VERSION)=$(VERSION) -X $(BUCKETBROKER_COMMIT)=$(COMMIT)" --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
 
 .PHONY: docker-build-bucketbroker
 docker-build-bucketbroker: ## Build bucketbroker image.

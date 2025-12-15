@@ -486,22 +486,16 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 	}
 
 	log.V(1).Info("Listing volumes")
-	res, err := r.VolumeRuntime.ListVolumes(ctx, &iri.ListVolumesRequest{
-		Filter: &iri.VolumeFilter{
-			LabelSelector: map[string]string{
-				volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),
-			},
-		},
-	})
+	volumes, err := r.listIRIVolumesByUID(ctx, volume.UID)
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing volumes: %w", err)
 	}
 
-	switch len(res.Volumes) {
+	switch len(volumes) {
 	case 0:
 		return r.create(ctx, log, volume)
 	case 1:
-		iriVolume := res.Volumes[0]
+		iriVolume := volumes[0]
 		if err := r.update(ctx, log, volume, iriVolume); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error updating volume: %w", err)
 		}

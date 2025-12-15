@@ -140,5 +140,9 @@ func Run(ctx context.Context, opts Options) error {
 	if err := grpcSrv.Serve(l); err != nil {
 		return fmt.Errorf("error serving: %w", err)
 	}
+
+	if err := srv.SetVolumeUIDLabelToAllVolumes(ctx, log); err != nil {
+		return fmt.Errorf("failed to set volume uid label to all brokered volumes: %w", err)
+	}
 	return nil
 }

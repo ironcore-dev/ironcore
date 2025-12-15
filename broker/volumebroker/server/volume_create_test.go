@@ -52,8 +52,9 @@ var _ = Describe("CreateVolume", func() {
 		By("inspecting the ironcore volume")
 		Expect(ironcoreVolume.Labels).To(Equal(map[string]string{
 			poolletutils.DownwardAPILabel(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, "root-volume-uid"): "foobar",
-			volumebrokerv1alpha1.CreatedLabel: "true",
-			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
+			volumebrokerv1alpha1.CreatedLabel:    "true",
+			volumebrokerv1alpha1.ManagerLabel:    volumebrokerv1alpha1.VolumeBrokerManager,
+			volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 		}))
 		encodedIRIAnnotations, err := apiutils.EncodeAnnotationsAnnotation(nil)
 		Expect(err).NotTo(HaveOccurred())
