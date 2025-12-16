@@ -16,7 +16,9 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
 
 var _ = Describe("CreateVolume", func() {
@@ -68,6 +70,51 @@ var _ = Describe("CreateVolume", func() {
 		}))
 		Expect(ironcoreVolume.Spec.VolumeClassRef.Name).To(Equal(volumeClass.Name))
 		Expect(ironcoreVolume.Spec.Resources).To(HaveLen(1))
+	})
+
+	It("should correctly create a volume with an os image", func(ctx SpecContext) {
+		By("creating a volume")
+		res, err := srv.CreateVolume(ctx, &iri.CreateVolumeRequest{
+			Volume: &iri.Volume{
+				Metadata: &irimeta.ObjectMetadata{
+					Labels: map[string]string{
+						volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
+					},
+				},
+				Spec: &iri.VolumeSpec{
+					Class: volumeClass.Name,
+					Resources: &iri.VolumeResources{
+						StorageBytes: 100,
+					},
+					VolumeDataSource: &iri.VolumeDataSource{
+						ImageDataSource: &iri.ImageDataSource{
+							Image:        "test-image",
+							Architecture: "amd64",
+						},
+					},
+				},
+			},
+		})
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(res).NotTo(BeNil())
+
+		By("getting the ironcore volume")
+		ironcoreVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      res.Volume.Metadata.Id,
+			},
+		}
+
+		Eventually(Object(ironcoreVolume)).Should(SatisfyAll(
+			HaveField("Spec.DataSource.OSImage", &storagev1alpha1.OSDataSource{
+				Image:        "test-image",
+				Architecture: ptr.To("amd64"),
+			}),
+			HaveField("Spec.Image", "test-image"),
+			HaveField("Spec.Resources", HaveLen(1)),
+		))
 	})
 
 	It("should correctly create a volume from snapshot", func(ctx SpecContext) {

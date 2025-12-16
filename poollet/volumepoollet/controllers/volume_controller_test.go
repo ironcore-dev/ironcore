@@ -18,6 +18,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 )
@@ -946,6 +947,99 @@ var _ = Describe("VolumeController", func() {
 		Eventually(Object(volume)).Should(HaveField("Status.State", Equal(storagev1alpha1.VolumeStatePending)))
 
 		Consistently(srv).Should(HaveField("Volumes", HaveLen(0)), "No volumes created due to missing snapshot")
+	})
+
+	It("should create a volume with an os data source", func(ctx SpecContext) {
+		size := resource.MustParse("10Mi")
+		osImage := "test-image"
+		osArchitecture := "amd64"
+
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: vc.Name},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: vp.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: size,
+				},
+				DataSource: storagev1alpha1.VolumeDataSource{
+					OSImage: &storagev1alpha1.OSDataSource{
+						Image:        osImage,
+						Architecture: ptr.To(osArchitecture),
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(expectVolumeDeleted, volume)
+
+		By("waiting for the runtime to report the volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Volumes", HaveLen(1)),
+		))
+
+		_, iriVolume := GetSingleMapEntry(srv.Volumes)
+
+		Expect(iriVolume.Spec.Image).To(Equal(""))
+		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
+		Expect(iriVolume.Spec.Encryption).To(BeNil())
+		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
+		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
+		Expect(iriVolume.Spec.VolumeDataSource.ImageDataSource).To(Equal(&iri.ImageDataSource{
+			Image:        osImage,
+			Architecture: osArchitecture,
+		}))
+
+		volumeMonitors := "test-monitors"
+		volumeImage := "test-image"
+		volumeId := "test-id"
+		volumeUser := "test-user"
+		volumeDriver := "test"
+		volumeHandle := "testhandle"
+
+		iriVolume = &testingvolume.FakeVolume{Volume: proto.Clone(iriVolume.Volume).(*iri.Volume)}
+		iriVolume.Status.Access = &iri.VolumeAccess{
+			Driver: volumeDriver,
+			Handle: volumeHandle,
+			Attributes: map[string]string{
+				MonitorsKey: volumeMonitors,
+				ImageKey:    volumeImage,
+			},
+			SecretData: map[string][]byte{
+				UserIDKey:  []byte(volumeId),
+				UserKeyKey: []byte(volumeUser),
+			},
+		}
+		iriVolume.Status.State = iri.VolumeState_VOLUME_AVAILABLE
+		iriVolume.Status.Resources = iriVolume.Spec.Resources
+		srv.SetVolumes([]*testingvolume.FakeVolume{iriVolume})
+
+		By("Waiting for the ironcore volume Status to be up-to-date")
+		expectedVolumeID := poolletutils.MakeID(testingvolume.FakeRuntimeName, iriVolume.Metadata.Id)
+		Eventually(Object(volume)).Should(SatisfyAll(
+			HaveField("Status.State", storagev1alpha1.VolumeStateAvailable),
+			HaveField("Status.VolumeID", expectedVolumeID.String()),
+			HaveField("Status.Access.Driver", volumeDriver),
+			HaveField("Status.Access.SecretRef", Not(BeNil())),
+			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(MonitorsKey, volumeMonitors)),
+			HaveField("Status.Access.VolumeAttributes", HaveKeyWithValue(ImageKey, volumeImage)),
+		))
+
+		Expect(volume.Status.Resources.Storage().Value()).Should(Equal(size.Value()))
+
+		accessSecret := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      volume.Status.Access.SecretRef.Name,
+			}}
+		Eventually(Object(accessSecret)).Should(SatisfyAll(
+			HaveField("Data", HaveKeyWithValue(UserKeyKey, []byte(volumeUser))),
+			HaveField("Data", HaveKeyWithValue(UserIDKey, []byte(volumeId))),
+		))
 	})
 
 })
