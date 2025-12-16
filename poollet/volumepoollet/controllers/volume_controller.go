@@ -12,6 +12,7 @@ import (
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"k8s.io/utils/ptr"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -296,14 +297,15 @@ func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1a
 }
 
 func (r *VolumeReconciler) prepareIRIVolumeDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
-	if volume.Spec.VolumeSnapshotRef != nil {
+	if volume.Spec.DataSource.VolumeSnapshotRef != nil {
 		return r.prepareIRIVolumeSnapshotDataSource(volume, volumeSnapshot)
 	}
 
-	if volume.Spec.OSImage != nil && *volume.Spec.OSImage != "" {
+	if osImage := volume.Spec.DataSource.OSImage; osImage != nil {
 		return &iri.VolumeDataSource{
 			ImageDataSource: &iri.ImageDataSource{
-				Image: *volume.Spec.OSImage,
+				Image:        osImage.Image,
+				Architecture: ptr.Deref(osImage.Architecture, ""),
 			},
 		}, true, nil
 	}
@@ -365,7 +367,7 @@ func (r *VolumeReconciler) prepareIRIVolumeInheritedEncryption(ctx context.Conte
 }
 
 func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.EncryptionSpec, bool, error) {
-	if volume.Spec.VolumeSnapshotRef != nil {
+	if volume.Spec.DataSource.VolumeSnapshotRef != nil {
 		inheritedEncryption, err := r.prepareIRIVolumeInheritedEncryption(ctx, volumeSnapshot)
 		if err != nil {
 			return nil, false, fmt.Errorf("error getting encryption from source volume: %w", err)
@@ -405,17 +407,17 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	}
 
 	var volumeSnapshot *storagev1alpha1.VolumeSnapshot
-	if volume.Spec.VolumeSnapshotRef != nil {
+	if volumeSnapshotRef := volume.Spec.DataSource.VolumeSnapshotRef; volumeSnapshotRef != nil {
 		log.V(1).Info("Getting volume snapshot")
 		volumeSnapshot = &storagev1alpha1.VolumeSnapshot{}
-		volumeSnapshotKey := client.ObjectKey{Namespace: volume.Namespace, Name: volume.Spec.VolumeSnapshotRef.Name}
+		volumeSnapshotKey := client.ObjectKey{Namespace: volume.Namespace, Name: volumeSnapshotRef.Name}
 		if err := r.Get(ctx, volumeSnapshotKey, volumeSnapshot); err != nil {
 			if apierrors.IsNotFound(err) {
 				r.Eventf(volume, corev1.EventTypeWarning, events.VolumeSnapshotNotFound,
-					"VolumeSnapshot %s not found", volume.Spec.VolumeSnapshotRef.Name)
-				return nil, false, fmt.Errorf("volume snapshot %s not found", volume.Spec.VolumeSnapshotRef.Name)
+					"VolumeSnapshot %s not found", volumeSnapshotRef.Name)
+				return nil, false, fmt.Errorf("volume snapshot %s not found", volumeSnapshotRef.Name)
 			}
-			return nil, false, fmt.Errorf("error getting volume snapshot %s: %w", volume.Spec.VolumeSnapshotRef.Name, err)
+			return nil, false, fmt.Errorf("error getting volume snapshot %s: %w", volumeSnapshotRef.Name, err)
 		}
 	}
 

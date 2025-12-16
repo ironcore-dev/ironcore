@@ -134,7 +134,7 @@ var _ = Describe("Volume", func() {
 		Entry("valid volumeSnapshotRef name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeDataSource: storage.VolumeDataSource{
+					DataSource: storage.VolumeDataSource{
 						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo"},
 					},
 				},
@@ -144,7 +144,7 @@ var _ = Describe("Volume", func() {
 		Entry("invalid volumeSnapshotRef name",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeDataSource: storage.VolumeDataSource{
+					DataSource: storage.VolumeDataSource{
 						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo*"},
 					},
 				},
@@ -155,8 +155,10 @@ var _ = Describe("Volume", func() {
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
 					VolumeClassRef: &corev1.LocalObjectReference{Name: "foo"},
-					VolumeDataSource: storage.VolumeDataSource{
-						OSImage: &[]string{"test-image"}[0],
+					DataSource: storage.VolumeDataSource{
+						OSImage: &storage.OSDataSource{
+							Image: "test-image",
+						},
 					},
 				},
 			},
@@ -165,8 +167,10 @@ var _ = Describe("Volume", func() {
 		Entry("classless: invalid os image as volume data source",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeDataSource: storage.VolumeDataSource{
-						OSImage: &[]string{"test-image"}[0],
+					DataSource: storage.VolumeDataSource{
+						OSImage: &storage.OSDataSource{
+							Image: "test-image",
+						},
 					},
 				},
 			},
@@ -175,9 +179,11 @@ var _ = Describe("Volume", func() {
 		Entry("invalid os image as single volume data source",
 			&storage.Volume{
 				Spec: storage.VolumeSpec{
-					VolumeDataSource: storage.VolumeDataSource{
+					DataSource: storage.VolumeDataSource{
 						VolumeSnapshotRef: &corev1.LocalObjectReference{Name: "foo"},
-						OSImage:           &[]string{"test-image"}[0],
+						OSImage: &storage.OSDataSource{
+							Image: "test-image",
+						},
 					},
 				},
 			},

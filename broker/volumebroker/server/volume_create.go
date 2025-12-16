@@ -12,6 +12,7 @@ import (
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	brokerutils "github.com/ironcore-dev/ironcore/broker/common/utils"
 	volumebrokerv1alpha1 "github.com/ironcore-dev/ironcore/broker/volumebroker/api/v1alpha1"
+	"k8s.io/utils/ptr"
 
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/apiutils"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -69,7 +70,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 
 	var image string
 	var volumeSnapshotRef *corev1.LocalObjectReference
-
+	var osImageDataSource *storagev1alpha1.OSDataSource
 	image = volume.Spec.Image // TODO: Remove this once volume.Spec.Image is deprecated
 
 	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil {
@@ -78,6 +79,15 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			volumeSnapshotRef = &corev1.LocalObjectReference{Name: dataSource.SnapshotDataSource.SnapshotId}
 			image = "" // TODO: Remove this once volume.Spec.Image is deprecated
 		case dataSource.ImageDataSource != nil:
+			var architecture *string
+			if dataSource.ImageDataSource.Architecture != "" {
+				architecture = ptr.To(dataSource.ImageDataSource.Architecture)
+			}
+
+			osImageDataSource = &storagev1alpha1.OSDataSource{
+				Image:        dataSource.ImageDataSource.Image,
+				Architecture: architecture,
+			}
 			image = dataSource.ImageDataSource.Image
 		}
 	}
@@ -100,14 +110,9 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Image:              image, // TODO: Remove this once volume.Spec.Image is deprecated
 			ImagePullSecretRef: nil,   // TODO: Fill if necessary
 			Encryption:         encryption,
-			VolumeDataSource: storagev1alpha1.VolumeDataSource{
+			DataSource: storagev1alpha1.VolumeDataSource{
 				VolumeSnapshotRef: volumeSnapshotRef,
-				OSImage: func() *string {
-					if image == "" {
-						return nil
-					}
-					return &image
-				}(),
+				OSImage:           osImageDataSource,
 			},
 		},
 	}

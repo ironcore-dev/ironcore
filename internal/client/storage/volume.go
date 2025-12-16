@@ -41,8 +41,8 @@ func SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx context.Context, indexer c
 func SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx context.Context, indexer client.FieldIndexer) error {
 	return indexer.IndexField(ctx, &storagev1alpha1.Volume{}, VolumeSpecVolumeSnapshotRefNameField, func(obj client.Object) []string {
 		volume := obj.(*storagev1alpha1.Volume)
-		if volume.Spec.VolumeSnapshotRef != nil {
-			return []string{volume.Spec.VolumeSnapshotRef.Name}
+		if volume.Spec.DataSource.VolumeSnapshotRef != nil {
+			return []string{volume.Spec.DataSource.VolumeSnapshotRef.Name}
 		}
 		return nil
 	})
