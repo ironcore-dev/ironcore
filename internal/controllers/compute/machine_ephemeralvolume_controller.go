@@ -9,16 +9,17 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
-	"github.com/ironcore-dev/ironcore/utils/annotations"
-
 	"github.com/go-logr/logr"
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
+	"github.com/ironcore-dev/ironcore/utils/annotations"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -130,6 +131,34 @@ func (r *MachineEphemeralVolumeReconciler) handleCreateVolume(ctx context.Contex
 	return r.handleExistingVolume(ctx, log, machine, true, volume)
 }
 
+func (r *MachineEphemeralVolumeReconciler) getMachineArchitecture(ctx context.Context, machine *computev1alpha1.Machine) (*string, error) {
+	machineClass := &computev1alpha1.MachineClass{}
+	if err := r.Get(ctx, types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}, machineClass); err != nil {
+		return nil, fmt.Errorf("error getting machine class %s: %w", machine.Spec.MachineClassRef.Name, err)
+	}
+
+	architecture, ok := machineClass.Labels[commonv1alpha1.MachineArchitectureLabel]
+	if !ok {
+		return nil, nil
+	}
+
+	return &architecture, nil
+}
+
+func (r *MachineEphemeralVolumeReconciler) addArchitectureIfNeeded(log logr.Logger, volume *storagev1alpha1.Volume, architecture *string) {
+	if volume.Spec.DataSource.OSImage == nil || architecture == nil {
+		return
+	}
+
+	if volume.Spec.DataSource.OSImage.Architecture != nil {
+		log.V(2).Info("Architecture already set", "architecture", volume.Spec.DataSource.OSImage.Architecture)
+		return
+	}
+
+	log.V(2).Info("Adding architecture", "architecture", architecture)
+	volume.Spec.DataSource.OSImage.Architecture = architecture
+}
+
 func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
 	log.V(1).Info("Reconcile")
 
@@ -139,6 +168,11 @@ func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log lo
 		client.InNamespace(machine.Namespace),
 	); err != nil {
 		return ctrl.Result{}, fmt.Errorf("error listing volumes: %w", err)
+	}
+
+	arch, err := r.getMachineArchitecture(ctx, machine)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("error getting machine architecture: %w", err)
 	}
 
 	var (
@@ -157,6 +191,7 @@ func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log lo
 
 	for _, volume := range ephemVolumeByName {
 		log := log.WithValues("Volume", klog.KObj(volume))
+		r.addArchitectureIfNeeded(log, volume, arch)
 		if err := r.handleCreateVolume(ctx, log, machine, volume); err != nil {
 			if apierrors.IsForbidden(err) {
 				r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s exceeded quota ", volume.Name)
