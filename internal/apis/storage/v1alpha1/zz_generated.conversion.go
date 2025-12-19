@@ -832,7 +832,6 @@ func autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *storage
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
 	out.LastTransitionTime = in.LastTransitionTime
 	return nil
 }
@@ -847,7 +846,6 @@ func autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage
 	out.Status = v1.ConditionStatus(in.Status)
 	out.Reason = in.Reason
 	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
 	out.LastTransitionTime = in.LastTransitionTime
 	return nil
 }
