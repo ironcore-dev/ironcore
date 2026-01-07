@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
 
-	volumebrokerconfig "github.com/ironcore-dev/ironcore/broker/bucketbroker/client/config"
 	"github.com/ironcore-dev/ironcore/broker/common"
+	volumebrokerconfig "github.com/ironcore-dev/ironcore/broker/volumebroker/client/config"
 	"github.com/ironcore-dev/ironcore/broker/volumebroker/server"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
