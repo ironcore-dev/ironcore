@@ -32,6 +32,9 @@ const (
 	// some ephemeral controller is managing the resource.
 	EphemeralManagedByAnnotation = "common.ironcore.dev/ephemeral-managed-by"
 
+	// MachineArchitectureLabel is a label that indicates the machine architecture.
+	MachineArchitectureLabel = "common.ironcore.dev/architecture"
+
 	// DefaultEphemeralManager is the default ironcoreephemeral manager.
 	DefaultEphemeralManager = "ephemeral-manager"
 )

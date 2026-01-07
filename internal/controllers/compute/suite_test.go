@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+
 	"github.com/ironcore-dev/controller-utils/buildutils"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
@@ -177,10 +179,27 @@ func SetupMachineClass() *computev1alpha1.MachineClass {
 		*machineClass = computev1alpha1.MachineClass{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "machine-class-",
+				Labels: map[string]string{
+					commonv1alpha1.MachineArchitectureLabel: "amd64",
+				},
 			},
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceCPU:    resource.MustParse("1"),
 				corev1alpha1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+		}
+	})
+}
+
+func SetupVolumeClass() *storagev1alpha1.VolumeClass {
+	return SetupObjectStruct[*storagev1alpha1.VolumeClass](&k8sClient, func(volumeClass *storagev1alpha1.VolumeClass) {
+		*volumeClass = storagev1alpha1.VolumeClass{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "volume-class-",
+			},
+			Capabilities: corev1alpha1.ResourceList{
+				corev1alpha1.ResourceIOPS: resource.MustParse("500"),
+				corev1alpha1.ResourceTPS:  resource.MustParse("500Mi"),
 			},
 		}
 	})
