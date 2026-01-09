@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/go-logr/logr"
@@ -552,7 +553,7 @@ func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.M
 	}
 
 	return computev1alpha1.MachineCondition{
-		Type:               "MachineReady",
+		Type:               computev1alpha1.MachineConditionType("MachineReady"),
 		Status:             status,
 		Reason:             reason,
 		Message:            message,
@@ -585,9 +586,8 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 
 	if status == corev1.ConditionTrue {
 		for _, vs := range volumeStatuses {
-			if vs.LastStateTransitionTime != nil {
+			if vs.LastStateTransitionTime != nil && (lastTransitionTime == nil || vs.LastStateTransitionTime.After(lastTransitionTime.Time)) {
 				lastTransitionTime = vs.LastStateTransitionTime
-				break
 			}
 		}
 	}
@@ -627,9 +627,8 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 
 	if status == corev1.ConditionTrue {
 		for _, nicStatus := range nicStatuses {
-			if nicStatus.LastStateTransitionTime != nil {
+			if nicStatus.LastStateTransitionTime != nil && (lastTransitionTime == nil || nicStatus.LastStateTransitionTime.After(lastTransitionTime.Time)) {
 				lastTransitionTime = nicStatus.LastStateTransitionTime
-				break
 			}
 		}
 	}
@@ -667,7 +666,33 @@ func (r *MachineReconciler) mergeMachineConditions(
 		}
 	}
 
-	return updated
+	// Group conditions by type and keep only the latest 10 per type (by LastTransitionTime)
+	const maxConditionsPerType = 10
+	conditionsByType := make(map[string][]computev1alpha1.MachineCondition)
+	for _, cond := range updated {
+		condType := string(cond.Type)
+		conditionsByType[condType] = append(conditionsByType[condType], cond)
+	}
+
+	var result []computev1alpha1.MachineCondition
+	// Sort condition types for deterministic ordering
+	types := make([]string, 0, len(conditionsByType))
+	for t := range conditionsByType {
+		types = append(types, t)
+	}
+	sort.Strings(types)
+	for _, t := range types {
+		conds := conditionsByType[t]
+		sort.Slice(conds, func(i, j int) bool {
+			return conds[i].LastTransitionTime.Before(&conds[j].LastTransitionTime)
+		})
+		if len(conds) > maxConditionsPerType {
+			conds = conds[len(conds)-maxConditionsPerType:]
+		}
+		result = append(result, conds...)
+	}
+
+	return result
 }
 
 func (r *MachineReconciler) prepareIRIPower(power computev1alpha1.Power) (iri.Power, error) {
@@ -1019,7 +1044,7 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface() handler
 			},
 			r.matchingWatchLabel(),
 		); err != nil {
-			log.Error(err, "Error listing machines using network interface", "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
+			log.Error(err, "Error listing machines using secret", "NetworkInterfaceKey", client.ObjectKeyFromObject(nic))
 			return nil
 		}
 
