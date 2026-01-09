@@ -189,6 +189,15 @@ const (
 // MachineConditionType is a type a MachineCondition can have.
 type MachineConditionType string
 
+const (
+	// MachineConditionReady indicates that the machine is ready.
+	MachineConditionReady MachineConditionType = "MachineReady"
+	// MachineConditionVolumesReady indicates that the volumes are ready.
+	MachineConditionVolumesReady MachineConditionType = "VolumesReady"
+	// MachineConditionNetworkInterfacesReady indicates that the network interfaces are ready.
+	MachineConditionNetworkInterfacesReady MachineConditionType = "NetworkInterfacesReady"
+)
+
 // MachineCondition is one of the conditions of a machine.
 type MachineCondition struct {
 	// Type is the type of the condition.
