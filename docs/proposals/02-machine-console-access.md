@@ -23,12 +23,16 @@ reviewers:
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-02: Machine Console Access](#IEP-02-machine-console-access)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
-- [Proposal](#proposal)
-- [Alternatives](#alternatives)
+  - [Proposal](#proposal)
+    - [User-facing API](#user-facing-api)
+    - [Server-Side API](#server-side-api)
+  - [Alternatives](#alternatives)
 
 ## Summary
 

@@ -25,12 +25,15 @@ reviewers:
 
 ## Table of Contents
 
-- [Summary](#summary)
-- [Motivation](#motivation)
+- [IEP-3: Network Loadbalancer](#IEP-3-network-loadbalancer)
+  - [Table of Contents](#table-of-contents)
+  - [Summary](#summary)
+  - [Motivation](#motivation)
     - [Goals](#goals)
     - [Non-Goals](#non-goals)
     - [Details](#details)
-- [Proposal](#proposal)
+  - [Proposal](#proposal)
+    - [Routing State Object](#routing-state-object)
 
 ## Summary
 
