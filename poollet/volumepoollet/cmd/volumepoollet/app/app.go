@@ -12,6 +12,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
 	"github.com/ironcore-dev/controller-utils/cmdutils/switches"
 	"github.com/ironcore-dev/controller-utils/configutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -21,14 +24,14 @@ import (
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	iriremotevolume "github.com/ironcore-dev/ironcore/iri/remote/volume"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/irievent"
 	volumepoolletconfig "github.com/ironcore-dev/ironcore/poollet/volumepoollet/client/config"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vem"
 	"github.com/ironcore-dev/ironcore/utils/client/config"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -78,6 +81,7 @@ type Options struct {
 
 	ProviderID                          string
 	VolumeRuntimeEndpoint               string
+	GrpcMaxReceivedMessageSize          int
 	DialTimeout                         time.Duration
 	VolumeRuntimeSocketDiscoveryTimeout time.Duration
 	VolumeClassMapperSyncTimeout        time.Duration
@@ -128,6 +132,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.ProviderID, "provider-id", "", "Provider id to announce on the volume pool.")
 	fs.StringVar(&o.VolumeRuntimeEndpoint, "volume-runtime-endpoint", o.VolumeRuntimeEndpoint, "Endpoint of the remote volume runtime service.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the volume runtime endpoint.")
+	fs.IntVar(&o.GrpcMaxReceivedMessageSize, "grpc-max-received-msg-size", poolletutils.DefaultGrpcMaxRecvMsgSize, "Maximum gRPC received message size in bytes.")
 	fs.DurationVar(&o.VolumeRuntimeSocketDiscoveryTimeout, "volume-runtime-discovery-timeout", 20*time.Second, "Timeout for discovering the volume runtime socket.")
 	fs.DurationVar(&o.VolumeClassMapperSyncTimeout, "vcm-sync-timeout", 10*time.Second, "Timeout waiting for the volume class mapper to sync.")
 
@@ -149,7 +154,6 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 			o.Switches.DisabledByDefault(),
 		),
 	)
-
 }
 
 func (o *Options) MarkFlagsRequired(cmd *cobra.Command) {
@@ -209,7 +213,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error detecting volume runtime endpoint: %w", err)
 	}
 
-	volumeRuntime, err := iriremotevolume.NewRemoteRuntime(endpoint)
+	volumeRuntime, err := iriremotevolume.NewRemoteRuntime(endpoint, opts.GrpcMaxReceivedMessageSize)
 	if err != nil {
 		return fmt.Errorf("error creating remote volume runtime: %w", err)
 	}
