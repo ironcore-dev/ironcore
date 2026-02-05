@@ -197,7 +197,7 @@ var _ = Describe("MachineController", func() {
 		))
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
-				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Type":               Equal(computev1alpha1.MachineConditionType("MachineReady")),
 				"Status":             Equal(corev1.ConditionFalse),
 				"Reason":             Equal("Pending"),
 				"Message":            Equal("Machine is pending"),
@@ -206,15 +206,15 @@ var _ = Describe("MachineController", func() {
 			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
 				"Type":               Equal(computev1alpha1.MachineConditionType("VolumesReady")),
 				"Status":             Equal(corev1.ConditionFalse),
-				"Reason":             Equal(fmt.Sprintf("VolumeNotReady: %s", "primary")),
-				"Message":            Equal(fmt.Sprintf("Volume %s is not attached (state: %s)", "primary", "Pending")),
+				"Reason":             Equal(fmt.Sprintf("VolumeNotReady: %s", volume.Name)),
+				"Message":            Equal(fmt.Sprintf("Volume %s is not attached (state: %s)", volume.Name, "Pending")),
 				"LastTransitionTime": Not(BeNil()),
 			}))),
 			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
 				"Type":               Equal(computev1alpha1.MachineConditionType("NetworkInterfacesReady")),
 				"Status":             Equal(corev1.ConditionFalse),
-				"Reason":             Equal(fmt.Sprintf("NetworkInterfaceNotReady: %s", "primary")),
-				"Message":            Equal(fmt.Sprintf("Network interface %s is not attached (state: %s)", "primary", "Pending")),
+				"Reason":             Equal(fmt.Sprintf("NetworkInterfaceNotReady: %s", nic.Name)),
+				"Message":            Equal(fmt.Sprintf("Network interface %s is not attached (state: %s)", nic.Name, "Pending")),
 				"LastTransitionTime": Not(BeNil()),
 			}))),
 		))
@@ -507,7 +507,7 @@ var _ = Describe("MachineController", func() {
 		By("waiting for the machine conditions to be updated")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
-				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Type":               Equal(computev1alpha1.MachineConditionType("MachineReady")),
 				"Status":             Equal(corev1.ConditionTrue),
 				"Reason":             Equal("Running"),
 				"Message":            Equal("Machine is running"),
@@ -527,7 +527,7 @@ var _ = Describe("MachineController", func() {
 		By("waiting for the machine conditions to be updated")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Status.Conditions", ContainElement(MatchFields(IgnoreExtras, Fields{
-				"Type":               Equal(computev1alpha1.MachineConditionType("Ready")),
+				"Type":               Equal(computev1alpha1.MachineConditionType("MachineReady")),
 				"Status":             Equal(corev1.ConditionFalse),
 				"Reason":             Equal("Terminating"),
 				"Message":            Equal("Machine is terminating or terminated"),
