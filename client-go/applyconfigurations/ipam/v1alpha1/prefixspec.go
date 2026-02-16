@@ -13,11 +13,21 @@ import (
 
 // PrefixSpecApplyConfiguration represents a declarative configuration of the PrefixSpec type for use
 // with apply.
+//
+// PrefixSpec defines the desired state of Prefix
 type PrefixSpecApplyConfiguration struct {
-	IPFamily       *v1.IPFamily                            `json:"ipFamily,omitempty"`
-	Prefix         *commonv1alpha1.IPPrefix                `json:"prefix,omitempty"`
-	PrefixLength   *int32                                  `json:"prefixLength,omitempty"`
-	ParentRef      *v1.LocalObjectReference                `json:"parentRef,omitempty"`
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// Prefix is the prefix to allocate for this Prefix.
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// PrefixLength is the length of prefix to allocate for this Prefix.
+	PrefixLength *int32 `json:"prefixLength,omitempty"`
+	// ParentRef references the parent to allocate the Prefix from.
+	// If ParentRef and ParentSelector is empty, the Prefix is considered a root prefix and thus
+	// allocated by itself.
+	ParentRef *v1.LocalObjectReference `json:"parentRef,omitempty"`
+	// ParentSelector is the LabelSelector to use for determining the parent for this Prefix.
 	ParentSelector *metav1.LabelSelectorApplyConfiguration `json:"parentSelector,omitempty"`
 }
 

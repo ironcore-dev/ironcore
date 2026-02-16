@@ -11,8 +11,12 @@ import (
 
 // ObjectSelectorApplyConfiguration represents a declarative configuration of the ObjectSelector type for use
 // with apply.
+//
+// ObjectSelector specifies how to select objects of a certain kind.
 type ObjectSelectorApplyConfiguration struct {
-	Kind                               *string `json:"kind,omitempty"`
+	// Kind is the kind of object to select.
+	Kind *string `json:"kind,omitempty"`
+	// LabelSelector is the label selector to select objects of the specified Kind by.
 	v1.LabelSelectorApplyConfiguration `json:",inline"`
 }
 

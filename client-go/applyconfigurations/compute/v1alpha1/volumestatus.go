@@ -13,12 +13,19 @@ import (
 
 // VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
+//
+// VolumeStatus is the status of a Volume.
 type VolumeStatusApplyConfiguration struct {
-	Name                    *string                      `json:"name,omitempty"`
-	Handle                  *string                      `json:"handle,omitempty"`
-	State                   *computev1alpha1.VolumeState `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                     `json:"lastStateTransitionTime,omitempty"`
-	VolumeRef               *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
+	// Name is the name of a volume attachment.
+	Name *string `json:"name,omitempty"`
+	// Handle is the MachinePool internal handle of the volume.
+	Handle *string `json:"handle,omitempty"`
+	// State represents the attachment state of a Volume.
+	State *computev1alpha1.VolumeState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned.
+	LastStateTransitionTime *v1.Time `json:"lastStateTransitionTime,omitempty"`
+	// VolumeRef reference to the claimed Volume
+	VolumeRef *corev1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 
 // VolumeStatusApplyConfiguration constructs a declarative configuration of the VolumeStatus type for use with

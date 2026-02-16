@@ -13,10 +13,15 @@ import (
 
 // PrefixStatusApplyConfiguration represents a declarative configuration of the PrefixStatus type for use
 // with apply.
+//
+// PrefixStatus defines the observed state of Prefix
 type PrefixStatusApplyConfiguration struct {
-	Phase                   *ipamv1alpha1.PrefixPhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                  `json:"lastPhaseTransitionTime,omitempty"`
-	Used                    []commonv1alpha1.IPPrefix `json:"used,omitempty"`
+	// Phase is the PrefixPhase of the Prefix.
+	Phase *ipamv1alpha1.PrefixPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase changed values.
+	LastPhaseTransitionTime *v1.Time `json:"lastPhaseTransitionTime,omitempty"`
+	// Used is a list of used prefixes.
+	Used []commonv1alpha1.IPPrefix `json:"used,omitempty"`
 }
 
 // PrefixStatusApplyConfiguration constructs a declarative configuration of the PrefixStatus type for use with

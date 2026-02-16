@@ -13,10 +13,15 @@ import (
 
 // PrefixAllocationStatusApplyConfiguration represents a declarative configuration of the PrefixAllocationStatus type for use
 // with apply.
+//
+// PrefixAllocationStatus is the status of a PrefixAllocation.
 type PrefixAllocationStatusApplyConfiguration struct {
-	Prefix                  *commonv1alpha1.IPPrefix            `json:"prefix,omitempty"`
-	Phase                   *ipamv1alpha1.PrefixAllocationPhase `json:"phase,omitempty"`
-	LastPhaseTransitionTime *v1.Time                            `json:"lastPhaseTransitionTime,omitempty"`
+	// Prefix is the allocated prefix, if any
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// Phase is the phase of the PrefixAllocation.
+	Phase *ipamv1alpha1.PrefixAllocationPhase `json:"phase,omitempty"`
+	// LastPhaseTransitionTime is the last time the Phase changed values.
+	LastPhaseTransitionTime *v1.Time `json:"lastPhaseTransitionTime,omitempty"`
 }
 
 // PrefixAllocationStatusApplyConfiguration constructs a declarative configuration of the PrefixAllocationStatus type for use with

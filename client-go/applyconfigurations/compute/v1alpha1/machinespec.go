@@ -13,18 +13,36 @@ import (
 
 // MachineSpecApplyConfiguration represents a declarative configuration of the MachineSpec type for use
 // with apply.
+//
+// MachineSpec defines the desired state of Machine
 type MachineSpecApplyConfiguration struct {
-	MachineClassRef     *v1.LocalObjectReference             `json:"machineClassRef,omitempty"`
-	MachinePoolSelector map[string]string                    `json:"machinePoolSelector,omitempty"`
-	MachinePoolRef      *v1.LocalObjectReference             `json:"machinePoolRef,omitempty"`
-	Power               *computev1alpha1.Power               `json:"power,omitempty"`
-	Image               *string                              `json:"image,omitempty"`
-	ImagePullSecretRef  *v1.LocalObjectReference             `json:"imagePullSecret,omitempty"`
-	NetworkInterfaces   []NetworkInterfaceApplyConfiguration `json:"networkInterfaces,omitempty"`
-	Volumes             []VolumeApplyConfiguration           `json:"volumes,omitempty"`
-	IgnitionRef         *commonv1alpha1.SecretKeySelector    `json:"ignitionRef,omitempty"`
-	EFIVars             []EFIVarApplyConfiguration           `json:"efiVars,omitempty"`
-	Tolerations         []commonv1alpha1.Toleration          `json:"tolerations,omitempty"`
+	// MachineClassRef is a reference to the machine class/flavor of the machine.
+	MachineClassRef *v1.LocalObjectReference `json:"machineClassRef,omitempty"`
+	// MachinePoolSelector selects a suitable MachinePoolRef by the given labels.
+	MachinePoolSelector map[string]string `json:"machinePoolSelector,omitempty"`
+	// MachinePoolRef defines machine pool to run the machine in.
+	// If empty, a scheduler will figure out an appropriate pool to run the machine in.
+	MachinePoolRef *v1.LocalObjectReference `json:"machinePoolRef,omitempty"`
+	// Power is the desired machine power state.
+	// Defaults to PowerOn.
+	Power *computev1alpha1.Power `json:"power,omitempty"`
+	// Deprecated: Use LocalDisk to provide a bootable disk
+	// Image is the optional URL providing the operating system image of the machine.
+	Image *string `json:"image,omitempty"`
+	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
+	ImagePullSecretRef *v1.LocalObjectReference `json:"imagePullSecret,omitempty"`
+	// NetworkInterfaces define a list of network interfaces present on the machine
+	NetworkInterfaces []NetworkInterfaceApplyConfiguration `json:"networkInterfaces,omitempty"`
+	// Volumes are volumes attached to this machine.
+	Volumes []VolumeApplyConfiguration `json:"volumes,omitempty"`
+	// IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up.
+	// If key is empty, DefaultIgnitionKey will be used as fallback.
+	IgnitionRef *commonv1alpha1.SecretKeySelector `json:"ignitionRef,omitempty"`
+	// EFIVars are variables to pass to EFI while booting up.
+	EFIVars []EFIVarApplyConfiguration `json:"efiVars,omitempty"`
+	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
+	// covered by Tolerations will be considered to run the Machine.
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
 // MachineSpecApplyConfiguration constructs a declarative configuration of the MachineSpec type for use with

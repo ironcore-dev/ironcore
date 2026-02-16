@@ -11,8 +11,12 @@ import (
 
 // LoadBalancerDestinationApplyConfiguration represents a declarative configuration of the LoadBalancerDestination type for use
 // with apply.
+//
+// LoadBalancerDestination is the destination of the load balancer.
 type LoadBalancerDestinationApplyConfiguration struct {
-	IP        *commonv1alpha1.IP                       `json:"ip,omitempty"`
+	// IP is the target IP.
+	IP *commonv1alpha1.IP `json:"ip,omitempty"`
+	// TargetRef is the target providing the destination.
 	TargetRef *LoadBalancerTargetRefApplyConfiguration `json:"targetRef,omitempty"`
 }
 

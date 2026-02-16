@@ -12,7 +12,9 @@ import (
 // PrefixSourceApplyConfiguration represents a declarative configuration of the PrefixSource type for use
 // with apply.
 type PrefixSourceApplyConfiguration struct {
-	Value     *commonv1alpha1.IPPrefix                 `json:"value,omitempty"`
+	// Value specifies a static prefix to use.
+	Value *commonv1alpha1.IPPrefix `json:"value,omitempty"`
+	// Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 

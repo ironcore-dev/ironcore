@@ -1,6 +1,6 @@
 module github.com/ironcore-dev/ironcore
 
-go 1.24.1
+go 1.25.1
 
 require (
 	github.com/afritzler/protoequal v0.1.10
@@ -20,19 +20,19 @@ require (
 	golang.org/x/sys v0.41.0
 	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
-	k8s.io/api v0.34.1
-	k8s.io/apimachinery v0.34.1
-	k8s.io/apiserver v0.34.1
-	k8s.io/client-go v0.34.1
-	k8s.io/code-generator v0.34.1
-	k8s.io/component-base v0.34.1
+	k8s.io/api v0.35.0
+	k8s.io/apimachinery v0.35.0
+	k8s.io/apiserver v0.35.0
+	k8s.io/client-go v0.35.0
+	k8s.io/code-generator v0.35.0
+	k8s.io/component-base v0.35.0
 	k8s.io/klog/v2 v2.130.1
-	k8s.io/kube-aggregator v0.34.1
-	k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912
-	k8s.io/kubectl v0.34.1
-	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
-	sigs.k8s.io/controller-runtime v0.22.3
-	sigs.k8s.io/structured-merge-diff/v6 v6.3.0
+	k8s.io/kube-aggregator v0.35.0
+	k8s.io/kube-openapi v0.0.0-20260127142750-a19766b6e2d4
+	k8s.io/kubectl v0.35.0
+	k8s.io/utils v0.0.0-20260108192941-914a6e750570
+	sigs.k8s.io/controller-runtime v0.23.1
+	sigs.k8s.io/structured-merge-diff/v6 v6.3.2-0.20260122202528-d9cc6641c482
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -99,9 +99,9 @@ require (
 	github.com/prometheus/procfs v0.19.1 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	go.etcd.io/etcd/api/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.6.4 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.4 // indirect
+	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect
+	go.etcd.io/etcd/client/v3 v3.6.5 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0 // indirect
@@ -130,10 +130,10 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	k8s.io/apiextensions-apiserver v0.34.1 // indirect
-	k8s.io/cli-runtime v0.34.1 // indirect
-	k8s.io/gengo/v2 v2.0.0-20250604051438-85fd79dbfd9f // indirect
-	k8s.io/kms v0.34.1 // indirect
+	k8s.io/apiextensions-apiserver v0.35.0 // indirect
+	k8s.io/cli-runtime v0.35.0 // indirect
+	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
+	k8s.io/kms v0.35.0 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.33.0 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect

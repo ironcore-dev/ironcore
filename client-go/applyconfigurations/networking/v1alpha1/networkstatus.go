@@ -11,8 +11,12 @@ import (
 
 // NetworkStatusApplyConfiguration represents a declarative configuration of the NetworkStatus type for use
 // with apply.
+//
+// NetworkStatus defines the observed state of Network
 type NetworkStatusApplyConfiguration struct {
-	State    *networkingv1alpha1.NetworkState         `json:"state,omitempty"`
+	// State is the state of the machine.
+	State *networkingv1alpha1.NetworkState `json:"state,omitempty"`
+	// Peerings contains the states of the network peerings for the network.
 	Peerings []NetworkPeeringStatusApplyConfiguration `json:"peerings,omitempty"`
 }
 

@@ -26,6 +26,175 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
+- name: FieldsV1.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    elementType:
+      scalar: untyped
+      list:
+        elementType:
+          namedType: __untyped_atomic_
+        elementRelationship: atomic
+      map:
+        elementType:
+          namedType: __untyped_deduced_
+        elementRelationship: separable
+- name: LabelSelector.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    fields:
+    - name: matchExpressions
+      type:
+        list:
+          elementType:
+            namedType: LabelSelectorRequirement.v1.meta.apis.pkg.apimachinery.k8s.io
+          elementRelationship: atomic
+    - name: matchLabels
+      type:
+        map:
+          elementType:
+            scalar: string
+    elementRelationship: atomic
+- name: LabelSelectorRequirement.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    fields:
+    - name: key
+      type:
+        scalar: string
+      default: ""
+    - name: operator
+      type:
+        scalar: string
+      default: ""
+    - name: values
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+- name: LocalObjectReference.v1.core.api.k8s.io
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    elementRelationship: atomic
+- name: ManagedFieldsEntry.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: fieldsType
+      type:
+        scalar: string
+    - name: fieldsV1
+      type:
+        namedType: FieldsV1.v1.meta.apis.pkg.apimachinery.k8s.io
+    - name: manager
+      type:
+        scalar: string
+    - name: operation
+      type:
+        scalar: string
+    - name: subresource
+      type:
+        scalar: string
+    - name: time
+      type:
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+- name: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    fields:
+    - name: annotations
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: creationTimestamp
+      type:
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+    - name: deletionGracePeriodSeconds
+      type:
+        scalar: numeric
+    - name: deletionTimestamp
+      type:
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+    - name: finalizers
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: associative
+    - name: generateName
+      type:
+        scalar: string
+    - name: generation
+      type:
+        scalar: numeric
+    - name: labels
+      type:
+        map:
+          elementType:
+            scalar: string
+    - name: managedFields
+      type:
+        list:
+          elementType:
+            namedType: ManagedFieldsEntry.v1.meta.apis.pkg.apimachinery.k8s.io
+          elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
+    - name: namespace
+      type:
+        scalar: string
+    - name: ownerReferences
+      type:
+        list:
+          elementType:
+            namedType: OwnerReference.v1.meta.apis.pkg.apimachinery.k8s.io
+          elementRelationship: associative
+          keys:
+          - uid
+    - name: resourceVersion
+      type:
+        scalar: string
+    - name: selfLink
+      type:
+        scalar: string
+    - name: uid
+      type:
+        scalar: string
+- name: OwnerReference.v1.meta.apis.pkg.apimachinery.k8s.io
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+      default: ""
+    - name: blockOwnerDeletion
+      type:
+        scalar: boolean
+    - name: controller
+      type:
+        scalar: boolean
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: uid
+      type:
+        scalar: string
+      default: ""
+    elementRelationship: atomic
+- name: Quantity.resource.api.pkg.apimachinery.k8s.io
+  scalar: string
+- name: Time.v1.meta.apis.pkg.apimachinery.k8s.io
+  scalar: untyped
 - name: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP
   scalar: untyped
 - name: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
@@ -108,7 +277,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: sizeLimit
       type:
-        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+        namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralNetworkInterfaceSource
   map:
     fields:
@@ -129,7 +298,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: sizeLimit
       type:
-        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+        namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine
   map:
     fields:
@@ -141,7 +310,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -161,20 +330,20 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: kind
       type:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition
   map:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -202,7 +371,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -228,7 +397,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -281,18 +450,18 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: availableMachineClasses
       type:
         list:
           elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
+            namedType: LocalObjectReference.v1.core.api.k8s.io
           elementRelationship: atomic
     - name: capacity
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: conditions
       type:
         list:
@@ -325,14 +494,14 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: imagePullSecret
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: machineClassRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: machinePoolRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: machinePoolSelector
       type:
         map:
@@ -405,7 +574,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: networkInterfaceRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.NetworkInterfaceStatus
   map:
     fields:
@@ -414,14 +583,14 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: name
       type:
         scalar: string
       default: ""
     - name: networkInterfaceRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: state
       type:
@@ -447,7 +616,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: volumeRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.VolumeStatus
   map:
     fields:
@@ -456,7 +625,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: name
       type:
         scalar: string
@@ -466,7 +635,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: volumeRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.core.v1alpha1.ObjectSelector
   map:
@@ -479,7 +648,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
+            namedType: LabelSelectorRequirement.v1.meta.apis.pkg.apimachinery.k8s.io
           elementRelationship: atomic
     - name: matchLabels
       type:
@@ -497,7 +666,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -514,7 +683,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: scopeSelector
       type:
         namedType: com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelector
@@ -525,12 +694,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: used
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelector
   map:
     fields:
@@ -568,7 +737,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -589,7 +758,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -613,16 +782,16 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: numeric
     - name: prefixRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: prefixSelector
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+        namedType: LabelSelector.v1.meta.apis.pkg.apimachinery.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationStatus
   map:
     fields:
     - name: lastPhaseTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: phase
       type:
         scalar: string
@@ -637,10 +806,10 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: parentRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: parentSelector
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+        namedType: LabelSelector.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: prefix
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
@@ -652,7 +821,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: lastPhaseTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: phase
       type:
         scalar: string
@@ -667,7 +836,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -734,7 +903,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -783,7 +952,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: networkRef
       type:
@@ -806,10 +975,10 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: networkInterfaceSelector
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+        namedType: LabelSelector.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: networkRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: ports
       type:
@@ -856,7 +1025,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -875,7 +1044,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: networkRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: portsPerNetworkInterface
       type:
@@ -904,7 +1073,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -925,7 +1094,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -960,7 +1129,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference
     - name: networkRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: prefixes
       type:
@@ -985,7 +1154,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: prefixes
       type:
         list:
@@ -1003,7 +1172,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1076,7 +1245,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1091,7 +1260,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -1179,11 +1348,11 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: networkInterfaceSelector
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
+        namedType: LabelSelector.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: networkRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
     - name: policyTypes
       type:
@@ -1248,7 +1417,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix
     - name: prefixRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus
   map:
@@ -1280,7 +1449,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1298,7 +1467,7 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSource
     - name: virtualIPRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec
   map:
     fields:
@@ -1324,7 +1493,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1341,7 +1510,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1360,7 +1529,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: secretRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass
   map:
     fields:
@@ -1371,20 +1540,20 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: kind
       type:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketCondition
   map:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -1413,7 +1582,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1443,7 +1612,7 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         list:
           elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
+            namedType: LocalObjectReference.v1.core.api.k8s.io
           elementRelationship: atomic
     - name: state
       type:
@@ -1453,10 +1622,10 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: bucketClassRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: bucketPoolRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: bucketPoolSelector
       type:
         map:
@@ -1485,7 +1654,7 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: state
       type:
         scalar: string
@@ -1509,7 +1678,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1532,7 +1701,7 @@ var schemaYAML = typed.YAMLObject(`types:
       default: ""
     - name: secretRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: volumeAttributes
       type:
         map:
@@ -1548,13 +1717,13 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: kind
       type:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: resizePolicy
       type:
@@ -1564,7 +1733,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -1590,13 +1759,13 @@ var schemaYAML = typed.YAMLObject(`types:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource
     - name: volumeSnapshotRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption
   map:
     fields:
     - name: secretRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
       default: {}
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool
   map:
@@ -1609,7 +1778,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1624,7 +1793,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: lastTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: message
       type:
         scalar: string
@@ -1664,18 +1833,18 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: availableVolumeClasses
       type:
         list:
           elementType:
-            namedType: io.k8s.api.core.v1.LocalObjectReference
+            namedType: LocalObjectReference.v1.core.api.k8s.io
           elementRelationship: atomic
     - name: capacity
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: conditions
       type:
         list:
@@ -1696,7 +1865,7 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
@@ -1711,16 +1880,16 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: volumeRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
 - name: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus
   map:
     fields:
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: size
       type:
-        namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+        namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: snapshotID
       type:
         scalar: string
@@ -1745,12 +1914,12 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: string
     - name: imagePullSecretRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: resources
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: tolerations
       type:
         list:
@@ -1762,10 +1931,10 @@ var schemaYAML = typed.YAMLObject(`types:
         scalar: boolean
     - name: volumeClassRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: volumePoolRef
       type:
-        namedType: io.k8s.api.core.v1.LocalObjectReference
+        namedType: LocalObjectReference.v1.core.api.k8s.io
     - name: volumePoolSelector
       type:
         map:
@@ -1785,12 +1954,12 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: atomic
     - name: lastStateTransitionTime
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
+        namedType: Time.v1.meta.apis.pkg.apimachinery.k8s.io
     - name: resources
       type:
         map:
           elementType:
-            namedType: io.k8s.apimachinery.pkg.api.resource.Quantity
+            namedType: Quantity.resource.api.pkg.apimachinery.k8s.io
     - name: state
       type:
         scalar: string
@@ -1802,181 +1971,12 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: metadata
       type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+        namedType: ObjectMeta.v1.meta.apis.pkg.apimachinery.k8s.io
       default: {}
     - name: spec
       type:
         namedType: com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec
       default: {}
-- name: io.k8s.api.core.v1.LocalObjectReference
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    elementRelationship: atomic
-- name: io.k8s.apimachinery.pkg.api.resource.Quantity
-  scalar: untyped
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
-  map:
-    elementType:
-      scalar: untyped
-      list:
-        elementType:
-          namedType: __untyped_atomic_
-        elementRelationship: atomic
-      map:
-        elementType:
-          namedType: __untyped_deduced_
-        elementRelationship: separable
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector
-  map:
-    fields:
-    - name: matchExpressions
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
-          elementRelationship: atomic
-    - name: matchLabels
-      type:
-        map:
-          elementType:
-            scalar: string
-    elementRelationship: atomic
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelectorRequirement
-  map:
-    fields:
-    - name: key
-      type:
-        scalar: string
-      default: ""
-    - name: operator
-      type:
-        scalar: string
-      default: ""
-    - name: values
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: fieldsType
-      type:
-        scalar: string
-    - name: fieldsV1
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
-    - name: manager
-      type:
-        scalar: string
-    - name: operation
-      type:
-        scalar: string
-    - name: subresource
-      type:
-        scalar: string
-    - name: time
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-  map:
-    fields:
-    - name: annotations
-      type:
-        map:
-          elementType:
-            scalar: string
-    - name: creationTimestamp
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: deletionGracePeriodSeconds
-      type:
-        scalar: numeric
-    - name: deletionTimestamp
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-    - name: finalizers
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: associative
-    - name: generateName
-      type:
-        scalar: string
-    - name: generation
-      type:
-        scalar: numeric
-    - name: labels
-      type:
-        map:
-          elementType:
-            scalar: string
-    - name: managedFields
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ManagedFieldsEntry
-          elementRelationship: atomic
-    - name: name
-      type:
-        scalar: string
-    - name: namespace
-      type:
-        scalar: string
-    - name: ownerReferences
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference
-          elementRelationship: associative
-          keys:
-          - uid
-    - name: resourceVersion
-      type:
-        scalar: string
-    - name: selfLink
-      type:
-        scalar: string
-    - name: uid
-      type:
-        scalar: string
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.OwnerReference
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-      default: ""
-    - name: blockOwnerDeletion
-      type:
-        scalar: boolean
-    - name: controller
-      type:
-        scalar: boolean
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: uid
-      type:
-        scalar: string
-      default: ""
-    elementRelationship: atomic
-- name: io.k8s.apimachinery.pkg.apis.meta.v1.Time
-  scalar: untyped
 - name: __untyped_atomic_
   scalar: untyped
   list:

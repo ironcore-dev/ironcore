@@ -11,7 +11,10 @@ import (
 
 // LoadBalancerStatusApplyConfiguration represents a declarative configuration of the LoadBalancerStatus type for use
 // with apply.
+//
+// LoadBalancerStatus defines the observed state of LoadBalancer
 type LoadBalancerStatusApplyConfiguration struct {
+	// IPs are the IPs allocated for the load balancer.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 }
 

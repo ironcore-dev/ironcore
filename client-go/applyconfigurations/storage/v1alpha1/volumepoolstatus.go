@@ -13,12 +13,17 @@ import (
 
 // VolumePoolStatusApplyConfiguration represents a declarative configuration of the VolumePoolStatus type for use
 // with apply.
+//
+// VolumePoolStatus defines the observed state of VolumePool
 type VolumePoolStatusApplyConfiguration struct {
-	State                  *storagev1alpha1.VolumePoolState        `json:"state,omitempty"`
-	Conditions             []VolumePoolConditionApplyConfiguration `json:"conditions,omitempty"`
-	AvailableVolumeClasses []v1.LocalObjectReference               `json:"availableVolumeClasses,omitempty"`
-	Capacity               *corev1alpha1.ResourceList              `json:"capacity,omitempty"`
-	Allocatable            *corev1alpha1.ResourceList              `json:"allocatable,omitempty"`
+	State      *storagev1alpha1.VolumePoolState        `json:"state,omitempty"`
+	Conditions []VolumePoolConditionApplyConfiguration `json:"conditions,omitempty"`
+	// AvailableVolumeClasses list the references of any supported VolumeClass of this pool
+	AvailableVolumeClasses []v1.LocalObjectReference `json:"availableVolumeClasses,omitempty"`
+	// Capacity represents the total resources of a machine pool.
+	Capacity *corev1alpha1.ResourceList `json:"capacity,omitempty"`
+	// Allocatable represents the resources of a machine pool that are available for scheduling.
+	Allocatable *corev1alpha1.ResourceList `json:"allocatable,omitempty"`
 }
 
 // VolumePoolStatusApplyConfiguration constructs a declarative configuration of the VolumePoolStatus type for use with

@@ -16,6 +16,8 @@ import (
 
 // BucketPoolApplyConfiguration represents a declarative configuration of the BucketPool type for use
 // with apply.
+//
+// BucketPool is the Schema for the bucketpools API
 type BucketPoolApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func BucketPool(name string) *BucketPoolApplyConfiguration {
 	return b
 }
 
-// ExtractBucketPool extracts the applied configuration owned by fieldManager from
-// bucketPool. If no managedFields are found in bucketPool for fieldManager, a
-// BucketPoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractBucketPoolFrom extracts the applied configuration owned by fieldManager from
+// bucketPool for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // bucketPool must be a unmodified BucketPool API object that was retrieved from the Kubernetes API.
-// ExtractBucketPool provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractBucketPoolFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractBucketPool(bucketPool *storagev1alpha1.BucketPool, fieldManager string) (*BucketPoolApplyConfiguration, error) {
-	return extractBucketPool(bucketPool, fieldManager, "")
-}
-
-// ExtractBucketPoolStatus is the same as ExtractBucketPool except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractBucketPoolStatus(bucketPool *storagev1alpha1.BucketPool, fieldManager string) (*BucketPoolApplyConfiguration, error) {
-	return extractBucketPool(bucketPool, fieldManager, "status")
-}
-
-func extractBucketPool(bucketPool *storagev1alpha1.BucketPool, fieldManager string, subresource string) (*BucketPoolApplyConfiguration, error) {
+func ExtractBucketPoolFrom(bucketPool *storagev1alpha1.BucketPool, fieldManager string, subresource string) (*BucketPoolApplyConfiguration, error) {
 	b := &BucketPoolApplyConfiguration{}
 	err := managedfields.ExtractInto(bucketPool, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"), fieldManager, b, subresource)
 	if err != nil {
@@ -67,6 +54,27 @@ func extractBucketPool(bucketPool *storagev1alpha1.BucketPool, fieldManager stri
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractBucketPool extracts the applied configuration owned by fieldManager from
+// bucketPool. If no managedFields are found in bucketPool for fieldManager, a
+// BucketPoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// bucketPool must be a unmodified BucketPool API object that was retrieved from the Kubernetes API.
+// ExtractBucketPool provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractBucketPool(bucketPool *storagev1alpha1.BucketPool, fieldManager string) (*BucketPoolApplyConfiguration, error) {
+	return ExtractBucketPoolFrom(bucketPool, fieldManager, "")
+}
+
+// ExtractBucketPoolStatus extracts the applied configuration owned by fieldManager from
+// bucketPool for the status subresource.
+func ExtractBucketPoolStatus(bucketPool *storagev1alpha1.BucketPool, fieldManager string) (*BucketPoolApplyConfiguration, error) {
+	return ExtractBucketPoolFrom(bucketPool, fieldManager, "status")
+}
+
 func (b BucketPoolApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

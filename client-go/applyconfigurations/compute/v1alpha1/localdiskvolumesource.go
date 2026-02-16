@@ -11,9 +11,16 @@ import (
 
 // LocalDiskVolumeSourceApplyConfiguration represents a declarative configuration of the LocalDiskVolumeSource type for use
 // with apply.
+//
+// LocalDiskVolumeSource is a volume that's offered by the machine pool provider.
+// Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+// varying performance characteristics. Potentially not recoverable.
 type LocalDiskVolumeSourceApplyConfiguration struct {
+	// SizeLimit is the total amount of local storage required for this LocalDisk volume.
+	// The default is nil which means that the limit is undefined.
 	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
-	Image     *string            `json:"image,omitempty"`
+	// Image is the optional URL providing the operating system image of the machine.
+	Image *string `json:"image,omitempty"`
 }
 
 // LocalDiskVolumeSourceApplyConfiguration constructs a declarative configuration of the LocalDiskVolumeSource type for use with

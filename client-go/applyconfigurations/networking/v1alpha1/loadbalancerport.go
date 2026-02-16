@@ -12,9 +12,14 @@ import (
 // LoadBalancerPortApplyConfiguration represents a declarative configuration of the LoadBalancerPort type for use
 // with apply.
 type LoadBalancerPortApplyConfiguration struct {
+	// Protocol is the protocol the load balancer should allow.
+	// If not specified, defaults to TCP.
 	Protocol *v1.Protocol `json:"protocol,omitempty"`
-	Port     *int32       `json:"port,omitempty"`
-	EndPort  *int32       `json:"endPort,omitempty"`
+	// Port is the port to allow.
+	Port *int32 `json:"port,omitempty"`
+	// EndPort marks the end of the port range to allow.
+	// If unspecified, only a single port, Port, will be allowed.
+	EndPort *int32 `json:"endPort,omitempty"`
 }
 
 // LoadBalancerPortApplyConfiguration constructs a declarative configuration of the LoadBalancerPort type for use with

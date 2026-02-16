@@ -11,7 +11,11 @@ import (
 
 // EphemeralVolumeSourceApplyConfiguration represents a declarative configuration of the EphemeralVolumeSource type for use
 // with apply.
+//
+// EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+// storage.Volume.
 type EphemeralVolumeSourceApplyConfiguration struct {
+	// VolumeTemplate is the template definition of the storage.Volume.
 	VolumeTemplate *storagev1alpha1.VolumeTemplateSpecApplyConfiguration `json:"volumeTemplate,omitempty"`
 }
 

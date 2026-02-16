@@ -7,9 +7,14 @@ package v1alpha1
 
 // NetworkSpecApplyConfiguration represents a declarative configuration of the NetworkSpec type for use
 // with apply.
+//
+// NetworkSpec defines the desired state of Network
 type NetworkSpecApplyConfiguration struct {
-	ProviderID       *string                                    `json:"providerID,omitempty"`
-	Peerings         []NetworkPeeringApplyConfiguration         `json:"peerings,omitempty"`
+	// ProviderID is the provider-internal ID of the network.
+	ProviderID *string `json:"providerID,omitempty"`
+	// Peerings are the network peerings with this network.
+	Peerings []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
+	// PeeringClaimRefs are the peering claim references of other networks.
 	PeeringClaimRefs []NetworkPeeringClaimRefApplyConfiguration `json:"incomingPeerings,omitempty"`
 }
 

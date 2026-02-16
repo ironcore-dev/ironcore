@@ -16,6 +16,8 @@ import (
 
 // VolumeApplyConfiguration represents a declarative configuration of the Volume type for use
 // with apply.
+//
+// Volume is the Schema for the volumes API
 type VolumeApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func Volume(name, namespace string) *VolumeApplyConfiguration {
 	return b
 }
 
-// ExtractVolume extracts the applied configuration owned by fieldManager from
-// volume. If no managedFields are found in volume for fieldManager, a
-// VolumeApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractVolumeFrom extracts the applied configuration owned by fieldManager from
+// volume for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // volume must be a unmodified Volume API object that was retrieved from the Kubernetes API.
-// ExtractVolume provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractVolumeFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractVolume(volume *storagev1alpha1.Volume, fieldManager string) (*VolumeApplyConfiguration, error) {
-	return extractVolume(volume, fieldManager, "")
-}
-
-// ExtractVolumeStatus is the same as ExtractVolume except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractVolumeStatus(volume *storagev1alpha1.Volume, fieldManager string) (*VolumeApplyConfiguration, error) {
-	return extractVolume(volume, fieldManager, "status")
-}
-
-func extractVolume(volume *storagev1alpha1.Volume, fieldManager string, subresource string) (*VolumeApplyConfiguration, error) {
+func ExtractVolumeFrom(volume *storagev1alpha1.Volume, fieldManager string, subresource string) (*VolumeApplyConfiguration, error) {
 	b := &VolumeApplyConfiguration{}
 	err := managedfields.ExtractInto(volume, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractVolume(volume *storagev1alpha1.Volume, fieldManager string, subresou
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractVolume extracts the applied configuration owned by fieldManager from
+// volume. If no managedFields are found in volume for fieldManager, a
+// VolumeApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// volume must be a unmodified Volume API object that was retrieved from the Kubernetes API.
+// ExtractVolume provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractVolume(volume *storagev1alpha1.Volume, fieldManager string) (*VolumeApplyConfiguration, error) {
+	return ExtractVolumeFrom(volume, fieldManager, "")
+}
+
+// ExtractVolumeStatus extracts the applied configuration owned by fieldManager from
+// volume for the status subresource.
+func ExtractVolumeStatus(volume *storagev1alpha1.Volume, fieldManager string) (*VolumeApplyConfiguration, error) {
+	return ExtractVolumeFrom(volume, fieldManager, "status")
+}
+
 func (b VolumeApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

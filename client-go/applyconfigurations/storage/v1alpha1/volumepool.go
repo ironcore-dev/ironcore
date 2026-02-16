@@ -16,6 +16,8 @@ import (
 
 // VolumePoolApplyConfiguration represents a declarative configuration of the VolumePool type for use
 // with apply.
+//
+// VolumePool is the Schema for the volumepools API
 type VolumePoolApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func VolumePool(name string) *VolumePoolApplyConfiguration {
 	return b
 }
 
-// ExtractVolumePool extracts the applied configuration owned by fieldManager from
-// volumePool. If no managedFields are found in volumePool for fieldManager, a
-// VolumePoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractVolumePoolFrom extracts the applied configuration owned by fieldManager from
+// volumePool for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // volumePool must be a unmodified VolumePool API object that was retrieved from the Kubernetes API.
-// ExtractVolumePool provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractVolumePoolFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractVolumePool(volumePool *storagev1alpha1.VolumePool, fieldManager string) (*VolumePoolApplyConfiguration, error) {
-	return extractVolumePool(volumePool, fieldManager, "")
-}
-
-// ExtractVolumePoolStatus is the same as ExtractVolumePool except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractVolumePoolStatus(volumePool *storagev1alpha1.VolumePool, fieldManager string) (*VolumePoolApplyConfiguration, error) {
-	return extractVolumePool(volumePool, fieldManager, "status")
-}
-
-func extractVolumePool(volumePool *storagev1alpha1.VolumePool, fieldManager string, subresource string) (*VolumePoolApplyConfiguration, error) {
+func ExtractVolumePoolFrom(volumePool *storagev1alpha1.VolumePool, fieldManager string, subresource string) (*VolumePoolApplyConfiguration, error) {
 	b := &VolumePoolApplyConfiguration{}
 	err := managedfields.ExtractInto(volumePool, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"), fieldManager, b, subresource)
 	if err != nil {
@@ -67,6 +54,27 @@ func extractVolumePool(volumePool *storagev1alpha1.VolumePool, fieldManager stri
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractVolumePool extracts the applied configuration owned by fieldManager from
+// volumePool. If no managedFields are found in volumePool for fieldManager, a
+// VolumePoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// volumePool must be a unmodified VolumePool API object that was retrieved from the Kubernetes API.
+// ExtractVolumePool provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractVolumePool(volumePool *storagev1alpha1.VolumePool, fieldManager string) (*VolumePoolApplyConfiguration, error) {
+	return ExtractVolumePoolFrom(volumePool, fieldManager, "")
+}
+
+// ExtractVolumePoolStatus extracts the applied configuration owned by fieldManager from
+// volumePool for the status subresource.
+func ExtractVolumePoolStatus(volumePool *storagev1alpha1.VolumePool, fieldManager string) (*VolumePoolApplyConfiguration, error) {
+	return ExtractVolumePoolFrom(volumePool, fieldManager, "status")
+}
+
 func (b VolumePoolApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value
