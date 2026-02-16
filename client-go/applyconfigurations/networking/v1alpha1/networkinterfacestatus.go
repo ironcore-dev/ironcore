@@ -13,12 +13,19 @@ import (
 
 // NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
+//
+// NetworkInterfaceStatus defines the observed state of NetworkInterface
 type NetworkInterfaceStatusApplyConfiguration struct {
-	State                   *networkingv1alpha1.NetworkInterfaceState `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                                  `json:"lastStateTransitionTime,omitempty"`
-	IPs                     []commonv1alpha1.IP                       `json:"ips,omitempty"`
-	Prefixes                []commonv1alpha1.IPPrefix                 `json:"prefixes,omitempty"`
-	VirtualIP               *commonv1alpha1.IP                        `json:"virtualIP,omitempty"`
+	// State is the NetworkInterfaceState of the NetworkInterface.
+	State *networkingv1alpha1.NetworkInterfaceState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned from one value to another.
+	LastStateTransitionTime *v1.Time `json:"lastStateTransitionTime,omitempty"`
+	// IPs represent the effective IP addresses of the NetworkInterface.
+	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
+	// Prefixes represent the prefixes routed to the NetworkInterface.
+	Prefixes []commonv1alpha1.IPPrefix `json:"prefixes,omitempty"`
+	// VirtualIP is any virtual ip assigned to the NetworkInterface.
+	VirtualIP *commonv1alpha1.IP `json:"virtualIP,omitempty"`
 }
 
 // NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with

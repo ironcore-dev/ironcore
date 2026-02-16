@@ -11,7 +11,10 @@ import (
 
 // NATGatewayStatusApplyConfiguration represents a declarative configuration of the NATGatewayStatus type for use
 // with apply.
+//
+// NATGatewayStatus defines the observed state of NATGateway
 type NATGatewayStatusApplyConfiguration struct {
+	// IPs are the IPs allocated for the NAT gateway.
 	IPs []commonv1alpha1.IP `json:"ips,omitempty"`
 }
 

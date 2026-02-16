@@ -11,7 +11,10 @@ import (
 
 // VolumeSnapshotSpecApplyConfiguration represents a declarative configuration of the VolumeSnapshotSpec type for use
 // with apply.
+//
+// VolumeSnapshotSpec defines the desired state of VolumeSnapshot
 type VolumeSnapshotSpecApplyConfiguration struct {
+	// VolumeRef indicates which Volume to refer for VolumeSnapshot
 	VolumeRef *v1.LocalObjectReference `json:"volumeRef,omitempty"`
 }
 

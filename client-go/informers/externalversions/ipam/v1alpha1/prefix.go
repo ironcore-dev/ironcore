@@ -44,7 +44,7 @@ func NewPrefixInformer(client versioned.Interface, namespace string, resyncPerio
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredPrefixInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -69,7 +69,7 @@ func NewFilteredPrefixInformer(client versioned.Interface, namespace string, res
 				}
 				return client.IpamV1alpha1().Prefixes(namespace).Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apiipamv1alpha1.Prefix{},
 		resyncPeriod,
 		indexers,

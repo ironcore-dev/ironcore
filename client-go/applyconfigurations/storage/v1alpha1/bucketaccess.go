@@ -11,9 +11,13 @@ import (
 
 // BucketAccessApplyConfiguration represents a declarative configuration of the BucketAccess type for use
 // with apply.
+//
+// BucketAccess represents information on how to access a bucket.
 type BucketAccessApplyConfiguration struct {
+	// SecretRef references the Secret containing the access credentials to consume a Bucket.
 	SecretRef *v1.LocalObjectReference `json:"secretRef,omitempty"`
-	Endpoint  *string                  `json:"endpoint,omitempty"`
+	// Endpoint defines address of the Bucket REST-API.
+	Endpoint *string `json:"endpoint,omitempty"`
 }
 
 // BucketAccessApplyConfiguration constructs a declarative configuration of the BucketAccess type for use with

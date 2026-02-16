@@ -12,9 +12,13 @@ import (
 // NetworkPeeringClaimRefApplyConfiguration represents a declarative configuration of the NetworkPeeringClaimRef type for use
 // with apply.
 type NetworkPeeringClaimRefApplyConfiguration struct {
-	Namespace *string    `json:"namespace,omitempty"`
-	Name      *string    `json:"name,omitempty"`
-	UID       *types.UID `json:"uid,omitempty"`
+	// Namespace is the namespace of the referenced entity. If empty,
+	// the same namespace as the referring resource is implied.
+	Namespace *string `json:"namespace,omitempty"`
+	// Name is the name of the referenced entity.
+	Name *string `json:"name,omitempty"`
+	// UID is the UID of the referenced entity.
+	UID *types.UID `json:"uid,omitempty"`
 }
 
 // NetworkPeeringClaimRefApplyConfiguration constructs a declarative configuration of the NetworkPeeringClaimRef type for use with

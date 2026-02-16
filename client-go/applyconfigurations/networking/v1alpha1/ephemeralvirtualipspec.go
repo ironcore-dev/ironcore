@@ -14,8 +14,10 @@ import (
 // EphemeralVirtualIPSpecApplyConfiguration represents a declarative configuration of the EphemeralVirtualIPSpec type for use
 // with apply.
 type EphemeralVirtualIPSpecApplyConfiguration struct {
+	// VirtualIPSpec defines the desired state of a VirtualIP
 	VirtualIPSpecApplyConfiguration `json:",inline"`
-	ReclaimPolicy                   *networkingv1alpha1.ReclaimPolicyType `json:"reclaimPolicy,omitempty"`
+	// ReclaimPolicy is the ReclaimPolicyType of virtualIP
+	ReclaimPolicy *networkingv1alpha1.ReclaimPolicyType `json:"reclaimPolicy,omitempty"`
 }
 
 // EphemeralVirtualIPSpecApplyConfiguration constructs a declarative configuration of the EphemeralVirtualIPSpec type for use with

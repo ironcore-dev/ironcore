@@ -11,7 +11,13 @@ import (
 
 // EmptyDiskVolumeSourceApplyConfiguration represents a declarative configuration of the EmptyDiskVolumeSource type for use
 // with apply.
+//
+// EmptyDiskVolumeSource is a volume that's offered by the machine pool provider.
+// Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
+// varying performance characteristics. Potentially not recoverable.
 type EmptyDiskVolumeSourceApplyConfiguration struct {
+	// SizeLimit is the total amount of local storage required for this EmptyDisk volume.
+	// The default is nil which means that the limit is undefined.
 	SizeLimit *resource.Quantity `json:"sizeLimit,omitempty"`
 }
 

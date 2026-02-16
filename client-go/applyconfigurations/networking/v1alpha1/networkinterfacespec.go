@@ -12,15 +12,27 @@ import (
 
 // NetworkInterfaceSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceSpec type for use
 // with apply.
+//
+// NetworkInterfaceSpec defines the desired state of NetworkInterface
 type NetworkInterfaceSpecApplyConfiguration struct {
-	ProviderID *string                            `json:"providerID,omitempty"`
-	NetworkRef *v1.LocalObjectReference           `json:"networkRef,omitempty"`
-	MachineRef *commonv1alpha1.LocalUIDReference  `json:"machineRef,omitempty"`
-	IPFamilies []v1.IPFamily                      `json:"ipFamilies,omitempty"`
-	IPs        []IPSourceApplyConfiguration       `json:"ips,omitempty"`
-	Prefixes   []PrefixSourceApplyConfiguration   `json:"prefixes,omitempty"`
-	VirtualIP  *VirtualIPSourceApplyConfiguration `json:"virtualIP,omitempty"`
-	Attributes map[string]string                  `json:"attributes,omitempty"`
+	// ProviderID is the provider-internal ID of the network interface.
+	ProviderID *string `json:"providerID,omitempty"`
+	// NetworkRef is the Network this NetworkInterface is connected to
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// MachineRef is the Machine this NetworkInterface is used by
+	MachineRef *commonv1alpha1.LocalUIDReference `json:"machineRef,omitempty"`
+	// IPFamilies defines which IPFamilies this NetworkInterface is supporting
+	IPFamilies []v1.IPFamily `json:"ipFamilies,omitempty"`
+	// IPs is the list of provided IPs or ephemeral IPs which should be assigned to
+	// this NetworkInterface.
+	IPs []IPSourceApplyConfiguration `json:"ips,omitempty"`
+	// Prefixes is the list of provided prefixes or ephemeral prefixes which should be assigned to
+	// this NetworkInterface.
+	Prefixes []PrefixSourceApplyConfiguration `json:"prefixes,omitempty"`
+	// VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.
+	VirtualIP *VirtualIPSourceApplyConfiguration `json:"virtualIP,omitempty"`
+	// Attributes are provider-specific attributes for the network interface.
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 // NetworkInterfaceSpecApplyConfiguration constructs a declarative configuration of the NetworkInterfaceSpec type for use with
