@@ -11,7 +11,10 @@ import (
 
 // VirtualIPStatusApplyConfiguration represents a declarative configuration of the VirtualIPStatus type for use
 // with apply.
+//
+// VirtualIPStatus defines the observed state of VirtualIP
 type VirtualIPStatusApplyConfiguration struct {
+	// IP is the allocated IP, if any.
 	IP *commonv1alpha1.IP `json:"ip,omitempty"`
 }
 

@@ -16,6 +16,8 @@ import (
 
 // PrefixAllocationApplyConfiguration represents a declarative configuration of the PrefixAllocation type for use
 // with apply.
+//
+// PrefixAllocation is the Schema for the prefixallocations API
 type PrefixAllocationApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func PrefixAllocation(name, namespace string) *PrefixAllocationApplyConfiguratio
 	return b
 }
 
-// ExtractPrefixAllocation extracts the applied configuration owned by fieldManager from
-// prefixAllocation. If no managedFields are found in prefixAllocation for fieldManager, a
-// PrefixAllocationApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractPrefixAllocationFrom extracts the applied configuration owned by fieldManager from
+// prefixAllocation for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // prefixAllocation must be a unmodified PrefixAllocation API object that was retrieved from the Kubernetes API.
-// ExtractPrefixAllocation provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractPrefixAllocationFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractPrefixAllocation(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string) (*PrefixAllocationApplyConfiguration, error) {
-	return extractPrefixAllocation(prefixAllocation, fieldManager, "")
-}
-
-// ExtractPrefixAllocationStatus is the same as ExtractPrefixAllocation except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractPrefixAllocationStatus(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string) (*PrefixAllocationApplyConfiguration, error) {
-	return extractPrefixAllocation(prefixAllocation, fieldManager, "status")
-}
-
-func extractPrefixAllocation(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string, subresource string) (*PrefixAllocationApplyConfiguration, error) {
+func ExtractPrefixAllocationFrom(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string, subresource string) (*PrefixAllocationApplyConfiguration, error) {
 	b := &PrefixAllocationApplyConfiguration{}
 	err := managedfields.ExtractInto(prefixAllocation, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractPrefixAllocation(prefixAllocation *ipamv1alpha1.PrefixAllocation, fi
 	b.WithAPIVersion("ipam.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractPrefixAllocation extracts the applied configuration owned by fieldManager from
+// prefixAllocation. If no managedFields are found in prefixAllocation for fieldManager, a
+// PrefixAllocationApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// prefixAllocation must be a unmodified PrefixAllocation API object that was retrieved from the Kubernetes API.
+// ExtractPrefixAllocation provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractPrefixAllocation(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string) (*PrefixAllocationApplyConfiguration, error) {
+	return ExtractPrefixAllocationFrom(prefixAllocation, fieldManager, "")
+}
+
+// ExtractPrefixAllocationStatus extracts the applied configuration owned by fieldManager from
+// prefixAllocation for the status subresource.
+func ExtractPrefixAllocationStatus(prefixAllocation *ipamv1alpha1.PrefixAllocation, fieldManager string) (*PrefixAllocationApplyConfiguration, error) {
+	return ExtractPrefixAllocationFrom(prefixAllocation, fieldManager, "status")
+}
+
 func (b PrefixAllocationApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

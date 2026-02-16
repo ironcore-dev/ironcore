@@ -12,9 +12,13 @@ import (
 
 // BucketPoolStatusApplyConfiguration represents a declarative configuration of the BucketPoolStatus type for use
 // with apply.
+//
+// BucketPoolStatus defines the observed state of BucketPool
 type BucketPoolStatusApplyConfiguration struct {
-	State                  *storagev1alpha1.BucketPoolState `json:"state,omitempty"`
-	AvailableBucketClasses []v1.LocalObjectReference        `json:"availableBucketClasses,omitempty"`
+	// State represents the infrastructure state of a BucketPool.
+	State *storagev1alpha1.BucketPoolState `json:"state,omitempty"`
+	// AvailableBucketClasses list the references of any supported BucketClass of this pool
+	AvailableBucketClasses []v1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
 }
 
 // BucketPoolStatusApplyConfiguration constructs a declarative configuration of the BucketPoolStatus type for use with

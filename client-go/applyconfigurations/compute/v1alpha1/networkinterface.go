@@ -11,8 +11,12 @@ import (
 
 // NetworkInterfaceApplyConfiguration represents a declarative configuration of the NetworkInterface type for use
 // with apply.
+//
+// NetworkInterface is the definition of a single interface
 type NetworkInterfaceApplyConfiguration struct {
-	Name                                     *string `json:"name,omitempty"`
+	// Name is the name of the network interface.
+	Name *string `json:"name,omitempty"`
+	// NetworkInterfaceSource is where to obtain the interface from.
 	NetworkInterfaceSourceApplyConfiguration `json:",inline"`
 }
 

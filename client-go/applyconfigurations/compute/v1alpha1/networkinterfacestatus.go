@@ -13,12 +13,19 @@ import (
 
 // NetworkInterfaceStatusApplyConfiguration represents a declarative configuration of the NetworkInterfaceStatus type for use
 // with apply.
+//
+// NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.
 type NetworkInterfaceStatusApplyConfiguration struct {
-	Name                    *string                                `json:"name,omitempty"`
-	Handle                  *string                                `json:"handle,omitempty"`
-	State                   *computev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
-	NetworkInterfaceRef     *v1.LocalObjectReference               `json:"networkInterfaceRef,omitempty"`
-	LastStateTransitionTime *metav1.Time                           `json:"lastStateTransitionTime,omitempty"`
+	// Name is the name of the NetworkInterface to whom the status belongs to.
+	Name *string `json:"name,omitempty"`
+	// Handle is the MachinePool internal handle of the NetworkInterface.
+	Handle *string `json:"handle,omitempty"`
+	// State represents the attachment state of a NetworkInterface.
+	State *computev1alpha1.NetworkInterfaceState `json:"state,omitempty"`
+	// networkInterfaceRef is the reference to the networkinterface attached to the machine
+	NetworkInterfaceRef *v1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned.
+	LastStateTransitionTime *metav1.Time `json:"lastStateTransitionTime,omitempty"`
 }
 
 // NetworkInterfaceStatusApplyConfiguration constructs a declarative configuration of the NetworkInterfaceStatus type for use with

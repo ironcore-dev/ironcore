@@ -12,12 +12,20 @@ import (
 
 // BucketStatusApplyConfiguration represents a declarative configuration of the BucketStatus type for use
 // with apply.
+//
+// BucketStatus defines the observed state of Bucket
 type BucketStatusApplyConfiguration struct {
-	BucketID                *string                             `json:"bucketID,omitempty"`
-	State                   *storagev1alpha1.BucketState        `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                            `json:"lastStateTransitionTime,omitempty"`
-	Access                  *BucketAccessApplyConfiguration     `json:"access,omitempty"`
-	Conditions              []BucketConditionApplyConfiguration `json:"conditions,omitempty"`
+	// BucketID is the provider-specific bucket ID in the format 'TYPE://BUCKET_ID'.
+	BucketID *string `json:"bucketID,omitempty"`
+	// State represents the infrastructure state of a Bucket.
+	State *storagev1alpha1.BucketState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *v1.Time `json:"lastStateTransitionTime,omitempty"`
+	// Access specifies how to access a Bucket.
+	// This is set by the bucket provider when the bucket is provisioned.
+	Access *BucketAccessApplyConfiguration `json:"access,omitempty"`
+	// Conditions are the conditions of a bucket.
+	Conditions []BucketConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // BucketStatusApplyConfiguration constructs a declarative configuration of the BucketStatus type for use with

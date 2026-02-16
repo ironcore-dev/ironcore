@@ -13,11 +13,17 @@ import (
 
 // VolumeSnapshotStatusApplyConfiguration represents a declarative configuration of the VolumeSnapshotStatus type for use
 // with apply.
+//
+// VolumeSnapshotStatus defines the observed state of VolumeSnapshot
 type VolumeSnapshotStatusApplyConfiguration struct {
-	SnapshotID              *string                              `json:"snapshotID,omitempty"`
-	State                   *storagev1alpha1.VolumeSnapshotState `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                             `json:"lastStateTransitionTime,omitempty"`
-	Size                    *resource.Quantity                   `json:"size,omitempty"`
+	// SnapshotID is the provider-specific snapshot ID in the format 'TYPE://SNAPSHOT_ID'.
+	SnapshotID *string `json:"snapshotID,omitempty"`
+	// State represents the storage provider state of VolumeSnapshot
+	State *storagev1alpha1.VolumeSnapshotState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *v1.Time `json:"lastStateTransitionTime,omitempty"`
+	// Size is the storage size used by VolumeSnapshot
+	Size *resource.Quantity `json:"size,omitempty"`
 }
 
 // VolumeSnapshotStatusApplyConfiguration constructs a declarative configuration of the VolumeSnapshotStatus type for use with

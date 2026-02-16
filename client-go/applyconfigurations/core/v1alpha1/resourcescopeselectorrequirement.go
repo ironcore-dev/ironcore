@@ -11,10 +11,16 @@ import (
 
 // ResourceScopeSelectorRequirementApplyConfiguration represents a declarative configuration of the ResourceScopeSelectorRequirement type for use
 // with apply.
+//
+// ResourceScopeSelectorRequirement is a requirement for a resource using a ResourceScope alongside
+// a ResourceScopeSelectorOperator with Values (depending on the ResourceScopeSelectorOperator).
 type ResourceScopeSelectorRequirementApplyConfiguration struct {
-	ScopeName *corev1alpha1.ResourceScope                 `json:"scopeName,omitempty"`
-	Operator  *corev1alpha1.ResourceScopeSelectorOperator `json:"operator,omitempty"`
-	Values    []string                                    `json:"values,omitempty"`
+	// ScopeName is the ResourceScope to make a requirement for.
+	ScopeName *corev1alpha1.ResourceScope `json:"scopeName,omitempty"`
+	// Operator is the ResourceScopeSelectorOperator to check the ScopeName with in a resource.
+	Operator *corev1alpha1.ResourceScopeSelectorOperator `json:"operator,omitempty"`
+	// Values are the values to compare the Operator with the ScopeName. May be optional.
+	Values []string `json:"values,omitempty"`
 }
 
 // ResourceScopeSelectorRequirementApplyConfiguration constructs a declarative configuration of the ResourceScopeSelectorRequirement type for use with

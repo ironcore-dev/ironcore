@@ -13,9 +13,14 @@ import (
 
 // VirtualIPSpecApplyConfiguration represents a declarative configuration of the VirtualIPSpec type for use
 // with apply.
+//
+// VirtualIPSpec defines the desired state of a VirtualIP
 type VirtualIPSpecApplyConfiguration struct {
-	Type      *networkingv1alpha1.VirtualIPType `json:"type,omitempty"`
-	IPFamily  *v1.IPFamily                      `json:"ipFamily,omitempty"`
+	// Type is the type of VirtualIP.
+	Type *networkingv1alpha1.VirtualIPType `json:"type,omitempty"`
+	// IPFamily is the ip family of the VirtualIP.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// TargetRef references the target for this VirtualIP (currently only NetworkInterface).
 	TargetRef *commonv1alpha1.LocalUIDReference `json:"targetRef,omitempty"`
 }
 

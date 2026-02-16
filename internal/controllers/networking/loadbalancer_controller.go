@@ -20,6 +20,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -27,7 +28,8 @@ import (
 )
 
 var (
-	loadBalancerFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("loadbalancers").String())
+	// loadBalancerFieldOwner is no longer used with Create/Update pattern
+	_ = client.FieldOwner(networkingv1alpha1.Resource("loadbalancers").String())
 )
 
 type LoadBalancerReconciler struct {
@@ -171,9 +173,28 @@ func (r *LoadBalancerReconciler) applyRouting(
 			UID:  network.UID,
 		},
 	}
-	_ = ctrl.SetControllerReference(loadBalancer, loadBalancerRouting, r.Scheme())
-	if err := r.Patch(ctx, loadBalancerRouting, client.Apply, loadBalancerFieldOwner, client.ForceOwnership); err != nil {
-		return fmt.Errorf("error applying loadbalancer routing: %w", err)
+	//TODO: Just added this to check if simple create/update works with controller reference.
+	//  We should ideally switch to server side apply, like how it was before
+	existingRouting := &networkingv1alpha1.LoadBalancerRouting{}
+	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancerRouting), existingRouting); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return fmt.Errorf("error getting loadbalancer routing: %w", err)
+		}
+		// Create new object
+		if err := controllerutil.SetControllerReference(loadBalancer, loadBalancerRouting, r.Scheme()); err != nil {
+			return fmt.Errorf("error setting controller reference: %w", err)
+		}
+		if err := r.Create(ctx, loadBalancerRouting); err != nil {
+			return fmt.Errorf("error creating loadbalancer routing: %w", err)
+		}
+		return nil
+	}
+
+	// Update existing object
+	existingRouting.Destinations = destinations
+	existingRouting.NetworkRef = loadBalancerRouting.NetworkRef
+	if err := r.Update(ctx, existingRouting); err != nil {
+		return fmt.Errorf("error updating loadbalancer routing: %w", err)
 	}
 	return nil
 }

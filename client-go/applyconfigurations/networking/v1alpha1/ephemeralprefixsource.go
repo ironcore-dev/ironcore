@@ -11,7 +11,11 @@ import (
 
 // EphemeralPrefixSourceApplyConfiguration represents a declarative configuration of the EphemeralPrefixSource type for use
 // with apply.
+//
+// EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+// surrounding object) Prefix.
 type EphemeralPrefixSourceApplyConfiguration struct {
+	// PrefixTemplate is the template for the Prefix.
 	PrefixTemplate *ipamv1alpha1.PrefixTemplateSpecApplyConfiguration `json:"prefixTemplate,omitempty"`
 }
 

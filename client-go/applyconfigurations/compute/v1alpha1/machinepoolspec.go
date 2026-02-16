@@ -11,9 +11,14 @@ import (
 
 // MachinePoolSpecApplyConfiguration represents a declarative configuration of the MachinePoolSpec type for use
 // with apply.
+//
+// MachinePoolSpec defines the desired state of MachinePool
 type MachinePoolSpecApplyConfiguration struct {
-	ProviderID *string                `json:"providerID,omitempty"`
-	Taints     []commonv1alpha1.Taint `json:"taints,omitempty"`
+	// ProviderID identifies the MachinePool on provider side.
+	ProviderID *string `json:"providerID,omitempty"`
+	// Taints of the MachinePool. Only Machines who tolerate all the taints
+	// will land in the MachinePool.
+	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // MachinePoolSpecApplyConfiguration constructs a declarative configuration of the MachinePoolSpec type for use with

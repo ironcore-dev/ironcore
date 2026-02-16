@@ -12,8 +12,11 @@ import (
 // NetworkInterfaceSourceApplyConfiguration represents a declarative configuration of the NetworkInterfaceSource type for use
 // with apply.
 type NetworkInterfaceSourceApplyConfiguration struct {
-	NetworkInterfaceRef *v1.LocalObjectReference                           `json:"networkInterfaceRef,omitempty"`
-	Ephemeral           *EphemeralNetworkInterfaceSourceApplyConfiguration `json:"ephemeral,omitempty"`
+	// NetworkInterfaceRef instructs to use the NetworkInterface at the target reference.
+	NetworkInterfaceRef *v1.LocalObjectReference `json:"networkInterfaceRef,omitempty"`
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// NetworkInterface to use.
+	Ephemeral *EphemeralNetworkInterfaceSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
 // NetworkInterfaceSourceApplyConfiguration constructs a declarative configuration of the NetworkInterfaceSource type for use with

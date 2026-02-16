@@ -17,6 +17,8 @@ import (
 
 // MachineClassApplyConfiguration represents a declarative configuration of the MachineClass type for use
 // with apply.
+//
+// MachineClass is the Schema for the machineclasses API
 type MachineClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func MachineClass(name string) *MachineClassApplyConfiguration {
 	return b
 }
 
-// ExtractMachineClass extracts the applied configuration owned by fieldManager from
-// machineClass. If no managedFields are found in machineClass for fieldManager, a
-// MachineClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractMachineClassFrom extracts the applied configuration owned by fieldManager from
+// machineClass for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // machineClass must be a unmodified MachineClass API object that was retrieved from the Kubernetes API.
-// ExtractMachineClass provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractMachineClassFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
-	return extractMachineClass(machineClass, fieldManager, "")
-}
-
-// ExtractMachineClassStatus is the same as ExtractMachineClass except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractMachineClassStatus(machineClass *computev1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
-	return extractMachineClass(machineClass, fieldManager, "status")
-}
-
-func extractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManager string, subresource string) (*MachineClassApplyConfiguration, error) {
+func ExtractMachineClassFrom(machineClass *computev1alpha1.MachineClass, fieldManager string, subresource string) (*MachineClassApplyConfiguration, error) {
 	b := &MachineClassApplyConfiguration{}
 	err := managedfields.ExtractInto(machineClass, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -67,6 +54,21 @@ func extractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManage
 	b.WithAPIVersion("compute.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractMachineClass extracts the applied configuration owned by fieldManager from
+// machineClass. If no managedFields are found in machineClass for fieldManager, a
+// MachineClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// machineClass must be a unmodified MachineClass API object that was retrieved from the Kubernetes API.
+// ExtractMachineClass provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractMachineClass(machineClass *computev1alpha1.MachineClass, fieldManager string) (*MachineClassApplyConfiguration, error) {
+	return ExtractMachineClassFrom(machineClass, fieldManager, "")
+}
+
 func (b MachineClassApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

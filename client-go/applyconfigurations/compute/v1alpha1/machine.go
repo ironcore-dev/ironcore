@@ -16,6 +16,8 @@ import (
 
 // MachineApplyConfiguration represents a declarative configuration of the Machine type for use
 // with apply.
+//
+// Machine is the Schema for the machines API
 type MachineApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func Machine(name, namespace string) *MachineApplyConfiguration {
 	return b
 }
 
-// ExtractMachine extracts the applied configuration owned by fieldManager from
-// machine. If no managedFields are found in machine for fieldManager, a
-// MachineApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractMachineFrom extracts the applied configuration owned by fieldManager from
+// machine for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // machine must be a unmodified Machine API object that was retrieved from the Kubernetes API.
-// ExtractMachine provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractMachineFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractMachine(machine *computev1alpha1.Machine, fieldManager string) (*MachineApplyConfiguration, error) {
-	return extractMachine(machine, fieldManager, "")
-}
-
-// ExtractMachineStatus is the same as ExtractMachine except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractMachineStatus(machine *computev1alpha1.Machine, fieldManager string) (*MachineApplyConfiguration, error) {
-	return extractMachine(machine, fieldManager, "status")
-}
-
-func extractMachine(machine *computev1alpha1.Machine, fieldManager string, subresource string) (*MachineApplyConfiguration, error) {
+func ExtractMachineFrom(machine *computev1alpha1.Machine, fieldManager string, subresource string) (*MachineApplyConfiguration, error) {
 	b := &MachineApplyConfiguration{}
 	err := managedfields.ExtractInto(machine, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractMachine(machine *computev1alpha1.Machine, fieldManager string, subre
 	b.WithAPIVersion("compute.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractMachine extracts the applied configuration owned by fieldManager from
+// machine. If no managedFields are found in machine for fieldManager, a
+// MachineApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// machine must be a unmodified Machine API object that was retrieved from the Kubernetes API.
+// ExtractMachine provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractMachine(machine *computev1alpha1.Machine, fieldManager string) (*MachineApplyConfiguration, error) {
+	return ExtractMachineFrom(machine, fieldManager, "")
+}
+
+// ExtractMachineStatus extracts the applied configuration owned by fieldManager from
+// machine for the status subresource.
+func ExtractMachineStatus(machine *computev1alpha1.Machine, fieldManager string) (*MachineApplyConfiguration, error) {
+	return ExtractMachineFrom(machine, fieldManager, "status")
+}
+
 func (b MachineApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

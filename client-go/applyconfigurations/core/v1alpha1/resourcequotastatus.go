@@ -11,8 +11,13 @@ import (
 
 // ResourceQuotaStatusApplyConfiguration represents a declarative configuration of the ResourceQuotaStatus type for use
 // with apply.
+//
+// ResourceQuotaStatus is the status of a ResourceQuota.
 type ResourceQuotaStatusApplyConfiguration struct {
+	// Hard are the currently enforced hard resource limits. Hard may be less than used in
+	// case the limits were introduced / updated after more than allowed resources were already present.
 	Hard *corev1alpha1.ResourceList `json:"hard,omitempty"`
+	// Used is the amount of currently used resources.
 	Used *corev1alpha1.ResourceList `json:"used,omitempty"`
 }
 

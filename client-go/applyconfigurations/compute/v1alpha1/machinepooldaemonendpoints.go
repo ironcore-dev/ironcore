@@ -7,7 +7,10 @@ package v1alpha1
 
 // MachinePoolDaemonEndpointsApplyConfiguration represents a declarative configuration of the MachinePoolDaemonEndpoints type for use
 // with apply.
+//
+// MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.
 type MachinePoolDaemonEndpointsApplyConfiguration struct {
+	// Endpoint on which machinepoollet is listening.
 	MachinepoolletEndpoint *DaemonEndpointApplyConfiguration `json:"machinepoolletEndpoint,omitempty"`
 }
 

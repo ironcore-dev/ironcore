@@ -7,7 +7,10 @@ package v1alpha1
 
 // ResourceScopeSelectorApplyConfiguration represents a declarative configuration of the ResourceScopeSelector type for use
 // with apply.
+//
+// ResourceScopeSelector selects
 type ResourceScopeSelectorApplyConfiguration struct {
+	// MatchExpressions is a list of ResourceScopeSelectorRequirement to match resources by.
 	MatchExpressions []ResourceScopeSelectorRequirementApplyConfiguration `json:"matchExpressions,omitempty"`
 }
 

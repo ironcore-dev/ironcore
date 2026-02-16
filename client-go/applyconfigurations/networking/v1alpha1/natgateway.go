@@ -16,6 +16,8 @@ import (
 
 // NATGatewayApplyConfiguration represents a declarative configuration of the NATGateway type for use
 // with apply.
+//
+// NATGateway is the Schema for the NATGateway API
 type NATGatewayApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func NATGateway(name, namespace string) *NATGatewayApplyConfiguration {
 	return b
 }
 
-// ExtractNATGateway extracts the applied configuration owned by fieldManager from
-// nATGateway. If no managedFields are found in nATGateway for fieldManager, a
-// NATGatewayApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNATGatewayFrom extracts the applied configuration owned by fieldManager from
+// nATGateway for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // nATGateway must be a unmodified NATGateway API object that was retrieved from the Kubernetes API.
-// ExtractNATGateway provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNATGatewayFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNATGateway(nATGateway *networkingv1alpha1.NATGateway, fieldManager string) (*NATGatewayApplyConfiguration, error) {
-	return extractNATGateway(nATGateway, fieldManager, "")
-}
-
-// ExtractNATGatewayStatus is the same as ExtractNATGateway except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNATGatewayStatus(nATGateway *networkingv1alpha1.NATGateway, fieldManager string) (*NATGatewayApplyConfiguration, error) {
-	return extractNATGateway(nATGateway, fieldManager, "status")
-}
-
-func extractNATGateway(nATGateway *networkingv1alpha1.NATGateway, fieldManager string, subresource string) (*NATGatewayApplyConfiguration, error) {
+func ExtractNATGatewayFrom(nATGateway *networkingv1alpha1.NATGateway, fieldManager string, subresource string) (*NATGatewayApplyConfiguration, error) {
 	b := &NATGatewayApplyConfiguration{}
 	err := managedfields.ExtractInto(nATGateway, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractNATGateway(nATGateway *networkingv1alpha1.NATGateway, fieldManager s
 	b.WithAPIVersion("networking.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNATGateway extracts the applied configuration owned by fieldManager from
+// nATGateway. If no managedFields are found in nATGateway for fieldManager, a
+// NATGatewayApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// nATGateway must be a unmodified NATGateway API object that was retrieved from the Kubernetes API.
+// ExtractNATGateway provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNATGateway(nATGateway *networkingv1alpha1.NATGateway, fieldManager string) (*NATGatewayApplyConfiguration, error) {
+	return ExtractNATGatewayFrom(nATGateway, fieldManager, "")
+}
+
+// ExtractNATGatewayStatus extracts the applied configuration owned by fieldManager from
+// nATGateway for the status subresource.
+func ExtractNATGatewayStatus(nATGateway *networkingv1alpha1.NATGateway, fieldManager string) (*NATGatewayApplyConfiguration, error) {
+	return ExtractNATGatewayFrom(nATGateway, fieldManager, "status")
+}
+
 func (b NATGatewayApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

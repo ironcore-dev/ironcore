@@ -11,8 +11,12 @@ import (
 
 // PeeringPrefixStatusApplyConfiguration represents a declarative configuration of the PeeringPrefixStatus type for use
 // with apply.
+//
+// PeeringPrefixStatus lists prefixes exposed to peered network
 type PeeringPrefixStatusApplyConfiguration struct {
-	Name   *string                  `json:"name,omitempty"`
+	// Name is the name of the peering prefix
+	Name *string `json:"name,omitempty"`
+	// CIDR exposed to the peered network
 	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
 }
 

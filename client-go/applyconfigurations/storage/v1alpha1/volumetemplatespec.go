@@ -13,6 +13,8 @@ import (
 
 // VolumeTemplateSpecApplyConfiguration represents a declarative configuration of the VolumeTemplateSpec type for use
 // with apply.
+//
+// VolumeTemplateSpec is the specification of a Volume template.
 type VolumeTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumeSpecApplyConfiguration `json:"spec,omitempty"`
