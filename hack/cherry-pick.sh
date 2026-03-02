@@ -44,7 +44,7 @@ fi
 
 # Get the merge commit SHA for the PR
 MERGE_COMMIT=$(gh pr view "${PR_NUMBER}" --json mergeCommit --jq '.mergeCommit.oid')
-if [[ -z "${MERGE_COMMIT}" ]]; then
+if [[ -z "${MERGE_COMMIT}" || "${MERGE_COMMIT}" == "null" ]]; then
     echo "Error: PR #${PR_NUMBER} has no merge commit. Is it merged?"
     exit 1
 fi
@@ -61,10 +61,26 @@ echo ""
 git fetch origin "${RELEASE_BRANCH}"
 
 # Create cherry-pick branch from the release branch
+if git show-ref --verify --quiet "refs/heads/${CHERRY_PICK_BRANCH}"; then
+    echo "Error: local branch '${CHERRY_PICK_BRANCH}' already exists."
+    echo "If it is left over from a previous attempt, delete it with:"
+    echo "  git branch -D ${CHERRY_PICK_BRANCH}"
+    exit 1
+fi
 git switch -c "${CHERRY_PICK_BRANCH}" "origin/${RELEASE_BRANCH}"
 
-# Cherry-pick the merge commit using the first parent
-if ! git cherry-pick -x -m1 "${MERGE_COMMIT}"; then
+# Fetch the merge commit (it may not exist locally yet)
+git fetch origin "${MERGE_COMMIT}"
+
+# Use -m1 only for true merge commits (more than one parent)
+PARENT_COUNT=$(git rev-list --parents -n1 "${MERGE_COMMIT}" | wc -w)
+# rev-list output includes the commit itself, so >2 words means multiple parents
+CHERRY_PICK_ARGS=("-x")
+if [[ "${PARENT_COUNT}" -gt 2 ]]; then
+    CHERRY_PICK_ARGS+=("-m1")
+fi
+
+if ! git cherry-pick "${CHERRY_PICK_ARGS[@]}" "${MERGE_COMMIT}"; then
     echo ""
     echo "Cherry-pick has conflicts. Please resolve them, then run:"
     echo "  git cherry-pick --continue"

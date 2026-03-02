@@ -18,5 +18,5 @@ jobs:
           TAG="${GITHUB_REF#refs/tags/}"
           # Extract major.minor from tag (e.g. v0.1.0 -> release-v0.1)
           BRANCH="release-${TAG%.*}"
-          git switch -c "${BRANCH}"
+          git switch "${BRANCH}" 2>/dev/null || git switch -c "${BRANCH}"
           git push origin "${BRANCH}"
