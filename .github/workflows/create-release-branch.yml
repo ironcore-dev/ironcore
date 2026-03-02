@@ -1,0 +1,22 @@
+name: Create Release Branch
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.0"
+
+jobs:
+  create-release-branch:
+    name: Create release branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Create release branch
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          # Extract major.minor from tag (e.g. v0.1.0 -> release-v0.1)
+          BRANCH="release-${TAG%.*}"
+          git switch -c "${BRANCH}"
+          git push origin "${BRANCH}"
