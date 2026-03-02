@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - main
+      - release-**
   pull_request_target:
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 
 jobs:
   update_release_draft:
+    name: Run release drafter
     permissions:
       # write permission is required to create a github release
       contents: write
@@ -19,8 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Drafts your next Release notes as Pull Requests are merged into "main"
+      # or a release branch
       - uses: release-drafter/release-drafter@v6
         with:
           config-name: release-drafter.yml
+          commitish: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
