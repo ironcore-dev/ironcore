@@ -31,6 +31,7 @@ type IronCoreMachineConfig struct {
 	IgnitionData            []byte
 	NetworkInterfaceConfigs []*IronCoreNetworkInterfaceConfig
 	VolumeConfigs           []*IronCoreVolumeConfig
+	HostName                string
 }
 
 func (s *Server) ironcoreMachinePoolRef() *corev1.LocalObjectReference {
@@ -113,6 +114,7 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		IgnitionData:            machine.Spec.IgnitionData,
 		NetworkInterfaceConfigs: ironcoreNicCfgs,
 		VolumeConfigs:           ironcoreVolumeCfgs,
+		HostName:                machine.Spec.HostName,
 	}, nil
 }
 
@@ -127,6 +129,7 @@ func (s *Server) createIronCoreMachine(
 	var (
 		ignitionRef    *commonv1alpha1.SecretKeySelector
 		ignitionSecret *corev1.Secret
+		guestConfig    *computev1alpha1.MachineGuestConfig
 	)
 	if ignitionData := cfg.IgnitionData; len(ignitionData) > 0 {
 		log.V(1).Info("Creating ironcore ignition secret")
@@ -178,6 +181,12 @@ func (s *Server) createIronCoreMachine(
 		}
 	}
 
+	if cfg.HostName != "" {
+		guestConfig = &computev1alpha1.MachineGuestConfig{
+			Hostname: cfg.HostName,
+		}
+	}
+
 	ironcoreMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   s.cluster.Namespace(),
@@ -196,6 +205,7 @@ func (s *Server) createIronCoreMachine(
 			NetworkInterfaces:   ironcoreMachineNics,
 			Volumes:             ironcoreMachineVolumes,
 			IgnitionRef:         ignitionRef,
+			GuestConfig:         guestConfig,
 		},
 	}
 	log.V(1).Info("Creating ironcore machine")

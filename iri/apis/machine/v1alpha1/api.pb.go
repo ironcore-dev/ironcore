@@ -835,6 +835,7 @@ type MachineSpec struct {
 	IgnitionData      []byte                 `protobuf:"bytes,3,opt,name=ignition_data,json=ignitionData,proto3" json:"ignition_data,omitempty"`
 	Volumes           []*Volume              `protobuf:"bytes,4,rep,name=volumes,proto3" json:"volumes,omitempty"`
 	NetworkInterfaces []*NetworkInterface    `protobuf:"bytes,5,rep,name=network_interfaces,json=networkInterfaces,proto3" json:"network_interfaces,omitempty"`
+	HostName          string                 `protobuf:"bytes,6,opt,name=host_name,json=hostName,proto3" json:"host_name,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -902,6 +903,13 @@ func (x *MachineSpec) GetNetworkInterfaces() []*NetworkInterface {
 		return x.NetworkInterfaces
 	}
 	return nil
+}
+
+func (x *MachineSpec) GetHostName() string {
+	if x != nil {
+		return x.HostName
+	}
+	return ""
 }
 
 type MachineStatus struct {
@@ -2601,13 +2609,14 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xfe\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9b\x02\n" +
 	"\vMachineSpec\x12-\n" +
 	"\x05power\x18\x01 \x01(\x0e2\x17.machine.v1alpha1.PowerR\x05power\x12\x14\n" +
 	"\x05class\x18\x02 \x01(\tR\x05class\x12#\n" +
 	"\rignition_data\x18\x03 \x01(\fR\fignitionData\x122\n" +
 	"\avolumes\x18\x04 \x03(\v2\x18.machine.v1alpha1.VolumeR\avolumes\x12Q\n" +
-	"\x12network_interfaces\x18\x05 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\"\xf3\x02\n" +
+	"\x12network_interfaces\x18\x05 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\x12\x1b\n" +
+	"\thost_name\x18\x06 \x01(\tR\bhostName\"\xf3\x02\n" +
 	"\rMachineStatus\x12/\n" +
 	"\x13observed_generation\x18\x01 \x01(\x03R\x12observedGeneration\x124\n" +
 	"\x05state\x18\x02 \x01(\x0e2\x1e.machine.v1alpha1.MachineStateR\x05state\x12\x1b\n" +
