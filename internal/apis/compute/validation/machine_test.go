@@ -574,5 +574,37 @@ var _ = Describe("Machine", func() {
 			},
 			ContainElement(DuplicateField("spec.volume[1].name")),
 		),
+		Entry("remove hostname if set",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					GuestConfig: &compute.MachineGuestConfig{},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					GuestConfig: &compute.MachineGuestConfig{
+						Hostname: "foo-hostname",
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.guestConfig.hostname")),
+		),
+		Entry("immutable hostname if set",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					GuestConfig: &compute.MachineGuestConfig{
+						Hostname: "bar-hostname",
+					},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					GuestConfig: &compute.MachineGuestConfig{
+						Hostname: "foo-hostname",
+					},
+				},
+			},
+			ContainElement(ImmutableField("spec.guestConfig.hostname")),
+		),
 	)
 })
