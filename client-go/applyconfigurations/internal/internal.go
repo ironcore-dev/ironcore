@@ -191,6 +191,12 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineGuestConfig
+  map:
+    fields:
+    - name: hostname
+      type:
+        scalar: string
 - name: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool
   map:
     fields:
@@ -317,6 +323,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementRelationship: associative
           keys:
           - name
+    - name: guestConfig
+      type:
+        namedType: com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineGuestConfig
     - name: ignitionRef
       type:
         namedType: com.github.ironcore-dev.ironcore.api.common.v1alpha1.SecretKeySelector
