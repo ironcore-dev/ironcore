@@ -42,7 +42,8 @@ type MachineSpecApplyConfiguration struct {
 	EFIVars []EFIVarApplyConfiguration `json:"efiVars,omitempty"`
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
-	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	Tolerations []commonv1alpha1.Toleration           `json:"tolerations,omitempty"`
+	GuestConfig *MachineGuestConfigApplyConfiguration `json:"guestConfig,omitempty"`
 }
 
 // MachineSpecApplyConfiguration constructs a declarative configuration of the MachineSpec type for use with
@@ -159,5 +160,13 @@ func (b *MachineSpecApplyConfiguration) WithTolerations(values ...commonv1alpha1
 	for i := range values {
 		b.Tolerations = append(b.Tolerations, values[i])
 	}
+	return b
+}
+
+// WithGuestConfig sets the GuestConfig field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the GuestConfig field is set to the value of the last call.
+func (b *MachineSpecApplyConfiguration) WithGuestConfig(value *MachineGuestConfigApplyConfiguration) *MachineSpecApplyConfiguration {
+	b.GuestConfig = value
 	return b
 }

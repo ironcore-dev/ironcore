@@ -40,6 +40,7 @@ var _ = Describe("CreateMachine", func() {
 							},
 						},
 					}},
+					HostName: "foo-machine",
 				},
 			},
 		})
@@ -70,5 +71,7 @@ var _ = Describe("CreateMachine", func() {
 		}))
 		Expect(ironcoreMachine.Spec.Power).To(Equal(computev1alpha1.PowerOn))
 		Expect(ironcoreMachine.Spec.MachineClassRef.Name).To(Equal(machineClass.Name))
+
+		Expect(ironcoreMachine.Spec.GuestConfig.Hostname).To(Equal("foo-machine"))
 	})
 })

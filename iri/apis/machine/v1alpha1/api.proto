@@ -98,6 +98,7 @@ message MachineSpec {
   bytes ignition_data = 3;
   repeated Volume volumes = 4;
   repeated NetworkInterface network_interfaces = 5;
+  string host_name = 6;
 }
 
 message MachineStatus {

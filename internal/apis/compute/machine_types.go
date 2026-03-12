@@ -39,6 +39,8 @@ type MachineSpec struct {
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
 	Tolerations []commonv1alpha1.Toleration
+	// GuestConfig contains an optional guest OS level configuration for the machine.
+	GuestConfig *MachineGuestConfig `json:"guestConfig,omitempty"`
 }
 
 // Power is the desired power state of a Machine.
@@ -225,6 +227,12 @@ const (
 	// MachineStateTerminating means the machine that is terminating.
 	MachineStateTerminating MachineState = "Terminating"
 )
+
+// MachineGuestConfig contains guest OS level configuration for the machine.
+type MachineGuestConfig struct {
+	// Hostname is an optional desired hostname of the machine.
+	Hostname string
+}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient
