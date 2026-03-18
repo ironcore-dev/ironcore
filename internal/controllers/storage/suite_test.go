@@ -22,7 +22,7 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/envtest/apiserver"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/lru"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -166,7 +166,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&VolumeScheduler{
 		Client:        k8sManager.GetClient(),
-		EventRecorder: &record.FakeRecorder{},
+		EventRecorder: &events.FakeRecorder{},
 		Cache:         schedulerCache,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
@@ -177,7 +177,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&BucketScheduler{
 		Client:        k8sManager.GetClient(),
-		EventRecorder: &record.FakeRecorder{},
+		EventRecorder: &events.FakeRecorder{},
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {

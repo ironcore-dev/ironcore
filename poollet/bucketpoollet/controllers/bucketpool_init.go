@@ -8,9 +8,11 @@ import (
 	"fmt"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	storagev1alpha1apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
+	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,20 +36,14 @@ func (i *BucketPoolInit) Start(ctx context.Context) error {
 
 	log.V(1).Info("Applying bucket pool")
 	bucketPoolApply := storagev1alpha1apply.BucketPool(i.BucketPoolName).
-		WithKind("BucketPool").
-		WithAPIVersion("storage.ironcore.dev/v1alpha1").
 		WithSpec(storagev1alpha1apply.BucketPoolSpec().
 			WithProviderID(i.ProviderID))
 
 	log.V(1).Info("Initially setting topology labels")
-	// Convert topology labels to string map and set them
-	labels := make(map[string]string)
-	for key, val := range i.TopologyLabels {
-		log.V(1).Info("Setting topology label", "Label", key, "Value", val)
-		labels[string(key)] = val
-	}
-	if len(labels) > 0 {
-		bucketPoolApply.WithLabels(labels)
+	om := &metav1.ObjectMeta{}
+	poolletutils.SetTopologyLabels(log, om, i.TopologyLabels)
+	if len(om.Labels) > 0 {
+		bucketPoolApply.WithLabels(om.Labels)
 	}
 
 	if err := i.Apply(ctx, bucketPoolApply, client.ForceOwnership, client.FieldOwner(bucketpoolletv1alpha1.FieldOwner)); err != nil {

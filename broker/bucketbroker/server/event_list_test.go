@@ -55,30 +55,29 @@ var _ = Describe("ListEvents", func() {
 
 		By("generating the bucket events")
 		eventGeneratedTime := time.Now()
-		eventRecorder := k8sManager.GetEventRecorderFor("test-recorder")
-		eventRecorder.Event(ironcoreBucket, corev1.EventTypeNormal, "testing", "this is test bucket event")
+		eventRecorder := k8sManager.GetEventRecorder("test-recorder")
+		eventRecorder.Eventf(ironcoreBucket, nil, corev1.EventTypeNormal, "testing", "Synced", "this is test bucket event")
 
 		By("listing the bucket events with no filters")
 		Eventually(func(g Gomega) []*v1alpha1.Event {
 			resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{})
 			g.Expect(err).NotTo(HaveOccurred())
 			return resp.Events
-		}).Should((ConsistOf(
+		}).Should(ConsistOf(
 			HaveField("Spec", SatisfyAll(
 				HaveField("InvolvedObjectMeta.Id", Equal(ironcoreBucket.Name)),
 				HaveField("Reason", Equal("testing")),
 				HaveField("Message", Equal("this is test bucket event")),
+				HaveField("Action", Equal("Synced")),
 				HaveField("Type", Equal(corev1.EventTypeNormal)),
 			)),
-		)))
+		))
 
 		By("listing the bucket events with matching label and time filters")
 		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{Filter: &iri.EventFilter{
 			LabelSelector:  map[string]string{bucketpoolletv1alpha1.BucketUIDLabel: "foobar"},
 			EventsFromTime: eventGeneratedTime.Unix(),
-			EventsToTime:   time.Now().Unix(),
 		}})
-
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(resp.Events).To(ConsistOf(
@@ -86,6 +85,7 @@ var _ = Describe("ListEvents", func() {
 				HaveField("InvolvedObjectMeta.Id", Equal(ironcoreBucket.Name)),
 				HaveField("Reason", Equal("testing")),
 				HaveField("Message", Equal("this is test bucket event")),
+				HaveField("Action", Equal("Synced")),
 				HaveField("Type", Equal(corev1.EventTypeNormal)),
 			)),
 		),

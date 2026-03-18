@@ -16,7 +16,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -34,7 +34,7 @@ const (
 )
 
 type MachineScheduler struct {
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	Cache    *scheduler.Cache
@@ -103,7 +103,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule machine on")
+		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule %s on", machine.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -126,7 +126,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 	}
 
 	if len(filteredNodes) == 0 {
-		s.Event(machine, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule machine on")
+		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule %s on", machine.Name)
 		return ctrl.Result{}, nil
 	}
 

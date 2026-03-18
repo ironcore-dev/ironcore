@@ -395,7 +395,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
 	}
 
-	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorderFor("machine-cluster-events"), mem.MachineEventMapperOptions{})
+	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorder("machine-cluster-events"), mem.MachineEventMapperOptions{})
 	if err := mgr.Add(machineEventMapper); err != nil {
 		return fmt.Errorf("error adding machine event mapper: %w", err)
 	}
@@ -442,7 +442,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:                 mgr.GetEventRecorderFor("machines"),
+			EventRecorder:                 mgr.GetEventRecorder("machines"),
 			Client:                        mgr.GetClient(),
 			MachineRuntime:                machineRuntime,
 			MachineRuntimeName:            version.RuntimeName,

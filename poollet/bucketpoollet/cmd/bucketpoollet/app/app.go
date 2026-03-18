@@ -298,7 +298,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
 	}
 
-	bucketEventMapper := bem.NewBucketEventMapper(mgr.GetClient(), bucketRuntime, mgr.GetEventRecorderFor("bucket-cluster-events"), bem.BucketEventMapperOptions{})
+	bucketEventMapper := bem.NewBucketEventMapper(mgr.GetClient(), bucketRuntime, mgr.GetEventRecorder("bucket-cluster-events"), bem.BucketEventMapperOptions{})
 	if err := mgr.Add(bucketEventMapper); err != nil {
 		return fmt.Errorf("error adding bucket event mapper: %w", err)
 	}
@@ -330,7 +330,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.BucketReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("buckets"),
+			EventRecorder:           mgr.GetEventRecorder("buckets"),
 			Client:                  mgr.GetClient(),
 			Scheme:                  scheme,
 			BucketRuntime:           bucketRuntime,

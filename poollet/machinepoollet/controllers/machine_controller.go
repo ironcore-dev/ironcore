@@ -25,7 +25,7 @@ import (
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	machinepoolletclient "github.com/ironcore-dev/ironcore/poollet/machinepoollet/client"
-	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
+	machinepoolletEvents "github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 	utilclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
@@ -35,7 +35,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -47,7 +47,7 @@ import (
 )
 
 type MachineReconciler struct {
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	MachineRuntime        irimachine.RuntimeService
@@ -337,7 +337,7 @@ func (r *MachineReconciler) create(
 	}
 
 	if machine.Spec.Image != "" { //nolint:staticcheck
-		r.Eventf(machine, corev1.EventTypeWarning, "ImageRefDeprecated", "Image reference in spec.image is deprecated")
+		r.Eventf(machine, nil, corev1.EventTypeWarning, "ImageRefDeprecated", "Image reference in %s is deprecated", machine.Spec.Image) //nolint:staticcheck
 	}
 
 	log.V(1).Info("Creating machine")
@@ -745,7 +745,7 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 			return "", false, fmt.Errorf("error getting machine class: %w", err)
 		}
 
-		r.Eventf(machine, corev1.EventTypeNormal, events.MachineClassNotReady, "Machine class %s is not ready: %v", machineClassName, err)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.MachineClassNotReady, "Machine class %s is not ready: %v", machineClassName, err)
 		return "", false, nil
 	}
 
@@ -779,7 +779,7 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 			return nil, false, err
 		}
 
-		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition not ready: %v", err)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, "Ignition not ready: %v", ignitionSecret.GetName(), err)
 		return nil, false, nil
 	}
 
@@ -790,7 +790,7 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 
 	data, ok := ignitionSecret.Data[ignitionKey]
 	if !ok {
-		r.Eventf(machine, corev1.EventTypeNormal, events.IgnitionNotReady, "Ignition has no data at key %s", ignitionKey)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, "Ignition has no data at key %s", ignitionKey)
 		return nil, false, nil
 	}
 
