@@ -136,17 +136,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClassList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClassList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClassList"
 								}
 							}
 						}
@@ -198,7 +198,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 							}
 						}
 					},
@@ -210,12 +210,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -225,12 +225,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -240,12 +240,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -441,12 +441,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -498,7 +498,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 							}
 						}
 					},
@@ -510,12 +510,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -525,12 +525,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -719,12 +719,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -734,12 +734,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							}
 						}
@@ -879,17 +879,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolList"
 								}
 							}
 						}
@@ -941,7 +941,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 							}
 						}
 					},
@@ -953,12 +953,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -968,12 +968,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -983,12 +983,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1184,12 +1184,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1241,7 +1241,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 							}
 						}
 					},
@@ -1253,12 +1253,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1268,12 +1268,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1462,12 +1462,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1477,12 +1477,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1530,12 +1530,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1587,7 +1587,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 							}
 						}
 					},
@@ -1599,12 +1599,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1614,12 +1614,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1707,12 +1707,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1722,12 +1722,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							}
 						}
@@ -1775,17 +1775,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							}
 						}
@@ -2005,17 +2005,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineList"
 								}
 							}
 						}
@@ -2067,7 +2067,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 							}
 						}
 					},
@@ -2079,12 +2079,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2094,12 +2094,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2109,12 +2109,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2320,12 +2320,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2377,7 +2377,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 							}
 						}
 					},
@@ -2389,12 +2389,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2404,12 +2404,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2598,12 +2598,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2613,12 +2613,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2758,12 +2758,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2815,7 +2815,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 							}
 						}
 					},
@@ -2827,12 +2827,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2842,12 +2842,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2935,12 +2935,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -2950,12 +2950,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							}
 						}
@@ -4019,17 +4019,17 @@
 	},
 	"components": {
 		"schemas": {
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP": {
 				"description": "IP is an IP address.",
 				"type": "string",
 				"format": "ip"
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix": {
 				"description": "IPPrefix represents a network prefix.",
 				"type": "string",
 				"format": "ip-prefix"
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference": {
 				"description": "LocalUIDReference is a reference to another entity including its UID",
 				"type": "object",
 				"required": [
@@ -4050,7 +4050,7 @@
 				},
 				"x-kubernetes-map-type": "atomic"
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.SecretKeySelector": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector": {
 				"description": "SecretKeySelector is a reference to a specific 'key' within a Secret resource. In some instances, `key` is a required field.",
 				"type": "object",
 				"properties": {
@@ -4065,7 +4065,7 @@
 				},
 				"x-kubernetes-map-type": "atomic"
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Taint": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint": {
 				"description": "The resource pool this Taint is attached to has the \"effect\" on any resource that does not tolerate the Taint.",
 				"type": "object",
 				"required": [
@@ -4089,7 +4089,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration": {
 				"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				"type": "object",
 				"properties": {
@@ -4111,7 +4111,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.DaemonEndpoint": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.DaemonEndpoint": {
 				"description": "DaemonEndpoint contains information about a single Daemon endpoint.",
 				"type": "object",
 				"required": [
@@ -4126,7 +4126,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EFIVar": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar": {
 				"description": "EFIVar is a variable to pass to EFI while booting up.",
 				"type": "object",
 				"required": [
@@ -4152,7 +4152,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource": {
 				"description": "EmptyDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
 				"type": "object",
 				"properties": {
@@ -4166,7 +4166,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralNetworkInterfaceSource": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource": {
 				"description": "EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object) networking.NetworkInterface.",
 				"type": "object",
 				"properties": {
@@ -4174,13 +4174,13 @@
 						"description": "NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceTemplateSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralVolumeSource": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource": {
 				"description": "EphemeralVolumeSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object) storage.Volume.",
 				"type": "object",
 				"properties": {
@@ -4188,13 +4188,13 @@
 						"description": "VolumeTemplate is the template definition of the storage.Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource": {
 				"description": "LocalDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
 				"type": "object",
 				"properties": {
@@ -4212,7 +4212,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine": {
 				"description": "Machine is the Schema for the machines API",
 				"type": "object",
 				"properties": {
@@ -4236,7 +4236,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineSpec"
 							}
 						]
 					},
@@ -4244,20 +4244,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "Machine",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass": {
 				"description": "MachineClass is the Schema for the machineclasses API",
 				"type": "object",
 				"properties": {
@@ -4283,16 +4276,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "MachineClass",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClassList": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClassList": {
 				"description": "MachineClassList contains a list of MachineClass",
 				"type": "object",
 				"required": [
@@ -4309,7 +4295,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineClass"
 								}
 							]
 						}
@@ -4326,16 +4312,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "MachineClassList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition": {
 				"description": "MachineCondition is one of the conditions of a machine.",
 				"type": "object",
 				"required": [
@@ -4375,7 +4354,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineList": {
 				"description": "MachineList contains a list of Machine",
 				"type": "object",
 				"required": [
@@ -4392,7 +4371,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Machine"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Machine"
 								}
 							]
 						}
@@ -4409,16 +4388,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "MachineList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool": {
 				"description": "MachinePool is the Schema for the machinepools API",
 				"type": "object",
 				"properties": {
@@ -4442,7 +4414,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolSpec"
 							}
 						]
 					},
@@ -4450,20 +4422,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "MachinePool",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolAddress": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolAddress": {
 				"type": "object",
 				"required": [
 					"type",
@@ -4480,7 +4445,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolCondition": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolCondition": {
 				"description": "MachinePoolCondition is one of the conditions of a MachinePool.",
 				"type": "object",
 				"required": [
@@ -4525,7 +4490,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolDaemonEndpoints": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolDaemonEndpoints": {
 				"description": "MachinePoolDaemonEndpoints lists ports opened by daemons running on the MachinePool.",
 				"type": "object",
 				"properties": {
@@ -4534,13 +4499,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.DaemonEndpoint"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.DaemonEndpoint"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolList": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolList": {
 				"description": "MachinePoolList contains a list of MachinePool",
 				"type": "object",
 				"required": [
@@ -4557,7 +4522,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePool"
 								}
 							]
 						}
@@ -4574,16 +4539,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "compute.ironcore.dev",
-						"kind": "MachinePoolList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolSpec": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolSpec": {
 				"description": "MachinePoolSpec defines the desired state of MachinePool",
 				"type": "object",
 				"required": [
@@ -4602,14 +4560,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Taint"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Taint"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolStatus": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolStatus": {
 				"description": "MachinePoolStatus defines the observed state of MachinePool",
 				"type": "object",
 				"properties": {
@@ -4619,7 +4577,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolAddress"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolAddress"
 								}
 							]
 						}
@@ -4655,7 +4613,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolCondition"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolCondition"
 								}
 							]
 						}
@@ -4664,7 +4622,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePoolDaemonEndpoints"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachinePoolDaemonEndpoints"
 							}
 						]
 					},
@@ -4680,7 +4638,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineSpec": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineSpec": {
 				"description": "MachineSpec defines the desired state of Machine",
 				"type": "object",
 				"required": [
@@ -4694,7 +4652,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EFIVar"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.EFIVar"
 								}
 							]
 						},
@@ -4705,7 +4663,7 @@
 						"description": "IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.SecretKeySelector"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.SecretKeySelector"
 							}
 						]
 					},
@@ -4753,7 +4711,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.NetworkInterface"
 								}
 							]
 						},
@@ -4771,7 +4729,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Toleration"
 								}
 							]
 						}
@@ -4783,7 +4741,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.Volume"
 								}
 							]
 						},
@@ -4792,7 +4750,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineStatus": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineStatus": {
 				"description": "MachineStatus defines the observed state of Machine",
 				"type": "object",
 				"properties": {
@@ -4803,7 +4761,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineCondition"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.MachineCondition"
 								}
 							]
 						}
@@ -4819,7 +4777,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.NetworkInterfaceStatus"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.NetworkInterfaceStatus"
 								}
 							]
 						}
@@ -4847,14 +4805,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.VolumeStatus"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.VolumeStatus"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.NetworkInterface": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface": {
 				"description": "NetworkInterface is the definition of a single interface",
 				"type": "object",
 				"required": [
@@ -4865,7 +4823,7 @@
 						"description": "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) NetworkInterface to use.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralNetworkInterfaceSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.EphemeralNetworkInterfaceSource"
 							}
 						]
 					},
@@ -4884,7 +4842,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.NetworkInterfaceStatus": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus": {
 				"description": "NetworkInterfaceStatus reports the status of a NetworkInterfaceSource.",
 				"type": "object",
 				"required": [
@@ -4923,7 +4881,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.Volume": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume": {
 				"description": "Volume defines a volume attachment of a machine",
 				"type": "object",
 				"required": [
@@ -4938,7 +4896,7 @@
 						"description": "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.EmptyDiskVolumeSource"
 							}
 						]
 					},
@@ -4946,7 +4904,7 @@
 						"description": "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralVolumeSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.EphemeralVolumeSource"
 							}
 						]
 					},
@@ -4954,7 +4912,7 @@
 						"description": "LocalDisk instructs to use a Volume offered by the machine pool provider.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.LocalDiskVolumeSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1compute~1v1alpha1.LocalDiskVolumeSource"
 							}
 						]
 					},
@@ -4973,7 +4931,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.VolumeStatus": {
+			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus": {
 				"description": "VolumeStatus is the status of a Volume.",
 				"type": "object",
 				"required": [
@@ -5012,7 +4970,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec": {
+			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec": {
 				"description": "PrefixSpec defines the desired state of Prefix",
 				"type": "object",
 				"properties": {
@@ -5045,7 +5003,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -5056,7 +5014,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixTemplateSpec": {
+			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec": {
 				"type": "object",
 				"properties": {
 					"metadata": {
@@ -5071,13 +5029,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource": {
 				"description": "EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Prefix.",
 				"type": "object",
 				"properties": {
@@ -5085,13 +5043,13 @@
 						"description": "PrefixTemplate is the template for the Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixTemplateSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSource": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource": {
 				"description": "EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
 				"type": "object",
 				"properties": {
@@ -5099,13 +5057,13 @@
 						"description": "VirtualIPTemplate is the template for the VirtualIP.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec": {
 				"type": "object",
 				"required": [
 					"type",
@@ -5130,7 +5088,7 @@
 						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -5141,7 +5099,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource": {
 				"description": "IPSource is the definition of how to obtain an IP.",
 				"type": "object",
 				"properties": {
@@ -5149,7 +5107,7 @@
 						"description": "Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralPrefixSource"
 							}
 						]
 					},
@@ -5157,13 +5115,13 @@
 						"description": "Value specifies an IP by using an IP literal.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceSpec": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec": {
 				"description": "NetworkInterfaceSpec defines the desired state of NetworkInterface",
 				"type": "object",
 				"required": [
@@ -5200,7 +5158,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.IPSource"
 								}
 							]
 						}
@@ -5209,7 +5167,7 @@
 						"description": "MachineRef is the Machine this NetworkInterface is used by",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -5229,7 +5187,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PrefixSource"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.PrefixSource"
 								}
 							]
 						}
@@ -5242,13 +5200,13 @@
 						"description": "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPSource"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceTemplateSpec": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceTemplateSpec": {
 				"description": "NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.",
 				"type": "object",
 				"properties": {
@@ -5264,20 +5222,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PrefixSource": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource": {
 				"type": "object",
 				"properties": {
 					"ephemeral": {
 						"description": "Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralPrefixSource"
 							}
 						]
 					},
@@ -5285,13 +5243,13 @@
 						"description": "Value specifies a static prefix to use.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSource": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSource": {
 				"description": "VirtualIPSource is the definition of how to obtain a VirtualIP.",
 				"type": "object",
 				"properties": {
@@ -5299,7 +5257,7 @@
 						"description": "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSource"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralVirtualIPSource"
 							}
 						]
 					},
@@ -5313,7 +5271,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec": {
+			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPTemplateSpec": {
 				"description": "VirtualIPTemplateSpec is the specification of a VirtualIP template.",
 				"type": "object",
 				"properties": {
@@ -5329,13 +5287,48 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralVirtualIPSpec"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource": {
+				"type": "object",
+				"properties": {
+					"architecture": {
+						"description": "Architecture defines the architecture of the OS which should be used",
+						"type": "string"
+					},
+					"image": {
+						"description": "Image is an optional image to bootstrap the volume with.",
+						"type": "string"
+					}
+				}
+			},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource": {
+				"description": "VolumeDataSource specifies the source to use for a Volume.",
+				"type": "object",
+				"properties": {
+					"osImage": {
+						"description": "OSImage defines an optional os image to bootstrap the volume.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.OSDataSource"
+							}
+						]
+					},
+					"volumeSnapshotRef": {
+						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					}
+				}
+			},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption": {
 				"description": "VolumeEncryption represents information to encrypt a volume.",
 				"type": "object",
 				"required": [
@@ -5353,7 +5346,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec": {
 				"description": "VolumeSpec defines the desired state of Volume",
 				"type": "object",
 				"properties": {
@@ -5361,7 +5354,16 @@
 						"description": "ClaimRef is the reference to the claiming entity of the Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"dataSource": {
+						"description": "DataSource contains the content to prepopulate the Volume with.",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeDataSource"
 							}
 						]
 					},
@@ -5369,7 +5371,7 @@
 						"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeEncryption"
 							}
 						]
 					},
@@ -5385,10 +5387,6 @@
 							}
 						]
 					},
-					"osImage": {
-						"description": "OSImage is an optional os image to bootstrap the volume.",
-						"type": "string"
-					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
 						"type": "object",
@@ -5403,7 +5401,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Toleration"
 								}
 							]
 						}
@@ -5435,18 +5433,10 @@
 							"type": "string",
 							"default": ""
 						}
-					},
-					"volumeSnapshotRef": {
-						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeTemplateSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec": {
 				"description": "VolumeTemplateSpec is the specification of a Volume template.",
 				"type": "object",
 				"properties": {
@@ -5462,7 +5452,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSpec"
 							}
 						]
 					}
@@ -6007,8 +5997,7 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						],
-						"x-kubernetes-list-type": "atomic"
+						]
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",

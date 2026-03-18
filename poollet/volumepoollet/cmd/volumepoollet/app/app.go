@@ -332,7 +332,7 @@ func Run(ctx context.Context, opts Options) error {
 		if err := mgr.Add(volumeClassMapper); err != nil {
 			return fmt.Errorf("error adding volume class mapper: %w", err)
 		}
-		volumeEventMapper = vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorderFor("volume-cluster-events"), vem.VolumeEventMapperOptions{})
+		volumeEventMapper = vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorder("volume-cluster-events"), vem.VolumeEventMapperOptions{})
 		if err := mgr.Add(volumeEventMapper); err != nil {
 			return fmt.Errorf("error adding volume event mapper: %w", err)
 		}
@@ -395,7 +395,7 @@ func Run(ctx context.Context, opts Options) error {
 			}
 
 			if err := (&controllers.VolumeReconciler{
-				EventRecorder:           mgr.GetEventRecorderFor("volumes"),
+				EventRecorder:           mgr.GetEventRecorder("volumes"),
 				Client:                  mgr.GetClient(),
 				Scheme:                  scheme,
 				VolumeRuntime:           volumeRuntime,
@@ -444,7 +444,7 @@ func Run(ctx context.Context, opts Options) error {
 				return fmt.Errorf("error setting up volume snapshot annotator reconciler with manager: %w", err)
 			}
 			if err := (&controllers.VolumeSnapshotReconciler{
-				EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
+				EventRecorder:           mgr.GetEventRecorder("volume-snapshots"),
 				Client:                  mgr.GetClient(),
 				Scheme:                  scheme,
 				VolumeRuntime:           volumeRuntime,

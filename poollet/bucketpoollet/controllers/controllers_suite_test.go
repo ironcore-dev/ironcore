@@ -32,7 +32,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -215,7 +215,7 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *storagev1alph
 		DeferCleanup(cancel)
 
 		Expect((&controllers.BucketReconciler{
-			EventRecorder:     &record.FakeRecorder{},
+			EventRecorder:     &events.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			Scheme:            scheme.Scheme,
 			BucketRuntime:     srv,

@@ -23,7 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -67,13 +67,13 @@ var _ = Describe("MachineEventMapper", func() {
 		})
 		Expect(k8sManager.Add(machineClassMapper)).To(Succeed())
 
-		machineEventMapper := mem.NewMachineEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), mem.MachineEventMapperOptions{
+		machineEventMapper := mem.NewMachineEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorder("test"), mem.MachineEventMapperOptions{
 			RelistPeriod: 2 * time.Second,
 		})
 		Expect(k8sManager.Add(machineEventMapper)).To(Succeed())
 
 		Expect((&controllers.MachineReconciler{
-			EventRecorder:         &record.FakeRecorder{},
+			EventRecorder:         &events.FakeRecorder{},
 			Client:                k8sManager.GetClient(),
 			MachineRuntime:        srv,
 			MachineRuntimeName:    fakemachine.FakeRuntimeName,
@@ -130,6 +130,7 @@ var _ = Describe("MachineEventMapper", func() {
 					Reason:    "testing",
 					Message:   "this is test event",
 					Type:      "Normal",
+					Action:    "Synced",
 					EventTime: time.Now().Unix(),
 				}},
 		},
@@ -149,6 +150,7 @@ var _ = Describe("MachineEventMapper", func() {
 		}).Should(ContainElement(SatisfyAll(
 			HaveField("Reason", Equal("testing")),
 			HaveField("Message", Equal("this is test event")),
+			HaveField("Action", Equal("Synced")),
 			HaveField("Type", Equal(corev1.EventTypeNormal)),
 		)))
 	})

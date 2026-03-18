@@ -35,7 +35,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -230,7 +230,7 @@ func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alp
 		DeferCleanup(cancel)
 
 		Expect((&controllers.MachineReconciler{
-			EventRecorder:         &record.FakeRecorder{},
+			EventRecorder:         &events.FakeRecorder{},
 			Client:                k8sManager.GetClient(),
 			MachineRuntime:        srv,
 			MachineRuntimeName:    machine.FakeRuntimeName,

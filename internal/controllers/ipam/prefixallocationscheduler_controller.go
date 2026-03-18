@@ -16,7 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -24,7 +24,7 @@ import (
 )
 
 type PrefixAllocationScheduler struct {
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
 }
@@ -148,7 +148,7 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 	}
 	if ref == "" {
 		log.V(1).Info("No suitable prefix found")
-		s.Event(allocation, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling allocation found.")
+		s.Eventf(allocation, nil, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling %s found.", allocation.Name)
 		return ctrl.Result{}, nil
 	}
 

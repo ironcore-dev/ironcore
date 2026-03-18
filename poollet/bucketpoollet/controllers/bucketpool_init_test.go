@@ -17,7 +17,7 @@ import (
 )
 
 var _ = Describe("BucketPoolInit", func() {
-	FIt("should set topology labels", func(ctx SpecContext) {
+	It("should set topology labels", func(ctx SpecContext) {
 		initializedCalled := false
 
 		bpi := &controllers.BucketPoolInit{

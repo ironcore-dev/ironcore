@@ -62,7 +62,9 @@ rules:
   resources:
   - machinepools
   verbs:
+  - apply
   - create
+  - delete
   - get
   - list
   - patch
