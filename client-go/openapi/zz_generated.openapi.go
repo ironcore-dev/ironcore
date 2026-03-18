@@ -10,6 +10,10 @@ package openapi
 
 import (
 	v1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
+	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,432 +25,432 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.ConfigMapKeySelector":             schema_ironcore_api_common_v1alpha1_ConfigMapKeySelector(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP":                               schema_ironcore_api_common_v1alpha1_IP(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix":                         schema_ironcore_api_common_v1alpha1_IPPrefix(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPRange":                          schema_ironcore_api_common_v1alpha1_IPRange(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference":                schema_ironcore_api_common_v1alpha1_LocalUIDReference(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector":                schema_ironcore_api_common_v1alpha1_SecretKeySelector(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint":                            schema_ironcore_api_common_v1alpha1_Taint(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration":                       schema_ironcore_api_common_v1alpha1_Toleration(ref),
-		"github.com/ironcore-dev/ironcore/api/common/v1alpha1.UIDReference":                     schema_ironcore_api_common_v1alpha1_UIDReference(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.DaemonEndpoint":                  schema_ironcore_api_compute_v1alpha1_DaemonEndpoint(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar":                          schema_ironcore_api_compute_v1alpha1_EFIVar(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource":           schema_ironcore_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource": schema_ironcore_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource":           schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource":           schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine":                         schema_ironcore_api_compute_v1alpha1_Machine(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass":                    schema_ironcore_api_compute_v1alpha1_MachineClass(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClassList":                schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition":                schema_ironcore_api_compute_v1alpha1_MachineCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineExecOptions":              schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineList":                     schema_ironcore_api_compute_v1alpha1_MachineList(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool":                     schema_ironcore_api_compute_v1alpha1_MachinePool(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolAddress":              schema_ironcore_api_compute_v1alpha1_MachinePoolAddress(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolCondition":            schema_ironcore_api_compute_v1alpha1_MachinePoolCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolDaemonEndpoints":      schema_ironcore_api_compute_v1alpha1_MachinePoolDaemonEndpoints(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolList":                 schema_ironcore_api_compute_v1alpha1_MachinePoolList(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolSpec":                 schema_ironcore_api_compute_v1alpha1_MachinePoolSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolStatus":               schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineSpec":                     schema_ironcore_api_compute_v1alpha1_MachineSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineStatus":                   schema_ironcore_api_compute_v1alpha1_MachineStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface":                schema_ironcore_api_compute_v1alpha1_NetworkInterface(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceSource":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus":          schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume":                          schema_ironcore_api_compute_v1alpha1_Volume(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeSource":                    schema_ironcore_api_compute_v1alpha1_VolumeSource(ref),
-		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus":                    schema_ironcore_api_compute_v1alpha1_VolumeStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector":                     schema_ironcore_api_core_v1alpha1_ObjectSelector(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuota":                      schema_ironcore_api_core_v1alpha1_ResourceQuota(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaList":                  schema_ironcore_api_core_v1alpha1_ResourceQuotaList(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaSpec":                  schema_ironcore_api_core_v1alpha1_ResourceQuotaSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaStatus":                schema_ironcore_api_core_v1alpha1_ResourceQuotaStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelector":              schema_ironcore_api_core_v1alpha1_ResourceScopeSelector(ref),
-		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelectorRequirement":   schema_ironcore_api_core_v1alpha1_ResourceScopeSelectorRequirement(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.Prefix":                             schema_ironcore_api_ipam_v1alpha1_Prefix(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocation":                   schema_ironcore_api_ipam_v1alpha1_PrefixAllocation(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationList":               schema_ironcore_api_ipam_v1alpha1_PrefixAllocationList(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationSpec":               schema_ironcore_api_ipam_v1alpha1_PrefixAllocationSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationStatus":             schema_ironcore_api_ipam_v1alpha1_PrefixAllocationStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixList":                         schema_ironcore_api_ipam_v1alpha1_PrefixList(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec":                         schema_ironcore_api_ipam_v1alpha1_PrefixSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixStatus":                       schema_ironcore_api_ipam_v1alpha1_PrefixStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec":                 schema_ironcore_api_ipam_v1alpha1_PrefixTemplateSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource":        schema_ironcore_api_networking_v1alpha1_EphemeralPrefixSource(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource":     schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSource(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec":       schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPBlock":                      schema_ironcore_api_networking_v1alpha1_IPBlock(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource":                     schema_ironcore_api_networking_v1alpha1_IPSource(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancer":                 schema_ironcore_api_networking_v1alpha1_LoadBalancer(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerDestination":      schema_ironcore_api_networking_v1alpha1_LoadBalancerDestination(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerList":             schema_ironcore_api_networking_v1alpha1_LoadBalancerList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerPort":             schema_ironcore_api_networking_v1alpha1_LoadBalancerPort(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRouting":          schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRoutingList":      schema_ironcore_api_networking_v1alpha1_LoadBalancerRoutingList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerSpec":             schema_ironcore_api_networking_v1alpha1_LoadBalancerSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerStatus":           schema_ironcore_api_networking_v1alpha1_LoadBalancerStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerTargetRef":        schema_ironcore_api_networking_v1alpha1_LoadBalancerTargetRef(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGateway":                   schema_ironcore_api_networking_v1alpha1_NATGateway(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayList":               schema_ironcore_api_networking_v1alpha1_NATGatewayList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewaySpec":               schema_ironcore_api_networking_v1alpha1_NATGatewaySpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayStatus":             schema_ironcore_api_networking_v1alpha1_NATGatewayStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.Network":                      schema_ironcore_api_networking_v1alpha1_Network(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterface":             schema_ironcore_api_networking_v1alpha1_NetworkInterface(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceList":         schema_ironcore_api_networking_v1alpha1_NetworkInterfaceList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec":         schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceStatus":       schema_ironcore_api_networking_v1alpha1_NetworkInterfaceStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceTemplateSpec": schema_ironcore_api_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkList":                  schema_ironcore_api_networking_v1alpha1_NetworkList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeering":               schema_ironcore_api_networking_v1alpha1_NetworkPeering(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringClaimRef":       schema_ironcore_api_networking_v1alpha1_NetworkPeeringClaimRef(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringNetworkRef":     schema_ironcore_api_networking_v1alpha1_NetworkPeeringNetworkRef(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringStatus":         schema_ironcore_api_networking_v1alpha1_NetworkPeeringStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicy":                schema_ironcore_api_networking_v1alpha1_NetworkPolicy(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyCondition":       schema_ironcore_api_networking_v1alpha1_NetworkPolicyCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyEgressRule":      schema_ironcore_api_networking_v1alpha1_NetworkPolicyEgressRule(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyIngressRule":     schema_ironcore_api_networking_v1alpha1_NetworkPolicyIngressRule(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyList":            schema_ironcore_api_networking_v1alpha1_NetworkPolicyList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer":            schema_ironcore_api_networking_v1alpha1_NetworkPolicyPeer(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort":            schema_ironcore_api_networking_v1alpha1_NetworkPolicyPort(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicySpec":            schema_ironcore_api_networking_v1alpha1_NetworkPolicySpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyStatus":          schema_ironcore_api_networking_v1alpha1_NetworkPolicyStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkSpec":                  schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkStatus":                schema_ironcore_api_networking_v1alpha1_NetworkStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefix":                schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixStatus":          schema_ironcore_api_networking_v1alpha1_PeeringPrefixStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource":                 schema_ironcore_api_networking_v1alpha1_PrefixSource(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIP":                    schema_ironcore_api_networking_v1alpha1_VirtualIP(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPList":                schema_ironcore_api_networking_v1alpha1_VirtualIPList(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSource":              schema_ironcore_api_networking_v1alpha1_VirtualIPSource(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec":                schema_ironcore_api_networking_v1alpha1_VirtualIPSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPStatus":              schema_ironcore_api_networking_v1alpha1_VirtualIPStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPTemplateSpec":        schema_ironcore_api_networking_v1alpha1_VirtualIPTemplateSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Bucket":                          schema_ironcore_api_storage_v1alpha1_Bucket(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketAccess":                    schema_ironcore_api_storage_v1alpha1_BucketAccess(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClass":                     schema_ironcore_api_storage_v1alpha1_BucketClass(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClassList":                 schema_ironcore_api_storage_v1alpha1_BucketClassList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketCondition":                 schema_ironcore_api_storage_v1alpha1_BucketCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketList":                      schema_ironcore_api_storage_v1alpha1_BucketList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPool":                      schema_ironcore_api_storage_v1alpha1_BucketPool(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolList":                  schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolSpec":                  schema_ironcore_api_storage_v1alpha1_BucketPoolSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolStatus":                schema_ironcore_api_storage_v1alpha1_BucketPoolStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec":                      schema_ironcore_api_storage_v1alpha1_BucketSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus":                    schema_ironcore_api_storage_v1alpha1_BucketStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketTemplateSpec":              schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource":                    schema_ironcore_api_storage_v1alpha1_OSDataSource(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume":                          schema_ironcore_api_storage_v1alpha1_Volume(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess":                    schema_ironcore_api_storage_v1alpha1_VolumeAccess(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass":                     schema_ironcore_api_storage_v1alpha1_VolumeClass(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClassList":                 schema_ironcore_api_storage_v1alpha1_VolumeClassList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition":                 schema_ironcore_api_storage_v1alpha1_VolumeCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource":                schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption":                schema_ironcore_api_storage_v1alpha1_VolumeEncryption(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeList":                      schema_ironcore_api_storage_v1alpha1_VolumeList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePool":                      schema_ironcore_api_storage_v1alpha1_VolumePool(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolCondition":             schema_ironcore_api_storage_v1alpha1_VolumePoolCondition(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolList":                  schema_ironcore_api_storage_v1alpha1_VolumePoolList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec":                  schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus":                schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot":                  schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotList":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec":              schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus":            schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec":                      schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeStatus":                    schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref),
-		"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec":              schema_ironcore_api_storage_v1alpha1_VolumeTemplateSpec(ref),
-		v1.AWSElasticBlockStoreVolumeSource{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
-		v1.Affinity{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_Affinity(ref),
-		v1.AppArmorProfile{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_AppArmorProfile(ref),
-		v1.AttachedVolume{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_AttachedVolume(ref),
-		v1.AvoidPods{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_AvoidPods(ref),
-		v1.AzureDiskVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_AzureDiskVolumeSource(ref),
-		v1.AzureFilePersistentVolumeSource{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_AzureFilePersistentVolumeSource(ref),
-		v1.AzureFileVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_AzureFileVolumeSource(ref),
-		v1.Binding{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_Binding(ref),
-		v1.CSIPersistentVolumeSource{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_CSIPersistentVolumeSource(ref),
-		v1.CSIVolumeSource{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_CSIVolumeSource(ref),
-		v1.Capabilities{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_Capabilities(ref),
-		v1.CephFSPersistentVolumeSource{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_CephFSPersistentVolumeSource(ref),
-		v1.CephFSVolumeSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_CephFSVolumeSource(ref),
-		v1.CinderPersistentVolumeSource{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_CinderPersistentVolumeSource(ref),
-		v1.CinderVolumeSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_CinderVolumeSource(ref),
-		v1.ClientIPConfig{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ClientIPConfig(ref),
-		v1.ClusterTrustBundleProjection{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_ClusterTrustBundleProjection(ref),
-		v1.ComponentCondition{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_ComponentCondition(ref),
-		v1.ComponentStatus{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ComponentStatus(ref),
-		v1.ComponentStatusList{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ComponentStatusList(ref),
-		v1.ConfigMap{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_ConfigMap(ref),
-		v1.ConfigMapEnvSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_ConfigMapEnvSource(ref),
-		v1.ConfigMapKeySelector{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ConfigMapKeySelector(ref),
-		v1.ConfigMapList{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ConfigMapList(ref),
-		v1.ConfigMapNodeConfigSource{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_ConfigMapNodeConfigSource(ref),
-		v1.ConfigMapProjection{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ConfigMapProjection(ref),
-		v1.ConfigMapVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ConfigMapVolumeSource(ref),
-		v1.Container{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Container(ref),
-		v1.ContainerExtendedResourceRequest{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_ContainerExtendedResourceRequest(ref),
-		v1.ContainerImage{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ContainerImage(ref),
-		v1.ContainerPort{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ContainerPort(ref),
-		v1.ContainerResizePolicy{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ContainerResizePolicy(ref),
-		v1.ContainerRestartRule{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ContainerRestartRule(ref),
-		v1.ContainerRestartRuleOnExitCodes{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_ContainerRestartRuleOnExitCodes(ref),
-		v1.ContainerState{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ContainerState(ref),
-		v1.ContainerStateRunning{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ContainerStateRunning(ref),
-		v1.ContainerStateTerminated{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_ContainerStateTerminated(ref),
-		v1.ContainerStateWaiting{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ContainerStateWaiting(ref),
-		v1.ContainerStatus{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ContainerStatus(ref),
-		v1.ContainerUser{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ContainerUser(ref),
-		v1.DaemonEndpoint{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_DaemonEndpoint(ref),
-		v1.DownwardAPIProjection{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_DownwardAPIProjection(ref),
-		v1.DownwardAPIVolumeFile{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_DownwardAPIVolumeFile(ref),
-		v1.DownwardAPIVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_DownwardAPIVolumeSource(ref),
-		v1.EmptyDirVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_EmptyDirVolumeSource(ref),
-		v1.EndpointAddress{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_EndpointAddress(ref),
-		v1.EndpointPort{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_EndpointPort(ref),
-		v1.EndpointSubset{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_EndpointSubset(ref),
-		v1.Endpoints{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Endpoints(ref),
-		v1.EndpointsList{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_EndpointsList(ref),
-		v1.EnvFromSource{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_EnvFromSource(ref),
-		v1.EnvVar{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_EnvVar(ref),
-		v1.EnvVarSource{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_EnvVarSource(ref),
-		v1.EphemeralContainer{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_EphemeralContainer(ref),
-		v1.EphemeralContainerCommon{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_EphemeralContainerCommon(ref),
-		v1.EphemeralVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_EphemeralVolumeSource(ref),
-		v1.Event{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_Event(ref),
-		v1.EventList{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_EventList(ref),
-		v1.EventSeries{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_EventSeries(ref),
-		v1.EventSource{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_EventSource(ref),
-		v1.ExecAction{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_ExecAction(ref),
-		v1.FCVolumeSource{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_FCVolumeSource(ref),
-		v1.FileKeySelector{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_FileKeySelector(ref),
-		v1.FlexPersistentVolumeSource{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_FlexPersistentVolumeSource(ref),
-		v1.FlexVolumeSource{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_FlexVolumeSource(ref),
-		v1.FlockerVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_FlockerVolumeSource(ref),
-		v1.GCEPersistentDiskVolumeSource{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_GCEPersistentDiskVolumeSource(ref),
-		v1.GRPCAction{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_GRPCAction(ref),
-		v1.GitRepoVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_GitRepoVolumeSource(ref),
-		v1.GlusterfsPersistentVolumeSource{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_GlusterfsPersistentVolumeSource(ref),
-		v1.GlusterfsVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_GlusterfsVolumeSource(ref),
-		v1.HTTPGetAction{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_HTTPGetAction(ref),
-		v1.HTTPHeader{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_HTTPHeader(ref),
-		v1.HostAlias{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_HostAlias(ref),
-		v1.HostIP{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_HostIP(ref),
-		v1.HostPathVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_HostPathVolumeSource(ref),
-		v1.ISCSIPersistentVolumeSource{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_ISCSIPersistentVolumeSource(ref),
-		v1.ISCSIVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ISCSIVolumeSource(ref),
-		v1.ImageVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ImageVolumeSource(ref),
-		v1.KeyToPath{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_KeyToPath(ref),
-		v1.Lifecycle{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Lifecycle(ref),
-		v1.LifecycleHandler{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_LifecycleHandler(ref),
-		v1.LimitRange{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_LimitRange(ref),
-		v1.LimitRangeItem{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_LimitRangeItem(ref),
-		v1.LimitRangeList{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_LimitRangeList(ref),
-		v1.LimitRangeSpec{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_LimitRangeSpec(ref),
-		v1.LinuxContainerUser{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_LinuxContainerUser(ref),
-		v1.List{}.OpenAPIModelName():                                                            schema_k8sio_api_core_v1_List(ref),
-		v1.LoadBalancerIngress{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_LoadBalancerIngress(ref),
-		v1.LoadBalancerStatus{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_LoadBalancerStatus(ref),
-		v1.LocalObjectReference{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_LocalObjectReference(ref),
-		v1.LocalVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_LocalVolumeSource(ref),
-		v1.ModifyVolumeStatus{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_ModifyVolumeStatus(ref),
-		v1.NFSVolumeSource{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_NFSVolumeSource(ref),
-		v1.Namespace{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Namespace(ref),
-		v1.NamespaceCondition{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NamespaceCondition(ref),
-		v1.NamespaceList{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_NamespaceList(ref),
-		v1.NamespaceSpec{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_NamespaceSpec(ref),
-		v1.NamespaceStatus{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_NamespaceStatus(ref),
-		v1.Node{}.OpenAPIModelName():                                                            schema_k8sio_api_core_v1_Node(ref),
-		v1.NodeAddress{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_NodeAddress(ref),
-		v1.NodeAffinity{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_NodeAffinity(ref),
-		v1.NodeCondition{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_NodeCondition(ref),
-		v1.NodeConfigSource{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeConfigSource(ref),
-		v1.NodeConfigStatus{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeConfigStatus(ref),
-		v1.NodeDaemonEndpoints{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_NodeDaemonEndpoints(ref),
-		v1.NodeFeatures{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_NodeFeatures(ref),
-		v1.NodeList{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_NodeList(ref),
-		v1.NodeProxyOptions{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeProxyOptions(ref),
-		v1.NodeRuntimeHandler{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NodeRuntimeHandler(ref),
-		v1.NodeRuntimeHandlerFeatures{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_NodeRuntimeHandlerFeatures(ref),
-		v1.NodeSelector{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_NodeSelector(ref),
-		v1.NodeSelectorRequirement{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_NodeSelectorRequirement(ref),
-		v1.NodeSelectorTerm{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeSelectorTerm(ref),
-		v1.NodeSpec{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_NodeSpec(ref),
-		v1.NodeStatus{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_NodeStatus(ref),
-		v1.NodeSwapStatus{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_NodeSwapStatus(ref),
-		v1.NodeSystemInfo{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_NodeSystemInfo(ref),
-		v1.ObjectFieldSelector{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ObjectFieldSelector(ref),
-		v1.ObjectReference{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ObjectReference(ref),
-		v1.PersistentVolume{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_PersistentVolume(ref),
-		v1.PersistentVolumeClaim{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_PersistentVolumeClaim(ref),
-		v1.PersistentVolumeClaimCondition{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_PersistentVolumeClaimCondition(ref),
-		v1.PersistentVolumeClaimList{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_PersistentVolumeClaimList(ref),
-		v1.PersistentVolumeClaimSpec{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_PersistentVolumeClaimSpec(ref),
-		v1.PersistentVolumeClaimStatus{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_PersistentVolumeClaimStatus(ref),
-		v1.PersistentVolumeClaimTemplate{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_PersistentVolumeClaimTemplate(ref),
-		v1.PersistentVolumeClaimVolumeSource{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_PersistentVolumeClaimVolumeSource(ref),
-		v1.PersistentVolumeList{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PersistentVolumeList(ref),
-		v1.PersistentVolumeSource{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PersistentVolumeSource(ref),
-		v1.PersistentVolumeSpec{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PersistentVolumeSpec(ref),
-		v1.PersistentVolumeStatus{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PersistentVolumeStatus(ref),
-		v1.PhotonPersistentDiskVolumeSource{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_PhotonPersistentDiskVolumeSource(ref),
-		v1.Pod{}.OpenAPIModelName():                                                             schema_k8sio_api_core_v1_Pod(ref),
-		v1.PodAffinity{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_PodAffinity(ref),
-		v1.PodAffinityTerm{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodAffinityTerm(ref),
-		v1.PodAntiAffinity{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodAntiAffinity(ref),
-		v1.PodAttachOptions{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_PodAttachOptions(ref),
-		v1.PodCertificateProjection{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_PodCertificateProjection(ref),
-		v1.PodCondition{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_PodCondition(ref),
-		v1.PodDNSConfig{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_PodDNSConfig(ref),
-		v1.PodDNSConfigOption{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PodDNSConfigOption(ref),
-		v1.PodExecOptions{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_PodExecOptions(ref),
-		v1.PodExtendedResourceClaimStatus{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_PodExtendedResourceClaimStatus(ref),
-		v1.PodIP{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_PodIP(ref),
-		v1.PodList{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_PodList(ref),
-		v1.PodLogOptions{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_PodLogOptions(ref),
-		v1.PodOS{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_PodOS(ref),
-		v1.PodPortForwardOptions{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_PodPortForwardOptions(ref),
-		v1.PodProxyOptions{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodProxyOptions(ref),
-		v1.PodReadinessGate{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_PodReadinessGate(ref),
-		v1.PodResourceClaim{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_PodResourceClaim(ref),
-		v1.PodResourceClaimStatus{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PodResourceClaimStatus(ref),
-		v1.PodSchedulingGate{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodSchedulingGate(ref),
-		v1.PodSecurityContext{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PodSecurityContext(ref),
-		v1.PodSignature{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_PodSignature(ref),
-		v1.PodSpec{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_PodSpec(ref),
-		v1.PodStatus{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_PodStatus(ref),
-		v1.PodStatusResult{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodStatusResult(ref),
-		v1.PodTemplate{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_PodTemplate(ref),
-		v1.PodTemplateList{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodTemplateList(ref),
-		v1.PodTemplateSpec{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodTemplateSpec(ref),
-		v1.PortStatus{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_PortStatus(ref),
-		v1.PortworxVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PortworxVolumeSource(ref),
-		v1.PreferAvoidPodsEntry{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PreferAvoidPodsEntry(ref),
-		v1.PreferredSchedulingTerm{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_PreferredSchedulingTerm(ref),
-		v1.Probe{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_Probe(ref),
-		v1.ProbeHandler{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_ProbeHandler(ref),
-		v1.ProjectedVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ProjectedVolumeSource(ref),
-		v1.QuobyteVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_QuobyteVolumeSource(ref),
-		v1.RBDPersistentVolumeSource{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_RBDPersistentVolumeSource(ref),
-		v1.RBDVolumeSource{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_RBDVolumeSource(ref),
-		v1.RangeAllocation{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_RangeAllocation(ref),
-		v1.ReplicationController{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ReplicationController(ref),
-		v1.ReplicationControllerCondition{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_ReplicationControllerCondition(ref),
-		v1.ReplicationControllerList{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_ReplicationControllerList(ref),
-		v1.ReplicationControllerSpec{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_ReplicationControllerSpec(ref),
-		v1.ReplicationControllerStatus{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_ReplicationControllerStatus(ref),
-		v1.ResourceClaim{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ResourceClaim(ref),
-		v1.ResourceFieldSelector{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ResourceFieldSelector(ref),
-		v1.ResourceHealth{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ResourceHealth(ref),
-		v1.ResourceQuota{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ResourceQuota(ref),
-		v1.ResourceQuotaList{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ResourceQuotaList(ref),
-		v1.ResourceQuotaSpec{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ResourceQuotaSpec(ref),
-		v1.ResourceQuotaStatus{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ResourceQuotaStatus(ref),
-		v1.ResourceRequirements{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ResourceRequirements(ref),
-		v1.ResourceStatus{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ResourceStatus(ref),
-		v1.SELinuxOptions{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_SELinuxOptions(ref),
-		v1.ScaleIOPersistentVolumeSource{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_ScaleIOPersistentVolumeSource(ref),
-		v1.ScaleIOVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ScaleIOVolumeSource(ref),
-		v1.ScopeSelector{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ScopeSelector(ref),
-		v1.ScopedResourceSelectorRequirement{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_ScopedResourceSelectorRequirement(ref),
-		v1.SeccompProfile{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_SeccompProfile(ref),
-		v1.Secret{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_Secret(ref),
-		v1.SecretEnvSource{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_SecretEnvSource(ref),
-		v1.SecretKeySelector{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_SecretKeySelector(ref),
-		v1.SecretList{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_SecretList(ref),
-		v1.SecretProjection{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_SecretProjection(ref),
-		v1.SecretReference{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_SecretReference(ref),
-		v1.SecretVolumeSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_SecretVolumeSource(ref),
-		v1.SecurityContext{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_SecurityContext(ref),
-		v1.SerializedReference{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_SerializedReference(ref),
-		v1.Service{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_Service(ref),
-		v1.ServiceAccount{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ServiceAccount(ref),
-		v1.ServiceAccountList{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_ServiceAccountList(ref),
-		v1.ServiceAccountTokenProjection{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_ServiceAccountTokenProjection(ref),
-		v1.ServiceList{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_ServiceList(ref),
-		v1.ServicePort{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_ServicePort(ref),
-		v1.ServiceProxyOptions{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ServiceProxyOptions(ref),
-		v1.ServiceSpec{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_ServiceSpec(ref),
-		v1.ServiceStatus{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ServiceStatus(ref),
-		v1.SessionAffinityConfig{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_SessionAffinityConfig(ref),
-		v1.SleepAction{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_SleepAction(ref),
-		v1.StorageOSPersistentVolumeSource{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_StorageOSPersistentVolumeSource(ref),
-		v1.StorageOSVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_StorageOSVolumeSource(ref),
-		v1.Sysctl{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_Sysctl(ref),
-		v1.TCPSocketAction{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_TCPSocketAction(ref),
-		v1.Taint{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_Taint(ref),
-		v1.Toleration{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_Toleration(ref),
-		v1.TopologySelectorLabelRequirement{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_TopologySelectorLabelRequirement(ref),
-		v1.TopologySelectorTerm{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_TopologySelectorTerm(ref),
-		v1.TopologySpreadConstraint{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_TopologySpreadConstraint(ref),
-		v1.TypedLocalObjectReference{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_TypedLocalObjectReference(ref),
-		v1.TypedObjectReference{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_TypedObjectReference(ref),
-		v1.Volume{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_Volume(ref),
-		v1.VolumeDevice{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_VolumeDevice(ref),
-		v1.VolumeMount{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_VolumeMount(ref),
-		v1.VolumeMountStatus{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_VolumeMountStatus(ref),
-		v1.VolumeNodeAffinity{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_VolumeNodeAffinity(ref),
-		v1.VolumeProjection{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_VolumeProjection(ref),
-		v1.VolumeResourceRequirements{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_VolumeResourceRequirements(ref),
-		v1.VolumeSource{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_VolumeSource(ref),
-		v1.VsphereVirtualDiskVolumeSource{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_VsphereVirtualDiskVolumeSource(ref),
-		v1.WeightedPodAffinityTerm{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_WeightedPodAffinityTerm(ref),
-		v1.WindowsSecurityContextOptions{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_WindowsSecurityContextOptions(ref),
-		v1.WorkloadReference{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_WorkloadReference(ref),
-		resource.Quantity{}.OpenAPIModelName():                                                  schema_apimachinery_pkg_api_resource_Quantity(ref),
-		metav1.APIGroup{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_APIGroup(ref),
-		metav1.APIGroupList{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_APIGroupList(ref),
-		metav1.APIResource{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_APIResource(ref),
-		metav1.APIResourceList{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_APIResourceList(ref),
-		metav1.APIVersions{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_APIVersions(ref),
-		metav1.ApplyOptions{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_ApplyOptions(ref),
-		metav1.Condition{}.OpenAPIModelName():                                                   schema_pkg_apis_meta_v1_Condition(ref),
-		metav1.CreateOptions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_CreateOptions(ref),
-		metav1.DeleteOptions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_DeleteOptions(ref),
-		metav1.Duration{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_Duration(ref),
-		metav1.FieldSelectorRequirement{}.OpenAPIModelName():                                    schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref),
-		metav1.FieldsV1{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_FieldsV1(ref),
-		metav1.GetOptions{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_GetOptions(ref),
-		metav1.GroupKind{}.OpenAPIModelName():                                                   schema_pkg_apis_meta_v1_GroupKind(ref),
-		metav1.GroupResource{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_GroupResource(ref),
-		metav1.GroupVersion{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_GroupVersion(ref),
-		metav1.GroupVersionForDiscovery{}.OpenAPIModelName():                                    schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref),
-		metav1.GroupVersionKind{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_GroupVersionKind(ref),
-		metav1.GroupVersionResource{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_GroupVersionResource(ref),
-		metav1.InternalEvent{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_InternalEvent(ref),
-		metav1.LabelSelector{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_LabelSelector(ref),
-		metav1.LabelSelectorRequirement{}.OpenAPIModelName():                                    schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref),
-		metav1.List{}.OpenAPIModelName():                                                        schema_pkg_apis_meta_v1_List(ref),
-		metav1.ListMeta{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_ListMeta(ref),
-		metav1.ListOptions{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_ListOptions(ref),
-		metav1.ManagedFieldsEntry{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_ManagedFieldsEntry(ref),
-		metav1.MicroTime{}.OpenAPIModelName():                                                   schema_pkg_apis_meta_v1_MicroTime(ref),
-		metav1.ObjectMeta{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_ObjectMeta(ref),
-		metav1.OwnerReference{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_OwnerReference(ref),
-		metav1.PartialObjectMetadata{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_PartialObjectMetadata(ref),
-		metav1.PartialObjectMetadataList{}.OpenAPIModelName():                                   schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref),
-		metav1.Patch{}.OpenAPIModelName():                                                       schema_pkg_apis_meta_v1_Patch(ref),
-		metav1.PatchOptions{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_PatchOptions(ref),
-		metav1.Preconditions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_Preconditions(ref),
-		metav1.RootPaths{}.OpenAPIModelName():                                                   schema_pkg_apis_meta_v1_RootPaths(ref),
-		metav1.ServerAddressByClientCIDR{}.OpenAPIModelName():                                   schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
-		metav1.Status{}.OpenAPIModelName():                                                      schema_pkg_apis_meta_v1_Status(ref),
-		metav1.StatusCause{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_StatusCause(ref),
-		metav1.StatusDetails{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_StatusDetails(ref),
-		metav1.Table{}.OpenAPIModelName():                                                       schema_pkg_apis_meta_v1_Table(ref),
-		metav1.TableColumnDefinition{}.OpenAPIModelName():                                       schema_pkg_apis_meta_v1_TableColumnDefinition(ref),
-		metav1.TableOptions{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_TableOptions(ref),
-		metav1.TableRow{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_TableRow(ref),
-		metav1.TableRowCondition{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_TableRowCondition(ref),
-		metav1.Time{}.OpenAPIModelName():                                                        schema_pkg_apis_meta_v1_Time(ref),
-		metav1.Timestamp{}.OpenAPIModelName():                                                   schema_pkg_apis_meta_v1_Timestamp(ref),
-		metav1.TypeMeta{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_TypeMeta(ref),
-		metav1.UpdateOptions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_UpdateOptions(ref),
-		metav1.WatchEvent{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_WatchEvent(ref),
-		runtime.RawExtension{}.OpenAPIModelName():                                               schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref),
-		runtime.TypeMeta{}.OpenAPIModelName():                                                   schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
-		runtime.Unknown{}.OpenAPIModelName():                                                    schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
-		version.Info{}.OpenAPIModelName():                                                       schema_k8sio_apimachinery_pkg_version_Info(ref),
+		v1alpha1.ConfigMapKeySelector{}.OpenAPIModelName():                                    schema_ironcore_api_common_v1alpha1_ConfigMapKeySelector(ref),
+		v1alpha1.IP{}.OpenAPIModelName():                                                      schema_ironcore_api_common_v1alpha1_IP(ref),
+		v1alpha1.IPPrefix{}.OpenAPIModelName():                                                schema_ironcore_api_common_v1alpha1_IPPrefix(ref),
+		v1alpha1.IPRange{}.OpenAPIModelName():                                                 schema_ironcore_api_common_v1alpha1_IPRange(ref),
+		v1alpha1.LocalUIDReference{}.OpenAPIModelName():                                       schema_ironcore_api_common_v1alpha1_LocalUIDReference(ref),
+		v1alpha1.SecretKeySelector{}.OpenAPIModelName():                                       schema_ironcore_api_common_v1alpha1_SecretKeySelector(ref),
+		v1alpha1.Taint{}.OpenAPIModelName():                                                   schema_ironcore_api_common_v1alpha1_Taint(ref),
+		v1alpha1.Toleration{}.OpenAPIModelName():                                              schema_ironcore_api_common_v1alpha1_Toleration(ref),
+		v1alpha1.UIDReference{}.OpenAPIModelName():                                            schema_ironcore_api_common_v1alpha1_UIDReference(ref),
+		computev1alpha1.DaemonEndpoint{}.OpenAPIModelName():                                   schema_ironcore_api_compute_v1alpha1_DaemonEndpoint(ref),
+		computev1alpha1.EFIVar{}.OpenAPIModelName():                                           schema_ironcore_api_compute_v1alpha1_EFIVar(ref),
+		computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName():                            schema_ironcore_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
+		computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName():                  schema_ironcore_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
+		computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName():                            schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref),
+		computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName():                            schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref),
+		computev1alpha1.Machine{}.OpenAPIModelName():                                          schema_ironcore_api_compute_v1alpha1_Machine(ref),
+		computev1alpha1.MachineClass{}.OpenAPIModelName():                                     schema_ironcore_api_compute_v1alpha1_MachineClass(ref),
+		computev1alpha1.MachineClassList{}.OpenAPIModelName():                                 schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
+		computev1alpha1.MachineCondition{}.OpenAPIModelName():                                 schema_ironcore_api_compute_v1alpha1_MachineCondition(ref),
+		computev1alpha1.MachineExecOptions{}.OpenAPIModelName():                               schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref),
+		computev1alpha1.MachineList{}.OpenAPIModelName():                                      schema_ironcore_api_compute_v1alpha1_MachineList(ref),
+		computev1alpha1.MachinePool{}.OpenAPIModelName():                                      schema_ironcore_api_compute_v1alpha1_MachinePool(ref),
+		computev1alpha1.MachinePoolAddress{}.OpenAPIModelName():                               schema_ironcore_api_compute_v1alpha1_MachinePoolAddress(ref),
+		computev1alpha1.MachinePoolCondition{}.OpenAPIModelName():                             schema_ironcore_api_compute_v1alpha1_MachinePoolCondition(ref),
+		computev1alpha1.MachinePoolDaemonEndpoints{}.OpenAPIModelName():                       schema_ironcore_api_compute_v1alpha1_MachinePoolDaemonEndpoints(ref),
+		computev1alpha1.MachinePoolList{}.OpenAPIModelName():                                  schema_ironcore_api_compute_v1alpha1_MachinePoolList(ref),
+		computev1alpha1.MachinePoolSpec{}.OpenAPIModelName():                                  schema_ironcore_api_compute_v1alpha1_MachinePoolSpec(ref),
+		computev1alpha1.MachinePoolStatus{}.OpenAPIModelName():                                schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref),
+		computev1alpha1.MachineSpec{}.OpenAPIModelName():                                      schema_ironcore_api_compute_v1alpha1_MachineSpec(ref),
+		computev1alpha1.MachineStatus{}.OpenAPIModelName():                                    schema_ironcore_api_compute_v1alpha1_MachineStatus(ref),
+		computev1alpha1.NetworkInterface{}.OpenAPIModelName():                                 schema_ironcore_api_compute_v1alpha1_NetworkInterface(ref),
+		computev1alpha1.NetworkInterfaceSource{}.OpenAPIModelName():                           schema_ironcore_api_compute_v1alpha1_NetworkInterfaceSource(ref),
+		computev1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName():                           schema_ironcore_api_compute_v1alpha1_NetworkInterfaceStatus(ref),
+		computev1alpha1.Volume{}.OpenAPIModelName():                                           schema_ironcore_api_compute_v1alpha1_Volume(ref),
+		computev1alpha1.VolumeSource{}.OpenAPIModelName():                                     schema_ironcore_api_compute_v1alpha1_VolumeSource(ref),
+		computev1alpha1.VolumeStatus{}.OpenAPIModelName():                                     schema_ironcore_api_compute_v1alpha1_VolumeStatus(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector":                   schema_ironcore_api_core_v1alpha1_ObjectSelector(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuota":                    schema_ironcore_api_core_v1alpha1_ResourceQuota(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaList":                schema_ironcore_api_core_v1alpha1_ResourceQuotaList(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaSpec":                schema_ironcore_api_core_v1alpha1_ResourceQuotaSpec(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaStatus":              schema_ironcore_api_core_v1alpha1_ResourceQuotaStatus(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelector":            schema_ironcore_api_core_v1alpha1_ResourceScopeSelector(ref),
+		"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelectorRequirement": schema_ironcore_api_core_v1alpha1_ResourceScopeSelectorRequirement(ref),
+		ipamv1alpha1.Prefix{}.OpenAPIModelName():                                              schema_ironcore_api_ipam_v1alpha1_Prefix(ref),
+		ipamv1alpha1.PrefixAllocation{}.OpenAPIModelName():                                    schema_ironcore_api_ipam_v1alpha1_PrefixAllocation(ref),
+		ipamv1alpha1.PrefixAllocationList{}.OpenAPIModelName():                                schema_ironcore_api_ipam_v1alpha1_PrefixAllocationList(ref),
+		ipamv1alpha1.PrefixAllocationSpec{}.OpenAPIModelName():                                schema_ironcore_api_ipam_v1alpha1_PrefixAllocationSpec(ref),
+		ipamv1alpha1.PrefixAllocationStatus{}.OpenAPIModelName():                              schema_ironcore_api_ipam_v1alpha1_PrefixAllocationStatus(ref),
+		ipamv1alpha1.PrefixList{}.OpenAPIModelName():                                          schema_ironcore_api_ipam_v1alpha1_PrefixList(ref),
+		ipamv1alpha1.PrefixSpec{}.OpenAPIModelName():                                          schema_ironcore_api_ipam_v1alpha1_PrefixSpec(ref),
+		ipamv1alpha1.PrefixStatus{}.OpenAPIModelName():                                        schema_ironcore_api_ipam_v1alpha1_PrefixStatus(ref),
+		ipamv1alpha1.PrefixTemplateSpec{}.OpenAPIModelName():                                  schema_ironcore_api_ipam_v1alpha1_PrefixTemplateSpec(ref),
+		networkingv1alpha1.EphemeralPrefixSource{}.OpenAPIModelName():                         schema_ironcore_api_networking_v1alpha1_EphemeralPrefixSource(ref),
+		networkingv1alpha1.EphemeralVirtualIPSource{}.OpenAPIModelName():                      schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSource(ref),
+		networkingv1alpha1.EphemeralVirtualIPSpec{}.OpenAPIModelName():                        schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref),
+		networkingv1alpha1.IPBlock{}.OpenAPIModelName():                                       schema_ironcore_api_networking_v1alpha1_IPBlock(ref),
+		networkingv1alpha1.IPSource{}.OpenAPIModelName():                                      schema_ironcore_api_networking_v1alpha1_IPSource(ref),
+		networkingv1alpha1.LoadBalancer{}.OpenAPIModelName():                                  schema_ironcore_api_networking_v1alpha1_LoadBalancer(ref),
+		networkingv1alpha1.LoadBalancerDestination{}.OpenAPIModelName():                       schema_ironcore_api_networking_v1alpha1_LoadBalancerDestination(ref),
+		networkingv1alpha1.LoadBalancerList{}.OpenAPIModelName():                              schema_ironcore_api_networking_v1alpha1_LoadBalancerList(ref),
+		networkingv1alpha1.LoadBalancerPort{}.OpenAPIModelName():                              schema_ironcore_api_networking_v1alpha1_LoadBalancerPort(ref),
+		networkingv1alpha1.LoadBalancerRouting{}.OpenAPIModelName():                           schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref),
+		networkingv1alpha1.LoadBalancerRoutingList{}.OpenAPIModelName():                       schema_ironcore_api_networking_v1alpha1_LoadBalancerRoutingList(ref),
+		networkingv1alpha1.LoadBalancerSpec{}.OpenAPIModelName():                              schema_ironcore_api_networking_v1alpha1_LoadBalancerSpec(ref),
+		networkingv1alpha1.LoadBalancerStatus{}.OpenAPIModelName():                            schema_ironcore_api_networking_v1alpha1_LoadBalancerStatus(ref),
+		networkingv1alpha1.LoadBalancerTargetRef{}.OpenAPIModelName():                         schema_ironcore_api_networking_v1alpha1_LoadBalancerTargetRef(ref),
+		networkingv1alpha1.NATGateway{}.OpenAPIModelName():                                    schema_ironcore_api_networking_v1alpha1_NATGateway(ref),
+		networkingv1alpha1.NATGatewayList{}.OpenAPIModelName():                                schema_ironcore_api_networking_v1alpha1_NATGatewayList(ref),
+		networkingv1alpha1.NATGatewaySpec{}.OpenAPIModelName():                                schema_ironcore_api_networking_v1alpha1_NATGatewaySpec(ref),
+		networkingv1alpha1.NATGatewayStatus{}.OpenAPIModelName():                              schema_ironcore_api_networking_v1alpha1_NATGatewayStatus(ref),
+		networkingv1alpha1.Network{}.OpenAPIModelName():                                       schema_ironcore_api_networking_v1alpha1_Network(ref),
+		networkingv1alpha1.NetworkInterface{}.OpenAPIModelName():                              schema_ironcore_api_networking_v1alpha1_NetworkInterface(ref),
+		networkingv1alpha1.NetworkInterfaceList{}.OpenAPIModelName():                          schema_ironcore_api_networking_v1alpha1_NetworkInterfaceList(ref),
+		networkingv1alpha1.NetworkInterfaceSpec{}.OpenAPIModelName():                          schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref),
+		networkingv1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName():                        schema_ironcore_api_networking_v1alpha1_NetworkInterfaceStatus(ref),
+		networkingv1alpha1.NetworkInterfaceTemplateSpec{}.OpenAPIModelName():                  schema_ironcore_api_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref),
+		networkingv1alpha1.NetworkList{}.OpenAPIModelName():                                   schema_ironcore_api_networking_v1alpha1_NetworkList(ref),
+		networkingv1alpha1.NetworkPeering{}.OpenAPIModelName():                                schema_ironcore_api_networking_v1alpha1_NetworkPeering(ref),
+		networkingv1alpha1.NetworkPeeringClaimRef{}.OpenAPIModelName():                        schema_ironcore_api_networking_v1alpha1_NetworkPeeringClaimRef(ref),
+		networkingv1alpha1.NetworkPeeringNetworkRef{}.OpenAPIModelName():                      schema_ironcore_api_networking_v1alpha1_NetworkPeeringNetworkRef(ref),
+		networkingv1alpha1.NetworkPeeringStatus{}.OpenAPIModelName():                          schema_ironcore_api_networking_v1alpha1_NetworkPeeringStatus(ref),
+		networkingv1alpha1.NetworkPolicy{}.OpenAPIModelName():                                 schema_ironcore_api_networking_v1alpha1_NetworkPolicy(ref),
+		networkingv1alpha1.NetworkPolicyCondition{}.OpenAPIModelName():                        schema_ironcore_api_networking_v1alpha1_NetworkPolicyCondition(ref),
+		networkingv1alpha1.NetworkPolicyEgressRule{}.OpenAPIModelName():                       schema_ironcore_api_networking_v1alpha1_NetworkPolicyEgressRule(ref),
+		networkingv1alpha1.NetworkPolicyIngressRule{}.OpenAPIModelName():                      schema_ironcore_api_networking_v1alpha1_NetworkPolicyIngressRule(ref),
+		networkingv1alpha1.NetworkPolicyList{}.OpenAPIModelName():                             schema_ironcore_api_networking_v1alpha1_NetworkPolicyList(ref),
+		networkingv1alpha1.NetworkPolicyPeer{}.OpenAPIModelName():                             schema_ironcore_api_networking_v1alpha1_NetworkPolicyPeer(ref),
+		networkingv1alpha1.NetworkPolicyPort{}.OpenAPIModelName():                             schema_ironcore_api_networking_v1alpha1_NetworkPolicyPort(ref),
+		networkingv1alpha1.NetworkPolicySpec{}.OpenAPIModelName():                             schema_ironcore_api_networking_v1alpha1_NetworkPolicySpec(ref),
+		networkingv1alpha1.NetworkPolicyStatus{}.OpenAPIModelName():                           schema_ironcore_api_networking_v1alpha1_NetworkPolicyStatus(ref),
+		networkingv1alpha1.NetworkSpec{}.OpenAPIModelName():                                   schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref),
+		networkingv1alpha1.NetworkStatus{}.OpenAPIModelName():                                 schema_ironcore_api_networking_v1alpha1_NetworkStatus(ref),
+		networkingv1alpha1.PeeringPrefix{}.OpenAPIModelName():                                 schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref),
+		networkingv1alpha1.PeeringPrefixStatus{}.OpenAPIModelName():                           schema_ironcore_api_networking_v1alpha1_PeeringPrefixStatus(ref),
+		networkingv1alpha1.PrefixSource{}.OpenAPIModelName():                                  schema_ironcore_api_networking_v1alpha1_PrefixSource(ref),
+		networkingv1alpha1.VirtualIP{}.OpenAPIModelName():                                     schema_ironcore_api_networking_v1alpha1_VirtualIP(ref),
+		networkingv1alpha1.VirtualIPList{}.OpenAPIModelName():                                 schema_ironcore_api_networking_v1alpha1_VirtualIPList(ref),
+		networkingv1alpha1.VirtualIPSource{}.OpenAPIModelName():                               schema_ironcore_api_networking_v1alpha1_VirtualIPSource(ref),
+		networkingv1alpha1.VirtualIPSpec{}.OpenAPIModelName():                                 schema_ironcore_api_networking_v1alpha1_VirtualIPSpec(ref),
+		networkingv1alpha1.VirtualIPStatus{}.OpenAPIModelName():                               schema_ironcore_api_networking_v1alpha1_VirtualIPStatus(ref),
+		networkingv1alpha1.VirtualIPTemplateSpec{}.OpenAPIModelName():                         schema_ironcore_api_networking_v1alpha1_VirtualIPTemplateSpec(ref),
+		storagev1alpha1.Bucket{}.OpenAPIModelName():                                           schema_ironcore_api_storage_v1alpha1_Bucket(ref),
+		storagev1alpha1.BucketAccess{}.OpenAPIModelName():                                     schema_ironcore_api_storage_v1alpha1_BucketAccess(ref),
+		storagev1alpha1.BucketClass{}.OpenAPIModelName():                                      schema_ironcore_api_storage_v1alpha1_BucketClass(ref),
+		storagev1alpha1.BucketClassList{}.OpenAPIModelName():                                  schema_ironcore_api_storage_v1alpha1_BucketClassList(ref),
+		storagev1alpha1.BucketCondition{}.OpenAPIModelName():                                  schema_ironcore_api_storage_v1alpha1_BucketCondition(ref),
+		storagev1alpha1.BucketList{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_BucketList(ref),
+		storagev1alpha1.BucketPool{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_BucketPool(ref),
+		storagev1alpha1.BucketPoolList{}.OpenAPIModelName():                                   schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref),
+		storagev1alpha1.BucketPoolSpec{}.OpenAPIModelName():                                   schema_ironcore_api_storage_v1alpha1_BucketPoolSpec(ref),
+		storagev1alpha1.BucketPoolStatus{}.OpenAPIModelName():                                 schema_ironcore_api_storage_v1alpha1_BucketPoolStatus(ref),
+		storagev1alpha1.BucketSpec{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_BucketSpec(ref),
+		storagev1alpha1.BucketStatus{}.OpenAPIModelName():                                     schema_ironcore_api_storage_v1alpha1_BucketStatus(ref),
+		storagev1alpha1.BucketTemplateSpec{}.OpenAPIModelName():                               schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref),
+		storagev1alpha1.OSDataSource{}.OpenAPIModelName():                                     schema_ironcore_api_storage_v1alpha1_OSDataSource(ref),
+		storagev1alpha1.Volume{}.OpenAPIModelName():                                           schema_ironcore_api_storage_v1alpha1_Volume(ref),
+		storagev1alpha1.VolumeAccess{}.OpenAPIModelName():                                     schema_ironcore_api_storage_v1alpha1_VolumeAccess(ref),
+		storagev1alpha1.VolumeClass{}.OpenAPIModelName():                                      schema_ironcore_api_storage_v1alpha1_VolumeClass(ref),
+		storagev1alpha1.VolumeClassList{}.OpenAPIModelName():                                  schema_ironcore_api_storage_v1alpha1_VolumeClassList(ref),
+		storagev1alpha1.VolumeCondition{}.OpenAPIModelName():                                  schema_ironcore_api_storage_v1alpha1_VolumeCondition(ref),
+		storagev1alpha1.VolumeDataSource{}.OpenAPIModelName():                                 schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref),
+		storagev1alpha1.VolumeEncryption{}.OpenAPIModelName():                                 schema_ironcore_api_storage_v1alpha1_VolumeEncryption(ref),
+		storagev1alpha1.VolumeList{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_VolumeList(ref),
+		storagev1alpha1.VolumePool{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_VolumePool(ref),
+		storagev1alpha1.VolumePoolCondition{}.OpenAPIModelName():                              schema_ironcore_api_storage_v1alpha1_VolumePoolCondition(ref),
+		storagev1alpha1.VolumePoolList{}.OpenAPIModelName():                                   schema_ironcore_api_storage_v1alpha1_VolumePoolList(ref),
+		storagev1alpha1.VolumePoolSpec{}.OpenAPIModelName():                                   schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref),
+		storagev1alpha1.VolumePoolStatus{}.OpenAPIModelName():                                 schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref),
+		storagev1alpha1.VolumeSnapshot{}.OpenAPIModelName():                                   schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref),
+		storagev1alpha1.VolumeSnapshotList{}.OpenAPIModelName():                               schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref),
+		storagev1alpha1.VolumeSnapshotSpec{}.OpenAPIModelName():                               schema_ironcore_api_storage_v1alpha1_VolumeSnapshotSpec(ref),
+		storagev1alpha1.VolumeSnapshotStatus{}.OpenAPIModelName():                             schema_ironcore_api_storage_v1alpha1_VolumeSnapshotStatus(ref),
+		storagev1alpha1.VolumeSpec{}.OpenAPIModelName():                                       schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref),
+		storagev1alpha1.VolumeStatus{}.OpenAPIModelName():                                     schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref),
+		storagev1alpha1.VolumeTemplateSpec{}.OpenAPIModelName():                               schema_ironcore_api_storage_v1alpha1_VolumeTemplateSpec(ref),
+		v1.AWSElasticBlockStoreVolumeSource{}.OpenAPIModelName():                              schema_k8sio_api_core_v1_AWSElasticBlockStoreVolumeSource(ref),
+		v1.Affinity{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_Affinity(ref),
+		v1.AppArmorProfile{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_AppArmorProfile(ref),
+		v1.AttachedVolume{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_AttachedVolume(ref),
+		v1.AvoidPods{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_AvoidPods(ref),
+		v1.AzureDiskVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_AzureDiskVolumeSource(ref),
+		v1.AzureFilePersistentVolumeSource{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_AzureFilePersistentVolumeSource(ref),
+		v1.AzureFileVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_AzureFileVolumeSource(ref),
+		v1.Binding{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Binding(ref),
+		v1.CSIPersistentVolumeSource{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_CSIPersistentVolumeSource(ref),
+		v1.CSIVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_CSIVolumeSource(ref),
+		v1.Capabilities{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_Capabilities(ref),
+		v1.CephFSPersistentVolumeSource{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_CephFSPersistentVolumeSource(ref),
+		v1.CephFSVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_CephFSVolumeSource(ref),
+		v1.CinderPersistentVolumeSource{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_CinderPersistentVolumeSource(ref),
+		v1.CinderVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_CinderVolumeSource(ref),
+		v1.ClientIPConfig{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ClientIPConfig(ref),
+		v1.ClusterTrustBundleProjection{}.OpenAPIModelName():                                  schema_k8sio_api_core_v1_ClusterTrustBundleProjection(ref),
+		v1.ComponentCondition{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ComponentCondition(ref),
+		v1.ComponentStatus{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ComponentStatus(ref),
+		v1.ComponentStatusList{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ComponentStatusList(ref),
+		v1.ConfigMap{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_ConfigMap(ref),
+		v1.ConfigMapEnvSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ConfigMapEnvSource(ref),
+		v1.ConfigMapKeySelector{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_ConfigMapKeySelector(ref),
+		v1.ConfigMapList{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ConfigMapList(ref),
+		v1.ConfigMapNodeConfigSource{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_ConfigMapNodeConfigSource(ref),
+		v1.ConfigMapProjection{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ConfigMapProjection(ref),
+		v1.ConfigMapVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ConfigMapVolumeSource(ref),
+		v1.Container{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_Container(ref),
+		v1.ContainerExtendedResourceRequest{}.OpenAPIModelName():                              schema_k8sio_api_core_v1_ContainerExtendedResourceRequest(ref),
+		v1.ContainerImage{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ContainerImage(ref),
+		v1.ContainerPort{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ContainerPort(ref),
+		v1.ContainerResizePolicy{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ContainerResizePolicy(ref),
+		v1.ContainerRestartRule{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_ContainerRestartRule(ref),
+		v1.ContainerRestartRuleOnExitCodes{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_ContainerRestartRuleOnExitCodes(ref),
+		v1.ContainerState{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ContainerState(ref),
+		v1.ContainerStateRunning{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ContainerStateRunning(ref),
+		v1.ContainerStateTerminated{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_ContainerStateTerminated(ref),
+		v1.ContainerStateWaiting{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ContainerStateWaiting(ref),
+		v1.ContainerStatus{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ContainerStatus(ref),
+		v1.ContainerUser{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ContainerUser(ref),
+		v1.DaemonEndpoint{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_DaemonEndpoint(ref),
+		v1.DownwardAPIProjection{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_DownwardAPIProjection(ref),
+		v1.DownwardAPIVolumeFile{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_DownwardAPIVolumeFile(ref),
+		v1.DownwardAPIVolumeSource{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_DownwardAPIVolumeSource(ref),
+		v1.EmptyDirVolumeSource{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_EmptyDirVolumeSource(ref),
+		v1.EndpointAddress{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_EndpointAddress(ref),
+		v1.EndpointPort{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_EndpointPort(ref),
+		v1.EndpointSubset{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_EndpointSubset(ref),
+		v1.Endpoints{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_Endpoints(ref),
+		v1.EndpointsList{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_EndpointsList(ref),
+		v1.EnvFromSource{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_EnvFromSource(ref),
+		v1.EnvVar{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_EnvVar(ref),
+		v1.EnvVarSource{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_EnvVarSource(ref),
+		v1.EphemeralContainer{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_EphemeralContainer(ref),
+		v1.EphemeralContainerCommon{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_EphemeralContainerCommon(ref),
+		v1.EphemeralVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_EphemeralVolumeSource(ref),
+		v1.Event{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_Event(ref),
+		v1.EventList{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_EventList(ref),
+		v1.EventSeries{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_EventSeries(ref),
+		v1.EventSource{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_EventSource(ref),
+		v1.ExecAction{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_ExecAction(ref),
+		v1.FCVolumeSource{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_FCVolumeSource(ref),
+		v1.FileKeySelector{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_FileKeySelector(ref),
+		v1.FlexPersistentVolumeSource{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_FlexPersistentVolumeSource(ref),
+		v1.FlexVolumeSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_FlexVolumeSource(ref),
+		v1.FlockerVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_FlockerVolumeSource(ref),
+		v1.GCEPersistentDiskVolumeSource{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_GCEPersistentDiskVolumeSource(ref),
+		v1.GRPCAction{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_GRPCAction(ref),
+		v1.GitRepoVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_GitRepoVolumeSource(ref),
+		v1.GlusterfsPersistentVolumeSource{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_GlusterfsPersistentVolumeSource(ref),
+		v1.GlusterfsVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_GlusterfsVolumeSource(ref),
+		v1.HTTPGetAction{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_HTTPGetAction(ref),
+		v1.HTTPHeader{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_HTTPHeader(ref),
+		v1.HostAlias{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_HostAlias(ref),
+		v1.HostIP{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_HostIP(ref),
+		v1.HostPathVolumeSource{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_HostPathVolumeSource(ref),
+		v1.ISCSIPersistentVolumeSource{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_ISCSIPersistentVolumeSource(ref),
+		v1.ISCSIVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ISCSIVolumeSource(ref),
+		v1.ImageVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ImageVolumeSource(ref),
+		v1.KeyToPath{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_KeyToPath(ref),
+		v1.Lifecycle{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_Lifecycle(ref),
+		v1.LifecycleHandler{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_LifecycleHandler(ref),
+		v1.LimitRange{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_LimitRange(ref),
+		v1.LimitRangeItem{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_LimitRangeItem(ref),
+		v1.LimitRangeList{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_LimitRangeList(ref),
+		v1.LimitRangeSpec{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_LimitRangeSpec(ref),
+		v1.LinuxContainerUser{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_LinuxContainerUser(ref),
+		v1.List{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_List(ref),
+		v1.LoadBalancerIngress{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_LoadBalancerIngress(ref),
+		v1.LoadBalancerStatus{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_LoadBalancerStatus(ref),
+		v1.LocalObjectReference{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_LocalObjectReference(ref),
+		v1.LocalVolumeSource{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_LocalVolumeSource(ref),
+		v1.ModifyVolumeStatus{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ModifyVolumeStatus(ref),
+		v1.NFSVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_NFSVolumeSource(ref),
+		v1.Namespace{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_Namespace(ref),
+		v1.NamespaceCondition{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_NamespaceCondition(ref),
+		v1.NamespaceList{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_NamespaceList(ref),
+		v1.NamespaceSpec{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_NamespaceSpec(ref),
+		v1.NamespaceStatus{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_NamespaceStatus(ref),
+		v1.Node{}.OpenAPIModelName():                                                          schema_k8sio_api_core_v1_Node(ref),
+		v1.NodeAddress{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_NodeAddress(ref),
+		v1.NodeAffinity{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_NodeAffinity(ref),
+		v1.NodeCondition{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_NodeCondition(ref),
+		v1.NodeConfigSource{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NodeConfigSource(ref),
+		v1.NodeConfigStatus{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NodeConfigStatus(ref),
+		v1.NodeDaemonEndpoints{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_NodeDaemonEndpoints(ref),
+		v1.NodeFeatures{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_NodeFeatures(ref),
+		v1.NodeList{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_NodeList(ref),
+		v1.NodeProxyOptions{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NodeProxyOptions(ref),
+		v1.NodeRuntimeHandler{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_NodeRuntimeHandler(ref),
+		v1.NodeRuntimeHandlerFeatures{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_NodeRuntimeHandlerFeatures(ref),
+		v1.NodeSelector{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_NodeSelector(ref),
+		v1.NodeSelectorRequirement{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_NodeSelectorRequirement(ref),
+		v1.NodeSelectorTerm{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_NodeSelectorTerm(ref),
+		v1.NodeSpec{}.OpenAPIModelName():                                                      schema_k8sio_api_core_v1_NodeSpec(ref),
+		v1.NodeStatus{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_NodeStatus(ref),
+		v1.NodeSwapStatus{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeSwapStatus(ref),
+		v1.NodeSystemInfo{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_NodeSystemInfo(ref),
+		v1.ObjectFieldSelector{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ObjectFieldSelector(ref),
+		v1.ObjectReference{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_ObjectReference(ref),
+		v1.PersistentVolume{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PersistentVolume(ref),
+		v1.PersistentVolumeClaim{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_PersistentVolumeClaim(ref),
+		v1.PersistentVolumeClaimCondition{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_PersistentVolumeClaimCondition(ref),
+		v1.PersistentVolumeClaimList{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_PersistentVolumeClaimList(ref),
+		v1.PersistentVolumeClaimSpec{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_PersistentVolumeClaimSpec(ref),
+		v1.PersistentVolumeClaimStatus{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_PersistentVolumeClaimStatus(ref),
+		v1.PersistentVolumeClaimTemplate{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_PersistentVolumeClaimTemplate(ref),
+		v1.PersistentVolumeClaimVolumeSource{}.OpenAPIModelName():                             schema_k8sio_api_core_v1_PersistentVolumeClaimVolumeSource(ref),
+		v1.PersistentVolumeList{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PersistentVolumeList(ref),
+		v1.PersistentVolumeSource{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_PersistentVolumeSource(ref),
+		v1.PersistentVolumeSpec{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PersistentVolumeSpec(ref),
+		v1.PersistentVolumeStatus{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_PersistentVolumeStatus(ref),
+		v1.PhotonPersistentDiskVolumeSource{}.OpenAPIModelName():                              schema_k8sio_api_core_v1_PhotonPersistentDiskVolumeSource(ref),
+		v1.Pod{}.OpenAPIModelName():                                                           schema_k8sio_api_core_v1_Pod(ref),
+		v1.PodAffinity{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_PodAffinity(ref),
+		v1.PodAffinityTerm{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodAffinityTerm(ref),
+		v1.PodAntiAffinity{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodAntiAffinity(ref),
+		v1.PodAttachOptions{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PodAttachOptions(ref),
+		v1.PodCertificateProjection{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_PodCertificateProjection(ref),
+		v1.PodCondition{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_PodCondition(ref),
+		v1.PodDNSConfig{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_PodDNSConfig(ref),
+		v1.PodDNSConfigOption{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PodDNSConfigOption(ref),
+		v1.PodExecOptions{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_PodExecOptions(ref),
+		v1.PodExtendedResourceClaimStatus{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_PodExtendedResourceClaimStatus(ref),
+		v1.PodIP{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_PodIP(ref),
+		v1.PodList{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_PodList(ref),
+		v1.PodLogOptions{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_PodLogOptions(ref),
+		v1.PodOS{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_PodOS(ref),
+		v1.PodPortForwardOptions{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_PodPortForwardOptions(ref),
+		v1.PodProxyOptions{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodProxyOptions(ref),
+		v1.PodReadinessGate{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PodReadinessGate(ref),
+		v1.PodResourceClaim{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_PodResourceClaim(ref),
+		v1.PodResourceClaimStatus{}.OpenAPIModelName():                                        schema_k8sio_api_core_v1_PodResourceClaimStatus(ref),
+		v1.PodSchedulingGate{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_PodSchedulingGate(ref),
+		v1.PodSecurityContext{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_PodSecurityContext(ref),
+		v1.PodSignature{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_PodSignature(ref),
+		v1.PodSpec{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_PodSpec(ref),
+		v1.PodStatus{}.OpenAPIModelName():                                                     schema_k8sio_api_core_v1_PodStatus(ref),
+		v1.PodStatusResult{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodStatusResult(ref),
+		v1.PodTemplate{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_PodTemplate(ref),
+		v1.PodTemplateList{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodTemplateList(ref),
+		v1.PodTemplateSpec{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_PodTemplateSpec(ref),
+		v1.PortStatus{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_PortStatus(ref),
+		v1.PortworxVolumeSource{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PortworxVolumeSource(ref),
+		v1.PreferAvoidPodsEntry{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_PreferAvoidPodsEntry(ref),
+		v1.PreferredSchedulingTerm{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_PreferredSchedulingTerm(ref),
+		v1.Probe{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_Probe(ref),
+		v1.ProbeHandler{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_ProbeHandler(ref),
+		v1.ProjectedVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ProjectedVolumeSource(ref),
+		v1.QuobyteVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_QuobyteVolumeSource(ref),
+		v1.RBDPersistentVolumeSource{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_RBDPersistentVolumeSource(ref),
+		v1.RBDVolumeSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_RBDVolumeSource(ref),
+		v1.RangeAllocation{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_RangeAllocation(ref),
+		v1.ReplicationController{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ReplicationController(ref),
+		v1.ReplicationControllerCondition{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_ReplicationControllerCondition(ref),
+		v1.ReplicationControllerList{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_ReplicationControllerList(ref),
+		v1.ReplicationControllerSpec{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_ReplicationControllerSpec(ref),
+		v1.ReplicationControllerStatus{}.OpenAPIModelName():                                   schema_k8sio_api_core_v1_ReplicationControllerStatus(ref),
+		v1.ResourceClaim{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ResourceClaim(ref),
+		v1.ResourceFieldSelector{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_ResourceFieldSelector(ref),
+		v1.ResourceHealth{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ResourceHealth(ref),
+		v1.ResourceQuota{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ResourceQuota(ref),
+		v1.ResourceQuotaList{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ResourceQuotaList(ref),
+		v1.ResourceQuotaSpec{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_ResourceQuotaSpec(ref),
+		v1.ResourceQuotaStatus{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ResourceQuotaStatus(ref),
+		v1.ResourceRequirements{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_ResourceRequirements(ref),
+		v1.ResourceStatus{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ResourceStatus(ref),
+		v1.SELinuxOptions{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_SELinuxOptions(ref),
+		v1.ScaleIOPersistentVolumeSource{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_ScaleIOPersistentVolumeSource(ref),
+		v1.ScaleIOVolumeSource{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ScaleIOVolumeSource(ref),
+		v1.ScopeSelector{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ScopeSelector(ref),
+		v1.ScopedResourceSelectorRequirement{}.OpenAPIModelName():                             schema_k8sio_api_core_v1_ScopedResourceSelectorRequirement(ref),
+		v1.SeccompProfile{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_SeccompProfile(ref),
+		v1.Secret{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_Secret(ref),
+		v1.SecretEnvSource{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_SecretEnvSource(ref),
+		v1.SecretKeySelector{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_SecretKeySelector(ref),
+		v1.SecretList{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_SecretList(ref),
+		v1.SecretProjection{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_SecretProjection(ref),
+		v1.SecretReference{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_SecretReference(ref),
+		v1.SecretVolumeSource{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_SecretVolumeSource(ref),
+		v1.SecurityContext{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_SecurityContext(ref),
+		v1.SerializedReference{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_SerializedReference(ref),
+		v1.Service{}.OpenAPIModelName():                                                       schema_k8sio_api_core_v1_Service(ref),
+		v1.ServiceAccount{}.OpenAPIModelName():                                                schema_k8sio_api_core_v1_ServiceAccount(ref),
+		v1.ServiceAccountList{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_ServiceAccountList(ref),
+		v1.ServiceAccountTokenProjection{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_ServiceAccountTokenProjection(ref),
+		v1.ServiceList{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ServiceList(ref),
+		v1.ServicePort{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ServicePort(ref),
+		v1.ServiceProxyOptions{}.OpenAPIModelName():                                           schema_k8sio_api_core_v1_ServiceProxyOptions(ref),
+		v1.ServiceSpec{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_ServiceSpec(ref),
+		v1.ServiceStatus{}.OpenAPIModelName():                                                 schema_k8sio_api_core_v1_ServiceStatus(ref),
+		v1.SessionAffinityConfig{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_SessionAffinityConfig(ref),
+		v1.SleepAction{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_SleepAction(ref),
+		v1.StorageOSPersistentVolumeSource{}.OpenAPIModelName():                               schema_k8sio_api_core_v1_StorageOSPersistentVolumeSource(ref),
+		v1.StorageOSVolumeSource{}.OpenAPIModelName():                                         schema_k8sio_api_core_v1_StorageOSVolumeSource(ref),
+		v1.Sysctl{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_Sysctl(ref),
+		v1.TCPSocketAction{}.OpenAPIModelName():                                               schema_k8sio_api_core_v1_TCPSocketAction(ref),
+		v1.Taint{}.OpenAPIModelName():                                                         schema_k8sio_api_core_v1_Taint(ref),
+		v1.Toleration{}.OpenAPIModelName():                                                    schema_k8sio_api_core_v1_Toleration(ref),
+		v1.TopologySelectorLabelRequirement{}.OpenAPIModelName():                              schema_k8sio_api_core_v1_TopologySelectorLabelRequirement(ref),
+		v1.TopologySelectorTerm{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_TopologySelectorTerm(ref),
+		v1.TopologySpreadConstraint{}.OpenAPIModelName():                                      schema_k8sio_api_core_v1_TopologySpreadConstraint(ref),
+		v1.TypedLocalObjectReference{}.OpenAPIModelName():                                     schema_k8sio_api_core_v1_TypedLocalObjectReference(ref),
+		v1.TypedObjectReference{}.OpenAPIModelName():                                          schema_k8sio_api_core_v1_TypedObjectReference(ref),
+		v1.Volume{}.OpenAPIModelName():                                                        schema_k8sio_api_core_v1_Volume(ref),
+		v1.VolumeDevice{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_VolumeDevice(ref),
+		v1.VolumeMount{}.OpenAPIModelName():                                                   schema_k8sio_api_core_v1_VolumeMount(ref),
+		v1.VolumeMountStatus{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_VolumeMountStatus(ref),
+		v1.VolumeNodeAffinity{}.OpenAPIModelName():                                            schema_k8sio_api_core_v1_VolumeNodeAffinity(ref),
+		v1.VolumeProjection{}.OpenAPIModelName():                                              schema_k8sio_api_core_v1_VolumeProjection(ref),
+		v1.VolumeResourceRequirements{}.OpenAPIModelName():                                    schema_k8sio_api_core_v1_VolumeResourceRequirements(ref),
+		v1.VolumeSource{}.OpenAPIModelName():                                                  schema_k8sio_api_core_v1_VolumeSource(ref),
+		v1.VsphereVirtualDiskVolumeSource{}.OpenAPIModelName():                                schema_k8sio_api_core_v1_VsphereVirtualDiskVolumeSource(ref),
+		v1.WeightedPodAffinityTerm{}.OpenAPIModelName():                                       schema_k8sio_api_core_v1_WeightedPodAffinityTerm(ref),
+		v1.WindowsSecurityContextOptions{}.OpenAPIModelName():                                 schema_k8sio_api_core_v1_WindowsSecurityContextOptions(ref),
+		v1.WorkloadReference{}.OpenAPIModelName():                                             schema_k8sio_api_core_v1_WorkloadReference(ref),
+		resource.Quantity{}.OpenAPIModelName():                                                schema_apimachinery_pkg_api_resource_Quantity(ref),
+		metav1.APIGroup{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_APIGroup(ref),
+		metav1.APIGroupList{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_APIGroupList(ref),
+		metav1.APIResource{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_APIResource(ref),
+		metav1.APIResourceList{}.OpenAPIModelName():                                           schema_pkg_apis_meta_v1_APIResourceList(ref),
+		metav1.APIVersions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_APIVersions(ref),
+		metav1.ApplyOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_ApplyOptions(ref),
+		metav1.Condition{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_Condition(ref),
+		metav1.CreateOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_CreateOptions(ref),
+		metav1.DeleteOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_DeleteOptions(ref),
+		metav1.Duration{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_Duration(ref),
+		metav1.FieldSelectorRequirement{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_FieldSelectorRequirement(ref),
+		metav1.FieldsV1{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_FieldsV1(ref),
+		metav1.GetOptions{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_GetOptions(ref),
+		metav1.GroupKind{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_GroupKind(ref),
+		metav1.GroupResource{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_GroupResource(ref),
+		metav1.GroupVersion{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_GroupVersion(ref),
+		metav1.GroupVersionForDiscovery{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_GroupVersionForDiscovery(ref),
+		metav1.GroupVersionKind{}.OpenAPIModelName():                                          schema_pkg_apis_meta_v1_GroupVersionKind(ref),
+		metav1.GroupVersionResource{}.OpenAPIModelName():                                      schema_pkg_apis_meta_v1_GroupVersionResource(ref),
+		metav1.InternalEvent{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_InternalEvent(ref),
+		metav1.LabelSelector{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_LabelSelector(ref),
+		metav1.LabelSelectorRequirement{}.OpenAPIModelName():                                  schema_pkg_apis_meta_v1_LabelSelectorRequirement(ref),
+		metav1.List{}.OpenAPIModelName():                                                      schema_pkg_apis_meta_v1_List(ref),
+		metav1.ListMeta{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_ListMeta(ref),
+		metav1.ListOptions{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_ListOptions(ref),
+		metav1.ManagedFieldsEntry{}.OpenAPIModelName():                                        schema_pkg_apis_meta_v1_ManagedFieldsEntry(ref),
+		metav1.MicroTime{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_MicroTime(ref),
+		metav1.ObjectMeta{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_ObjectMeta(ref),
+		metav1.OwnerReference{}.OpenAPIModelName():                                            schema_pkg_apis_meta_v1_OwnerReference(ref),
+		metav1.PartialObjectMetadata{}.OpenAPIModelName():                                     schema_pkg_apis_meta_v1_PartialObjectMetadata(ref),
+		metav1.PartialObjectMetadataList{}.OpenAPIModelName():                                 schema_pkg_apis_meta_v1_PartialObjectMetadataList(ref),
+		metav1.Patch{}.OpenAPIModelName():                                                     schema_pkg_apis_meta_v1_Patch(ref),
+		metav1.PatchOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_PatchOptions(ref),
+		metav1.Preconditions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_Preconditions(ref),
+		metav1.RootPaths{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_RootPaths(ref),
+		metav1.ServerAddressByClientCIDR{}.OpenAPIModelName():                                 schema_pkg_apis_meta_v1_ServerAddressByClientCIDR(ref),
+		metav1.Status{}.OpenAPIModelName():                                                    schema_pkg_apis_meta_v1_Status(ref),
+		metav1.StatusCause{}.OpenAPIModelName():                                               schema_pkg_apis_meta_v1_StatusCause(ref),
+		metav1.StatusDetails{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_StatusDetails(ref),
+		metav1.Table{}.OpenAPIModelName():                                                     schema_pkg_apis_meta_v1_Table(ref),
+		metav1.TableColumnDefinition{}.OpenAPIModelName():                                     schema_pkg_apis_meta_v1_TableColumnDefinition(ref),
+		metav1.TableOptions{}.OpenAPIModelName():                                              schema_pkg_apis_meta_v1_TableOptions(ref),
+		metav1.TableRow{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_TableRow(ref),
+		metav1.TableRowCondition{}.OpenAPIModelName():                                         schema_pkg_apis_meta_v1_TableRowCondition(ref),
+		metav1.Time{}.OpenAPIModelName():                                                      schema_pkg_apis_meta_v1_Time(ref),
+		metav1.Timestamp{}.OpenAPIModelName():                                                 schema_pkg_apis_meta_v1_Timestamp(ref),
+		metav1.TypeMeta{}.OpenAPIModelName():                                                  schema_pkg_apis_meta_v1_TypeMeta(ref),
+		metav1.UpdateOptions{}.OpenAPIModelName():                                             schema_pkg_apis_meta_v1_UpdateOptions(ref),
+		metav1.WatchEvent{}.OpenAPIModelName():                                                schema_pkg_apis_meta_v1_WatchEvent(ref),
+		runtime.RawExtension{}.OpenAPIModelName():                                             schema_k8sio_apimachinery_pkg_runtime_RawExtension(ref),
+		runtime.TypeMeta{}.OpenAPIModelName():                                                 schema_k8sio_apimachinery_pkg_runtime_TypeMeta(ref),
+		runtime.Unknown{}.OpenAPIModelName():                                                  schema_k8sio_apimachinery_pkg_runtime_Unknown(ref),
+		version.Info{}.OpenAPIModelName():                                                     schema_k8sio_apimachinery_pkg_version_Info(ref),
 	}
 }
 
@@ -515,12 +519,12 @@ func schema_ironcore_api_common_v1alpha1_IPRange(ref common.ReferenceCallback) c
 				Properties: map[string]spec.Schema{
 					"from": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref: ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 					"to": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref: ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -528,7 +532,7 @@ func schema_ironcore_api_common_v1alpha1_IPRange(ref common.ReferenceCallback) c
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"},
+			v1alpha1.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -809,14 +813,14 @@ func schema_ironcore_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref co
 					"networkInterfaceTemplate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceTemplateSpec"),
+							Ref:         ref(networkingv1alpha1.NetworkInterfaceTemplateSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceTemplateSpec"},
+			networkingv1alpha1.NetworkInterfaceTemplateSpec{}.OpenAPIModelName()},
 	}
 }
 
@@ -830,14 +834,14 @@ func schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref common.Refer
 					"volumeTemplate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeTemplate is the template definition of the storage.Volume.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec"),
+							Ref:         ref(storagev1alpha1.VolumeTemplateSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeTemplateSpec"},
+			storagev1alpha1.VolumeTemplateSpec{}.OpenAPIModelName()},
 	}
 }
 
@@ -899,20 +903,20 @@ func schema_ironcore_api_compute_v1alpha1_Machine(ref common.ReferenceCallback) 
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineSpec"),
+							Ref:     ref(computev1alpha1.MachineSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineStatus"),
+							Ref:     ref(computev1alpha1.MachineStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineSpec", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			computev1alpha1.MachineSpec{}.OpenAPIModelName(), computev1alpha1.MachineStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -998,7 +1002,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineClassList(ref common.ReferenceC
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass"),
+										Ref:     ref(computev1alpha1.MachineClass{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1009,7 +1013,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineClassList(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClass", metav1.ListMeta{}.OpenAPIModelName()},
+			computev1alpha1.MachineClass{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -1134,7 +1138,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineList(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine"),
+										Ref:     ref(computev1alpha1.Machine{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1145,7 +1149,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineList(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Machine", metav1.ListMeta{}.OpenAPIModelName()},
+			computev1alpha1.Machine{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -1179,20 +1183,20 @@ func schema_ironcore_api_compute_v1alpha1_MachinePool(ref common.ReferenceCallba
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolSpec"),
+							Ref:     ref(computev1alpha1.MachinePoolSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolStatus"),
+							Ref:     ref(computev1alpha1.MachinePoolStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolSpec", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			computev1alpha1.MachinePoolSpec{}.OpenAPIModelName(), computev1alpha1.MachinePoolStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -1295,14 +1299,14 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolDaemonEndpoints(ref common.
 						SchemaProps: spec.SchemaProps{
 							Description: "Endpoint on which machinepoollet is listening.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.DaemonEndpoint"),
+							Ref:         ref(computev1alpha1.DaemonEndpoint{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.DaemonEndpoint"},
+			computev1alpha1.DaemonEndpoint{}.OpenAPIModelName()},
 	}
 }
 
@@ -1340,7 +1344,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolList(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool"),
+										Ref:     ref(computev1alpha1.MachinePool{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1351,7 +1355,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool", metav1.ListMeta{}.OpenAPIModelName()},
+			computev1alpha1.MachinePool{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -1378,7 +1382,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolSpec(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"),
+										Ref:     ref(v1alpha1.Taint{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1389,7 +1393,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolSpec(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"},
+			v1alpha1.Taint{}.OpenAPIModelName()},
 	}
 }
 
@@ -1415,7 +1419,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolCondition"),
+										Ref:     ref(computev1alpha1.MachinePoolCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1441,7 +1445,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolAddress"),
+										Ref:     ref(computev1alpha1.MachinePoolAddress{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1450,7 +1454,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref common.Reference
 					"daemonEndpoints": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolDaemonEndpoints"),
+							Ref:     ref(computev1alpha1.MachinePoolDaemonEndpoints{}.OpenAPIModelName()),
 						},
 					},
 					"capacity": {
@@ -1485,7 +1489,7 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolStatus(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolAddress", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolCondition", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolDaemonEndpoints", v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
+			computev1alpha1.MachinePoolAddress{}.OpenAPIModelName(), computev1alpha1.MachinePoolCondition{}.OpenAPIModelName(), computev1alpha1.MachinePoolDaemonEndpoints{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
 	}
 }
 
@@ -1559,7 +1563,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface"),
+										Ref:     ref(computev1alpha1.NetworkInterface{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1579,7 +1583,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume"),
+										Ref:     ref(computev1alpha1.Volume{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1588,7 +1592,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 					"ignitionRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector"),
+							Ref:         ref(v1alpha1.SecretKeySelector{}.OpenAPIModelName()),
 						},
 					},
 					"efiVars": {
@@ -1605,7 +1609,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar"),
+										Ref:     ref(computev1alpha1.EFIVar{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1619,7 +1623,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration"),
+										Ref:     ref(v1alpha1.Toleration{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1630,7 +1634,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.SecretKeySelector{}.OpenAPIModelName(), v1alpha1.Toleration{}.OpenAPIModelName(), computev1alpha1.EFIVar{}.OpenAPIModelName(), computev1alpha1.NetworkInterface{}.OpenAPIModelName(), computev1alpha1.Volume{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1663,7 +1667,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition"),
+										Ref:     ref(computev1alpha1.MachineCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1685,7 +1689,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus"),
+										Ref:     ref(computev1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1699,7 +1703,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus"),
+										Ref:     ref(computev1alpha1.VolumeStatus{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -1709,7 +1713,7 @@ func schema_ironcore_api_compute_v1alpha1_MachineStatus(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterfaceStatus", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.VolumeStatus"},
+			computev1alpha1.MachineCondition{}.OpenAPIModelName(), computev1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName(), computev1alpha1.VolumeStatus{}.OpenAPIModelName()},
 	}
 }
 
@@ -1737,7 +1741,7 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterface(ref common.ReferenceC
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) NetworkInterface to use.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource"),
+							Ref:         ref(computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -1745,7 +1749,7 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterface(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1764,14 +1768,14 @@ func schema_ironcore_api_compute_v1alpha1_NetworkInterfaceSource(ref common.Refe
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) NetworkInterface to use.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource"),
+							Ref:         ref(computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralNetworkInterfaceSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1857,19 +1861,19 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 					"emptyDisk": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource"),
+							Ref:         ref(computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 					"localDisk": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LocalDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource"),
+							Ref:         ref(computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource"),
+							Ref:         ref(computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -1877,7 +1881,7 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName(), computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1897,26 +1901,26 @@ func schema_ironcore_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCallb
 					"emptyDisk": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource"),
+							Ref:         ref(computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 					"localDisk": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LocalDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource"),
+							Ref:         ref(computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource"),
+							Ref:         ref(computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EmptyDiskVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EphemeralVolumeSource", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.LocalDiskVolumeSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName(), computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -2308,20 +2312,20 @@ func schema_ironcore_api_ipam_v1alpha1_Prefix(ref common.ReferenceCallback) comm
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec"),
+							Ref:     ref(ipamv1alpha1.PrefixSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixStatus"),
+							Ref:     ref(ipamv1alpha1.PrefixStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec", "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			ipamv1alpha1.PrefixSpec{}.OpenAPIModelName(), ipamv1alpha1.PrefixStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2355,20 +2359,20 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocation(ref common.ReferenceCall
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationSpec"),
+							Ref:     ref(ipamv1alpha1.PrefixAllocationSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationStatus"),
+							Ref:     ref(ipamv1alpha1.PrefixAllocationStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationSpec", "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			ipamv1alpha1.PrefixAllocationSpec{}.OpenAPIModelName(), ipamv1alpha1.PrefixAllocationStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2406,7 +2410,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationList(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocation"),
+										Ref:     ref(ipamv1alpha1.PrefixAllocation{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2417,7 +2421,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationList(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocation", metav1.ListMeta{}.OpenAPIModelName()},
+			ipamv1alpha1.PrefixAllocation{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2439,7 +2443,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationSpec(ref common.Reference
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the prefix to allocate for this Prefix.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"prefixLength": {
@@ -2465,7 +2469,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationSpec(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
 	}
 }
 
@@ -2479,7 +2483,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationStatus(ref common.Referen
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the allocated prefix, if any",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"phase": {
@@ -2499,7 +2503,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixAllocationStatus(ref common.Referen
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", metav1.Time{}.OpenAPIModelName()},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
 	}
 }
 
@@ -2537,7 +2541,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixList(ref common.ReferenceCallback) 
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.Prefix"),
+										Ref:     ref(ipamv1alpha1.Prefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2548,7 +2552,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixList(ref common.ReferenceCallback) 
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.Prefix", metav1.ListMeta{}.OpenAPIModelName()},
+			ipamv1alpha1.Prefix{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2570,7 +2574,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixSpec(ref common.ReferenceCallback) 
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Prefix is the prefix to allocate for this Prefix.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"prefixLength": {
@@ -2596,7 +2600,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixSpec(ref common.ReferenceCallback) 
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
 	}
 }
 
@@ -2627,7 +2631,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixStatus(ref common.ReferenceCallback
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+										Ref: ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2637,7 +2641,7 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixStatus(ref common.ReferenceCallback
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", metav1.Time{}.OpenAPIModelName()},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
 	}
 }
 
@@ -2656,14 +2660,14 @@ func schema_ironcore_api_ipam_v1alpha1_PrefixTemplateSpec(ref common.ReferenceCa
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec"),
+							Ref:     ref(ipamv1alpha1.PrefixSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec", metav1.ObjectMeta{}.OpenAPIModelName()},
+			ipamv1alpha1.PrefixSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2677,14 +2681,14 @@ func schema_ironcore_api_networking_v1alpha1_EphemeralPrefixSource(ref common.Re
 					"prefixTemplate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "PrefixTemplate is the template for the Prefix.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec"),
+							Ref:         ref(ipamv1alpha1.PrefixTemplateSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec"},
+			ipamv1alpha1.PrefixTemplateSpec{}.OpenAPIModelName()},
 	}
 }
 
@@ -2698,14 +2702,14 @@ func schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSource(ref common
 					"virtualIPTemplate": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VirtualIPTemplate is the template for the VirtualIP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPTemplateSpec"),
+							Ref:         ref(networkingv1alpha1.VirtualIPTemplateSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPTemplateSpec"},
+			networkingv1alpha1.VirtualIPTemplateSpec{}.OpenAPIModelName()},
 	}
 }
 
@@ -2735,7 +2739,7 @@ func schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref common.R
 					"targetRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+							Ref:         ref(v1alpha1.LocalUIDReference{}.OpenAPIModelName()),
 						},
 					},
 					"reclaimPolicy": {
@@ -2750,7 +2754,7 @@ func schema_ironcore_api_networking_v1alpha1_EphemeralVirtualIPSpec(ref common.R
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -2764,7 +2768,7 @@ func schema_ironcore_api_networking_v1alpha1_IPBlock(ref common.ReferenceCallbac
 					"cidr": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CIDR is a string representing the ip block.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"except": {
@@ -2774,7 +2778,7 @@ func schema_ironcore_api_networking_v1alpha1_IPBlock(ref common.ReferenceCallbac
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+										Ref: ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2785,7 +2789,7 @@ func schema_ironcore_api_networking_v1alpha1_IPBlock(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"},
+			v1alpha1.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -2799,20 +2803,20 @@ func schema_ironcore_api_networking_v1alpha1_IPSource(ref common.ReferenceCallba
 					"value": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Value specifies an IP by using an IP literal.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref:         ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource"),
+							Ref:         ref(networkingv1alpha1.EphemeralPrefixSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource"},
+			v1alpha1.IP{}.OpenAPIModelName(), networkingv1alpha1.EphemeralPrefixSource{}.OpenAPIModelName()},
 	}
 }
 
@@ -2846,20 +2850,20 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancer(ref common.ReferenceCa
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerSpec"),
+							Ref:     ref(networkingv1alpha1.LoadBalancerSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerStatus"),
+							Ref:     ref(networkingv1alpha1.LoadBalancerStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerSpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.LoadBalancerSpec{}.OpenAPIModelName(), networkingv1alpha1.LoadBalancerStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -2873,13 +2877,13 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerDestination(ref common.
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the target IP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref:         ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 					"targetRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TargetRef is the target providing the destination.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerTargetRef"),
+							Ref:         ref(networkingv1alpha1.LoadBalancerTargetRef{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -2887,7 +2891,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerDestination(ref common.
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerTargetRef"},
+			v1alpha1.IP{}.OpenAPIModelName(), networkingv1alpha1.LoadBalancerTargetRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -2925,7 +2929,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerList(ref common.Referen
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancer"),
+										Ref:     ref(networkingv1alpha1.LoadBalancer{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -2936,7 +2940,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerList(ref common.Referen
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancer", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.LoadBalancer{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3007,7 +3011,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref common.Refe
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkRef is the network the load balancer is assigned to.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+							Ref:         ref(v1alpha1.LocalUIDReference{}.OpenAPIModelName()),
 						},
 					},
 					"destinations": {
@@ -3018,7 +3022,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref common.Refe
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerDestination"),
+										Ref:     ref(networkingv1alpha1.LoadBalancerDestination{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3029,7 +3033,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRouting(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerDestination", metav1.ObjectMeta{}.OpenAPIModelName()},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName(), networkingv1alpha1.LoadBalancerDestination{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3067,7 +3071,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRoutingList(ref common.
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRouting"),
+										Ref:     ref(networkingv1alpha1.LoadBalancerRouting{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3078,7 +3082,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerRoutingList(ref common.
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRouting", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.LoadBalancerRouting{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3121,7 +3125,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerSpec(ref common.Referen
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource"),
+										Ref:     ref(networkingv1alpha1.IPSource{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3148,7 +3152,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerSpec(ref common.Referen
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerPort"),
+										Ref:     ref(networkingv1alpha1.LoadBalancerPort{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3159,7 +3163,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerSpec(ref common.Referen
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerPort", v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
+			networkingv1alpha1.IPSource{}.OpenAPIModelName(), networkingv1alpha1.LoadBalancerPort{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
 	}
 }
 
@@ -3177,7 +3181,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerStatus(ref common.Refer
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+										Ref: ref(v1alpha1.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3187,7 +3191,7 @@ func schema_ironcore_api_networking_v1alpha1_LoadBalancerStatus(ref common.Refer
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"},
+			v1alpha1.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -3259,20 +3263,20 @@ func schema_ironcore_api_networking_v1alpha1_NATGateway(ref common.ReferenceCall
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewaySpec"),
+							Ref:     ref(networkingv1alpha1.NATGatewaySpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayStatus"),
+							Ref:     ref(networkingv1alpha1.NATGatewayStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewaySpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NATGatewaySpec{}.OpenAPIModelName(), networkingv1alpha1.NATGatewayStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3310,7 +3314,7 @@ func schema_ironcore_api_networking_v1alpha1_NATGatewayList(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGateway"),
+										Ref:     ref(networkingv1alpha1.NATGateway{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3321,7 +3325,7 @@ func schema_ironcore_api_networking_v1alpha1_NATGatewayList(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGateway", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NATGateway{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3386,7 +3390,7 @@ func schema_ironcore_api_networking_v1alpha1_NATGatewayStatus(ref common.Referen
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+										Ref: ref(v1alpha1.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3396,7 +3400,7 @@ func schema_ironcore_api_networking_v1alpha1_NATGatewayStatus(ref common.Referen
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"},
+			v1alpha1.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -3430,20 +3434,20 @@ func schema_ironcore_api_networking_v1alpha1_Network(ref common.ReferenceCallbac
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkSpec"),
+							Ref:     ref(networkingv1alpha1.NetworkSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkStatus"),
+							Ref:     ref(networkingv1alpha1.NetworkStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkSpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkSpec{}.OpenAPIModelName(), networkingv1alpha1.NetworkStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3477,20 +3481,20 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterface(ref common.Referen
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec"),
+							Ref:     ref(networkingv1alpha1.NetworkInterfaceSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceStatus"),
+							Ref:     ref(networkingv1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkInterfaceSpec{}.OpenAPIModelName(), networkingv1alpha1.NetworkInterfaceStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3528,7 +3532,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceList(ref common.Ref
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterface"),
+										Ref:     ref(networkingv1alpha1.NetworkInterface{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3539,7 +3543,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceList(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterface", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkInterface{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3567,7 +3571,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.Ref
 					"machineRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "MachineRef is the Machine this NetworkInterface is used by",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+							Ref:         ref(v1alpha1.LocalUIDReference{}.OpenAPIModelName()),
 						},
 					},
 					"ipFamilies": {
@@ -3594,7 +3598,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.Ref
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource"),
+										Ref:     ref(networkingv1alpha1.IPSource{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3608,7 +3612,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.Ref
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource"),
+										Ref:     ref(networkingv1alpha1.PrefixSource{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3617,7 +3621,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.Ref
 					"virtualIP": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSource"),
+							Ref:         ref(networkingv1alpha1.VirtualIPSource{}.OpenAPIModelName()),
 						},
 					},
 					"attributes": {
@@ -3641,7 +3645,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceSpec(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName(), networkingv1alpha1.IPSource{}.OpenAPIModelName(), networkingv1alpha1.PrefixSource{}.OpenAPIModelName(), networkingv1alpha1.VirtualIPSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -3672,7 +3676,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceStatus(ref common.R
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+										Ref: ref(v1alpha1.IP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3685,7 +3689,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceStatus(ref common.R
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+										Ref: ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3694,14 +3698,14 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceStatus(ref common.R
 					"virtualIP": {
 						SchemaProps: spec.SchemaProps{
 							Description: "VirtualIP is any virtual ip assigned to the NetworkInterface.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref:         ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", metav1.Time{}.OpenAPIModelName()},
+			v1alpha1.IP{}.OpenAPIModelName(), v1alpha1.IPPrefix{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
 	}
 }
 
@@ -3721,14 +3725,14 @@ func schema_ironcore_api_networking_v1alpha1_NetworkInterfaceTemplateSpec(ref co
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec"),
+							Ref:     ref(networkingv1alpha1.NetworkInterfaceSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkInterfaceSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3766,7 +3770,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkList(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.Network"),
+										Ref:     ref(networkingv1alpha1.Network{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3777,7 +3781,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkList(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.Network", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.Network{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3800,7 +3804,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeering(ref common.Reference
 						SchemaProps: spec.SchemaProps{
 							Description: "NetworkRef is the reference to the network to peer with. An empty namespace indicates that the target network resides in the same namespace as the source network.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringNetworkRef"),
+							Ref:         ref(networkingv1alpha1.NetworkPeeringNetworkRef{}.OpenAPIModelName()),
 						},
 					},
 					"prefixes": {
@@ -3811,7 +3815,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeering(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefix"),
+										Ref:     ref(networkingv1alpha1.PeeringPrefix{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3822,7 +3826,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeering(ref common.Reference
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringNetworkRef", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefix"},
+			networkingv1alpha1.NetworkPeeringNetworkRef{}.OpenAPIModelName(), networkingv1alpha1.PeeringPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -3920,7 +3924,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeeringStatus(ref common.Ref
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixStatus"),
+										Ref:     ref(networkingv1alpha1.PeeringPrefixStatus{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3931,7 +3935,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPeeringStatus(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixStatus"},
+			networkingv1alpha1.PeeringPrefixStatus{}.OpenAPIModelName()},
 	}
 }
 
@@ -3965,20 +3969,20 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicy(ref common.ReferenceC
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicySpec"),
+							Ref:     ref(networkingv1alpha1.NetworkPolicySpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyStatus"),
+							Ref:     ref(networkingv1alpha1.NetworkPolicyStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicySpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkPolicySpec{}.OpenAPIModelName(), networkingv1alpha1.NetworkPolicyStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4058,7 +4062,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyEgressRule(ref common.
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyPort{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4072,7 +4076,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyEgressRule(ref common.
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyPeer{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4082,7 +4086,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyEgressRule(ref common.
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort"},
+			networkingv1alpha1.NetworkPolicyPeer{}.OpenAPIModelName(), networkingv1alpha1.NetworkPolicyPort{}.OpenAPIModelName()},
 	}
 }
 
@@ -4101,7 +4105,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyIngressRule(ref common
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyPort{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4115,7 +4119,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyIngressRule(ref common
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyPeer{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4125,7 +4129,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyIngressRule(ref common
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort"},
+			networkingv1alpha1.NetworkPolicyPeer{}.OpenAPIModelName(), networkingv1alpha1.NetworkPolicyPort{}.OpenAPIModelName()},
 	}
 }
 
@@ -4163,7 +4167,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyList(ref common.Refere
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicy"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicy{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4174,7 +4178,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyList(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicy", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkPolicy{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4194,14 +4198,14 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyPeer(ref common.Refere
 					"ipBlock": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IPBlock specifies the ip block from or to which network traffic may come.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPBlock"),
+							Ref:         ref(networkingv1alpha1.IPBlock{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPBlock"},
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector", networkingv1alpha1.IPBlock{}.OpenAPIModelName()},
 	}
 }
 
@@ -4269,7 +4273,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicySpec(ref common.Refere
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyIngressRule"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyIngressRule{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4283,7 +4287,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicySpec(ref common.Refere
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyEgressRule"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyEgressRule{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4309,7 +4313,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicySpec(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyEgressRule", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyIngressRule", v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
+			networkingv1alpha1.NetworkPolicyEgressRule{}.OpenAPIModelName(), networkingv1alpha1.NetworkPolicyIngressRule{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
 	}
 }
 
@@ -4328,7 +4332,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyStatus(ref common.Refe
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyCondition"),
+										Ref:     ref(networkingv1alpha1.NetworkPolicyCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4338,7 +4342,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkPolicyStatus(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyCondition"},
+			networkingv1alpha1.NetworkPolicyCondition{}.OpenAPIModelName()},
 	}
 }
 
@@ -4370,7 +4374,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeering"),
+										Ref:     ref(networkingv1alpha1.NetworkPeering{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4390,7 +4394,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringClaimRef"),
+										Ref:     ref(networkingv1alpha1.NetworkPeeringClaimRef{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4400,7 +4404,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkSpec(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeering", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringClaimRef"},
+			networkingv1alpha1.NetworkPeering{}.OpenAPIModelName(), networkingv1alpha1.NetworkPeeringClaimRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -4433,7 +4437,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkStatus(ref common.ReferenceC
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringStatus"),
+										Ref:     ref(networkingv1alpha1.NetworkPeeringStatus{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4443,7 +4447,7 @@ func schema_ironcore_api_networking_v1alpha1_NetworkStatus(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringStatus"},
+			networkingv1alpha1.NetworkPeeringStatus{}.OpenAPIModelName()},
 	}
 }
 
@@ -4465,7 +4469,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref common.ReferenceC
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CIDR to be exposed to the peered network",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"prefixRef": {
@@ -4480,7 +4484,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefix(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -4502,7 +4506,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefixStatus(ref common.Refe
 					"prefix": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CIDR exposed to the peered network",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -4510,7 +4514,7 @@ func schema_ironcore_api_networking_v1alpha1_PeeringPrefixStatus(ref common.Refe
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"},
+			v1alpha1.IPPrefix{}.OpenAPIModelName()},
 	}
 }
 
@@ -4523,20 +4527,20 @@ func schema_ironcore_api_networking_v1alpha1_PrefixSource(ref common.ReferenceCa
 					"value": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Value specifies a static prefix to use.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix"),
+							Ref:         ref(v1alpha1.IPPrefix{}.OpenAPIModelName()),
 						},
 					},
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource"),
+							Ref:         ref(networkingv1alpha1.EphemeralPrefixSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource"},
+			v1alpha1.IPPrefix{}.OpenAPIModelName(), networkingv1alpha1.EphemeralPrefixSource{}.OpenAPIModelName()},
 	}
 }
 
@@ -4570,20 +4574,20 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIP(ref common.ReferenceCallb
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec"),
+							Ref:     ref(networkingv1alpha1.VirtualIPSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPStatus"),
+							Ref:     ref(networkingv1alpha1.VirtualIPStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec", "github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.VirtualIPSpec{}.OpenAPIModelName(), networkingv1alpha1.VirtualIPStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4621,7 +4625,7 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPList(ref common.ReferenceC
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIP"),
+										Ref:     ref(networkingv1alpha1.VirtualIP{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4632,7 +4636,7 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPList(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIP", metav1.ListMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.VirtualIP{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4652,14 +4656,14 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPSource(ref common.Referenc
 					"ephemeral": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource"),
+							Ref:         ref(networkingv1alpha1.EphemeralVirtualIPSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			networkingv1alpha1.EphemeralVirtualIPSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -4690,7 +4694,7 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPSpec(ref common.ReferenceC
 					"targetRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+							Ref:         ref(v1alpha1.LocalUIDReference{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -4698,7 +4702,7 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPSpec(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -4712,14 +4716,14 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPStatus(ref common.Referenc
 					"ip": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IP is the allocated IP, if any.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"),
+							Ref:         ref(v1alpha1.IP{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP"},
+			v1alpha1.IP{}.OpenAPIModelName()},
 	}
 }
 
@@ -4739,14 +4743,14 @@ func schema_ironcore_api_networking_v1alpha1_VirtualIPTemplateSpec(ref common.Re
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec"),
+							Ref:     ref(networkingv1alpha1.EphemeralVirtualIPSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec", metav1.ObjectMeta{}.OpenAPIModelName()},
+			networkingv1alpha1.EphemeralVirtualIPSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4780,20 +4784,20 @@ func schema_ironcore_api_storage_v1alpha1_Bucket(ref common.ReferenceCallback) c
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec"),
+							Ref:     ref(storagev1alpha1.BucketSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus"),
+							Ref:     ref(storagev1alpha1.BucketStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.BucketSpec{}.OpenAPIModelName(), storagev1alpha1.BucketStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4910,7 +4914,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketClassList(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClass"),
+										Ref:     ref(storagev1alpha1.BucketClass{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4921,7 +4925,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketClassList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClass", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.BucketClass{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5018,7 +5022,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketList(ref common.ReferenceCallbac
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Bucket"),
+										Ref:     ref(storagev1alpha1.Bucket{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5029,7 +5033,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketList(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Bucket", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.Bucket{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5063,20 +5067,20 @@ func schema_ironcore_api_storage_v1alpha1_BucketPool(ref common.ReferenceCallbac
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolSpec"),
+							Ref:     ref(storagev1alpha1.BucketPoolSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolStatus"),
+							Ref:     ref(storagev1alpha1.BucketPoolStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.BucketPoolSpec{}.OpenAPIModelName(), storagev1alpha1.BucketPoolStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5114,7 +5118,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPool"),
+										Ref:     ref(storagev1alpha1.BucketPool{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5125,7 +5129,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPool", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.BucketPool{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5152,7 +5156,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolSpec(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"),
+										Ref:     ref(v1alpha1.Taint{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5163,7 +5167,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolSpec(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"},
+			v1alpha1.Taint{}.OpenAPIModelName()},
 	}
 }
 
@@ -5246,7 +5250,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketSpec(ref common.ReferenceCallbac
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration"),
+										Ref:     ref(v1alpha1.Toleration{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5256,7 +5260,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketSpec(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.Toleration{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -5290,7 +5294,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketStatus(ref common.ReferenceCallb
 					"access": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Access specifies how to access a Bucket. This is set by the bucket provider when the bucket is provisioned.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketAccess"),
+							Ref:         ref(storagev1alpha1.BucketAccess{}.OpenAPIModelName()),
 						},
 					},
 					"conditions": {
@@ -5301,7 +5305,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketStatus(ref common.ReferenceCallb
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketCondition"),
+										Ref:     ref(storagev1alpha1.BucketCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5311,7 +5315,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketStatus(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketAccess", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketCondition", metav1.Time{}.OpenAPIModelName()},
+			storagev1alpha1.BucketAccess{}.OpenAPIModelName(), storagev1alpha1.BucketCondition{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
 	}
 }
 
@@ -5331,14 +5335,14 @@ func schema_ironcore_api_storage_v1alpha1_BucketTemplateSpec(ref common.Referenc
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec"),
+							Ref:     ref(storagev1alpha1.BucketSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.BucketSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5398,20 +5402,20 @@ func schema_ironcore_api_storage_v1alpha1_Volume(ref common.ReferenceCallback) c
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec"),
+							Ref:     ref(storagev1alpha1.VolumeSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeStatus"),
+							Ref:     ref(storagev1alpha1.VolumeStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeSpec{}.OpenAPIModelName(), storagev1alpha1.VolumeStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5559,7 +5563,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeClassList(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass"),
+										Ref:     ref(storagev1alpha1.VolumeClass{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5570,7 +5574,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeClassList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeClass{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5649,14 +5653,14 @@ func schema_ironcore_api_storage_v1alpha1_VolumeDataSource(ref common.ReferenceC
 					"osImage": {
 						SchemaProps: spec.SchemaProps{
 							Description: "OSImage defines an optional os image to bootstrap the volume.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource"),
+							Ref:         ref(storagev1alpha1.OSDataSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource", v1.LocalObjectReference{}.OpenAPIModelName()},
+			storagev1alpha1.OSDataSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -5717,7 +5721,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeList(ref common.ReferenceCallbac
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume"),
+										Ref:     ref(storagev1alpha1.Volume{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5728,7 +5732,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeList(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.Volume{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5762,20 +5766,20 @@ func schema_ironcore_api_storage_v1alpha1_VolumePool(ref common.ReferenceCallbac
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec"),
+							Ref:     ref(storagev1alpha1.VolumePoolSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus"),
+							Ref:     ref(storagev1alpha1.VolumePoolStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumePoolSpec{}.OpenAPIModelName(), storagev1alpha1.VolumePoolStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5874,7 +5878,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolList(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePool"),
+										Ref:     ref(storagev1alpha1.VolumePool{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5885,7 +5889,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolList(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePool", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumePool{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -5912,7 +5916,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref common.ReferenceCal
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"),
+										Ref:     ref(v1alpha1.Taint{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5923,7 +5927,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolSpec(ref common.ReferenceCal
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint"},
+			v1alpha1.Taint{}.OpenAPIModelName()},
 	}
 }
 
@@ -5947,7 +5951,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref common.ReferenceC
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolCondition"),
+										Ref:     ref(storagev1alpha1.VolumePoolCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -5999,7 +6003,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolStatus(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolCondition", v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
+			storagev1alpha1.VolumePoolCondition{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
 	}
 }
 
@@ -6033,20 +6037,20 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshot(ref common.ReferenceCal
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec"),
+							Ref:     ref(storagev1alpha1.VolumeSnapshotSpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus"),
+							Ref:     ref(storagev1alpha1.VolumeSnapshotStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeSnapshotSpec{}.OpenAPIModelName(), storagev1alpha1.VolumeSnapshotStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -6084,7 +6088,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref common.Referenc
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot"),
+										Ref:     ref(storagev1alpha1.VolumeSnapshot{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6095,7 +6099,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSnapshotList(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot", metav1.ListMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeSnapshot{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -6200,7 +6204,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 					"claimRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "ClaimRef is the reference to the claiming entity of the Volume.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference"),
+							Ref:         ref(v1alpha1.LocalUIDReference{}.OpenAPIModelName()),
 						},
 					},
 					"resources": {
@@ -6245,7 +6249,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration"),
+										Ref:     ref(v1alpha1.Toleration{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6254,21 +6258,21 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 					"encryption": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Encryption is an optional field which provides attributes to encrypt Volume.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption"),
+							Ref:         ref(storagev1alpha1.VolumeEncryption{}.OpenAPIModelName()),
 						},
 					},
 					"dataSource": {
 						SchemaProps: spec.SchemaProps{
 							Description: "DataSource contains the content to prepopulate the Volume with.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource"),
+							Ref:         ref(storagev1alpha1.VolumeDataSource{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption", v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
+			v1alpha1.LocalUIDReference{}.OpenAPIModelName(), v1alpha1.Toleration{}.OpenAPIModelName(), storagev1alpha1.VolumeDataSource{}.OpenAPIModelName(), storagev1alpha1.VolumeEncryption{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName()},
 	}
 }
 
@@ -6302,7 +6306,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 					"access": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Access specifies how to access a Volume. This is set by the volume provider when the volume is provisioned.",
-							Ref:         ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess"),
+							Ref:         ref(storagev1alpha1.VolumeAccess{}.OpenAPIModelName()),
 						},
 					},
 					"conditions": {
@@ -6313,7 +6317,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition"),
+										Ref:     ref(storagev1alpha1.VolumeCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -6337,7 +6341,7 @@ func schema_ironcore_api_storage_v1alpha1_VolumeStatus(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess", "github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition", resource.Quantity{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeAccess{}.OpenAPIModelName(), storagev1alpha1.VolumeCondition{}.OpenAPIModelName(), resource.Quantity{}.OpenAPIModelName(), metav1.Time{}.OpenAPIModelName()},
 	}
 }
 
@@ -6357,14 +6361,14 @@ func schema_ironcore_api_storage_v1alpha1_VolumeTemplateSpec(ref common.Referenc
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec"),
+							Ref:     ref(storagev1alpha1.VolumeSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec", metav1.ObjectMeta{}.OpenAPIModelName()},
+			storagev1alpha1.VolumeSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 

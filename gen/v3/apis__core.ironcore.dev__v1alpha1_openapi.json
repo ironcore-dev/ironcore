@@ -136,17 +136,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							}
 						}
@@ -198,7 +198,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 							}
 						}
 					},
@@ -210,12 +210,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -225,12 +225,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -240,12 +240,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -451,12 +451,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -508,7 +508,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 							}
 						}
 					},
@@ -520,12 +520,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -535,12 +535,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -729,12 +729,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -744,12 +744,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -807,12 +807,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -864,7 +864,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 							}
 						}
 					},
@@ -876,12 +876,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -891,12 +891,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -984,12 +984,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -999,12 +999,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							}
 						}
@@ -1062,17 +1062,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaList"
 								}
 							}
 						}
@@ -1634,7 +1634,7 @@
 	},
 	"components": {
 		"schemas": {
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuota": {
 				"description": "ResourceQuota is the Schema for the resourcequotas API",
 				"type": "object",
 				"properties": {
@@ -1658,7 +1658,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaSpec"
 							}
 						]
 					},
@@ -1666,20 +1666,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuotaStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "core.ironcore.dev",
-						"kind": "ResourceQuota",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaList": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaList": {
 				"description": "ResourceQuotaList contains a list of ResourceQuota",
 				"type": "object",
 				"required": [
@@ -1696,7 +1689,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuota"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceQuota"
 								}
 							]
 						}
@@ -1713,16 +1706,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "core.ironcore.dev",
-						"kind": "ResourceQuotaList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaSpec": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaSpec": {
 				"description": "ResourceQuotaSpec defines the desired state of ResourceQuotaSpec",
 				"type": "object",
 				"properties": {
@@ -1737,13 +1723,13 @@
 						"description": "ScopeSelector selects the resources that are subject to this quota. Note: By using certain ScopeSelectors, only certain resources may be tracked.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelector"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceScopeSelector"
 							}
 						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceQuotaStatus": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceQuotaStatus": {
 				"description": "ResourceQuotaStatus is the status of a ResourceQuota.",
 				"type": "object",
 				"properties": {
@@ -1763,7 +1749,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelector": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelector": {
 				"description": "ResourceScopeSelector selects",
 				"type": "object",
 				"properties": {
@@ -1774,14 +1760,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelectorRequirement"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ResourceScopeSelectorRequirement"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ResourceScopeSelectorRequirement": {
+			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceScopeSelectorRequirement": {
 				"description": "ResourceScopeSelectorRequirement is a requirement for a resource using a ResourceScope alongside a ResourceScopeSelectorOperator with Values (depending on the ResourceScopeSelectorOperator).",
 				"type": "object",
 				"required": [
@@ -2279,8 +2265,7 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						],
-						"x-kubernetes-list-type": "atomic"
+						]
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",

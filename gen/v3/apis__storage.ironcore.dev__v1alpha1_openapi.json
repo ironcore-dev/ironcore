@@ -136,17 +136,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClassList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClassList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClassList"
 								}
 							}
 						}
@@ -198,7 +198,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 							}
 						}
 					},
@@ -210,12 +210,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -225,12 +225,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -240,12 +240,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -441,12 +441,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -498,7 +498,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 							}
 						}
 					},
@@ -510,12 +510,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -525,12 +525,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -719,12 +719,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -734,12 +734,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							}
 						}
@@ -879,17 +879,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPoolList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPoolList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPoolList"
 								}
 							}
 						}
@@ -941,7 +941,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 							}
 						}
 					},
@@ -953,12 +953,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -968,12 +968,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -983,12 +983,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1184,12 +1184,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1241,7 +1241,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 							}
 						}
 					},
@@ -1253,12 +1253,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1268,12 +1268,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1462,12 +1462,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1477,12 +1477,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1530,12 +1530,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1587,7 +1587,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 							}
 						}
 					},
@@ -1599,12 +1599,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1614,12 +1614,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1707,12 +1707,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1722,12 +1722,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							}
 						}
@@ -1775,17 +1775,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							}
 						}
@@ -2005,17 +2005,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketList"
 								}
 							}
 						}
@@ -2067,7 +2067,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 							}
 						}
 					},
@@ -2079,12 +2079,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2094,12 +2094,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2109,12 +2109,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2320,12 +2320,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2377,7 +2377,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 							}
 						}
 					},
@@ -2389,12 +2389,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2404,12 +2404,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2598,12 +2598,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2613,12 +2613,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2676,12 +2676,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2733,7 +2733,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 							}
 						}
 					},
@@ -2745,12 +2745,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2760,12 +2760,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2853,12 +2853,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -2868,12 +2868,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							}
 						}
@@ -3023,17 +3023,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							}
 						}
@@ -3085,7 +3085,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 							}
 						}
 					},
@@ -3097,12 +3097,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3112,12 +3112,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3127,12 +3127,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3338,12 +3338,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3395,7 +3395,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 							}
 						}
 					},
@@ -3407,12 +3407,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3422,12 +3422,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3616,12 +3616,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3631,12 +3631,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3694,12 +3694,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3751,7 +3751,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 							}
 						}
 					},
@@ -3763,12 +3763,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3778,12 +3778,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3871,12 +3871,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -3886,12 +3886,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							}
 						}
@@ -4041,17 +4041,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							}
 						}
@@ -4103,7 +4103,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 							}
 						}
 					},
@@ -4115,12 +4115,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4130,12 +4130,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4145,12 +4145,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4356,12 +4356,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4413,7 +4413,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 							}
 						}
 					},
@@ -4425,12 +4425,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4440,12 +4440,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4634,12 +4634,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4649,12 +4649,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4712,12 +4712,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4769,7 +4769,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 							}
 						}
 					},
@@ -4781,12 +4781,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4796,12 +4796,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4889,12 +4889,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -4904,12 +4904,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							}
 						}
@@ -5059,17 +5059,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClassList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClassList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClassList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClassList"
 								}
 							}
 						}
@@ -5121,7 +5121,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 							}
 						}
 					},
@@ -5133,12 +5133,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5148,12 +5148,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5163,12 +5163,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5364,12 +5364,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5421,7 +5421,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 							}
 						}
 					},
@@ -5433,12 +5433,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5448,12 +5448,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5642,12 +5642,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5657,12 +5657,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							}
 						}
@@ -5802,17 +5802,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolList"
 								}
 							}
 						}
@@ -5864,7 +5864,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 							}
 						}
 					},
@@ -5876,12 +5876,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -5891,12 +5891,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -5906,12 +5906,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6107,12 +6107,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6164,7 +6164,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 							}
 						}
 					},
@@ -6176,12 +6176,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6191,12 +6191,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6385,12 +6385,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6400,12 +6400,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6453,12 +6453,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6510,7 +6510,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 							}
 						}
 					},
@@ -6522,12 +6522,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6537,12 +6537,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6630,12 +6630,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6645,12 +6645,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							}
 						}
@@ -6698,17 +6698,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeList"
 								}
 							}
 						}
@@ -6836,17 +6836,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotList"
 								}
 							}
 						}
@@ -9440,7 +9440,7 @@
 	},
 	"components": {
 		"schemas": {
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference": {
 				"description": "LocalUIDReference is a reference to another entity including its UID",
 				"type": "object",
 				"required": [
@@ -9461,7 +9461,7 @@
 				},
 				"x-kubernetes-map-type": "atomic"
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Taint": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Taint": {
 				"description": "The resource pool this Taint is attached to has the \"effect\" on any resource that does not tolerate the Taint.",
 				"type": "object",
 				"required": [
@@ -9485,7 +9485,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration": {
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration": {
 				"description": "Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using the matching operator.",
 				"type": "object",
 				"properties": {
@@ -9507,7 +9507,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Bucket": {
 				"description": "Bucket is the Schema for the buckets API",
 				"type": "object",
 				"properties": {
@@ -9531,7 +9531,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketSpec"
 							}
 						]
 					},
@@ -9539,20 +9539,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "Bucket",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketAccess": {
 				"description": "BucketAccess represents information on how to access a bucket.",
 				"type": "object",
 				"required": [
@@ -9574,7 +9567,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClass": {
 				"description": "BucketClass is the Schema for the bucketclasses API",
 				"type": "object",
 				"properties": {
@@ -9601,16 +9594,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "BucketClass",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClassList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketClassList": {
 				"description": "BucketClassList contains a list of BucketClass",
 				"type": "object",
 				"required": [
@@ -9627,7 +9613,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketClass"
 								}
 							]
 						}
@@ -9644,16 +9630,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "BucketClassList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketCondition": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketCondition": {
 				"description": "BucketCondition is one of the conditions of a bucket.",
 				"type": "object",
 				"required": [
@@ -9694,7 +9673,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketList": {
 				"description": "BucketList contains a list of Bucket",
 				"type": "object",
 				"required": [
@@ -9711,7 +9690,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Bucket"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Bucket"
 								}
 							]
 						}
@@ -9728,16 +9707,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "BucketList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPool": {
 				"description": "BucketPool is the Schema for the bucketpools API",
 				"type": "object",
 				"properties": {
@@ -9761,7 +9733,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPoolSpec"
 							}
 						]
 					},
@@ -9769,20 +9741,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPoolStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "BucketPool",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolList": {
 				"description": "BucketPoolList contains a list of BucketPool",
 				"type": "object",
 				"required": [
@@ -9799,7 +9764,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketPool"
 								}
 							]
 						}
@@ -9816,16 +9781,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "BucketPoolList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolSpec": {
 				"description": "BucketPoolSpec defines the desired state of BucketPool",
 				"type": "object",
 				"required": [
@@ -9844,14 +9802,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Taint"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Taint"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolStatus": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketPoolStatus": {
 				"description": "BucketPoolStatus defines the observed state of BucketPool",
 				"type": "object",
 				"properties": {
@@ -9873,7 +9831,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketSpec": {
 				"description": "BucketSpec defines the desired state of Bucket",
 				"type": "object",
 				"properties": {
@@ -9908,14 +9866,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Toleration"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketStatus": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.BucketStatus": {
 				"description": "BucketStatus defines the observed state of Bucket",
 				"type": "object",
 				"properties": {
@@ -9923,7 +9881,7 @@
 						"description": "Access specifies how to access a Bucket. This is set by the bucket provider when the bucket is provisioned.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketAccess"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketAccess"
 							}
 						]
 					},
@@ -9938,7 +9896,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketCondition"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.BucketCondition"
 								}
 							]
 						}
@@ -9957,7 +9915,20 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.OSDataSource": {
+				"type": "object",
+				"properties": {
+					"architecture": {
+						"description": "Architecture defines the architecture of the OS which should be used",
+						"type": "string"
+					},
+					"image": {
+						"description": "Image is an optional image to bootstrap the volume with.",
+						"type": "string"
+					}
+				}
+			},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.Volume": {
 				"description": "Volume is the Schema for the volumes API",
 				"type": "object",
 				"properties": {
@@ -9981,7 +9952,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSpec"
 							}
 						]
 					},
@@ -9989,20 +9960,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "Volume",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeAccess": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeAccess": {
 				"description": "VolumeAccess represents information on how to access a volume.",
 				"type": "object",
 				"required": [
@@ -10038,7 +10002,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClass": {
 				"description": "VolumeClass is the Schema for the volumeclasses API",
 				"type": "object",
 				"properties": {
@@ -10069,16 +10033,9 @@
 						"description": "ResizePolicy describes the supported expansion policy of a VolumeClass. If not set default to Static expansion policy.",
 						"type": "string"
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumeClass",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClassList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeClassList": {
 				"description": "VolumeClassList contains a list of VolumeClass",
 				"type": "object",
 				"required": [
@@ -10095,7 +10052,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeClass"
 								}
 							]
 						}
@@ -10112,16 +10069,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumeClassList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeCondition": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeCondition": {
 				"description": "VolumeCondition is one of the conditions of a volume.",
 				"type": "object",
 				"required": [
@@ -10162,7 +10112,29 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeDataSource": {
+				"description": "VolumeDataSource specifies the source to use for a Volume.",
+				"type": "object",
+				"properties": {
+					"osImage": {
+						"description": "OSImage defines an optional os image to bootstrap the volume.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.OSDataSource"
+							}
+						]
+					},
+					"volumeSnapshotRef": {
+						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
+					}
+				}
+			},
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeEncryption": {
 				"description": "VolumeEncryption represents information to encrypt a volume.",
 				"type": "object",
 				"required": [
@@ -10180,7 +10152,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeList": {
 				"description": "VolumeList contains a list of Volume",
 				"type": "object",
 				"required": [
@@ -10197,7 +10169,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.Volume"
 								}
 							]
 						}
@@ -10214,16 +10186,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumeList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePool": {
 				"description": "VolumePool is the Schema for the volumepools API",
 				"type": "object",
 				"properties": {
@@ -10247,7 +10212,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolSpec"
 							}
 						]
 					},
@@ -10255,20 +10220,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumePool",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolCondition": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolCondition": {
 				"description": "VolumePoolCondition is one of the conditions of a volume.",
 				"type": "object",
 				"required": [
@@ -10313,7 +10271,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolList": {
 				"description": "VolumePoolList contains a list of VolumePool",
 				"type": "object",
 				"required": [
@@ -10330,7 +10288,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePool"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePool"
 								}
 							]
 						}
@@ -10347,16 +10305,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumePoolList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolSpec": {
 				"description": "VolumePoolSpec defines the desired state of VolumePool",
 				"type": "object",
 				"required": [
@@ -10375,14 +10326,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Taint"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Taint"
 								}
 							]
 						}
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolStatus": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumePoolStatus": {
 				"description": "VolumePoolStatus defines the observed state of VolumePool",
 				"type": "object",
 				"properties": {
@@ -10418,7 +10369,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumePoolCondition"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumePoolCondition"
 								}
 							]
 						}
@@ -10428,7 +10379,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshot": {
 				"description": "VolumeSnapshot is the Schema for the VolumeSnapshots API",
 				"type": "object",
 				"properties": {
@@ -10452,7 +10403,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotSpec"
 							}
 						]
 					},
@@ -10460,20 +10411,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshotStatus"
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumeSnapshot",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotList": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotList": {
 				"description": "VolumeSnapshotList contains a list of VolumeSnapshot",
 				"type": "object",
 				"required": [
@@ -10490,7 +10434,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeSnapshot"
 								}
 							]
 						}
@@ -10507,16 +10451,9 @@
 							}
 						]
 					}
-				},
-				"x-kubernetes-group-version-kind": [
-					{
-						"group": "storage.ironcore.dev",
-						"kind": "VolumeSnapshotList",
-						"version": "v1alpha1"
-					}
-				]
+				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotSpec": {
 				"description": "VolumeSnapshotSpec defines the desired state of VolumeSnapshot",
 				"type": "object",
 				"required": [
@@ -10533,7 +10470,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshotStatus": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSnapshotStatus": {
 				"description": "VolumeSnapshotStatus defines the observed state of VolumeSnapshot",
 				"type": "object",
 				"properties": {
@@ -10563,7 +10500,7 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSpec": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeSpec": {
 				"description": "VolumeSpec defines the desired state of Volume",
 				"type": "object",
 				"properties": {
@@ -10571,7 +10508,16 @@
 						"description": "ClaimRef is the reference to the claiming entity of the Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+							}
+						]
+					},
+					"dataSource": {
+						"description": "DataSource contains the content to prepopulate the Volume with.",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeDataSource"
 							}
 						]
 					},
@@ -10579,7 +10525,7 @@
 						"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeEncryption"
 							}
 						]
 					},
@@ -10595,10 +10541,6 @@
 							}
 						]
 					},
-					"osImage": {
-						"description": "OSImage is an optional os image to bootstrap the volume.",
-						"type": "string"
-					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
 						"type": "object",
@@ -10613,7 +10555,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.Toleration"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.Toleration"
 								}
 							]
 						}
@@ -10645,18 +10587,10 @@
 							"type": "string",
 							"default": ""
 						}
-					},
-					"volumeSnapshotRef": {
-						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeStatus": {
+			"github.com/ironcore-dev/ironcore/api/storage/v1alpha1.VolumeStatus": {
 				"description": "VolumeStatus defines the observed state of Volume",
 				"type": "object",
 				"properties": {
@@ -10664,7 +10598,7 @@
 						"description": "Access specifies how to access a Volume. This is set by the volume provider when the volume is provisioned.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeAccess"
+								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeAccess"
 							}
 						]
 					},
@@ -10675,7 +10609,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeCondition"
+									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1storage~1v1alpha1.VolumeCondition"
 								}
 							]
 						}
@@ -11187,8 +11121,7 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						],
-						"x-kubernetes-list-type": "atomic"
+						]
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",

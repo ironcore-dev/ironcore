@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // +k8s:openapi-gen=true
+// +k8s:openapi-model-package=com.github.ironcore-dev.ironcore.api.compute.v1alpha1
 // +k8s:deepcopy-gen=package
 // +groupName=compute.ironcore.dev
 

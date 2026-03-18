@@ -10,17 +10,18 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1Apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/client/networking"
 	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
@@ -29,7 +30,7 @@ import (
 
 var (
 	// loadBalancerFieldOwner is no longer used with Create/Update pattern
-	_ = client.FieldOwner(networkingv1alpha1.Resource("loadbalancers").String())
+	loadBalancerFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("loadbalancers").String())
 )
 
 type LoadBalancerReconciler struct {
@@ -158,43 +159,32 @@ func (r *LoadBalancerReconciler) applyRouting(
 	destinations []networkingv1alpha1.LoadBalancerDestination,
 	network *networkingv1alpha1.Network,
 ) error {
-	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "LoadBalancerRouting",
-			APIVersion: networkingv1alpha1.SchemeGroupVersion.String(),
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: loadBalancer.Namespace,
-			Name:      loadBalancer.Name,
-		},
-		Destinations: destinations,
-		NetworkRef: commonv1alpha1.LocalUIDReference{
-			Name: network.Name,
-			UID:  network.UID,
-		},
-	}
-	//TODO: Just added this to check if simple create/update works with controller reference.
-	//  We should ideally switch to server side apply, like how it was before
-	existingRouting := &networkingv1alpha1.LoadBalancerRouting{}
-	if err := r.Get(ctx, client.ObjectKeyFromObject(loadBalancerRouting), existingRouting); err != nil {
-		if !apierrors.IsNotFound(err) {
-			return fmt.Errorf("error getting loadbalancer routing: %w", err)
+	destinationsApply := make([]*networkingv1alpha1Apply.LoadBalancerDestinationApplyConfiguration, 0, len(destinations))
+	for _, dest := range destinations {
+		destApply := networkingv1alpha1Apply.LoadBalancerDestination().WithIP(dest.IP)
+		if dest.TargetRef != nil {
+			destApply.WithTargetRef(networkingv1alpha1Apply.LoadBalancerTargetRef().
+				WithUID(dest.TargetRef.UID).
+				WithName(dest.TargetRef.Name).
+				WithProviderID(dest.TargetRef.ProviderID))
 		}
-		// Create new object
-		if err := controllerutil.SetControllerReference(loadBalancer, loadBalancerRouting, r.Scheme()); err != nil {
-			return fmt.Errorf("error setting controller reference: %w", err)
-		}
-		if err := r.Create(ctx, loadBalancerRouting); err != nil {
-			return fmt.Errorf("error creating loadbalancer routing: %w", err)
-		}
-		return nil
+		destinationsApply = append(destinationsApply, destApply)
 	}
 
-	// Update existing object
-	existingRouting.Destinations = destinations
-	existingRouting.NetworkRef = loadBalancerRouting.NetworkRef
-	if err := r.Update(ctx, existingRouting); err != nil {
-		return fmt.Errorf("error updating loadbalancer routing: %w", err)
+	loadBalancerRoutingApply := networkingv1alpha1Apply.LoadBalancerRouting(loadBalancer.Name, loadBalancer.Namespace).
+		WithOwnerReferences(v1.OwnerReference().
+			WithAPIVersion(networkingv1alpha1.SchemeGroupVersion.String()).
+			WithKind("LoadBalancer").
+			WithName(loadBalancer.Name).
+			WithUID(loadBalancer.UID).
+			WithController(true)).
+		WithDestinations(destinationsApply...).
+		WithNetworkRef(commonv1alpha1.LocalUIDReference{
+			Name: network.Name,
+			UID:  network.UID,
+		})
+	if err := r.Apply(ctx, loadBalancerRoutingApply, loadBalancerFieldOwner, client.ForceOwnership); err != nil {
+		return fmt.Errorf("error applying loadbalancer routing: %w", err)
 	}
 	return nil
 }

@@ -60,8 +60,8 @@ var _ = Describe("ListEvents", func() {
 
 		By("generating the volume events")
 		eventGeneratedTime := time.Now()
-		eventRecorder := k8sManager.GetEventRecorderFor("test-recorder")
-		eventRecorder.Event(ironcoreVolume, corev1.EventTypeNormal, "testing", "this is test event")
+		eventRecorder := k8sManager.GetEventRecorder("test-recorder")
+		eventRecorder.Eventf(ironcoreVolume, nil, corev1.EventTypeNormal, "testing", "Synced", "this is test event")
 
 		By("listing the volume events with no filters")
 		Eventually(func(g Gomega) []*irievent.Event {
@@ -73,6 +73,7 @@ var _ = Describe("ListEvents", func() {
 				HaveField("InvolvedObjectMeta.Id", Equal(ironcoreVolume.Name)),
 				HaveField("Reason", Equal("testing")),
 				HaveField("Message", Equal("this is test event")),
+				HaveField("Action", Equal("Synced")),
 				HaveField("Type", Equal(corev1.EventTypeNormal)),
 			)),
 		),
@@ -82,9 +83,7 @@ var _ = Describe("ListEvents", func() {
 		resp, err := srv.ListEvents(ctx, &iri.ListEventsRequest{Filter: &iri.EventFilter{
 			LabelSelector:  map[string]string{volumepoolletv1alpha1.VolumeUIDLabel: "foobar"},
 			EventsFromTime: eventGeneratedTime.Unix(),
-			EventsToTime:   time.Now().Unix(),
 		}})
-
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(resp.Events).To(ConsistOf(
@@ -93,6 +92,7 @@ var _ = Describe("ListEvents", func() {
 				HaveField("Reason", Equal("testing")),
 				HaveField("Message", Equal("this is test event")),
 				HaveField("Type", Equal(corev1.EventTypeNormal)),
+				HaveField("Action", Equal("Synced")),
 			)),
 		),
 		)

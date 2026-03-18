@@ -15,4 +15,5 @@ message EventSpec {
   string message = 3;
   string type = 4;
   int64 event_time = 5;
+  string action = 6;
 }

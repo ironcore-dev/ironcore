@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computev1alpha1apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/compute/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -31,29 +31,23 @@ type MachinePoolInit struct {
 	OnFailed      func(ctx context.Context, reason error) error
 }
 
-//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;create;update;patch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;create;update;patch; apply;delete
 
 func (i *MachinePoolInit) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("machinepool").WithName("init")
 
 	log.V(1).Info("Applying machine pool")
-	machinePool := &computev1alpha1.MachinePool{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: computev1alpha1.SchemeGroupVersion.String(),
-			Kind:       "MachinePool",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: i.MachinePoolName,
-		},
-		Spec: computev1alpha1.MachinePoolSpec{
-			ProviderID: i.ProviderID,
-		},
-	}
+	machinePoolApply := computev1alpha1apply.MachinePool(i.MachinePoolName).
+		WithSpec(computev1alpha1apply.MachinePoolSpec().
+			WithProviderID(i.ProviderID))
 
 	log.V(1).Info("Initially setting topology labels")
-	poolletutils.SetTopologyLabels(log, &machinePool.ObjectMeta, i.TopologyLabels)
-
-	if err := i.Patch(ctx, machinePool, client.Apply, client.ForceOwnership, client.FieldOwner(machinepoolletv1alpha1.FieldOwner)); err != nil {
+	om := &metav1.ObjectMeta{}
+	poolletutils.SetTopologyLabels(log, om, i.TopologyLabels)
+	if len(om.Labels) > 0 {
+		machinePoolApply.WithLabels(om.Labels)
+	}
+	if err := i.Apply(ctx, machinePoolApply, client.ForceOwnership, client.FieldOwner(machinepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
 			log.V(1).Info("Failed applying, calling OnFailed callback", "Error", err)
 			return i.OnFailed(ctx, err)
