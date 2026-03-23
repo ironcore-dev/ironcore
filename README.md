@@ -21,6 +21,10 @@ related to its GitHub page, nor its content under https://github.com/IronCoreLab
 
 Please see our documentation in the `/docs` folder for more details.
 
+## Proposals
+
+Enhancement proposals are written and submitted centrally at [ironcore-dev/enhancements](https://github.com/ironcore-dev/enhancements).
+
 ## Contributing
 
 We'd love to get feedback from you. Please report bugs, suggestions or post questions by opening a GitHub issue.
