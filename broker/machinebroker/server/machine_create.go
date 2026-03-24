@@ -31,7 +31,11 @@ type IronCoreMachineConfig struct {
 	IgnitionData            []byte
 	NetworkInterfaceConfigs []*IronCoreNetworkInterfaceConfig
 	VolumeConfigs           []*IronCoreVolumeConfig
-	HostName                string
+	GuestConfig             *IroncoreGuestConfig
+}
+
+type IroncoreGuestConfig struct {
+	Hostname string
 }
 
 func (s *Server) ironcoreMachinePoolRef() *corev1.LocalObjectReference {
@@ -106,6 +110,12 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)
 	}
 
+	var ironcoreGuestConfig *IroncoreGuestConfig
+	if machine.Spec.GuestConfig != nil {
+		ironcoreGuestConfig = &IroncoreGuestConfig{
+			Hostname: machine.Spec.GuestConfig.Hostname,
+		}
+	}
 	return &IronCoreMachineConfig{
 		Labels:                  labels,
 		Annotations:             annotations,
@@ -114,7 +124,7 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		IgnitionData:            machine.Spec.IgnitionData,
 		NetworkInterfaceConfigs: ironcoreNicCfgs,
 		VolumeConfigs:           ironcoreVolumeCfgs,
-		HostName:                machine.Spec.HostName,
+		GuestConfig:             ironcoreGuestConfig,
 	}, nil
 }
 
@@ -129,7 +139,6 @@ func (s *Server) createIronCoreMachine(
 	var (
 		ignitionRef    *commonv1alpha1.SecretKeySelector
 		ignitionSecret *corev1.Secret
-		guestConfig    *computev1alpha1.MachineGuestConfig
 	)
 	if ignitionData := cfg.IgnitionData; len(ignitionData) > 0 {
 		log.V(1).Info("Creating ironcore ignition secret")
@@ -181,9 +190,10 @@ func (s *Server) createIronCoreMachine(
 		}
 	}
 
-	if cfg.HostName != "" {
-		guestConfig = &computev1alpha1.MachineGuestConfig{
-			Hostname: cfg.HostName,
+	var ironcoreGuestConfig *computev1alpha1.MachineGuestConfig
+	if cfg.GuestConfig != nil {
+		ironcoreGuestConfig = &computev1alpha1.MachineGuestConfig{
+			Hostname: cfg.GuestConfig.Hostname,
 		}
 	}
 
@@ -205,7 +215,7 @@ func (s *Server) createIronCoreMachine(
 			NetworkInterfaces:   ironcoreMachineNics,
 			Volumes:             ironcoreMachineVolumes,
 			IgnitionRef:         ignitionRef,
-			GuestConfig:         guestConfig,
+			GuestConfig:         ironcoreGuestConfig,
 		},
 	}
 	log.V(1).Info("Creating ironcore machine")
