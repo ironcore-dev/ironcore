@@ -251,9 +251,11 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 		return nil, err
 	}
 
-	var hostName string
+	var guestConfig *iri.GuestConfig
 	if aggIronCoreMachine.Machine.Spec.GuestConfig != nil {
-		hostName = aggIronCoreMachine.Machine.Spec.GuestConfig.Hostname
+		guestConfig = &iri.GuestConfig{
+			Hostname: aggIronCoreMachine.Machine.Spec.GuestConfig.Hostname,
+		}
 	}
 
 	return &iri.Machine{
@@ -264,7 +266,7 @@ func (s *Server) convertAggregateIronCoreMachine(aggIronCoreMachine *AggregateIr
 			IgnitionData:      ignitionData,
 			Volumes:           volumes,
 			NetworkInterfaces: nics,
-			HostName:          hostName,
+			GuestConfig:       guestConfig,
 		},
 		Status: &iri.MachineStatus{
 			ObservedGeneration: aggIronCoreMachine.Machine.Status.ObservedGeneration,

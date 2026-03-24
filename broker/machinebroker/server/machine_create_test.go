@@ -40,7 +40,9 @@ var _ = Describe("CreateMachine", func() {
 							},
 						},
 					}},
-					HostName: "foo-machine",
+					GuestConfig: &iri.GuestConfig{
+						Hostname: "foo-machine",
+					},
 				},
 			},
 		})
