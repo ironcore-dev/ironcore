@@ -343,6 +343,16 @@ func validateMachineSpecUpdate(new, old *compute.MachineSpec, fldPath *field.Pat
 		}
 	}
 
+	if old.GuestConfig == nil && new.GuestConfig != nil && new.GuestConfig.Hostname != "" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), new.GuestConfig.Hostname, "hostname must not be set if it was not set before"))
+	}
+
+	if old.GuestConfig != nil && old.GuestConfig.Hostname == "" {
+		if new.GuestConfig != nil && new.GuestConfig.Hostname != "" {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), new.GuestConfig.Hostname, "hostname must not be set if it was not set before"))
+		}
+	}
+
 	if old.GuestConfig != nil && old.GuestConfig.Hostname != "" {
 		if new.GuestConfig == nil || new.GuestConfig.Hostname == "" {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), nil, "hostname must not be cleared"))

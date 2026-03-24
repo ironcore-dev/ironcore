@@ -835,7 +835,7 @@ type MachineSpec struct {
 	IgnitionData      []byte                 `protobuf:"bytes,3,opt,name=ignition_data,json=ignitionData,proto3" json:"ignition_data,omitempty"`
 	Volumes           []*Volume              `protobuf:"bytes,4,rep,name=volumes,proto3" json:"volumes,omitempty"`
 	NetworkInterfaces []*NetworkInterface    `protobuf:"bytes,5,rep,name=network_interfaces,json=networkInterfaces,proto3" json:"network_interfaces,omitempty"`
-	HostName          string                 `protobuf:"bytes,6,opt,name=host_name,json=hostName,proto3" json:"host_name,omitempty"`
+	GuestConfig       *GuestConfig           `protobuf:"bytes,6,opt,name=guest_config,json=guestConfig,proto3" json:"guest_config,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -905,11 +905,11 @@ func (x *MachineSpec) GetNetworkInterfaces() []*NetworkInterface {
 	return nil
 }
 
-func (x *MachineSpec) GetHostName() string {
+func (x *MachineSpec) GetGuestConfig() *GuestConfig {
 	if x != nil {
-		return x.HostName
+		return x.GuestConfig
 	}
-	return ""
+	return nil
 }
 
 type MachineStatus struct {
@@ -2523,6 +2523,50 @@ func (x *ExecResponse) GetUrl() string {
 	return ""
 }
 
+type GuestConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hostname      string                 `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GuestConfig) Reset() {
+	*x = GuestConfig{}
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GuestConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GuestConfig) ProtoMessage() {}
+
+func (x *GuestConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_machine_v1alpha1_api_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GuestConfig.ProtoReflect.Descriptor instead.
+func (*GuestConfig) Descriptor() ([]byte, []int) {
+	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *GuestConfig) GetHostname() string {
+	if x != nil {
+		return x.Hostname
+	}
+	return ""
+}
+
 var File_machine_v1alpha1_api_proto protoreflect.FileDescriptor
 
 const file_machine_v1alpha1_api_proto_rawDesc = "" +
@@ -2609,14 +2653,14 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x9b\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc0\x02\n" +
 	"\vMachineSpec\x12-\n" +
 	"\x05power\x18\x01 \x01(\x0e2\x17.machine.v1alpha1.PowerR\x05power\x12\x14\n" +
 	"\x05class\x18\x02 \x01(\tR\x05class\x12#\n" +
 	"\rignition_data\x18\x03 \x01(\fR\fignitionData\x122\n" +
 	"\avolumes\x18\x04 \x03(\v2\x18.machine.v1alpha1.VolumeR\avolumes\x12Q\n" +
-	"\x12network_interfaces\x18\x05 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\x12\x1b\n" +
-	"\thost_name\x18\x06 \x01(\tR\bhostName\"\xf3\x02\n" +
+	"\x12network_interfaces\x18\x05 \x03(\v2\".machine.v1alpha1.NetworkInterfaceR\x11networkInterfaces\x12@\n" +
+	"\fguest_config\x18\x06 \x01(\v2\x1d.machine.v1alpha1.GuestConfigR\vguestConfig\"\xf3\x02\n" +
 	"\rMachineStatus\x12/\n" +
 	"\x13observed_generation\x18\x01 \x01(\x03R\x12observedGeneration\x124\n" +
 	"\x05state\x18\x02 \x01(\x0e2\x1e.machine.v1alpha1.MachineStateR\x05state\x12\x1b\n" +
@@ -2711,7 +2755,9 @@ const file_machine_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"machine_id\x18\x01 \x01(\tR\tmachineId\" \n" +
 	"\fExecResponse\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url*$\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\")\n" +
+	"\vGuestConfig\x12\x1a\n" +
+	"\bhostname\x18\x01 \x01(\tR\bhostname*$\n" +
 	"\x05Power\x12\f\n" +
 	"\bPOWER_ON\x10\x00\x12\r\n" +
 	"\tPOWER_OFF\x10\x01*6\n" +
@@ -2758,7 +2804,7 @@ func file_machine_v1alpha1_api_proto_rawDescGZIP() []byte {
 }
 
 var file_machine_v1alpha1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_machine_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 55)
+var file_machine_v1alpha1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 56)
 var file_machine_v1alpha1_api_proto_goTypes = []any{
 	(Power)(0),                               // 0: machine.v1alpha1.Power
 	(VolumeState)(0),                         // 1: machine.v1alpha1.VolumeState
@@ -2809,91 +2855,93 @@ var file_machine_v1alpha1_api_proto_goTypes = []any{
 	(*StatusResponse)(nil),                   // 46: machine.v1alpha1.StatusResponse
 	(*ExecRequest)(nil),                      // 47: machine.v1alpha1.ExecRequest
 	(*ExecResponse)(nil),                     // 48: machine.v1alpha1.ExecResponse
-	nil,                                      // 49: machine.v1alpha1.VolumeSpec.AttributesEntry
-	nil,                                      // 50: machine.v1alpha1.VolumeSpec.SecretDataEntry
-	nil,                                      // 51: machine.v1alpha1.MachineFilter.LabelSelectorEntry
-	nil,                                      // 52: machine.v1alpha1.EventFilter.LabelSelectorEntry
-	nil,                                      // 53: machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
-	nil,                                      // 54: machine.v1alpha1.VolumeConnection.AttributesEntry
-	nil,                                      // 55: machine.v1alpha1.VolumeConnection.SecretDataEntry
-	nil,                                      // 56: machine.v1alpha1.VolumeConnection.EncryptionDataEntry
-	nil,                                      // 57: machine.v1alpha1.NetworkInterface.AttributesEntry
-	nil,                                      // 58: machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
-	(*v1alpha1.ObjectMetadata)(nil),          // 59: meta.v1alpha1.ObjectMetadata
-	(*v1alpha11.Event)(nil),                  // 60: event.v1alpha1.Event
+	(*GuestConfig)(nil),                      // 49: machine.v1alpha1.GuestConfig
+	nil,                                      // 50: machine.v1alpha1.VolumeSpec.AttributesEntry
+	nil,                                      // 51: machine.v1alpha1.VolumeSpec.SecretDataEntry
+	nil,                                      // 52: machine.v1alpha1.MachineFilter.LabelSelectorEntry
+	nil,                                      // 53: machine.v1alpha1.EventFilter.LabelSelectorEntry
+	nil,                                      // 54: machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
+	nil,                                      // 55: machine.v1alpha1.VolumeConnection.AttributesEntry
+	nil,                                      // 56: machine.v1alpha1.VolumeConnection.SecretDataEntry
+	nil,                                      // 57: machine.v1alpha1.VolumeConnection.EncryptionDataEntry
+	nil,                                      // 58: machine.v1alpha1.NetworkInterface.AttributesEntry
+	nil,                                      // 59: machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
+	(*v1alpha1.ObjectMetadata)(nil),          // 60: meta.v1alpha1.ObjectMetadata
+	(*v1alpha11.Event)(nil),                  // 61: event.v1alpha1.Event
 }
 var file_machine_v1alpha1_api_proto_depIdxs = []int32{
-	49, // 0: machine.v1alpha1.VolumeSpec.attributes:type_name -> machine.v1alpha1.VolumeSpec.AttributesEntry
-	50, // 1: machine.v1alpha1.VolumeSpec.secret_data:type_name -> machine.v1alpha1.VolumeSpec.SecretDataEntry
-	51, // 2: machine.v1alpha1.MachineFilter.label_selector:type_name -> machine.v1alpha1.MachineFilter.LabelSelectorEntry
-	52, // 3: machine.v1alpha1.EventFilter.label_selector:type_name -> machine.v1alpha1.EventFilter.LabelSelectorEntry
-	53, // 4: machine.v1alpha1.MachineClassCapabilities.resources:type_name -> machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
-	59, // 5: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
+	50, // 0: machine.v1alpha1.VolumeSpec.attributes:type_name -> machine.v1alpha1.VolumeSpec.AttributesEntry
+	51, // 1: machine.v1alpha1.VolumeSpec.secret_data:type_name -> machine.v1alpha1.VolumeSpec.SecretDataEntry
+	52, // 2: machine.v1alpha1.MachineFilter.label_selector:type_name -> machine.v1alpha1.MachineFilter.LabelSelectorEntry
+	53, // 3: machine.v1alpha1.EventFilter.label_selector:type_name -> machine.v1alpha1.EventFilter.LabelSelectorEntry
+	54, // 4: machine.v1alpha1.MachineClassCapabilities.resources:type_name -> machine.v1alpha1.MachineClassCapabilities.ResourcesEntry
+	60, // 5: machine.v1alpha1.Machine.metadata:type_name -> meta.v1alpha1.ObjectMetadata
 	14, // 6: machine.v1alpha1.Machine.spec:type_name -> machine.v1alpha1.MachineSpec
 	15, // 7: machine.v1alpha1.Machine.status:type_name -> machine.v1alpha1.MachineStatus
 	9,  // 8: machine.v1alpha1.LocalDisk.image:type_name -> machine.v1alpha1.ImageSpec
-	54, // 9: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
-	55, // 10: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
-	56, // 11: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
+	55, // 9: machine.v1alpha1.VolumeConnection.attributes:type_name -> machine.v1alpha1.VolumeConnection.AttributesEntry
+	56, // 10: machine.v1alpha1.VolumeConnection.secret_data:type_name -> machine.v1alpha1.VolumeConnection.SecretDataEntry
+	57, // 11: machine.v1alpha1.VolumeConnection.encryption_data:type_name -> machine.v1alpha1.VolumeConnection.EncryptionDataEntry
 	10, // 12: machine.v1alpha1.Volume.local_disk:type_name -> machine.v1alpha1.LocalDisk
 	11, // 13: machine.v1alpha1.Volume.connection:type_name -> machine.v1alpha1.VolumeConnection
-	57, // 14: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
+	58, // 14: machine.v1alpha1.NetworkInterface.attributes:type_name -> machine.v1alpha1.NetworkInterface.AttributesEntry
 	0,  // 15: machine.v1alpha1.MachineSpec.power:type_name -> machine.v1alpha1.Power
 	12, // 16: machine.v1alpha1.MachineSpec.volumes:type_name -> machine.v1alpha1.Volume
 	13, // 17: machine.v1alpha1.MachineSpec.network_interfaces:type_name -> machine.v1alpha1.NetworkInterface
-	3,  // 18: machine.v1alpha1.MachineStatus.state:type_name -> machine.v1alpha1.MachineState
-	17, // 19: machine.v1alpha1.MachineStatus.volumes:type_name -> machine.v1alpha1.VolumeStatus
-	18, // 20: machine.v1alpha1.MachineStatus.network_interfaces:type_name -> machine.v1alpha1.NetworkInterfaceStatus
-	16, // 21: machine.v1alpha1.MachineStatus.machine_conditions:type_name -> machine.v1alpha1.Conditions
-	1,  // 22: machine.v1alpha1.VolumeStatus.state:type_name -> machine.v1alpha1.VolumeState
-	2,  // 23: machine.v1alpha1.NetworkInterfaceStatus.state:type_name -> machine.v1alpha1.NetworkInterfaceState
-	7,  // 24: machine.v1alpha1.MachineClass.capabilities:type_name -> machine.v1alpha1.MachineClassCapabilities
-	19, // 25: machine.v1alpha1.MachineClassStatus.machine_class:type_name -> machine.v1alpha1.MachineClass
-	5,  // 26: machine.v1alpha1.ListMachinesRequest.filter:type_name -> machine.v1alpha1.MachineFilter
-	8,  // 27: machine.v1alpha1.ListMachinesResponse.machines:type_name -> machine.v1alpha1.Machine
-	6,  // 28: machine.v1alpha1.ListEventsRequest.filter:type_name -> machine.v1alpha1.EventFilter
-	60, // 29: machine.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
-	8,  // 30: machine.v1alpha1.CreateMachineRequest.machine:type_name -> machine.v1alpha1.Machine
-	8,  // 31: machine.v1alpha1.CreateMachineResponse.machine:type_name -> machine.v1alpha1.Machine
-	58, // 32: machine.v1alpha1.UpdateMachineAnnotationsRequest.annotations:type_name -> machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
-	0,  // 33: machine.v1alpha1.UpdateMachinePowerRequest.power:type_name -> machine.v1alpha1.Power
-	12, // 34: machine.v1alpha1.AttachVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
-	12, // 35: machine.v1alpha1.UpdateVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
-	13, // 36: machine.v1alpha1.AttachNetworkInterfaceRequest.network_interface:type_name -> machine.v1alpha1.NetworkInterface
-	20, // 37: machine.v1alpha1.StatusResponse.machine_class_status:type_name -> machine.v1alpha1.MachineClassStatus
-	21, // 38: machine.v1alpha1.MachineRuntime.Version:input_type -> machine.v1alpha1.VersionRequest
-	25, // 39: machine.v1alpha1.MachineRuntime.ListEvents:input_type -> machine.v1alpha1.ListEventsRequest
-	23, // 40: machine.v1alpha1.MachineRuntime.ListMachines:input_type -> machine.v1alpha1.ListMachinesRequest
-	27, // 41: machine.v1alpha1.MachineRuntime.CreateMachine:input_type -> machine.v1alpha1.CreateMachineRequest
-	29, // 42: machine.v1alpha1.MachineRuntime.DeleteMachine:input_type -> machine.v1alpha1.DeleteMachineRequest
-	31, // 43: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:input_type -> machine.v1alpha1.UpdateMachineAnnotationsRequest
-	33, // 44: machine.v1alpha1.MachineRuntime.UpdateMachinePower:input_type -> machine.v1alpha1.UpdateMachinePowerRequest
-	35, // 45: machine.v1alpha1.MachineRuntime.AttachVolume:input_type -> machine.v1alpha1.AttachVolumeRequest
-	37, // 46: machine.v1alpha1.MachineRuntime.DetachVolume:input_type -> machine.v1alpha1.DetachVolumeRequest
-	39, // 47: machine.v1alpha1.MachineRuntime.UpdateVolume:input_type -> machine.v1alpha1.UpdateVolumeRequest
-	41, // 48: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:input_type -> machine.v1alpha1.AttachNetworkInterfaceRequest
-	43, // 49: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:input_type -> machine.v1alpha1.DetachNetworkInterfaceRequest
-	45, // 50: machine.v1alpha1.MachineRuntime.Status:input_type -> machine.v1alpha1.StatusRequest
-	47, // 51: machine.v1alpha1.MachineRuntime.Exec:input_type -> machine.v1alpha1.ExecRequest
-	22, // 52: machine.v1alpha1.MachineRuntime.Version:output_type -> machine.v1alpha1.VersionResponse
-	26, // 53: machine.v1alpha1.MachineRuntime.ListEvents:output_type -> machine.v1alpha1.ListEventsResponse
-	24, // 54: machine.v1alpha1.MachineRuntime.ListMachines:output_type -> machine.v1alpha1.ListMachinesResponse
-	28, // 55: machine.v1alpha1.MachineRuntime.CreateMachine:output_type -> machine.v1alpha1.CreateMachineResponse
-	30, // 56: machine.v1alpha1.MachineRuntime.DeleteMachine:output_type -> machine.v1alpha1.DeleteMachineResponse
-	32, // 57: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:output_type -> machine.v1alpha1.UpdateMachineAnnotationsResponse
-	34, // 58: machine.v1alpha1.MachineRuntime.UpdateMachinePower:output_type -> machine.v1alpha1.UpdateMachinePowerResponse
-	36, // 59: machine.v1alpha1.MachineRuntime.AttachVolume:output_type -> machine.v1alpha1.AttachVolumeResponse
-	38, // 60: machine.v1alpha1.MachineRuntime.DetachVolume:output_type -> machine.v1alpha1.DetachVolumeResponse
-	40, // 61: machine.v1alpha1.MachineRuntime.UpdateVolume:output_type -> machine.v1alpha1.UpdateVolumeResponse
-	42, // 62: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:output_type -> machine.v1alpha1.AttachNetworkInterfaceResponse
-	44, // 63: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:output_type -> machine.v1alpha1.DetachNetworkInterfaceResponse
-	46, // 64: machine.v1alpha1.MachineRuntime.Status:output_type -> machine.v1alpha1.StatusResponse
-	48, // 65: machine.v1alpha1.MachineRuntime.Exec:output_type -> machine.v1alpha1.ExecResponse
-	52, // [52:66] is the sub-list for method output_type
-	38, // [38:52] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	49, // 18: machine.v1alpha1.MachineSpec.guest_config:type_name -> machine.v1alpha1.GuestConfig
+	3,  // 19: machine.v1alpha1.MachineStatus.state:type_name -> machine.v1alpha1.MachineState
+	17, // 20: machine.v1alpha1.MachineStatus.volumes:type_name -> machine.v1alpha1.VolumeStatus
+	18, // 21: machine.v1alpha1.MachineStatus.network_interfaces:type_name -> machine.v1alpha1.NetworkInterfaceStatus
+	16, // 22: machine.v1alpha1.MachineStatus.machine_conditions:type_name -> machine.v1alpha1.Conditions
+	1,  // 23: machine.v1alpha1.VolumeStatus.state:type_name -> machine.v1alpha1.VolumeState
+	2,  // 24: machine.v1alpha1.NetworkInterfaceStatus.state:type_name -> machine.v1alpha1.NetworkInterfaceState
+	7,  // 25: machine.v1alpha1.MachineClass.capabilities:type_name -> machine.v1alpha1.MachineClassCapabilities
+	19, // 26: machine.v1alpha1.MachineClassStatus.machine_class:type_name -> machine.v1alpha1.MachineClass
+	5,  // 27: machine.v1alpha1.ListMachinesRequest.filter:type_name -> machine.v1alpha1.MachineFilter
+	8,  // 28: machine.v1alpha1.ListMachinesResponse.machines:type_name -> machine.v1alpha1.Machine
+	6,  // 29: machine.v1alpha1.ListEventsRequest.filter:type_name -> machine.v1alpha1.EventFilter
+	61, // 30: machine.v1alpha1.ListEventsResponse.events:type_name -> event.v1alpha1.Event
+	8,  // 31: machine.v1alpha1.CreateMachineRequest.machine:type_name -> machine.v1alpha1.Machine
+	8,  // 32: machine.v1alpha1.CreateMachineResponse.machine:type_name -> machine.v1alpha1.Machine
+	59, // 33: machine.v1alpha1.UpdateMachineAnnotationsRequest.annotations:type_name -> machine.v1alpha1.UpdateMachineAnnotationsRequest.AnnotationsEntry
+	0,  // 34: machine.v1alpha1.UpdateMachinePowerRequest.power:type_name -> machine.v1alpha1.Power
+	12, // 35: machine.v1alpha1.AttachVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
+	12, // 36: machine.v1alpha1.UpdateVolumeRequest.volume:type_name -> machine.v1alpha1.Volume
+	13, // 37: machine.v1alpha1.AttachNetworkInterfaceRequest.network_interface:type_name -> machine.v1alpha1.NetworkInterface
+	20, // 38: machine.v1alpha1.StatusResponse.machine_class_status:type_name -> machine.v1alpha1.MachineClassStatus
+	21, // 39: machine.v1alpha1.MachineRuntime.Version:input_type -> machine.v1alpha1.VersionRequest
+	25, // 40: machine.v1alpha1.MachineRuntime.ListEvents:input_type -> machine.v1alpha1.ListEventsRequest
+	23, // 41: machine.v1alpha1.MachineRuntime.ListMachines:input_type -> machine.v1alpha1.ListMachinesRequest
+	27, // 42: machine.v1alpha1.MachineRuntime.CreateMachine:input_type -> machine.v1alpha1.CreateMachineRequest
+	29, // 43: machine.v1alpha1.MachineRuntime.DeleteMachine:input_type -> machine.v1alpha1.DeleteMachineRequest
+	31, // 44: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:input_type -> machine.v1alpha1.UpdateMachineAnnotationsRequest
+	33, // 45: machine.v1alpha1.MachineRuntime.UpdateMachinePower:input_type -> machine.v1alpha1.UpdateMachinePowerRequest
+	35, // 46: machine.v1alpha1.MachineRuntime.AttachVolume:input_type -> machine.v1alpha1.AttachVolumeRequest
+	37, // 47: machine.v1alpha1.MachineRuntime.DetachVolume:input_type -> machine.v1alpha1.DetachVolumeRequest
+	39, // 48: machine.v1alpha1.MachineRuntime.UpdateVolume:input_type -> machine.v1alpha1.UpdateVolumeRequest
+	41, // 49: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:input_type -> machine.v1alpha1.AttachNetworkInterfaceRequest
+	43, // 50: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:input_type -> machine.v1alpha1.DetachNetworkInterfaceRequest
+	45, // 51: machine.v1alpha1.MachineRuntime.Status:input_type -> machine.v1alpha1.StatusRequest
+	47, // 52: machine.v1alpha1.MachineRuntime.Exec:input_type -> machine.v1alpha1.ExecRequest
+	22, // 53: machine.v1alpha1.MachineRuntime.Version:output_type -> machine.v1alpha1.VersionResponse
+	26, // 54: machine.v1alpha1.MachineRuntime.ListEvents:output_type -> machine.v1alpha1.ListEventsResponse
+	24, // 55: machine.v1alpha1.MachineRuntime.ListMachines:output_type -> machine.v1alpha1.ListMachinesResponse
+	28, // 56: machine.v1alpha1.MachineRuntime.CreateMachine:output_type -> machine.v1alpha1.CreateMachineResponse
+	30, // 57: machine.v1alpha1.MachineRuntime.DeleteMachine:output_type -> machine.v1alpha1.DeleteMachineResponse
+	32, // 58: machine.v1alpha1.MachineRuntime.UpdateMachineAnnotations:output_type -> machine.v1alpha1.UpdateMachineAnnotationsResponse
+	34, // 59: machine.v1alpha1.MachineRuntime.UpdateMachinePower:output_type -> machine.v1alpha1.UpdateMachinePowerResponse
+	36, // 60: machine.v1alpha1.MachineRuntime.AttachVolume:output_type -> machine.v1alpha1.AttachVolumeResponse
+	38, // 61: machine.v1alpha1.MachineRuntime.DetachVolume:output_type -> machine.v1alpha1.DetachVolumeResponse
+	40, // 62: machine.v1alpha1.MachineRuntime.UpdateVolume:output_type -> machine.v1alpha1.UpdateVolumeResponse
+	42, // 63: machine.v1alpha1.MachineRuntime.AttachNetworkInterface:output_type -> machine.v1alpha1.AttachNetworkInterfaceResponse
+	44, // 64: machine.v1alpha1.MachineRuntime.DetachNetworkInterface:output_type -> machine.v1alpha1.DetachNetworkInterfaceResponse
+	46, // 65: machine.v1alpha1.MachineRuntime.Status:output_type -> machine.v1alpha1.StatusResponse
+	48, // 66: machine.v1alpha1.MachineRuntime.Exec:output_type -> machine.v1alpha1.ExecResponse
+	53, // [53:67] is the sub-list for method output_type
+	39, // [39:53] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_machine_v1alpha1_api_proto_init() }
@@ -2907,7 +2955,7 @@ func file_machine_v1alpha1_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_machine_v1alpha1_api_proto_rawDesc), len(file_machine_v1alpha1_api_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   55,
+			NumMessages:   56,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
