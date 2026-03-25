@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - release-**
-  pull_request:
+  pull_request_target:
     types: [ opened, reopened, synchronize ]
 
 permissions:
@@ -16,7 +16,7 @@ permissions:
 jobs:
   update_release_draft:
     name: Run release drafter
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request_target'
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -29,7 +29,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
   auto_label:
     name: Run autolabeler
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request_target'
     permissions:
       pull-requests: write
     runs-on: ubuntu-latest
