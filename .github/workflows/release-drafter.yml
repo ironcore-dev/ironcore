@@ -1,6 +1,7 @@
 name: Release Drafter
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -9,13 +10,15 @@ on:
     types: [ opened, reopened, synchronize ]
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 jobs:
   update_release_draft:
     name: Run release drafter
     if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       # Drafts your next Release notes as Pull Requests are merged into "main"
