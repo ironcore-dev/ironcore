@@ -5,25 +5,30 @@ on:
     branches:
       - main
       - release-**
-  pull_request_target:
+  pull_request:
     types: [ opened, reopened, synchronize ]
-  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   update_release_draft:
     name: Run release drafter
-    permissions:
-      # write permission is required to create a github release
-      contents: write
-      # write permission is required for autolabeler
-      # otherwise, read permission is required at least
-      pull-requests: write
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       # Drafts your next Release notes as Pull Requests are merged into "main"
       # or a release branch
       - uses: release-drafter/release-drafter@v7
         with:
-          config-name: release-drafter.yml
           commitish: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+  auto_label:
+    name: Run autolabeler
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@v7
