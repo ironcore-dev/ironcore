@@ -22,7 +22,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	volumepoolletEvents "github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
+	volumepoolletevents "github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/vcm"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 
@@ -37,6 +37,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	v1 "k8s.io/client-go/applyconfigurations/core/v1"
+	applyconfigmetav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -263,7 +264,7 @@ func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *st
 			return "", false, fmt.Errorf("error getting volume class %s: %w", volumeClassName, err)
 		}
 
-		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletEvents.VolumeClassNotReady, "Volume class %s not found", volumeClassName)
+		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeClassNotReady, "Volume class %s not found", volumeClassName)
 		return "", false, nil
 	}
 
@@ -286,7 +287,7 @@ func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.Reso
 
 func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
 	if volumeSnapshot.Status.State != storagev1alpha1.VolumeSnapshotStateReady || volumeSnapshot.Status.SnapshotID == "" {
-		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletEvents.VolumeSnapshotNotReady, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeSnapshotNotReady, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
 		return nil, false, nil
 	}
 
@@ -324,7 +325,7 @@ func (r *VolumeReconciler) prepareIRIVolumeSpecEncryption(ctx context.Context, v
 	encryptionSecretKey := client.ObjectKey{Name: secretName, Namespace: volume.Namespace}
 	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
 		if apierrors.IsNotFound(err) {
-			r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletEvents.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", secretName)
+			r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", secretName)
 			return nil, false, nil
 		}
 		return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", secretName, err)
@@ -414,7 +415,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 		volumeSnapshotKey := client.ObjectKey{Namespace: volume.Namespace, Name: volumeSnapshotRef.Name}
 		if err := r.Get(ctx, volumeSnapshotKey, volumeSnapshot); err != nil {
 			if apierrors.IsNotFound(err) {
-				r.Eventf(volume, nil, corev1.EventTypeWarning, volumepoolletEvents.VolumeSnapshotNotFound,
+				r.Eventf(volume, nil, corev1.EventTypeWarning, volumepoolletevents.VolumeSnapshotNotFound,
 					"VolumeSnapshot %s not found", volumeSnapshotRef.Name)
 				return nil, false, fmt.Errorf("volume snapshot %s not found", volumeSnapshotRef.Name)
 			}
@@ -593,6 +594,14 @@ func (r *VolumeReconciler) updateStatus(ctx context.Context, log logr.Logger, vo
 				log.V(1).Info("Applying volume secret")
 				secretName := r.volumeSecretName(volume.Name, iriAccess.Handle)
 				volumeSecretApply := v1.Secret(secretName, volume.Namespace).
+					WithOwnerReferences(applyconfigmetav1.OwnerReference().
+						WithAPIVersion(storagev1alpha1.SchemeGroupVersion.String()).
+						WithKind("Volume").
+						WithName(volume.Name).
+						WithUID(volume.UID).
+						WithController(true).
+						WithBlockOwnerDeletion(true),
+					).
 					WithData(iriAccess.SecretData).
 					WithLabels(map[string]string{
 						volumepoolletv1alpha1.VolumeUIDLabel: string(volume.UID),

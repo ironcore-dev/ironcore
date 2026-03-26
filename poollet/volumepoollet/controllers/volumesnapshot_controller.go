@@ -19,7 +19,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	volumepoolletEvents "github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
+	volumepoolletevents "github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -256,7 +256,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	volume := &storagev1alpha1.Volume{}
 	if err := r.Get(ctx, client.ObjectKey{Namespace: volumeSnapshot.Namespace, Name: volumeSnapshot.Spec.VolumeRef.Name}, volume); err != nil {
 		if apierrors.IsNotFound(err) {
-			r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletEvents.SourceVolumeNotFound,
+			r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotFound,
 				"Source volume %s not found", volumeSnapshot.Spec.VolumeRef.Name)
 			return nil, false, nil
 		}
@@ -264,7 +264,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	}
 
 	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
-		r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletEvents.SourceVolumeNotAvailable,
+		r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotAvailable,
 			"Source volume %s is not available (state: %s)", volumeSnapshot.Spec.VolumeRef.Name, volume.Status.State)
 		return nil, false, nil
 	}
