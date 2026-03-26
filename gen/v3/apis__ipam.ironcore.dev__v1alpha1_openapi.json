@@ -136,17 +136,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							}
 						}
@@ -198,7 +198,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 							}
 						}
 					},
@@ -210,12 +210,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -225,12 +225,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -240,12 +240,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -451,12 +451,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -508,7 +508,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 							}
 						}
 					},
@@ -520,12 +520,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -535,12 +535,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -729,12 +729,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -744,12 +744,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -807,12 +807,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -864,7 +864,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 							}
 						}
 					},
@@ -876,12 +876,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -891,12 +891,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -984,12 +984,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -999,12 +999,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							}
 						}
@@ -1154,17 +1154,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							}
 						}
@@ -1216,7 +1216,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 							}
 						}
 					},
@@ -1228,12 +1228,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1243,12 +1243,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1258,12 +1258,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1469,12 +1469,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1526,7 +1526,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 							}
 						}
 					},
@@ -1538,12 +1538,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1553,12 +1553,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1747,12 +1747,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1762,12 +1762,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1825,12 +1825,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1882,7 +1882,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 							}
 						}
 					},
@@ -1894,12 +1894,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -1909,12 +1909,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -2002,12 +2002,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -2017,12 +2017,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							}
 						}
@@ -2080,17 +2080,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList"
 								}
 							}
 						}
@@ -2218,17 +2218,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList"
 								}
 							}
 						}
@@ -3234,12 +3234,12 @@
 	},
 	"components": {
 		"schemas": {
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix": {
+			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix": {
 				"description": "IPPrefix represents a network prefix.",
 				"type": "string",
 				"format": "ip-prefix"
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.Prefix": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix": {
 				"description": "Prefix is the Schema for the prefixes API",
 				"type": "object",
 				"properties": {
@@ -3263,7 +3263,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec"
 							}
 						]
 					},
@@ -3271,13 +3271,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "ipam.ironcore.dev",
+						"kind": "Prefix",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocation": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation": {
 				"description": "PrefixAllocation is the Schema for the prefixallocations API",
 				"type": "object",
 				"properties": {
@@ -3301,7 +3308,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationSpec"
 							}
 						]
 					},
@@ -3309,13 +3316,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocationStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "ipam.ironcore.dev",
+						"kind": "PrefixAllocation",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationList": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationList": {
 				"description": "PrefixAllocationList contains a list of PrefixAllocation",
 				"type": "object",
 				"required": [
@@ -3332,7 +3346,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixAllocation"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocation"
 								}
 							]
 						}
@@ -3349,9 +3363,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "ipam.ironcore.dev",
+						"kind": "PrefixAllocationList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationSpec": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationSpec": {
 				"description": "PrefixAllocationSpec defines the desired state of PrefixAllocation",
 				"type": "object",
 				"properties": {
@@ -3368,7 +3389,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -3395,7 +3416,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixAllocationStatus": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixAllocationStatus": {
 				"description": "PrefixAllocationStatus is the status of a PrefixAllocation.",
 				"type": "object",
 				"properties": {
@@ -3415,13 +3436,13 @@
 						"description": "Prefix is the allocated prefix, if any",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixList": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixList": {
 				"description": "PrefixList contains a list of Prefix",
 				"type": "object",
 				"required": [
@@ -3438,7 +3459,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.Prefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"
 								}
 							]
 						}
@@ -3455,9 +3476,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "ipam.ironcore.dev",
+						"kind": "PrefixList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec": {
 				"description": "PrefixSpec defines the desired state of Prefix",
 				"type": "object",
 				"properties": {
@@ -3490,7 +3518,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -3501,7 +3529,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixStatus": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixStatus": {
 				"description": "PrefixStatus defines the observed state of Prefix",
 				"type": "object",
 				"properties": {
@@ -3521,7 +3549,7 @@
 						"description": "Used is a list of used prefixes.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 						}
 					}
 				}

@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	clientcmdutil "github.com/ironcore-dev/ironcore/utils/clientcmd"
-	v1 "k8s.io/client-go/applyconfigurations/core/v1"
+	corev1apply "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -88,7 +88,7 @@ func (s *SecretStore) Set(ctx context.Context, cfg *rest.Config) error {
 		return err
 	}
 
-	secretApply := v1.Secret(s.key.Name, s.key.Namespace).
+	secretApply := corev1apply.Secret(s.key.Name, s.key.Namespace).
 		WithData(map[string][]byte{
 			s.field: kubeconfigData,
 		})

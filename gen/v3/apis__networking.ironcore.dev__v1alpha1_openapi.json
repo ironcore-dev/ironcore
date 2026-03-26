@@ -44,17 +44,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							}
 						}
@@ -182,17 +182,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							}
 						}
@@ -412,17 +412,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRoutingList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList"
 								}
 							}
 						}
@@ -474,7 +474,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 							}
 						}
 					},
@@ -486,12 +486,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -501,12 +501,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -516,12 +516,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -727,12 +727,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -784,7 +784,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 							}
 						}
 					},
@@ -796,12 +796,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -811,12 +811,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -1005,12 +1005,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -1020,12 +1020,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							}
 						}
@@ -1175,17 +1175,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList"
 								}
 							}
 						}
@@ -1237,7 +1237,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 							}
 						}
 					},
@@ -1249,12 +1249,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1264,12 +1264,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1279,12 +1279,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1490,12 +1490,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1547,7 +1547,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 							}
 						}
 					},
@@ -1559,12 +1559,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1574,12 +1574,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1768,12 +1768,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1783,12 +1783,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1846,12 +1846,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1903,7 +1903,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 							}
 						}
 					},
@@ -1915,12 +1915,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -1930,12 +1930,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -2023,12 +2023,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -2038,12 +2038,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							}
 						}
@@ -2193,17 +2193,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							}
 						}
@@ -2255,7 +2255,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 							}
 						}
 					},
@@ -2267,12 +2267,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2282,12 +2282,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2297,12 +2297,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2508,12 +2508,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2565,7 +2565,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 							}
 						}
 					},
@@ -2577,12 +2577,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2592,12 +2592,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2786,12 +2786,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2801,12 +2801,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2864,12 +2864,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2921,7 +2921,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 							}
 						}
 					},
@@ -2933,12 +2933,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -2948,12 +2948,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -3041,12 +3041,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -3056,12 +3056,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							}
 						}
@@ -3211,17 +3211,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							}
 						}
@@ -3273,7 +3273,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 							}
 						}
 					},
@@ -3285,12 +3285,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3300,12 +3300,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3315,12 +3315,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3526,12 +3526,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3583,7 +3583,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 							}
 						}
 					},
@@ -3595,12 +3595,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3610,12 +3610,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3804,12 +3804,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3819,12 +3819,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3882,12 +3882,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3939,7 +3939,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 							}
 						}
 					},
@@ -3951,12 +3951,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -3966,12 +3966,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -4059,12 +4059,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -4074,12 +4074,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							}
 						}
@@ -4229,17 +4229,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							}
 						}
@@ -4291,7 +4291,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 							}
 						}
 					},
@@ -4303,12 +4303,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4318,12 +4318,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4333,12 +4333,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4544,12 +4544,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4601,7 +4601,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 							}
 						}
 					},
@@ -4613,12 +4613,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4628,12 +4628,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4822,12 +4822,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4837,12 +4837,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4900,12 +4900,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4957,7 +4957,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 							}
 						}
 					},
@@ -4969,12 +4969,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -4984,12 +4984,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -5077,12 +5077,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -5092,12 +5092,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							}
 						}
@@ -5247,17 +5247,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							}
 						}
@@ -5309,7 +5309,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 							}
 						}
 					},
@@ -5321,12 +5321,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5336,12 +5336,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5351,12 +5351,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5562,12 +5562,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5619,7 +5619,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 							}
 						}
 					},
@@ -5631,12 +5631,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5646,12 +5646,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5840,12 +5840,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5855,12 +5855,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5918,12 +5918,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -5975,7 +5975,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 							}
 						}
 					},
@@ -5987,12 +5987,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -6002,12 +6002,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -6095,12 +6095,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -6110,12 +6110,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							}
 						}
@@ -6265,17 +6265,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							}
 						}
@@ -6327,7 +6327,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 							}
 						}
 					},
@@ -6339,12 +6339,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6354,12 +6354,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6369,12 +6369,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6580,12 +6580,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6637,7 +6637,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 							}
 						}
 					},
@@ -6649,12 +6649,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6664,12 +6664,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6858,12 +6858,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6873,12 +6873,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6936,12 +6936,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -6993,7 +6993,7 @@
 					"content": {
 						"*/*": {
 							"schema": {
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 							}
 						}
 					},
@@ -7005,12 +7005,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -7020,12 +7020,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -7113,12 +7113,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -7128,12 +7128,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							}
 						}
@@ -7191,17 +7191,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList"
 								}
 							}
 						}
@@ -7329,17 +7329,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList"
 								}
 							}
 						}
@@ -7467,17 +7467,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList"
 								}
 							}
 						}
@@ -7605,17 +7605,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList"
 								}
 							}
 						}
@@ -7743,17 +7743,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							},
 							"application/json;stream=watch": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							},
 							"application/yaml": {
 								"schema": {
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPList"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList"
 								}
 							}
 						}
@@ -10979,17 +10979,17 @@
 	},
 	"components": {
 		"schemas": {
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IP": {
+			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP": {
 				"description": "IP is an IP address.",
 				"type": "string",
 				"format": "ip"
 			},
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.IPPrefix": {
+			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix": {
 				"description": "IPPrefix represents a network prefix.",
 				"type": "string",
 				"format": "ip-prefix"
 			},
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.LocalUIDReference": {
+			"com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference": {
 				"description": "LocalUIDReference is a reference to another entity including its UID",
 				"type": "object",
 				"required": [
@@ -11010,7 +11010,7 @@
 				},
 				"x-kubernetes-map-type": "atomic"
 			},
-			"github.com/ironcore-dev/ironcore/api/core/v1alpha1.ObjectSelector": {
+			"com.github.ironcore-dev.ironcore.api.core.v1alpha1.ObjectSelector": {
 				"description": "ObjectSelector specifies how to select objects of a certain kind.",
 				"type": "object",
 				"required": [
@@ -11045,7 +11045,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixSpec": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec": {
 				"description": "PrefixSpec defines the desired state of Prefix",
 				"type": "object",
 				"properties": {
@@ -11078,7 +11078,7 @@
 						"description": "Prefix is the prefix to allocate for this Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -11089,7 +11089,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/ipam/v1alpha1.PrefixTemplateSpec": {
+			"com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixTemplateSpec": {
 				"type": "object",
 				"properties": {
 					"metadata": {
@@ -11104,13 +11104,13 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixSpec"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralPrefixSource": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource": {
 				"description": "EphemeralPrefixSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Prefix.",
 				"type": "object",
 				"properties": {
@@ -11118,13 +11118,13 @@
 						"description": "PrefixTemplate is the template for the Prefix.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1ipam~1v1alpha1.PrefixTemplateSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.PrefixTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSource": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSource": {
 				"description": "EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
 				"type": "object",
 				"properties": {
@@ -11132,13 +11132,13 @@
 						"description": "VirtualIPTemplate is the template for the VirtualIP.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPTemplateSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.EphemeralVirtualIPSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec": {
 				"type": "object",
 				"required": [
 					"type",
@@ -11163,7 +11163,7 @@
 						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -11174,7 +11174,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPBlock": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock": {
 				"description": "IPBlock specifies an ip block with optional exceptions.",
 				"type": "object",
 				"required": [
@@ -11185,7 +11185,7 @@
 						"description": "CIDR is a string representing the ip block.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -11193,12 +11193,12 @@
 						"description": "Except is a slice of CIDRs that should not be included within the specified CIDR. Values will be rejected if they are outside CIDR.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.IPSource": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource": {
 				"description": "IPSource is the definition of how to obtain an IP.",
 				"type": "object",
 				"properties": {
@@ -11206,7 +11206,7 @@
 						"description": "Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralPrefixSource"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource"
 							}
 						]
 					},
@@ -11214,13 +11214,13 @@
 						"description": "Value specifies an IP by using an IP literal.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancer": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer": {
 				"description": "LoadBalancer is the Schema for the LoadBalancer API",
 				"type": "object",
 				"properties": {
@@ -11244,7 +11244,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerSpec"
 							}
 						]
 					},
@@ -11252,13 +11252,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "LoadBalancer",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerDestination": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerDestination": {
 				"description": "LoadBalancerDestination is the destination of the load balancer.",
 				"type": "object",
 				"required": [
@@ -11269,7 +11276,7 @@
 						"description": "IP is the target IP.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 							}
 						]
 					},
@@ -11277,13 +11284,13 @@
 						"description": "TargetRef is the target providing the destination.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerTargetRef"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerTargetRef"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerList": {
 				"description": "LoadBalancerList contains a list of LoadBalancer",
 				"type": "object",
 				"required": [
@@ -11300,7 +11307,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancer"
 								}
 							]
 						}
@@ -11317,9 +11324,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "LoadBalancerList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerPort": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerPort": {
 				"type": "object",
 				"required": [
 					"port"
@@ -11347,7 +11361,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRouting": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting": {
 				"description": "LoadBalancerRouting is the Schema for the loadbalancerroutings API",
 				"type": "object",
 				"required": [
@@ -11366,7 +11380,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerDestination"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerDestination"
 								}
 							]
 						}
@@ -11388,13 +11402,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "LoadBalancerRouting",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerRoutingList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRoutingList": {
 				"description": "LoadBalancerRoutingList contains a list of LoadBalancerRouting",
 				"type": "object",
 				"required": [
@@ -11411,7 +11432,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerRouting"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerRouting"
 								}
 							]
 						}
@@ -11428,9 +11449,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "LoadBalancerRoutingList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerSpec": {
 				"description": "LoadBalancerSpec defines the desired state of LoadBalancer",
 				"type": "object",
 				"required": [
@@ -11459,7 +11487,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.IPSource"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource"
 								}
 							]
 						}
@@ -11488,7 +11516,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.LoadBalancerPort"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerPort"
 								}
 							]
 						}
@@ -11500,7 +11528,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerStatus": {
 				"description": "LoadBalancerStatus defines the observed state of LoadBalancer",
 				"type": "object",
 				"properties": {
@@ -11508,12 +11536,12 @@
 						"description": "IPs are the IPs allocated for the load balancer.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.LoadBalancerTargetRef": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.LoadBalancerTargetRef": {
 				"description": "LoadBalancerTargetRef is a load balancer target.",
 				"type": "object",
 				"required": [
@@ -11539,7 +11567,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGateway": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway": {
 				"description": "NATGateway is the Schema for the NATGateway API",
 				"type": "object",
 				"properties": {
@@ -11563,7 +11591,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewaySpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewaySpec"
 							}
 						]
 					},
@@ -11571,13 +11599,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGatewayStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NATGateway",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayList": {
 				"description": "NATGatewayList contains a list of NATGateway",
 				"type": "object",
 				"required": [
@@ -11594,7 +11629,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NATGateway"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGateway"
 								}
 							]
 						}
@@ -11611,9 +11646,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NATGatewayList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewaySpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewaySpec": {
 				"description": "NATGatewaySpec defines the desired state of NATGateway",
 				"type": "object",
 				"required": [
@@ -11653,7 +11695,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NATGatewayStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NATGatewayStatus": {
 				"description": "NATGatewayStatus defines the observed state of NATGateway",
 				"type": "object",
 				"properties": {
@@ -11661,12 +11703,12 @@
 						"description": "IPs are the IPs allocated for the NAT gateway.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.Network": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network": {
 				"description": "Network is the Schema for the network API",
 				"type": "object",
 				"properties": {
@@ -11690,7 +11732,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkSpec"
 							}
 						]
 					},
@@ -11698,13 +11740,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "Network",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterface": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface": {
 				"description": "NetworkInterface is the Schema for the networkinterfaces API",
 				"type": "object",
 				"properties": {
@@ -11728,7 +11777,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceSpec"
 							}
 						]
 					},
@@ -11736,13 +11785,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterfaceStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NetworkInterface",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceList": {
 				"description": "NetworkInterfaceList contains a list of NetworkInterface",
 				"type": "object",
 				"required": [
@@ -11759,7 +11815,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkInterface"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"
 								}
 							]
 						}
@@ -11776,9 +11832,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NetworkInterfaceList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceSpec": {
 				"description": "NetworkInterfaceSpec defines the desired state of NetworkInterface",
 				"type": "object",
 				"required": [
@@ -11815,7 +11878,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.IPSource"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPSource"
 								}
 							]
 						}
@@ -11824,7 +11887,7 @@
 						"description": "MachineRef is the Machine this NetworkInterface is used by",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -11844,7 +11907,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.PrefixSource"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PrefixSource"
 								}
 							]
 						}
@@ -11857,13 +11920,13 @@
 						"description": "VirtualIP specifies the virtual ip that should be assigned to this NetworkInterface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPSource"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSource"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkInterfaceStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterfaceStatus": {
 				"description": "NetworkInterfaceStatus defines the observed state of NetworkInterface",
 				"type": "object",
 				"properties": {
@@ -11871,7 +11934,7 @@
 						"description": "IPs represent the effective IP addresses of the NetworkInterface.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 						}
 					},
 					"lastStateTransitionTime": {
@@ -11886,7 +11949,7 @@
 						"description": "Prefixes represent the prefixes routed to the NetworkInterface.",
 						"type": "array",
 						"items": {
-							"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+							"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 						}
 					},
 					"state": {
@@ -11897,13 +11960,13 @@
 						"description": "VirtualIP is any virtual ip assigned to the NetworkInterface.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkList": {
 				"description": "NetworkList contains a list of Network",
 				"type": "object",
 				"required": [
@@ -11920,7 +11983,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.Network"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.Network"
 								}
 							]
 						}
@@ -11937,9 +12000,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NetworkList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeering": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeering": {
 				"description": "NetworkPeering defines a network peering with another network.",
 				"type": "object",
 				"required": [
@@ -11957,7 +12027,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPeeringNetworkRef"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringNetworkRef"
 							}
 						]
 					},
@@ -11968,14 +12038,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.PeeringPrefix"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefix"
 								}
 							]
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringClaimRef": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringClaimRef": {
 				"type": "object",
 				"required": [
 					"name"
@@ -11996,7 +12066,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringNetworkRef": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringNetworkRef": {
 				"description": "NetworkPeeringNetworkRef is a reference to a network to peer with.",
 				"type": "object",
 				"required": [
@@ -12014,7 +12084,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPeeringStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringStatus": {
 				"description": "NetworkPeeringStatus is the status of a network peering.",
 				"type": "object",
 				"required": [
@@ -12033,7 +12103,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.PeeringPrefixStatus"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus"
 								}
 							]
 						}
@@ -12044,7 +12114,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicy": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy": {
 				"description": "NetworkPolicy is the Schema for the networkpolicies API",
 				"type": "object",
 				"properties": {
@@ -12068,7 +12138,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicySpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicySpec"
 							}
 						]
 					},
@@ -12076,13 +12146,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NetworkPolicy",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyCondition": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyCondition": {
 				"description": "NetworkPolicyCondition is one of the conditions of a network policy.",
 				"type": "object",
 				"required": [
@@ -12127,7 +12204,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyEgressRule": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyEgressRule": {
 				"description": "NetworkPolicyEgressRule describes a rule to regulate egress traffic with.",
 				"type": "object",
 				"properties": {
@@ -12138,7 +12215,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyPort"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPort"
 								}
 							]
 						}
@@ -12150,14 +12227,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyPeer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPeer"
 								}
 							]
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyIngressRule": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyIngressRule": {
 				"description": "NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.",
 				"type": "object",
 				"properties": {
@@ -12168,7 +12245,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyPeer"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPeer"
 								}
 							]
 						}
@@ -12180,14 +12257,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyPort"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPort"
 								}
 							]
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyList": {
 				"description": "NetworkPolicyList contains a list of NetworkPolicy.",
 				"type": "object",
 				"required": [
@@ -12204,7 +12281,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicy"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicy"
 								}
 							]
 						}
@@ -12221,9 +12298,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "NetworkPolicyList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPeer": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPeer": {
 				"description": "NetworkPolicyPeer describes a peer to allow traffic to / from.",
 				"type": "object",
 				"properties": {
@@ -12231,7 +12315,7 @@
 						"description": "IPBlock specifies the ip block from or to which network traffic may come.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.IPBlock"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.IPBlock"
 							}
 						]
 					},
@@ -12239,13 +12323,13 @@
 						"description": "ObjectSelector selects peers with the given kind matching the label selector. Exclusive with other peer specifiers.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1core~1v1alpha1.ObjectSelector"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.core.v1alpha1.ObjectSelector"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyPort": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyPort": {
 				"description": "NetworkPolicyPort describes a port to allow traffic on",
 				"type": "object",
 				"properties": {
@@ -12270,7 +12354,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicySpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicySpec": {
 				"description": "NetworkPolicySpec defines the desired state of NetworkPolicy.",
 				"type": "object",
 				"required": [
@@ -12285,7 +12369,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyEgressRule"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyEgressRule"
 								}
 							]
 						}
@@ -12297,7 +12381,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyIngressRule"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyIngressRule"
 								}
 							]
 						}
@@ -12330,7 +12414,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkPolicyStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyStatus": {
 				"description": "NetworkPolicyStatus defines the observed state of NetworkPolicy.",
 				"type": "object",
 				"properties": {
@@ -12341,14 +12425,14 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPolicyCondition"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPolicyCondition"
 								}
 							]
 						}
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkSpec": {
 				"description": "NetworkSpec defines the desired state of Network",
 				"type": "object",
 				"properties": {
@@ -12359,7 +12443,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPeeringClaimRef"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringClaimRef"
 								}
 							]
 						},
@@ -12373,7 +12457,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPeering"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeering"
 								}
 							]
 						},
@@ -12386,7 +12470,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.NetworkStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkStatus": {
 				"description": "NetworkStatus defines the observed state of Network",
 				"type": "object",
 				"properties": {
@@ -12397,7 +12481,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.NetworkPeeringStatus"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkPeeringStatus"
 								}
 							]
 						},
@@ -12415,7 +12499,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefix": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefix": {
 				"description": "PeeringPrefixes defines prefixes to be exposed to the peered network",
 				"type": "object",
 				"required": [
@@ -12431,7 +12515,7 @@
 						"description": "CIDR to be exposed to the peered network",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					},
@@ -12446,7 +12530,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PeeringPrefixStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PeeringPrefixStatus": {
 				"description": "PeeringPrefixStatus lists prefixes exposed to peered network",
 				"type": "object",
 				"required": [
@@ -12462,20 +12546,20 @@
 						"description": "CIDR exposed to the peered network",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.PrefixSource": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.PrefixSource": {
 				"type": "object",
 				"properties": {
 					"ephemeral": {
 						"description": "Ephemeral specifies a prefix by creating an ephemeral ipam.Prefix to allocate the prefix with.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralPrefixSource"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralPrefixSource"
 							}
 						]
 					},
@@ -12483,13 +12567,13 @@
 						"description": "Value specifies a static prefix to use.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IPPrefix"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IPPrefix"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIP": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP": {
 				"description": "VirtualIP is the Schema for the virtualips API",
 				"type": "object",
 				"properties": {
@@ -12513,7 +12597,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec"
 							}
 						]
 					},
@@ -12521,13 +12605,20 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIPStatus"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPStatus"
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "VirtualIP",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPList": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPList": {
 				"description": "VirtualIPList contains a list of VirtualIP",
 				"type": "object",
 				"required": [
@@ -12544,7 +12635,7 @@
 							"default": {},
 							"allOf": [
 								{
-									"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.VirtualIP"
+									"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"
 								}
 							]
 						}
@@ -12561,9 +12652,16 @@
 							}
 						]
 					}
-				}
+				},
+				"x-kubernetes-group-version-kind": [
+					{
+						"group": "networking.ironcore.dev",
+						"kind": "VirtualIPList",
+						"version": "v1alpha1"
+					}
+				]
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSource": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSource": {
 				"description": "VirtualIPSource is the definition of how to obtain a VirtualIP.",
 				"type": "object",
 				"properties": {
@@ -12571,7 +12669,7 @@
 						"description": "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) VirtualIP.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralVirtualIPSource"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSource"
 							}
 						]
 					},
@@ -12585,7 +12683,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPSpec": {
 				"description": "VirtualIPSpec defines the desired state of a VirtualIP",
 				"type": "object",
 				"required": [
@@ -12607,7 +12705,7 @@
 						"description": "TargetRef references the target for this VirtualIP (currently only NetworkInterface).",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.LocalUIDReference"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
 							}
 						]
 					},
@@ -12618,7 +12716,7 @@
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPStatus": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPStatus": {
 				"description": "VirtualIPStatus defines the observed state of VirtualIP",
 				"type": "object",
 				"properties": {
@@ -12626,13 +12724,13 @@
 						"description": "IP is the allocated IP, if any.",
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1common~1v1alpha1.IP"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.IP"
 							}
 						]
 					}
 				}
 			},
-			"github.com/ironcore-dev/ironcore/api/networking/v1alpha1.VirtualIPTemplateSpec": {
+			"com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIPTemplateSpec": {
 				"description": "VirtualIPTemplateSpec is the specification of a VirtualIP template.",
 				"type": "object",
 				"properties": {
@@ -12648,7 +12746,7 @@
 						"default": {},
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/github.com~1ironcore-dev~1ironcore~1api~1networking~1v1alpha1.EphemeralVirtualIPSpec"
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.networking.v1alpha1.EphemeralVirtualIPSpec"
 							}
 						]
 					}

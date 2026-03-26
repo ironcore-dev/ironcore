@@ -10,13 +10,13 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	networkingv1alpha1Apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
+	networkingv1alpha1apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/client/networking"
 	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -159,11 +159,11 @@ func (r *LoadBalancerReconciler) applyRouting(
 	destinations []networkingv1alpha1.LoadBalancerDestination,
 	network *networkingv1alpha1.Network,
 ) error {
-	destinationsApply := make([]*networkingv1alpha1Apply.LoadBalancerDestinationApplyConfiguration, 0, len(destinations))
+	destinationsApply := make([]*networkingv1alpha1apply.LoadBalancerDestinationApplyConfiguration, 0, len(destinations))
 	for _, dest := range destinations {
-		destApply := networkingv1alpha1Apply.LoadBalancerDestination().WithIP(dest.IP)
+		destApply := networkingv1alpha1apply.LoadBalancerDestination().WithIP(dest.IP)
 		if dest.TargetRef != nil {
-			destApply.WithTargetRef(networkingv1alpha1Apply.LoadBalancerTargetRef().
+			destApply.WithTargetRef(networkingv1alpha1apply.LoadBalancerTargetRef().
 				WithUID(dest.TargetRef.UID).
 				WithName(dest.TargetRef.Name).
 				WithProviderID(dest.TargetRef.ProviderID))
@@ -171,8 +171,8 @@ func (r *LoadBalancerReconciler) applyRouting(
 		destinationsApply = append(destinationsApply, destApply)
 	}
 
-	loadBalancerRoutingApply := networkingv1alpha1Apply.LoadBalancerRouting(loadBalancer.Name, loadBalancer.Namespace).
-		WithOwnerReferences(v1.OwnerReference().
+	loadBalancerRoutingApply := networkingv1alpha1apply.LoadBalancerRouting(loadBalancer.Name, loadBalancer.Namespace).
+		WithOwnerReferences(metav1apply.OwnerReference().
 			WithAPIVersion(networkingv1alpha1.SchemeGroupVersion.String()).
 			WithKind("LoadBalancer").
 			WithName(loadBalancer.Name).

@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	v1 "k8s.io/client-go/applyconfigurations/core/v1"
+	corev1apply "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
@@ -180,8 +180,8 @@ func (o *APIServerInstallOptions) generateService(cfg *rest.Config) (namespace, 
 		name = "aggregated-apiserver"
 	}
 
-	serviceApply := v1.Service(name, namespace).
-		WithSpec(v1.ServiceSpec().
+	serviceApply := corev1apply.Service(name, namespace).
+		WithSpec(corev1apply.ServiceSpec().
 			WithType(corev1.ServiceTypeExternalName).
 			WithExternalName(host))
 	if err := c.Apply(ctx, serviceApply, fieldOwner, client.ForceOwnership); err != nil {

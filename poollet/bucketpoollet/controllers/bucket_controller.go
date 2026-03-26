@@ -17,7 +17,7 @@ import (
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	bucketpoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/bucketpoollet/bcm"
-	bucketpoolletEvents "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
+	bucketpoolletevents "github.com/ironcore-dev/ironcore/poollet/bucketpoollet/controllers/events"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
@@ -30,7 +30,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	v1 "k8s.io/client-go/applyconfigurations/core/v1"
+	corev1apply "k8s.io/client-go/applyconfigurations/core/v1"
+	metav1apply "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -255,7 +256,7 @@ func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *st
 			return "", false, fmt.Errorf("error getting bucket class %s: %w", bucketClassName, err)
 		}
 
-		r.Eventf(bucket, nil, corev1.EventTypeNormal, bucketpoolletEvents.BucketClassNotReady, "Bucket class %s not found", bucketClassName)
+		r.Eventf(bucket, nil, corev1.EventTypeNormal, bucketpoolletevents.BucketClassNotReady, "Bucket class %s not found", bucketClassName)
 		return "", false, nil
 	}
 
@@ -409,7 +410,15 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 			if iriAccess.SecretData != nil {
 				log.V(1).Info("Applying bucket secret")
 				secretName := string(bucket.UID)
-				bucketSecretApply := v1.Secret(secretName, bucket.Namespace).
+				bucketSecretApply := corev1apply.Secret(secretName, bucket.Namespace).
+					WithOwnerReferences(metav1apply.OwnerReference().
+						WithAPIVersion(storagev1alpha1.SchemeGroupVersion.String()).
+						WithKind("Bucket").
+						WithName(bucket.Name).
+						WithUID(bucket.UID).
+						WithController(true).
+						WithBlockOwnerDeletion(true),
+					).
 					WithLabels(map[string]string{
 						bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 					}).
