@@ -50,7 +50,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -77,7 +77,7 @@ MachineSpec
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -101,7 +101,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -142,7 +142,7 @@ Image is the optional URL providing the operating system image of the machine.</
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -272,7 +272,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -330,7 +330,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -619,6 +619,93 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="compute.ironcore.dev/v1alpha1.MachineCondition">MachineCondition
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineStatus">MachineStatus</a>)
+</p>
+<div>
+<p>MachineCondition is one of the conditions of a machine.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code><br/>
+<em>
+<a href="#compute.ironcore.dev/v1alpha1.MachineConditionType">
+MachineConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type is the type of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status is the status of the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Reason is a machine-readable indication of why the condition is in a certain state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Message is a human-readable explanation of why the condition has a certain reason / state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code><br/>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<p>LastTransitionTime is the last time the status of a condition has transitioned from one state to another.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.ironcore.dev/v1alpha1.MachineConditionType">MachineConditionType
+(<code>string</code> alias)</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineCondition">MachineCondition</a>)
+</p>
+<div>
+<p>MachineConditionType is a type a MachineCondition can have.</p>
+</div>
 <h3 id="compute.ironcore.dev/v1alpha1.MachineExecOptions">MachineExecOptions
 </h3>
 <div>
@@ -731,7 +818,7 @@ no specific semantics are assigned to the additional IPs.</p>
 (<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachinePoolStatus">MachinePoolStatus</a>)
 </p>
 <div>
-<p>MachinePoolCondition is one of the conditions of a volume.</p>
+<p>MachinePoolCondition is one of the conditions of a MachinePool.</p>
 </div>
 <table>
 <thead>
@@ -758,7 +845,7 @@ MachinePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -804,7 +891,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -971,7 +1058,7 @@ MachinePoolState
 <td>
 <code>availableMachineClasses</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1051,7 +1138,7 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1075,7 +1162,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1116,7 +1203,7 @@ Image is the optional URL providing the operating system image of the machine.</
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1271,6 +1358,19 @@ int64
 </tr>
 <tr>
 <td>
+<code>conditions</code><br/>
+<em>
+<a href="#compute.ironcore.dev/v1alpha1.MachineCondition">
+[]MachineCondition
+</a>
+</em>
+</td>
+<td>
+<p>Conditions are the conditions of a machine.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>state</code><br/>
 <em>
 <a href="#compute.ironcore.dev/v1alpha1.MachineState">
@@ -1374,7 +1474,7 @@ NetworkInterfaceSource
 <td>
 <code>networkInterfaceRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1477,7 +1577,7 @@ NetworkInterfaceState
 <td>
 <code>networkInterfaceRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1490,7 +1590,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1602,7 +1702,7 @@ VolumeSource
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1732,7 +1832,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1745,7 +1845,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>

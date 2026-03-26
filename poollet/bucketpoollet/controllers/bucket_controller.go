@@ -31,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	v1 "k8s.io/client-go/applyconfigurations/core/v1"
+	applyconfigmetav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -410,6 +411,14 @@ func (r *BucketReconciler) updateStatus(ctx context.Context, log logr.Logger, bu
 				log.V(1).Info("Applying bucket secret")
 				secretName := string(bucket.UID)
 				bucketSecretApply := v1.Secret(secretName, bucket.Namespace).
+					WithOwnerReferences(applyconfigmetav1.OwnerReference().
+						WithAPIVersion(storagev1alpha1.SchemeGroupVersion.String()).
+						WithKind("Bucket").
+						WithName(bucket.Name).
+						WithUID(bucket.UID).
+						WithController(true).
+						WithBlockOwnerDeletion(true),
+					).
 					WithLabels(map[string]string{
 						bucketpoolletv1alpha1.BucketUIDLabel: string(bucket.UID),
 					}).
