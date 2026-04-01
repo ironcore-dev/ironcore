@@ -13,13 +13,22 @@ import (
 
 // VolumeStatusApplyConfiguration represents a declarative configuration of the VolumeStatus type for use
 // with apply.
+//
+// VolumeStatus defines the observed state of Volume
 type VolumeStatusApplyConfiguration struct {
-	VolumeID                *string                             `json:"volumeID,omitempty"`
-	State                   *storagev1alpha1.VolumeState        `json:"state,omitempty"`
-	LastStateTransitionTime *v1.Time                            `json:"lastStateTransitionTime,omitempty"`
-	Access                  *VolumeAccessApplyConfiguration     `json:"access,omitempty"`
-	Conditions              []VolumeConditionApplyConfiguration `json:"conditions,omitempty"`
-	Resources               *corev1alpha1.ResourceList          `json:"resources,omitempty"`
+	// VolumeID is the provider-specific volume ID in the format 'TYPE://VOLUME_ID'.
+	VolumeID *string `json:"volumeID,omitempty"`
+	// State represents the infrastructure state of a Volume.
+	State *storagev1alpha1.VolumeState `json:"state,omitempty"`
+	// LastStateTransitionTime is the last time the State transitioned between values.
+	LastStateTransitionTime *v1.Time `json:"lastStateTransitionTime,omitempty"`
+	// Access specifies how to access a Volume.
+	// This is set by the volume provider when the volume is provisioned.
+	Access *VolumeAccessApplyConfiguration `json:"access,omitempty"`
+	// Conditions are the conditions of a volume.
+	Conditions []VolumeConditionApplyConfiguration `json:"conditions,omitempty"`
+	// Resources is a effective volume's resources.
+	Resources *corev1alpha1.ResourceList `json:"resources,omitempty"`
 }
 
 // VolumeStatusApplyConfiguration constructs a declarative configuration of the VolumeStatus type for use with

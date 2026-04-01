@@ -32,7 +32,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -85,7 +85,7 @@ var _ = BeforeSuite(func() {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "bin", "k8s",
-			fmt.Sprintf("1.34.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.35.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
 		APIServiceDirectoryPaths:       []string{filepath.Join("..", "..", "..", "config", "apiserver", "apiservice", "bases")},
@@ -215,7 +215,7 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.BucketPool, *storagev1alph
 		DeferCleanup(cancel)
 
 		Expect((&controllers.BucketReconciler{
-			EventRecorder:     &record.FakeRecorder{},
+			EventRecorder:     &events.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			Scheme:            scheme.Scheme,
 			BucketRuntime:     srv,

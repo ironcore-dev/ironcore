@@ -16,6 +16,8 @@ import (
 
 // VirtualIPApplyConfiguration represents a declarative configuration of the VirtualIP type for use
 // with apply.
+//
+// VirtualIP is the Schema for the virtualips API
 type VirtualIPApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func VirtualIP(name, namespace string) *VirtualIPApplyConfiguration {
 	return b
 }
 
-// ExtractVirtualIP extracts the applied configuration owned by fieldManager from
-// virtualIP. If no managedFields are found in virtualIP for fieldManager, a
-// VirtualIPApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractVirtualIPFrom extracts the applied configuration owned by fieldManager from
+// virtualIP for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // virtualIP must be a unmodified VirtualIP API object that was retrieved from the Kubernetes API.
-// ExtractVirtualIP provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractVirtualIPFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractVirtualIP(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string) (*VirtualIPApplyConfiguration, error) {
-	return extractVirtualIP(virtualIP, fieldManager, "")
-}
-
-// ExtractVirtualIPStatus is the same as ExtractVirtualIP except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractVirtualIPStatus(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string) (*VirtualIPApplyConfiguration, error) {
-	return extractVirtualIP(virtualIP, fieldManager, "status")
-}
-
-func extractVirtualIP(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string, subresource string) (*VirtualIPApplyConfiguration, error) {
+func ExtractVirtualIPFrom(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string, subresource string) (*VirtualIPApplyConfiguration, error) {
 	b := &VirtualIPApplyConfiguration{}
 	err := managedfields.ExtractInto(virtualIP, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.networking.v1alpha1.VirtualIP"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractVirtualIP(virtualIP *networkingv1alpha1.VirtualIP, fieldManager stri
 	b.WithAPIVersion("networking.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractVirtualIP extracts the applied configuration owned by fieldManager from
+// virtualIP. If no managedFields are found in virtualIP for fieldManager, a
+// VirtualIPApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// virtualIP must be a unmodified VirtualIP API object that was retrieved from the Kubernetes API.
+// ExtractVirtualIP provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractVirtualIP(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string) (*VirtualIPApplyConfiguration, error) {
+	return ExtractVirtualIPFrom(virtualIP, fieldManager, "")
+}
+
+// ExtractVirtualIPStatus extracts the applied configuration owned by fieldManager from
+// virtualIP for the status subresource.
+func ExtractVirtualIPStatus(virtualIP *networkingv1alpha1.VirtualIP, fieldManager string) (*VirtualIPApplyConfiguration, error) {
+	return ExtractVirtualIPFrom(virtualIP, fieldManager, "status")
+}
+
 func (b VirtualIPApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

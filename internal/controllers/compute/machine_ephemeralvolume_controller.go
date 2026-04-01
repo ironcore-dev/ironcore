@@ -20,7 +20,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	k8sevents "k8s.io/client-go/tools/events"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -34,7 +34,7 @@ const (
 )
 
 type MachineEphemeralVolumeReconciler struct {
-	record.EventRecorder
+	k8sevents.EventRecorder
 	client.Client
 }
 
@@ -194,7 +194,7 @@ func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log lo
 		r.addArchitectureIfNeeded(log, volume, arch)
 		if err := r.handleCreateVolume(ctx, log, machine, volume); err != nil {
 			if apierrors.IsForbidden(err) {
-				r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s exceeded quota ", volume.Name)
+				r.Eventf(machine, volume, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s exceeded quota ", volume.Name)
 			}
 			errs = append(errs, err)
 		}

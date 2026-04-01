@@ -13,11 +13,19 @@ import (
 
 // PrefixAllocationSpecApplyConfiguration represents a declarative configuration of the PrefixAllocationSpec type for use
 // with apply.
+//
+// PrefixAllocationSpec defines the desired state of PrefixAllocation
 type PrefixAllocationSpecApplyConfiguration struct {
-	IPFamily       *v1.IPFamily                            `json:"ipFamily,omitempty"`
-	Prefix         *commonv1alpha1.IPPrefix                `json:"prefix,omitempty"`
-	PrefixLength   *int32                                  `json:"prefixLength,omitempty"`
-	PrefixRef      *v1.LocalObjectReference                `json:"prefixRef,omitempty"`
+	// IPFamily is the IPFamily of the prefix.
+	// If unset but Prefix is set, this can be inferred.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// Prefix is the prefix to allocate for this Prefix.
+	Prefix *commonv1alpha1.IPPrefix `json:"prefix,omitempty"`
+	// PrefixLength is the length of prefix to allocate for this Prefix.
+	PrefixLength *int32 `json:"prefixLength,omitempty"`
+	// PrefixRef references the prefix to allocate from.
+	PrefixRef *v1.LocalObjectReference `json:"prefixRef,omitempty"`
+	// PrefixSelector selects the prefix to allocate from.
 	PrefixSelector *metav1.LabelSelectorApplyConfiguration `json:"prefixSelector,omitempty"`
 }
 

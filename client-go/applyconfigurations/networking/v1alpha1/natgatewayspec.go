@@ -12,11 +12,18 @@ import (
 
 // NATGatewaySpecApplyConfiguration represents a declarative configuration of the NATGatewaySpec type for use
 // with apply.
+//
+// NATGatewaySpec defines the desired state of NATGateway
 type NATGatewaySpecApplyConfiguration struct {
-	Type                     *networkingv1alpha1.NATGatewayType `json:"type,omitempty"`
-	IPFamily                 *v1.IPFamily                       `json:"ipFamily,omitempty"`
-	NetworkRef               *v1.LocalObjectReference           `json:"networkRef,omitempty"`
-	PortsPerNetworkInterface *int32                             `json:"portsPerNetworkInterface,omitempty"`
+	// Type is the type of NATGateway.
+	Type *networkingv1alpha1.NATGatewayType `json:"type,omitempty"`
+	// IPFamily is the ip family the NAT gateway should have.
+	IPFamily *v1.IPFamily `json:"ipFamily,omitempty"`
+	// NetworkRef is the Network this NATGateway should belong to.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// PortsPerNetworkInterface defines the number of concurrent connections per target network interface.
+	// Has to be a power of 2. If empty, 2048 (DefaultPortsPerNetworkInterface) is the default.
+	PortsPerNetworkInterface *int32 `json:"portsPerNetworkInterface,omitempty"`
 }
 
 // NATGatewaySpecApplyConfiguration constructs a declarative configuration of the NATGatewaySpec type for use with

@@ -9,8 +9,7 @@ import (
 	"sync"
 
 	clientcmdutil "github.com/ironcore-dev/ironcore/utils/clientcmd"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -89,20 +88,11 @@ func (s *SecretStore) Set(ctx context.Context, cfg *rest.Config) error {
 		return err
 	}
 
-	secret := &corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Secret",
-			APIVersion: corev1.SchemeGroupVersion.String(),
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: s.key.Namespace,
-			Name:      s.key.Name,
-		},
-		Data: map[string][]byte{
+	secretApply := v1.Secret(s.key.Name, s.key.Namespace).
+		WithData(map[string][]byte{
 			s.field: kubeconfigData,
-		},
-	}
-	if err := s.client.Patch(ctx, secret, client.Apply, s.fieldOwner, client.ForceOwnership); err != nil {
+		})
+	if err := s.client.Apply(ctx, secretApply, s.fieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying secret %s: %w", s.key, err)
 	}
 	return nil

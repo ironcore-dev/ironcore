@@ -13,14 +13,18 @@ import (
 
 // MachinePoolStatusApplyConfiguration represents a declarative configuration of the MachinePoolStatus type for use
 // with apply.
+//
+// MachinePoolStatus defines the observed state of MachinePool
 type MachinePoolStatusApplyConfiguration struct {
 	State                   *computev1alpha1.MachinePoolState             `json:"state,omitempty"`
 	Conditions              []MachinePoolConditionApplyConfiguration      `json:"conditions,omitempty"`
 	AvailableMachineClasses []v1.LocalObjectReference                     `json:"availableMachineClasses,omitempty"`
 	Addresses               []MachinePoolAddressApplyConfiguration        `json:"addresses,omitempty"`
 	DaemonEndpoints         *MachinePoolDaemonEndpointsApplyConfiguration `json:"daemonEndpoints,omitempty"`
-	Capacity                *corev1alpha1.ResourceList                    `json:"capacity,omitempty"`
-	Allocatable             *corev1alpha1.ResourceList                    `json:"allocatable,omitempty"`
+	// Capacity represents the total resources of a machine pool.
+	Capacity *corev1alpha1.ResourceList `json:"capacity,omitempty"`
+	// Allocatable represents the resources of a machine pool that are available for scheduling.
+	Allocatable *corev1alpha1.ResourceList `json:"allocatable,omitempty"`
 }
 
 // MachinePoolStatusApplyConfiguration constructs a declarative configuration of the MachinePoolStatus type for use with

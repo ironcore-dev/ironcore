@@ -43,7 +43,7 @@ func NewBucketClassInformer(client versioned.Interface, resyncPeriod time.Durati
 // one. This reduces memory footprint and number of connections to the server.
 func NewFilteredBucketClassInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
-		&cache.ListWatch{
+		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
@@ -68,7 +68,7 @@ func NewFilteredBucketClassInformer(client versioned.Interface, resyncPeriod tim
 				}
 				return client.StorageV1alpha1().BucketClasses().Watch(ctx, options)
 			},
-		},
+		}, client),
 		&apistoragev1alpha1.BucketClass{},
 		resyncPeriod,
 		indexers,

@@ -16,6 +16,8 @@ import (
 
 // PrefixApplyConfiguration represents a declarative configuration of the Prefix type for use
 // with apply.
+//
+// Prefix is the Schema for the prefixes API
 type PrefixApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func Prefix(name, namespace string) *PrefixApplyConfiguration {
 	return b
 }
 
-// ExtractPrefix extracts the applied configuration owned by fieldManager from
-// prefix. If no managedFields are found in prefix for fieldManager, a
-// PrefixApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractPrefixFrom extracts the applied configuration owned by fieldManager from
+// prefix for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // prefix must be a unmodified Prefix API object that was retrieved from the Kubernetes API.
-// ExtractPrefix provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractPrefixFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractPrefix(prefix *ipamv1alpha1.Prefix, fieldManager string) (*PrefixApplyConfiguration, error) {
-	return extractPrefix(prefix, fieldManager, "")
-}
-
-// ExtractPrefixStatus is the same as ExtractPrefix except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractPrefixStatus(prefix *ipamv1alpha1.Prefix, fieldManager string) (*PrefixApplyConfiguration, error) {
-	return extractPrefix(prefix, fieldManager, "status")
-}
-
-func extractPrefix(prefix *ipamv1alpha1.Prefix, fieldManager string, subresource string) (*PrefixApplyConfiguration, error) {
+func ExtractPrefixFrom(prefix *ipamv1alpha1.Prefix, fieldManager string, subresource string) (*PrefixApplyConfiguration, error) {
 	b := &PrefixApplyConfiguration{}
 	err := managedfields.ExtractInto(prefix, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.ipam.v1alpha1.Prefix"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractPrefix(prefix *ipamv1alpha1.Prefix, fieldManager string, subresource
 	b.WithAPIVersion("ipam.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractPrefix extracts the applied configuration owned by fieldManager from
+// prefix. If no managedFields are found in prefix for fieldManager, a
+// PrefixApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// prefix must be a unmodified Prefix API object that was retrieved from the Kubernetes API.
+// ExtractPrefix provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractPrefix(prefix *ipamv1alpha1.Prefix, fieldManager string) (*PrefixApplyConfiguration, error) {
+	return ExtractPrefixFrom(prefix, fieldManager, "")
+}
+
+// ExtractPrefixStatus extracts the applied configuration owned by fieldManager from
+// prefix for the status subresource.
+func ExtractPrefixStatus(prefix *ipamv1alpha1.Prefix, fieldManager string) (*PrefixApplyConfiguration, error) {
+	return ExtractPrefixFrom(prefix, fieldManager, "status")
+}
+
 func (b PrefixApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

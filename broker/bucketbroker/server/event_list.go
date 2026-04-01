@@ -55,6 +55,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 				Reason:             bucketEvent.Reason,
 				Message:            bucketEvent.Message,
 				Type:               bucketEvent.Type,
+				Action:             bucketEvent.Action,
 				EventTime:          bucketEvent.LastTimestamp.Unix(),
 			},
 		}

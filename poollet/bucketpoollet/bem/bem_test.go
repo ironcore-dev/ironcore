@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -62,13 +62,13 @@ var _ = Describe("BucketEventMapper", func() {
 		})
 		Expect(k8sManager.Add(bucketClassMapper)).To(Succeed())
 
-		bucketEventMapper := bem.NewBucketEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), bem.BucketEventMapperOptions{
+		bucketEventMapper := bem.NewBucketEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorder("test"), bem.BucketEventMapperOptions{
 			RelistPeriod: 2 * time.Second,
 		})
 		Expect(k8sManager.Add(bucketEventMapper)).To(Succeed())
 
 		Expect((&controllers.BucketReconciler{
-			EventRecorder:     &record.FakeRecorder{},
+			EventRecorder:     &events.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			BucketRuntime:     srv,
 			BucketRuntimeName: fakebucket.FakeRuntimeName,
@@ -116,6 +116,7 @@ var _ = Describe("BucketEventMapper", func() {
 					Reason:    "testing",
 					Message:   "this is test bucket event",
 					Type:      "Normal",
+					Action:    "Synced",
 					EventTime: time.Now().Unix(),
 				}},
 		},
@@ -136,6 +137,7 @@ var _ = Describe("BucketEventMapper", func() {
 			HaveField("Reason", Equal("testing")),
 			HaveField("Message", Equal("this is test bucket event")),
 			HaveField("Type", Equal(corev1.EventTypeNormal)),
+			HaveField("Action", Equal("Synced")),
 		)))
 	})
 })

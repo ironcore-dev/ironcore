@@ -11,9 +11,14 @@ import (
 
 // BucketPoolSpecApplyConfiguration represents a declarative configuration of the BucketPoolSpec type for use
 // with apply.
+//
+// BucketPoolSpec defines the desired state of BucketPool
 type BucketPoolSpecApplyConfiguration struct {
-	ProviderID *string                `json:"providerID,omitempty"`
-	Taints     []commonv1alpha1.Taint `json:"taints,omitempty"`
+	// ProviderID identifies the BucketPool on provider side.
+	ProviderID *string `json:"providerID,omitempty"`
+	// Taints of the BucketPool. Only Buckets who tolerate all the taints
+	// will land in the BucketPool.
+	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // BucketPoolSpecApplyConfiguration constructs a declarative configuration of the BucketPoolSpec type for use with

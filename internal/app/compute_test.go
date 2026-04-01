@@ -65,13 +65,13 @@ var _ = Describe("Compute", func() {
 					},
 				},
 			}
-			Expect(k8sClient.Patch(ctx, machine, client.Apply, fieldOwner)).To(Succeed())
+			Expect(k8sClient.Create(ctx, machine)).To(Succeed())
 
 			By("inspecting the machine's volumes")
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "foo",
-					Device: ptr.To[string]("oda"),
+					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
@@ -79,47 +79,27 @@ var _ = Describe("Compute", func() {
 			}))
 
 			By("applying a changed machine with a second volume")
-			machine = &computev1alpha1.Machine{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: computev1alpha1.SchemeGroupVersion.String(),
-					Kind:       "Machine",
+			machinebase := machine.DeepCopy()
+			machine.Spec.Volumes = append(machine.Spec.Volumes, computev1alpha1.Volume{
+				Name: "bar",
+				VolumeSource: computev1alpha1.VolumeSource{
+					EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: ns.Name,
-					Name:      "my-machine",
-				},
-				Spec: computev1alpha1.MachineSpec{
-					MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
-					Volumes: []computev1alpha1.Volume{
-						{
-							Name: "foo",
-							VolumeSource: computev1alpha1.VolumeSource{
-								EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
-							},
-						},
-						{
-							Name: "bar",
-							VolumeSource: computev1alpha1.VolumeSource{
-								EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
-							},
-						},
-					},
-				},
-			}
-			Expect(k8sClient.Patch(ctx, machine, client.Apply, fieldOwner)).To(Succeed())
+			})
+			Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machinebase), fieldOwner)).To(Succeed())
 
 			By("inspecting the machine's volumes")
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "foo",
-					Device: ptr.To[string]("oda"),
+					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
 				},
 				{
 					Name:   "bar",
-					Device: ptr.To[string]("odb"),
+					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},
@@ -127,34 +107,15 @@ var _ = Describe("Compute", func() {
 			}))
 
 			By("applying a changed machine with the first volume removed")
-			machine = &computev1alpha1.Machine{
-				TypeMeta: metav1.TypeMeta{
-					APIVersion: computev1alpha1.SchemeGroupVersion.String(),
-					Kind:       "Machine",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Namespace: ns.Name,
-					Name:      "my-machine",
-				},
-				Spec: computev1alpha1.MachineSpec{
-					MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
-					Volumes: []computev1alpha1.Volume{
-						{
-							Name: "bar",
-							VolumeSource: computev1alpha1.VolumeSource{
-								EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
-							},
-						},
-					},
-				},
-			}
-			Expect(k8sClient.Patch(ctx, machine, client.Apply, fieldOwner)).To(Succeed())
+			machinebase = machine.DeepCopy()
+			machine.Spec.Volumes = machine.Spec.Volumes[1:]
+			Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machinebase), fieldOwner)).To(Succeed())
 
 			By("inspecting the machine's volumes")
 			Expect(machine.Spec.Volumes).To(Equal([]computev1alpha1.Volume{
 				{
 					Name:   "bar",
-					Device: ptr.To[string]("odb"),
+					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
 						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
 					},

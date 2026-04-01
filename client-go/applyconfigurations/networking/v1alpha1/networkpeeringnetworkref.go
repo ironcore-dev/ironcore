@@ -7,9 +7,14 @@ package v1alpha1
 
 // NetworkPeeringNetworkRefApplyConfiguration represents a declarative configuration of the NetworkPeeringNetworkRef type for use
 // with apply.
+//
+// NetworkPeeringNetworkRef is a reference to a network to peer with.
 type NetworkPeeringNetworkRefApplyConfiguration struct {
+	// Namespace is the namespace of the referenced entity. If empty,
+	// the same namespace as the referring resource is implied.
 	Namespace *string `json:"namespace,omitempty"`
-	Name      *string `json:"name,omitempty"`
+	// Name is the name of the referenced entity.
+	Name *string `json:"name,omitempty"`
 }
 
 // NetworkPeeringNetworkRefApplyConfiguration constructs a declarative configuration of the NetworkPeeringNetworkRef type for use with

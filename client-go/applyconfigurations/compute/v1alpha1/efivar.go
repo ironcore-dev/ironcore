@@ -7,9 +7,14 @@ package v1alpha1
 
 // EFIVarApplyConfiguration represents a declarative configuration of the EFIVar type for use
 // with apply.
+//
+// EFIVar is a variable to pass to EFI while booting up.
 type EFIVarApplyConfiguration struct {
-	Name  *string `json:"name,omitempty"`
-	UUID  *string `json:"uuid,omitempty"`
+	// Name is the name of the EFIVar.
+	Name *string `json:"name,omitempty"`
+	// UUID is the uuid of the EFIVar.
+	UUID *string `json:"uuid,omitempty"`
+	// Value is the value of the EFIVar.
 	Value *string `json:"value,omitempty"`
 }
 

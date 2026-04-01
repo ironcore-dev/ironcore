@@ -15,7 +15,7 @@ import (
 	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/workqueue"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -33,7 +33,7 @@ const (
 )
 
 type VolumeScheduler struct {
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	Cache    *scheduler.Cache
@@ -148,7 +148,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule volume on")
+		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule %s on", volume.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -171,7 +171,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 	}
 
 	if len(filteredNodes) == 0 {
-		s.Event(volume, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule volume on")
+		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule %s on", volume.Name)
 		return ctrl.Result{}, nil
 	}
 

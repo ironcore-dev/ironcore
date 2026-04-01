@@ -281,7 +281,7 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	// Metrics endpoint is enabled in 'config/machinepoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
 	// More info:
-	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html
 	metricsServerOptions := metricsserver.Options{
 		BindAddress:   opts.MetricsAddr,
@@ -292,7 +292,7 @@ func Run(ctx context.Context, opts Options) error {
 		// FilterProvider is used to protect the metrics endpoint with authn/authz.
 		// These configurations ensure that only authorized users and service accounts
 		// can access the metrics endpoint. The RBAC are configured in 'config/machinepoollet-broker/broker-rbac/kustomization.yaml'. More info:
-		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
 		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
 	}
 
@@ -395,7 +395,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding machine class mapper: %w", err)
 	}
 
-	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorderFor("machine-cluster-events"), mem.MachineEventMapperOptions{})
+	machineEventMapper := mem.NewMachineEventMapper(mgr.GetClient(), machineRuntime, mgr.GetEventRecorder("machine-cluster-events"), mem.MachineEventMapperOptions{})
 	if err := mgr.Add(machineEventMapper); err != nil {
 		return fmt.Errorf("error adding machine event mapper: %w", err)
 	}
@@ -442,7 +442,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.MachineReconciler{
-			EventRecorder:                 mgr.GetEventRecorderFor("machines"),
+			EventRecorder:                 mgr.GetEventRecorder("machines"),
 			Client:                        mgr.GetClient(),
 			MachineRuntime:                machineRuntime,
 			MachineRuntimeName:            version.RuntimeName,

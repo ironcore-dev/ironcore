@@ -11,9 +11,13 @@ import (
 
 // VolumeDataSourceApplyConfiguration represents a declarative configuration of the VolumeDataSource type for use
 // with apply.
+//
+// VolumeDataSource specifies the source to use for a Volume.
 type VolumeDataSourceApplyConfiguration struct {
-	VolumeSnapshotRef *v1.LocalObjectReference        `json:"volumeSnapshotRef,omitempty"`
-	OSImage           *OSDataSourceApplyConfiguration `json:"osImage,omitempty"`
+	// VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.
+	VolumeSnapshotRef *v1.LocalObjectReference `json:"volumeSnapshotRef,omitempty"`
+	// OSImage defines an optional os image to bootstrap the volume.
+	OSImage *OSDataSourceApplyConfiguration `json:"osImage,omitempty"`
 }
 
 // VolumeDataSourceApplyConfiguration constructs a declarative configuration of the VolumeDataSource type for use with
