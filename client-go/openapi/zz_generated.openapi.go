@@ -39,6 +39,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineClassList":                schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineCondition":                schema_ironcore_api_compute_v1alpha1_MachineCondition(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineExecOptions":              schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref),
+		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineGuestConfig":              schema_ironcore_api_compute_v1alpha1_MachineGuestConfig(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineList":                     schema_ironcore_api_compute_v1alpha1_MachineList(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePool":                     schema_ironcore_api_compute_v1alpha1_MachinePool(ref),
 		"github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachinePoolAddress":              schema_ironcore_api_compute_v1alpha1_MachinePoolAddress(ref),
@@ -1097,6 +1098,26 @@ func schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref common.Referenc
 	}
 }
 
+func schema_ironcore_api_compute_v1alpha1_MachineGuestConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MachineGuestConfig contains guest OS level configuration for the machine.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname is the desired hostname of the machine.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_ironcore_api_compute_v1alpha1_MachineList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1622,12 +1643,18 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 							},
 						},
 					},
+					"guestConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GuestConfig contains guest OS level configuration for the machine.",
+							Ref:         ref("github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineGuestConfig"),
+						},
+					},
 				},
 				Required: []string{"machineClassRef"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume", "k8s.io/api/core/v1.LocalObjectReference"},
+			"github.com/ironcore-dev/ironcore/api/common/v1alpha1.SecretKeySelector", "github.com/ironcore-dev/ironcore/api/common/v1alpha1.Toleration", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.EFIVar", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.MachineGuestConfig", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.NetworkInterface", "github.com/ironcore-dev/ironcore/api/compute/v1alpha1.Volume", "k8s.io/api/core/v1.LocalObjectReference"},
 	}
 }
 
