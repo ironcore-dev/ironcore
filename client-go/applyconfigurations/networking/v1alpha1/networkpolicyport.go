@@ -11,10 +11,20 @@ import (
 
 // NetworkPolicyPortApplyConfiguration represents a declarative configuration of the NetworkPolicyPort type for use
 // with apply.
+//
+// NetworkPolicyPort describes a port to allow traffic on
 type NetworkPolicyPortApplyConfiguration struct {
+	// Protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this
+	// field defaults to TCP.
 	Protocol *v1.Protocol `json:"protocol,omitempty"`
-	Port     *int32       `json:"port,omitempty"`
-	EndPort  *int32       `json:"endPort,omitempty"`
+	// The port on the given protocol. If this field is not provided, this matches
+	// all port names and numbers.
+	// If present, only traffic on the specified protocol AND port will be matched.
+	Port *int32 `json:"port,omitempty"`
+	// EndPort indicates that the range of ports from Port to EndPort, inclusive,
+	// should be allowed by the policy. This field cannot be defined if the port field
+	// is not defined. The endPort must be equal or greater than port.
+	EndPort *int32 `json:"endPort,omitempty"`
 }
 
 // NetworkPolicyPortApplyConfiguration constructs a declarative configuration of the NetworkPolicyPort type for use with

@@ -11,9 +11,14 @@ import (
 
 // VirtualIPSourceApplyConfiguration represents a declarative configuration of the VirtualIPSource type for use
 // with apply.
+//
+// VirtualIPSource is the definition of how to obtain a VirtualIP.
 type VirtualIPSourceApplyConfiguration struct {
-	VirtualIPRef *v1.LocalObjectReference                    `json:"virtualIPRef,omitempty"`
-	Ephemeral    *EphemeralVirtualIPSourceApplyConfiguration `json:"ephemeral,omitempty"`
+	// VirtualIPRef references a VirtualIP to use.
+	VirtualIPRef *v1.LocalObjectReference `json:"virtualIPRef,omitempty"`
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// VirtualIP.
+	Ephemeral *EphemeralVirtualIPSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 
 // VirtualIPSourceApplyConfiguration constructs a declarative configuration of the VirtualIPSource type for use with

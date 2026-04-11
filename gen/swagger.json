@@ -2,7 +2,7 @@
 	"swagger": "2.0",
 	"info": {
 		"title": "Kubernetes",
-		"version": "1.34"
+		"version": "1.35"
 	},
 	"paths": {
 		"/.well-known/openid-configuration/": {
@@ -73809,6 +73809,19 @@
 				}
 			}
 		},
+		"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource": {
+			"type": "object",
+			"properties": {
+				"architecture": {
+					"description": "Architecture defines the architecture of the OS which should be used",
+					"type": "string"
+				},
+				"image": {
+					"description": "Image is an optional image to bootstrap the volume with.",
+					"type": "string"
+				}
+			}
+		},
 		"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume": {
 			"description": "Volume is the Schema for the volumes API",
 			"type": "object",
@@ -73968,6 +73981,20 @@
 				"type": {
 					"description": "Type is the type of the condition.",
 					"type": "string"
+				}
+			}
+		},
+		"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource": {
+			"description": "VolumeDataSource specifies the source to use for a Volume.",
+			"type": "object",
+			"properties": {
+				"osImage": {
+					"description": "OSImage defines an optional os image to bootstrap the volume.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource"
+				},
+				"volumeSnapshotRef": {
+					"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+					"$ref": "#/definitions/io.k8s.api.core.v1.LocalObjectReference"
 				}
 			}
 		},
@@ -74279,6 +74306,10 @@
 					"description": "ClaimRef is the reference to the claiming entity of the Volume.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.common.v1alpha1.LocalUIDReference"
 				},
+				"dataSource": {
+					"description": "DataSource contains the content to prepopulate the Volume with.",
+					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource"
+				},
 				"encryption": {
 					"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
 					"$ref": "#/definitions/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption"
@@ -74290,10 +74321,6 @@
 				"imagePullSecretRef": {
 					"description": "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.LocalObjectReference"
-				},
-				"osImage": {
-					"description": "OSImage is an optional os image to bootstrap the volume.",
-					"type": "string"
 				},
 				"resources": {
 					"description": "Resources is a description of the volume's resources and capacity.",
@@ -74327,10 +74354,6 @@
 					"additionalProperties": {
 						"type": "string"
 					}
-				},
-				"volumeSnapshotRef": {
-					"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-					"$ref": "#/definitions/io.k8s.api.core.v1.LocalObjectReference"
 				}
 			}
 		},
@@ -74539,8 +74562,12 @@
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.LabelSelector"
 				},
 				"reinvocationPolicy": {
-					"description": "reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation. Allowed values are \"Never\" and \"IfNeeded\".\n\nNever: the webhook will not be called more than once in a single admission evaluation.\n\nIfNeeded: the webhook will be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial webhook call. Webhooks that specify this option *must* be idempotent, able to process objects they previously admitted. Note: * the number of additional invocations is not guaranteed to be exactly one. * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again. * webhooks that use this option may be reordered to minimize the number of additional invocations. * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.\n\nDefaults to \"Never\".",
-					"type": "string"
+					"description": "reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation. Allowed values are \"Never\" and \"IfNeeded\".\n\nNever: the webhook will not be called more than once in a single admission evaluation.\n\nIfNeeded: the webhook will be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial webhook call. Webhooks that specify this option *must* be idempotent, able to process objects they previously admitted. Note: * the number of additional invocations is not guaranteed to be exactly one. * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again. * webhooks that use this option may be reordered to minimize the number of additional invocations. * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.\n\nDefaults to \"Never\".\n\nPossible enum values:\n - `\"IfNeeded\"` indicates that the mutation may be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial mutation call.\n - `\"Never\"` indicates that the mutation must not be called more than once in a single admission evaluation.",
+					"type": "string",
+					"enum": [
+						"IfNeeded",
+						"Never"
+					]
 				},
 				"rules": {
 					"description": "Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.",
@@ -74692,8 +74719,13 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"scope": {
-					"description": "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".",
-					"type": "string"
+					"description": "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".\n\n\nPossible enum values:\n - `\"*\"` means that all scopes are included.\n - `\"Cluster\"` means that scope is limited to cluster-scoped objects. Namespace objects are cluster-scoped.\n - `\"Namespaced\"` means that scope is limited to namespaced objects.",
+					"type": "string",
+					"enum": [
+						"*",
+						"Cluster",
+						"Namespaced"
+					]
 				}
 			},
 			"x-kubernetes-map-type": "atomic"
@@ -74780,8 +74812,13 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"scope": {
-					"description": "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".",
-					"type": "string"
+					"description": "scope specifies the scope of this rule. Valid values are \"Cluster\", \"Namespaced\", and \"*\" \"Cluster\" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. \"Namespaced\" means that only namespaced resources will match this rule. \"*\" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is \"*\".\n\n\nPossible enum values:\n - `\"*\"` means that all scopes are included.\n - `\"Cluster\"` means that scope is limited to cluster-scoped objects. Namespace objects are cluster-scoped.\n - `\"Namespaced\"` means that scope is limited to namespaced objects.",
+					"type": "string",
+					"enum": [
+						"*",
+						"Cluster",
+						"Namespaced"
+					]
 				}
 			}
 		},
@@ -75785,7 +75822,7 @@
 					"format": "int32"
 				},
 				"terminatingReplicas": {
-					"description": "Total number of terminating pods targeted by this deployment. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is an alpha field. Enable DeploymentReplicaSetTerminatingReplicas to be able to use this field.",
+					"description": "Total number of terminating pods targeted by this deployment. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).",
 					"type": "integer",
 					"format": "int32"
 				},
@@ -75990,7 +76027,7 @@
 					"format": "int32"
 				},
 				"terminatingReplicas": {
-					"description": "The number of terminating pods for this replica set. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is an alpha field. Enable DeploymentReplicaSetTerminatingReplicas to be able to use this field.",
+					"description": "The number of terminating pods for this replica set. Terminating pods have a non-null .metadata.deletionTimestamp and have not yet reached the Failed or Succeeded .status.phase.\n\nThis is a beta field and requires enabling DeploymentReplicaSetTerminatingReplicas feature (enabled by default).",
 					"type": "integer",
 					"format": "int32"
 				}
@@ -76029,7 +76066,7 @@
 			"type": "object",
 			"properties": {
 				"maxUnavailable": {
-					"description": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding up. This can not be 0. Defaults to 1. This field is alpha-level and is only honored by servers that enable the MaxUnavailableStatefulSet feature. The field applies to all pods in the range 0 to Replicas-1. That means if there is any unavailable pod in the range 0 to Replicas-1, it will be counted towards MaxUnavailable.",
+					"description": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding up. This can not be 0. Defaults to 1. This field is beta-level and is enabled by default. The field applies to all pods in the range 0 to Replicas-1. That means if there is any unavailable pod in the range 0 to Replicas-1, it will be counted towards MaxUnavailable. This setting might not be effective for the OrderedReady podManagementPolicy. That policy ensures pods are created and become ready one at a time.",
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.util.intstr.IntOrString"
 				},
 				"partition": {
@@ -77335,7 +77372,7 @@
 			}
 		},
 		"io.k8s.api.autoscaling.v2.HPAScalingRules": {
-			"description": "HPAScalingRules configures the scaling behavior for one direction via scaling Policy Rules and a configurable metric tolerance.\n\nScaling Policy Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.\n\nThe tolerance is applied to the metric values and prevents scaling too eagerly for small metric variations. (Note that setting a tolerance requires enabling the alpha HPAConfigurableTolerance feature gate.)",
+			"description": "HPAScalingRules configures the scaling behavior for one direction via scaling Policy Rules and a configurable metric tolerance.\n\nScaling Policy Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.\n\nThe tolerance is applied to the metric values and prevents scaling too eagerly for small metric variations. (Note that setting a tolerance requires the beta HPAConfigurableTolerance feature gate to be enabled.)",
 			"type": "object",
 			"properties": {
 				"policies": {
@@ -77356,7 +77393,7 @@
 					"format": "int32"
 				},
 				"tolerance": {
-					"description": "tolerance is the tolerance on the ratio between the current and desired metric value under which no updates are made to the desired number of replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not set, the default cluster-wide tolerance is applied (by default 10%).\n\nFor example, if autoscaling is configured with a memory consumption target of 100Mi, and scale-down and scale-up tolerances of 5% and 1% respectively, scaling will be triggered when the actual consumption falls below 95Mi or exceeds 101Mi.\n\nThis is an alpha field and requires enabling the HPAConfigurableTolerance feature gate.",
+					"description": "tolerance is the tolerance on the ratio between the current and desired metric value under which no updates are made to the desired number of replicas (e.g. 0.01 for 1%). Must be greater than or equal to zero. If not set, the default cluster-wide tolerance is applied (by default 10%).\n\nFor example, if autoscaling is configured with a memory consumption target of 100Mi, and scale-down and scale-up tolerances of 5% and 1% respectively, scaling will be triggered when the actual consumption falls below 95Mi or exceeds 101Mi.\n\nThis is an beta field and requires the HPAConfigurableTolerance feature gate to be enabled.",
 					"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
 				}
 			}
@@ -78082,7 +78119,7 @@
 					"format": "int32"
 				},
 				"managedBy": {
-					"description": "ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first \"/\" must be a valid subdomain as defined by RFC 1123. All characters trailing the first \"/\" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.\n\nThis field is beta-level. The job controller accepts setting the field when the feature gate JobManagedBy is enabled (enabled by default).",
+					"description": "ManagedBy field indicates the controller that manages a Job. The k8s Job controller reconciles jobs which don't have this field at all or the field value is the reserved string `kubernetes.io/job-controller`, but skips reconciling Jobs with a custom value for this field. The value must be a valid domain-prefixed path (e.g. acme.io/foo) - all characters before the first \"/\" must be a valid subdomain as defined by RFC 1123. All characters trailing the first \"/\" must be valid HTTP Path characters as defined by RFC 3986. The value cannot exceed 63 characters. This field is immutable.",
 					"type": "string"
 				},
 				"manualSelector": {
@@ -78261,8 +78298,7 @@
 			"description": "PodFailurePolicyOnPodConditionsPattern describes a pattern for matching an actual pod condition type.",
 			"type": "object",
 			"required": [
-				"type",
-				"status"
+				"type"
 			],
 			"properties": {
 				"status": {
@@ -78497,8 +78533,7 @@
 				"request": {
 					"description": "request contains an x509 certificate signing request encoded in a \"CERTIFICATE REQUEST\" PEM block. When serialized as JSON or YAML, the data is additionally base64-encoded.",
 					"type": "string",
-					"format": "byte",
-					"x-kubernetes-list-type": "atomic"
+					"format": "byte"
 				},
 				"signerName": {
 					"description": "signerName indicates the requested signer, and is a qualified name.\n\nList/watch requests for CertificateSigningRequests can filter on this field using a \"spec.signerName=NAME\" fieldSelector.\n\nWell-known Kubernetes signers are:\n 1. \"kubernetes.io/kube-apiserver-client\": issues client certificates that can be used to authenticate to kube-apiserver.\n  Requests for this signer are never auto-approved by kube-controller-manager, can be issued by the \"csrsigning\" controller in kube-controller-manager.\n 2. \"kubernetes.io/kube-apiserver-client-kubelet\": issues client certificates that kubelets use to authenticate to kube-apiserver.\n  Requests for this signer can be auto-approved by the \"csrapproving\" controller in kube-controller-manager, and can be issued by the \"csrsigning\" controller in kube-controller-manager.\n 3. \"kubernetes.io/kubelet-serving\" issues serving certificates that kubelets use to serve TLS endpoints, which kube-apiserver can connect to securely.\n  Requests for this signer are never auto-approved by kube-controller-manager, and can be issued by the \"csrsigning\" controller in kube-controller-manager.\n\nMore details are available at https://k8s.io/docs/reference/access-authn-authz/certificate-signing-requests/#kubernetes-signers\n\nCustom signerNames can also be specified. The signer defines:\n 1. Trust distribution: how trust (CA bundles) are distributed.\n 2. Permitted subjects: and behavior when a disallowed subject is requested.\n 3. Required, permitted, or forbidden x509 extensions in the request (including whether subjectAltNames are allowed, which types, restrictions on allowed values) and behavior when a disallowed extension is requested.\n 4. Required, permitted, or forbidden key usages / extended key usages.\n 5. Expiration/certificate lifetime: whether it is fixed by the signer, configurable by the admin.\n 6. Whether or not requests for CA certificates are allowed.",
@@ -78554,8 +78589,7 @@
 				"certificate": {
 					"description": "certificate is populated with an issued certificate by the signer after an Approved condition is present. This field is set via the /status subresource. Once populated, this field is immutable.\n\nIf the certificate signing request is denied, a condition of type \"Denied\" is added and this field remains empty. If the signer cannot issue the certificate, a condition of type \"Failed\" is added and this field remains empty.\n\nValidation requirements:\n 1. certificate must contain one or more PEM blocks.\n 2. All PEM blocks must have the \"CERTIFICATE\" label, contain no headers, and the encoded data\n  must be a BER-encoded ASN.1 Certificate structure as described in section 4 of RFC5280.\n 3. Non-PEM content may appear before or after the \"CERTIFICATE\" PEM blocks and is unvalidated,\n  to allow for explanatory text as described in section 5.2 of RFC7468.\n\nIf more than one PEM block is present, and the definition of the requested spec.signerName does not indicate otherwise, the first block is the issued certificate, and subsequent blocks should be treated as intermediate certificates and presented in TLS handshakes.\n\nThe certificate is encoded in PEM format.\n\nWhen serialized as JSON or YAML, the data is additionally base64-encoded, so it consists of:\n\n    base64(\n    -----BEGIN CERTIFICATE-----\n    ...\n    -----END CERTIFICATE-----\n    )",
 					"type": "string",
-					"format": "byte",
-					"x-kubernetes-list-type": "atomic"
+					"format": "byte"
 				},
 				"conditions": {
 					"description": "conditions applied to the request. Known conditions are \"Approved\", \"Denied\", and \"Failed\".",
@@ -79539,7 +79573,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.Probe"
 				},
 				"resizePolicy": {
-					"description": "Resources resize policy for the container.",
+					"description": "Resources resize policy for the container. This field cannot be set on ephemeral containers.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.core.v1.ContainerResizePolicy"
@@ -82111,6 +82145,14 @@
 					"description": "Endpoints of daemons running on the Node.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.NodeDaemonEndpoints"
 				},
+				"declaredFeatures": {
+					"description": "DeclaredFeatures represents the features related to feature gates that are declared by the node.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"x-kubernetes-list-type": "atomic"
+				},
 				"features": {
 					"description": "Features describes the set of features implemented by the CRI implementation.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.NodeFeatures"
@@ -82450,7 +82492,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.TypedObjectReference"
 				},
 				"resources": {
-					"description": "resources represents the minimum resources the volume should have. If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
+					"description": "resources represents the minimum resources the volume should have. Users are allowed to specify resource requirements that are lower than previous value but must still be higher than capacity recorded in the status field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources",
 					"$ref": "#/definitions/io.k8s.api.core.v1.VolumeResourceRequirements"
 				},
 				"selector": {
@@ -82498,7 +82540,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"allocatedResourceStatuses": {
-					"description": "allocatedResourceStatuses stores status of resource being resized for the given PVC. Key names follow standard Kubernetes label syntax. Valid values are either:\n\t* Un-prefixed keys:\n\t\t- storage - the capacity of the volume.\n\t* Custom resources must use implementation-defined prefixed names such as \"example.com/my-custom-resource\"\nApart from above values - keys that are unprefixed or have kubernetes.io prefix are considered reserved and hence may not be used.\n\nClaimResourceStatus can be in any of following states:\n\t- ControllerResizeInProgress:\n\t\tState set when resize controller starts resizing the volume in control-plane.\n\t- ControllerResizeFailed:\n\t\tState set when resize has failed in resize controller with a terminal error.\n\t- NodeResizePending:\n\t\tState set when resize controller has finished resizing the volume but further resizing of\n\t\tvolume is needed on the node.\n\t- NodeResizeInProgress:\n\t\tState set when kubelet starts resizing the volume.\n\t- NodeResizeFailed:\n\t\tState set when resizing has failed in kubelet with a terminal error. Transient errors don't set\n\t\tNodeResizeFailed.\nFor example: if expanding a PVC for more capacity - this field can be one of the following states:\n\t- pvc.status.allocatedResourceStatus['storage'] = \"ControllerResizeInProgress\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"ControllerResizeFailed\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizePending\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizeInProgress\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizeFailed\"\nWhen this field is not set, it means that no resize operation is in progress for the given PVC.\n\nA controller that receives PVC update with previously unknown resourceName or ClaimResourceStatus should ignore the update for the purpose it was designed. For example - a controller that only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid resources associated with PVC.\n\nThis is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
+					"description": "allocatedResourceStatuses stores status of resource being resized for the given PVC. Key names follow standard Kubernetes label syntax. Valid values are either:\n\t* Un-prefixed keys:\n\t\t- storage - the capacity of the volume.\n\t* Custom resources must use implementation-defined prefixed names such as \"example.com/my-custom-resource\"\nApart from above values - keys that are unprefixed or have kubernetes.io prefix are considered reserved and hence may not be used.\n\nClaimResourceStatus can be in any of following states:\n\t- ControllerResizeInProgress:\n\t\tState set when resize controller starts resizing the volume in control-plane.\n\t- ControllerResizeFailed:\n\t\tState set when resize has failed in resize controller with a terminal error.\n\t- NodeResizePending:\n\t\tState set when resize controller has finished resizing the volume but further resizing of\n\t\tvolume is needed on the node.\n\t- NodeResizeInProgress:\n\t\tState set when kubelet starts resizing the volume.\n\t- NodeResizeFailed:\n\t\tState set when resizing has failed in kubelet with a terminal error. Transient errors don't set\n\t\tNodeResizeFailed.\nFor example: if expanding a PVC for more capacity - this field can be one of the following states:\n\t- pvc.status.allocatedResourceStatus['storage'] = \"ControllerResizeInProgress\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"ControllerResizeFailed\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizePending\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizeInProgress\"\n     - pvc.status.allocatedResourceStatus['storage'] = \"NodeResizeFailed\"\nWhen this field is not set, it means that no resize operation is in progress for the given PVC.\n\nA controller that receives PVC update with previously unknown resourceName or ClaimResourceStatus should ignore the update for the purpose it was designed. For example - a controller that only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid resources associated with PVC.",
 					"type": "object",
 					"additionalProperties": {
 						"type": "string",
@@ -82513,7 +82555,7 @@
 					"x-kubernetes-map-type": "granular"
 				},
 				"allocatedResources": {
-					"description": "allocatedResources tracks the resources allocated to a PVC including its capacity. Key names follow standard Kubernetes label syntax. Valid values are either:\n\t* Un-prefixed keys:\n\t\t- storage - the capacity of the volume.\n\t* Custom resources must use implementation-defined prefixed names such as \"example.com/my-custom-resource\"\nApart from above values - keys that are unprefixed or have kubernetes.io prefix are considered reserved and hence may not be used.\n\nCapacity reported here may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity.\n\nA controller that receives PVC update with previously unknown resourceName should ignore the update for the purpose it was designed. For example - a controller that only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid resources associated with PVC.\n\nThis is an alpha field and requires enabling RecoverVolumeExpansionFailure feature.",
+					"description": "allocatedResources tracks the resources allocated to a PVC including its capacity. Key names follow standard Kubernetes label syntax. Valid values are either:\n\t* Un-prefixed keys:\n\t\t- storage - the capacity of the volume.\n\t* Custom resources must use implementation-defined prefixed names such as \"example.com/my-custom-resource\"\nApart from above values - keys that are unprefixed or have kubernetes.io prefix are considered reserved and hence may not be used.\n\nCapacity reported here may be larger than the actual capacity when a volume expansion operation is requested. For storage quota, the larger value from allocatedResources and PVC.spec.resources is used. If allocatedResources is not set, PVC.spec.resources alone is used for quota calculation. If a volume expansion capacity request is lowered, allocatedResources is only lowered if there are no expansion operations in progress and if the actual volume capacity is equal or lower than the requested capacity.\n\nA controller that receives PVC update with previously unknown resourceName should ignore the update for the purpose it was designed. For example - a controller that only is responsible for resizing capacity of the volume, should ignore PVC updates that change other valid resources associated with PVC.",
 					"type": "object",
 					"additionalProperties": {
 						"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
@@ -82726,7 +82768,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.NFSVolumeSource"
 				},
 				"nodeAffinity": {
-					"description": "nodeAffinity defines constraints that limit what nodes this volume can be accessed from. This field influences the scheduling of pods that use this volume.",
+					"description": "nodeAffinity defines constraints that limit what nodes this volume can be accessed from. This field influences the scheduling of pods that use this volume. This field is mutable if MutablePVNodeAffinity feature gate is enabled.",
 					"$ref": "#/definitions/io.k8s.api.core.v1.VolumeNodeAffinity"
 				},
 				"persistentVolumeReclaimPolicy": {
@@ -82984,6 +83026,13 @@
 				"signerName": {
 					"description": "Kubelet's generated CSRs will be addressed to this signer.",
 					"type": "string"
+				},
+				"userAnnotations": {
+					"description": "userAnnotations allow pod authors to pass additional information to the signer implementation.  Kubernetes does not restrict or validate this metadata in any way.\n\nThese values are copied verbatim into the `spec.unverifiedUserAnnotations` field of the PodCertificateRequest objects that Kubelet creates.\n\nEntries are subject to the same validation as object metadata annotations, with the addition that all keys must be domain-prefixed. No restrictions are placed on values, except an overall size limitation on the entire field.\n\nSigners should document the keys and values they support. Signers should deny requests that contain keys they do not recognize.",
+					"type": "object",
+					"additionalProperties": {
+						"type": "string"
+					}
 				}
 			}
 		},
@@ -83008,7 +83057,7 @@
 					"type": "string"
 				},
 				"observedGeneration": {
-					"description": "If set, this represents the .metadata.generation that the pod condition was set based upon. This is an alpha field. Enable PodObservedGenerationTracking to be able to use this field.",
+					"description": "If set, this represents the .metadata.generation that the pod condition was set based upon. The PodObservedGenerationTracking feature gate must be enabled to use this field.",
 					"type": "integer",
 					"format": "int64"
 				},
@@ -83471,7 +83520,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"resourceClaims": {
-					"description": "ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name.\n\nThis is an alpha field and requires enabling the DynamicResourceAllocation feature gate.\n\nThis field is immutable.",
+					"description": "ResourceClaims defines which ResourceClaims must be allocated and reserved before the Pod is allowed to start. The resources will be made available to those containers which consume them by name.\n\nThis is a stable field but requires that the DynamicResourceAllocation feature gate is enabled.\n\nThis field is immutable.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.core.v1.PodResourceClaim"
@@ -83580,6 +83629,10 @@
 					"x-kubernetes-list-type": "map",
 					"x-kubernetes-patch-merge-key": "name",
 					"x-kubernetes-patch-strategy": "merge,retainKeys"
+				},
+				"workloadRef": {
+					"description": "WorkloadRef provides a reference to the Workload object that this Pod belongs to. This field is used by the scheduler to identify the PodGroup and apply the correct group scheduling policies. The Workload object referenced by this field may not exist at the time the Pod is created. This field is immutable, but a Workload object with the same name may be recreated with different policies. Doing this during pod scheduling may result in the placement not conforming to the expected policies.",
+					"$ref": "#/definitions/io.k8s.api.core.v1.WorkloadReference"
 				}
 			}
 		},
@@ -83587,6 +83640,13 @@
 			"description": "PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane.",
 			"type": "object",
 			"properties": {
+				"allocatedResources": {
+					"description": "AllocatedResources is the total requests allocated for this pod by the node. If pod-level requests are not set, this will be the total requests aggregated across containers in the pod.",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/io.k8s.apimachinery.pkg.api.resource.Quantity"
+					}
+				},
 				"conditions": {
 					"description": "Current service state of pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions",
 					"type": "array",
@@ -83651,7 +83711,7 @@
 					"type": "string"
 				},
 				"observedGeneration": {
-					"description": "If set, this represents the .metadata.generation that the pod status was set based upon. This is an alpha field. Enable PodObservedGenerationTracking to be able to use this field.",
+					"description": "If set, this represents the .metadata.generation that the pod status was set based upon. The PodObservedGenerationTracking feature gate must be enabled to use this field.",
 					"type": "integer",
 					"format": "int64"
 				},
@@ -83712,6 +83772,10 @@
 					"x-kubernetes-list-type": "map",
 					"x-kubernetes-patch-merge-key": "name",
 					"x-kubernetes-patch-strategy": "merge,retainKeys"
+				},
+				"resources": {
+					"description": "Resources represents the compute resource requests and limits that have been applied at the pod level if pod-level requests or limits are set in PodSpec.Resources",
+					"$ref": "#/definitions/io.k8s.api.core.v1.ResourceRequirements"
 				},
 				"startTime": {
 					"description": "RFC 3339 date and time at which the object was acknowledged by the Kubelet. This is before the Kubelet pulled the container image(s) for the pod.",
@@ -85464,11 +85528,13 @@
 					"type": "string"
 				},
 				"operator": {
-					"description": "Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category.\n\nPossible enum values:\n - `\"Equal\"`\n - `\"Exists\"`",
+					"description": "Operator represents a key's relationship to the value. Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category. Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).\n\nPossible enum values:\n - `\"Equal\"`\n - `\"Exists\"`\n - `\"Gt\"`\n - `\"Lt\"`",
 					"type": "string",
 					"enum": [
 						"Equal",
-						"Exists"
+						"Exists",
+						"Gt",
+						"Lt"
 					]
 				},
 				"tolerationSeconds": {
@@ -85975,6 +86041,28 @@
 				}
 			}
 		},
+		"io.k8s.api.core.v1.WorkloadReference": {
+			"description": "WorkloadReference identifies the Workload object and PodGroup membership that a Pod belongs to. The scheduler uses this information to apply workload-aware scheduling semantics.",
+			"type": "object",
+			"required": [
+				"name",
+				"podGroup"
+			],
+			"properties": {
+				"name": {
+					"description": "Name defines the name of the Workload object this Pod belongs to. Workload must be in the same namespace as the Pod. If it doesn't match any existing Workload, the Pod will remain unschedulable until a Workload object is created and observed by the kube-scheduler. It must be a DNS subdomain.",
+					"type": "string"
+				},
+				"podGroup": {
+					"description": "PodGroup is the name of the PodGroup within the Workload that this Pod belongs to. If it doesn't match any existing PodGroup within the Workload, the Pod will remain unschedulable until the Workload object is recreated and observed by the kube-scheduler. It must be a DNS label.",
+					"type": "string"
+				},
+				"podGroupReplicaKey": {
+					"description": "PodGroupReplicaKey specifies the replica key of the PodGroup to which this Pod belongs. It is used to distinguish pods belonging to different replicas of the same pod group. The pod group policy is applied separately to each replica. When set, it must be a DNS label.",
+					"type": "string"
+				}
+			}
+		},
 		"io.k8s.api.discovery.v1.Endpoint": {
 			"description": "Endpoint represents a single logical \"backend\" implementing a service.",
 			"type": "object",
@@ -86046,7 +86134,7 @@
 			"type": "object",
 			"properties": {
 				"forNodes": {
-					"description": "forNodes indicates the node(s) this endpoint should be consumed by when using topology aware routing. May contain a maximum of 8 entries. This is an Alpha feature and is only used when the PreferSameTrafficDistribution feature gate is enabled.",
+					"description": "forNodes indicates the node(s) this endpoint should be consumed by when using topology aware routing. May contain a maximum of 8 entries.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.discovery.v1.ForNode"
@@ -88469,7 +88557,7 @@
 					"type": "string"
 				},
 				"driver": {
-					"description": "Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.",
+					"description": "Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. It should use only lower case characters.",
 					"type": "string"
 				},
 				"networkData": {
@@ -88587,7 +88675,7 @@
 			}
 		},
 		"io.k8s.api.resource.v1.CounterSet": {
-			"description": "CounterSet defines a named set of counters that are available to be used by devices defined in the ResourceSlice.\n\nThe counters are not allocatable by themselves, but can be referenced by devices. When a device is allocated, the portion of counters it uses will no longer be available for use by other devices.",
+			"description": "CounterSet defines a named set of counters that are available to be used by devices defined in the ResourcePool.\n\nThe counters are not allocatable by themselves, but can be referenced by devices. When a device is allocated, the portion of counters it uses will no longer be available for use by other devices.",
 			"type": "object",
 			"required": [
 				"name",
@@ -88595,7 +88683,7 @@
 			],
 			"properties": {
 				"counters": {
-					"description": "Counters defines the set of counters for this CounterSet The name of each counter must be unique in that set and must be a DNS label.\n\nThe maximum number of counters in all sets is 32.",
+					"description": "Counters defines the set of counters for this CounterSet The name of each counter must be unique in that set and must be a DNS label.\n\nThe maximum number of counters is 32.",
 					"type": "object",
 					"additionalProperties": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.Counter"
@@ -88657,7 +88745,7 @@
 					}
 				},
 				"consumesCounters": {
-					"description": "ConsumesCounters defines a list of references to sharedCounters and the set of counters that the device will consume from those counter sets.\n\nThere can only be a single entry per counterSet.\n\nThe total number of device counter consumption entries must be <= 32. In addition, the total number in the entire ResourceSlice must be <= 1024 (for example, 64 devices with 16 counters each).",
+					"description": "ConsumesCounters defines a list of references to sharedCounters and the set of counters that the device will consume from those counter sets.\n\nThere can only be a single entry per counterSet.\n\nThe maximum number of device counter consumptions per device is 2.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.DeviceCounterConsumption"
@@ -88677,7 +88765,7 @@
 					"$ref": "#/definitions/io.k8s.api.core.v1.NodeSelector"
 				},
 				"taints": {
-					"description": "If specified, these are the driver-defined taints.\n\nThe maximum number of taints is 4.\n\nThis is an alpha field and requires enabling the DRADeviceTaints feature gate.",
+					"description": "If specified, these are the driver-defined taints.\n\nThe maximum number of taints is 16. If taints are set for any device in a ResourceSlice, then the maximum number of allowed devices per ResourceSlice is 64 instead of 128.\n\nThis is an alpha field and requires enabling the DRADeviceTaints feature gate.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.DeviceTaint"
@@ -88706,8 +88794,12 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"source": {
-					"description": "Source records whether the configuration comes from a class and thus is not something that a normal user would have been able to set or from a claim.",
-					"type": "string"
+					"description": "Source records whether the configuration comes from a class and thus is not something that a normal user would have been able to set or from a claim.\n\n\nPossible enum values:\n - `\"FromClaim\"`\n - `\"FromClass\"`",
+					"type": "string",
+					"enum": [
+						"FromClaim",
+						"FromClass"
+					]
 				}
 			}
 		},
@@ -88959,7 +89051,7 @@
 					"type": "string"
 				},
 				"counters": {
-					"description": "Counters defines the counters that will be consumed by the device.\n\nThe maximum number counters in a device is 32. In addition, the maximum number of all counters in all devices is 1024 (for example, 64 devices with 16 counters each).",
+					"description": "Counters defines the counters that will be consumed by the device.\n\nThe maximum number of counters is 32.",
 					"type": "object",
 					"additionalProperties": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.Counter"
@@ -89034,7 +89126,7 @@
 					"type": "string"
 				},
 				"driver": {
-					"description": "Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.",
+					"description": "Driver specifies the name of the DRA driver whose kubelet plugin should be invoked to process the allocation once the claim is needed on a node.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. It should use only lower case characters.",
 					"type": "string"
 				},
 				"pool": {
@@ -89078,8 +89170,12 @@
 			],
 			"properties": {
 				"allocationMode": {
-					"description": "AllocationMode and its related fields define how devices are allocated to satisfy this subrequest. Supported values are:\n\n- ExactCount: This request is for a specific number of devices.\n  This is the default. The exact number is provided in the\n  count field.\n\n- All: This subrequest is for all of the matching devices in a pool.\n  Allocation will fail if some devices are already allocated,\n  unless adminAccess is requested.\n\nIf AllocationMode is not specified, the default mode is ExactCount. If the mode is ExactCount and count is not specified, the default count is one. Any other subrequests must specify this field.\n\nMore modes may get added in the future. Clients must refuse to handle requests with unknown modes.",
-					"type": "string"
+					"description": "AllocationMode and its related fields define how devices are allocated to satisfy this subrequest. Supported values are:\n\n- ExactCount: This request is for a specific number of devices.\n  This is the default. The exact number is provided in the\n  count field.\n\n- All: This subrequest is for all of the matching devices in a pool.\n  Allocation will fail if some devices are already allocated,\n  unless adminAccess is requested.\n\nIf AllocationMode is not specified, the default mode is ExactCount. If the mode is ExactCount and count is not specified, the default count is one. Any other subrequests must specify this field.\n\nMore modes may get added in the future. Clients must refuse to handle requests with unknown modes.\n\n\nPossible enum values:\n - `\"All\"`\n - `\"ExactCount\"`",
+					"type": "string",
+					"enum": [
+						"All",
+						"ExactCount"
+					]
 				},
 				"capacity": {
 					"description": "Capacity define resource requirements against each capacity.\n\nIf this field is unset and the device supports multiple allocations, the default value will be applied to each capacity according to requestPolicy. For the capacity that has no requestPolicy, default is the full capacity value.\n\nApplies to each device allocation. If Count > 1, the request fails if there aren't enough devices that meet the requirements. If AllocationMode is set to All, the request fails if there are devices that otherwise match the request, and have this capacity, with a value >= the requested amount, but which cannot be allocated to this request.",
@@ -89125,11 +89221,12 @@
 			],
 			"properties": {
 				"effect": {
-					"description": "The effect of the taint on claims that do not tolerate the taint and through such claims on the pods using them. Valid effects are NoSchedule and NoExecute. PreferNoSchedule as used for nodes is not valid here.\n\n\nPossible enum values:\n - `\"NoExecute\"` Evict any already-running pods that do not tolerate the device taint.\n - `\"NoSchedule\"` Do not allow new pods to schedule which use a tainted device unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running.",
+					"description": "The effect of the taint on claims that do not tolerate the taint and through such claims on the pods using them.\n\nValid effects are None, NoSchedule and NoExecute. PreferNoSchedule as used for nodes is not valid here. More effects may get added in the future. Consumers must treat unknown effects like None.\n\n\nPossible enum values:\n - `\"NoExecute\"` Evict any already-running pods that do not tolerate the device taint.\n - `\"NoSchedule\"` Do not allow new pods to schedule which use a tainted device unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running.\n - `\"None\"` No effect, the taint is purely informational.",
 					"type": "string",
 					"enum": [
 						"NoExecute",
-						"NoSchedule"
+						"NoSchedule",
+						"None"
 					]
 				},
 				"key": {
@@ -89151,11 +89248,12 @@
 			"type": "object",
 			"properties": {
 				"effect": {
-					"description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule and NoExecute.\n\n\nPossible enum values:\n - `\"NoExecute\"` Evict any already-running pods that do not tolerate the device taint.\n - `\"NoSchedule\"` Do not allow new pods to schedule which use a tainted device unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running.",
+					"description": "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule and NoExecute.\n\n\nPossible enum values:\n - `\"NoExecute\"` Evict any already-running pods that do not tolerate the device taint.\n - `\"NoSchedule\"` Do not allow new pods to schedule which use a tainted device unless they tolerate the taint, but allow all pods submitted to Kubelet without going through the scheduler to start, and allow all already-running pods to continue running.\n - `\"None\"` No effect, the taint is purely informational.",
 					"type": "string",
 					"enum": [
 						"NoExecute",
-						"NoSchedule"
+						"NoSchedule",
+						"None"
 					]
 				},
 				"key": {
@@ -89193,8 +89291,12 @@
 					"type": "boolean"
 				},
 				"allocationMode": {
-					"description": "AllocationMode and its related fields define how devices are allocated to satisfy this request. Supported values are:\n\n- ExactCount: This request is for a specific number of devices.\n  This is the default. The exact number is provided in the\n  count field.\n\n- All: This request is for all of the matching devices in a pool.\n  At least one device must exist on the node for the allocation to succeed.\n  Allocation will fail if some devices are already allocated,\n  unless adminAccess is requested.\n\nIf AllocationMode is not specified, the default mode is ExactCount. If the mode is ExactCount and count is not specified, the default count is one. Any other requests must specify this field.\n\nMore modes may get added in the future. Clients must refuse to handle requests with unknown modes.",
-					"type": "string"
+					"description": "AllocationMode and its related fields define how devices are allocated to satisfy this request. Supported values are:\n\n- ExactCount: This request is for a specific number of devices.\n  This is the default. The exact number is provided in the\n  count field.\n\n- All: This request is for all of the matching devices in a pool.\n  At least one device must exist on the node for the allocation to succeed.\n  Allocation will fail if some devices are already allocated,\n  unless adminAccess is requested.\n\nIf AllocationMode is not specified, the default mode is ExactCount. If the mode is ExactCount and count is not specified, the default count is one. Any other requests must specify this field.\n\nMore modes may get added in the future. Clients must refuse to handle requests with unknown modes.\n\n\nPossible enum values:\n - `\"All\"`\n - `\"ExactCount\"`",
+					"type": "string",
+					"enum": [
+						"All",
+						"ExactCount"
+					]
 				},
 				"capacity": {
 					"description": "Capacity define resource requirements against each capacity.\n\nIf this field is unset and the device supports multiple allocations, the default value will be applied to each capacity according to requestPolicy. For the capacity that has no requestPolicy, default is the full capacity value.\n\nApplies to each device allocation. If Count > 1, the request fails if there aren't enough devices that meet the requirements. If AllocationMode is set to All, the request fails if there are devices that otherwise match the request, and have this capacity, with a value >= the requested amount, but which cannot be allocated to this request.",
@@ -89258,7 +89360,7 @@
 			],
 			"properties": {
 				"driver": {
-					"description": "Driver is used to determine which kubelet plugin needs to be passed these configuration parameters.\n\nAn admission policy provided by the driver developer could use this to decide whether it needs to validate them.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver.",
+					"description": "Driver is used to determine which kubelet plugin needs to be passed these configuration parameters.\n\nAn admission policy provided by the driver developer could use this to decide whether it needs to validate them.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. It should use only lower case characters.",
 					"type": "string"
 				},
 				"parameters": {
@@ -89601,7 +89703,7 @@
 					"type": "boolean"
 				},
 				"devices": {
-					"description": "Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries.",
+					"description": "Devices lists some or all of the devices in this pool.\n\nMust not have more than 128 entries. If any device uses taints or consumes counters the limit is 64.\n\nOnly one of Devices and SharedCounters can be set in a ResourceSlice.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.Device"
@@ -89609,7 +89711,7 @@
 					"x-kubernetes-list-type": "atomic"
 				},
 				"driver": {
-					"description": "Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. This field is immutable.",
+					"description": "Driver identifies the DRA driver providing the capacity information. A field selector can be used to list only ResourceSlice objects with a certain driver name.\n\nMust be a DNS subdomain and should end with a DNS domain owned by the vendor of the driver. It should use only lower case characters. This field is immutable.",
 					"type": "string"
 				},
 				"nodeName": {
@@ -89629,7 +89731,7 @@
 					"$ref": "#/definitions/io.k8s.api.resource.v1.ResourcePool"
 				},
 				"sharedCounters": {
-					"description": "SharedCounters defines a list of counter sets, each of which has a name and a list of counters available.\n\nThe names of the SharedCounters must be unique in the ResourceSlice.\n\nThe maximum number of counters in all sets is 32.",
+					"description": "SharedCounters defines a list of counter sets, each of which has a name and a list of counters available.\n\nThe names of the counter sets must be unique in the ResourcePool.\n\nOnly one of Devices and SharedCounters can be set in a ResourceSlice.\n\nThe maximum number of counter sets is 8.",
 					"type": "array",
 					"items": {
 						"$ref": "#/definitions/io.k8s.api.resource.v1.CounterSet"
@@ -89816,6 +89918,10 @@
 				},
 				"seLinuxMount": {
 					"description": "seLinuxMount specifies if the CSI driver supports \"-o context\" mount option.\n\nWhen \"true\", the CSI driver must ensure that all volumes provided by this CSI driver can be mounted separately with different `-o context` options. This is typical for storage backends that provide volumes as filesystems on block devices or as independent shared volumes. Kubernetes will call NodeStage / NodePublish with \"-o context=xyz\" mount option when mounting a ReadWriteOncePod volume used in Pod that has explicitly set SELinux context. In the future, it may be expanded to other volume AccessModes. In any case, Kubernetes will ensure that the volume is mounted only with a single SELinux context.\n\nWhen \"false\", Kubernetes won't pass any special SELinux mount options to the driver. This is typical for volumes that represent subdirectories of a bigger shared filesystem.\n\nDefault is \"false\".",
+					"type": "boolean"
+				},
+				"serviceAccountTokenInSecrets": {
+					"description": "serviceAccountTokenInSecrets is an opt-in for CSI drivers to indicate that service account tokens should be passed via the Secrets field in NodePublishVolumeRequest instead of the VolumeContext field. The CSI specification provides a dedicated Secrets field for sensitive information like tokens, which is the appropriate mechanism for handling credentials. This addresses security concerns where sensitive tokens were being logged as part of volume context.\n\nWhen \"true\", kubelet will pass the tokens only in the Secrets field with the key \"csi.storage.k8s.io/serviceAccount.tokens\". The CSI driver must be updated to read tokens from the Secrets field instead of VolumeContext.\n\nWhen \"false\" or not set, kubelet will pass the tokens in VolumeContext with the key \"csi.storage.k8s.io/serviceAccount.tokens\" (existing behavior). This maintains backward compatibility with existing CSI drivers.\n\nThis field can only be set when TokenRequests is configured. The API server will reject CSIDriver specs that set this field without TokenRequests.\n\nDefault behavior if unset is to pass tokens in the VolumeContext field.",
 					"type": "boolean"
 				},
 				"storageCapacity": {
@@ -90512,6 +90618,11 @@
 					"description": "message is a human-readable message indicating details about last transition.",
 					"type": "string"
 				},
+				"observedGeneration": {
+					"description": "observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.",
+					"type": "integer",
+					"format": "int64"
+				},
 				"reason": {
 					"description": "reason is a unique, one-word, CamelCase reason for the condition's last transition.",
 					"type": "string"
@@ -90661,6 +90772,11 @@
 						"type"
 					],
 					"x-kubernetes-list-type": "map"
+				},
+				"observedGeneration": {
+					"description": "The generation observed by the CRD controller.",
+					"type": "integer",
+					"format": "int64"
 				},
 				"storedVersions": {
 					"description": "storedVersions lists all versions of CustomResources that were ever persisted. Tracking these versions allows a migration path for stored versions in etcd. The field is mutable so a migration controller can finish a migration to another version (ensuring no old objects are left in storage), and then remove the rest of the versions from this list. Versions may not be removed from `spec.versions` while they exist in this list.",
@@ -91762,7 +91878,7 @@
 				{
 					"group": "storagemigration.k8s.io",
 					"kind": "DeleteOptions",
-					"version": "v1alpha1"
+					"version": "v1beta1"
 				}
 			]
 		},
@@ -92104,8 +92220,7 @@
 				},
 				"details": {
 					"description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type.",
-					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails",
-					"x-kubernetes-list-type": "atomic"
+					"$ref": "#/definitions/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 				},
 				"kind": {
 					"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
@@ -92544,7 +92659,7 @@
 				{
 					"group": "storagemigration.k8s.io",
 					"kind": "WatchEvent",
-					"version": "v1alpha1"
+					"version": "v1beta1"
 				}
 			]
 		},

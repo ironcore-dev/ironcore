@@ -10,11 +10,13 @@ import (
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	networkingv1alpha1apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/networking/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/client/networking"
 	clientutils "github.com/ironcore-dev/ironcore/utils/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -27,6 +29,7 @@ import (
 )
 
 var (
+	// loadBalancerFieldOwner is no longer used with Create/Update pattern
 	loadBalancerFieldOwner = client.FieldOwner(networkingv1alpha1.Resource("loadbalancers").String())
 )
 
@@ -156,23 +159,31 @@ func (r *LoadBalancerReconciler) applyRouting(
 	destinations []networkingv1alpha1.LoadBalancerDestination,
 	network *networkingv1alpha1.Network,
 ) error {
-	loadBalancerRouting := &networkingv1alpha1.LoadBalancerRouting{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "LoadBalancerRouting",
-			APIVersion: networkingv1alpha1.SchemeGroupVersion.String(),
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: loadBalancer.Namespace,
-			Name:      loadBalancer.Name,
-		},
-		Destinations: destinations,
-		NetworkRef: commonv1alpha1.LocalUIDReference{
+	destinationsApply := make([]*networkingv1alpha1apply.LoadBalancerDestinationApplyConfiguration, 0, len(destinations))
+	for _, dest := range destinations {
+		destApply := networkingv1alpha1apply.LoadBalancerDestination().WithIP(dest.IP)
+		if dest.TargetRef != nil {
+			destApply.WithTargetRef(networkingv1alpha1apply.LoadBalancerTargetRef().
+				WithUID(dest.TargetRef.UID).
+				WithName(dest.TargetRef.Name).
+				WithProviderID(dest.TargetRef.ProviderID))
+		}
+		destinationsApply = append(destinationsApply, destApply)
+	}
+
+	loadBalancerRoutingApply := networkingv1alpha1apply.LoadBalancerRouting(loadBalancer.Name, loadBalancer.Namespace).
+		WithOwnerReferences(v1.OwnerReference().
+			WithAPIVersion(networkingv1alpha1.SchemeGroupVersion.String()).
+			WithKind("LoadBalancer").
+			WithName(loadBalancer.Name).
+			WithUID(loadBalancer.UID).
+			WithController(true)).
+		WithDestinations(destinationsApply...).
+		WithNetworkRef(commonv1alpha1.LocalUIDReference{
 			Name: network.Name,
 			UID:  network.UID,
-		},
-	}
-	_ = ctrl.SetControllerReference(loadBalancer, loadBalancerRouting, r.Scheme())
-	if err := r.Patch(ctx, loadBalancerRouting, client.Apply, loadBalancerFieldOwner, client.ForceOwnership); err != nil {
+		})
+	if err := r.Apply(ctx, loadBalancerRoutingApply, loadBalancerFieldOwner, client.ForceOwnership); err != nil {
 		return fmt.Errorf("error applying loadbalancer routing: %w", err)
 	}
 	return nil

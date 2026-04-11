@@ -17,10 +17,13 @@ import (
 
 // BucketClassApplyConfiguration represents a declarative configuration of the BucketClass type for use
 // with apply.
+//
+// BucketClass is the Schema for the bucketclasses API
 type BucketClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
+	// Capabilities describes the capabilities of a BucketClass.
+	Capabilities *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
 }
 
 // BucketClass constructs a declarative configuration of the BucketClass type for use with
@@ -33,29 +36,14 @@ func BucketClass(name string) *BucketClassApplyConfiguration {
 	return b
 }
 
-// ExtractBucketClass extracts the applied configuration owned by fieldManager from
-// bucketClass. If no managedFields are found in bucketClass for fieldManager, a
-// BucketClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractBucketClassFrom extracts the applied configuration owned by fieldManager from
+// bucketClass for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // bucketClass must be a unmodified BucketClass API object that was retrieved from the Kubernetes API.
-// ExtractBucketClass provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractBucketClassFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractBucketClass(bucketClass *storagev1alpha1.BucketClass, fieldManager string) (*BucketClassApplyConfiguration, error) {
-	return extractBucketClass(bucketClass, fieldManager, "")
-}
-
-// ExtractBucketClassStatus is the same as ExtractBucketClass except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractBucketClassStatus(bucketClass *storagev1alpha1.BucketClass, fieldManager string) (*BucketClassApplyConfiguration, error) {
-	return extractBucketClass(bucketClass, fieldManager, "status")
-}
-
-func extractBucketClass(bucketClass *storagev1alpha1.BucketClass, fieldManager string, subresource string) (*BucketClassApplyConfiguration, error) {
+func ExtractBucketClassFrom(bucketClass *storagev1alpha1.BucketClass, fieldManager string, subresource string) (*BucketClassApplyConfiguration, error) {
 	b := &BucketClassApplyConfiguration{}
 	err := managedfields.ExtractInto(bucketClass, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -67,6 +55,21 @@ func extractBucketClass(bucketClass *storagev1alpha1.BucketClass, fieldManager s
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractBucketClass extracts the applied configuration owned by fieldManager from
+// bucketClass. If no managedFields are found in bucketClass for fieldManager, a
+// BucketClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// bucketClass must be a unmodified BucketClass API object that was retrieved from the Kubernetes API.
+// ExtractBucketClass provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractBucketClass(bucketClass *storagev1alpha1.BucketClass, fieldManager string) (*BucketClassApplyConfiguration, error) {
+	return ExtractBucketClassFrom(bucketClass, fieldManager, "")
+}
+
 func (b BucketClassApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

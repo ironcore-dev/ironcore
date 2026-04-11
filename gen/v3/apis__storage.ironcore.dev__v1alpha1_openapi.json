@@ -9957,6 +9957,19 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource": {
+				"type": "object",
+				"properties": {
+					"architecture": {
+						"description": "Architecture defines the architecture of the OS which should be used",
+						"type": "string"
+					},
+					"image": {
+						"description": "Image is an optional image to bootstrap the volume with.",
+						"type": "string"
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.Volume": {
 				"description": "Volume is the Schema for the volumes API",
 				"type": "object",
@@ -10159,6 +10172,28 @@
 						"description": "Type is the type of the condition.",
 						"type": "string",
 						"default": ""
+					}
+				}
+			},
+			"com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource": {
+				"description": "VolumeDataSource specifies the source to use for a Volume.",
+				"type": "object",
+				"properties": {
+					"osImage": {
+						"description": "OSImage defines an optional os image to bootstrap the volume.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.OSDataSource"
+							}
+						]
+					},
+					"volumeSnapshotRef": {
+						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
+							}
+						]
 					}
 				}
 			},
@@ -10575,6 +10610,15 @@
 							}
 						]
 					},
+					"dataSource": {
+						"description": "DataSource contains the content to prepopulate the Volume with.",
+						"default": {},
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeDataSource"
+							}
+						]
+					},
 					"encryption": {
 						"description": "Encryption is an optional field which provides attributes to encrypt Volume.",
 						"allOf": [
@@ -10594,10 +10638,6 @@
 								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 							}
 						]
-					},
-					"osImage": {
-						"description": "OSImage is an optional os image to bootstrap the volume.",
-						"type": "string"
 					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
@@ -10645,14 +10685,6 @@
 							"type": "string",
 							"default": ""
 						}
-					},
-					"volumeSnapshotRef": {
-						"description": "VolumeSnapshotRef instructs to use the specified VolumeSnapshot as the data source.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
 					}
 				}
 			},
@@ -11187,8 +11219,7 @@
 							{
 								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.apis.meta.v1.StatusDetails"
 							}
-						],
-						"x-kubernetes-list-type": "atomic"
+						]
 					},
 					"kind": {
 						"description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",

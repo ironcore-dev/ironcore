@@ -202,7 +202,7 @@ func main() {
 
 	// Metrics endpoint is enabled in 'config/controller/default/kustomization.yaml'. The Metrics options configure the server.
 	// More info:
-	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html
 	metricsServerOptions := metricsserver.Options{
 		BindAddress:   metricsAddr,
@@ -214,7 +214,7 @@ func main() {
 		// FilterProvider is used to protect the metrics endpoint with authn/authz.
 		// These configurations ensure that only authorized users and service accounts
 		// can access the metrics endpoint. The RBAC are configured in 'config/controller/rbac/kustomization.yaml'. More info:
-		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
 		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
 	}
 
@@ -286,7 +286,7 @@ func main() {
 
 	if controllers.Enabled(machineEphemeralVolumeController) {
 		if err := (&computecontrollers.MachineEphemeralVolumeReconciler{
-			EventRecorder: mgr.GetEventRecorderFor("machine-ephemeral-volume"),
+			EventRecorder: mgr.GetEventRecorder("machine-ephemeral-volume"),
 			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineEphemeralVolume")
@@ -303,7 +303,7 @@ func main() {
 
 		if err := (&computecontrollers.MachineScheduler{
 			Client:        mgr.GetClient(),
-			EventRecorder: mgr.GetEventRecorderFor("machine-scheduler"),
+			EventRecorder: mgr.GetEventRecorder("machine-scheduler"),
 			Cache:         schedulerCache,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
@@ -325,7 +325,7 @@ func main() {
 
 	if controllers.Enabled(bucketScheduler) {
 		if err := (&storagecontrollers.BucketScheduler{
-			EventRecorder: mgr.GetEventRecorderFor("bucket-scheduler"),
+			EventRecorder: mgr.GetEventRecorder("bucket-scheduler"),
 			Client:        mgr.GetClient(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "BucketScheduler")
@@ -362,7 +362,7 @@ func main() {
 		}
 
 		if err := (&storagecontrollers.VolumeScheduler{
-			EventRecorder: mgr.GetEventRecorderFor("volume-scheduler"),
+			EventRecorder: mgr.GetEventRecorder("volume-scheduler"),
 			Client:        mgr.GetClient(),
 			Cache:         schedulerCache,
 		}).SetupWithManager(mgr); err != nil {
@@ -399,7 +399,7 @@ func main() {
 		if err := (&ipamcontrollers.PrefixAllocationScheduler{
 			Client:        mgr.GetClient(),
 			Scheme:        mgr.GetScheme(),
-			EventRecorder: mgr.GetEventRecorderFor("prefix-allocation-scheduler"),
+			EventRecorder: mgr.GetEventRecorder("prefix-allocation-scheduler"),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "PrefixAllocationScheduler")
 			os.Exit(1)

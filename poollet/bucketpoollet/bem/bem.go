@@ -16,7 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -24,7 +24,7 @@ import (
 
 type BucketEventMapper struct {
 	manager.Runnable
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	bucketRuntime bucket.RuntimeService
@@ -53,7 +53,7 @@ func (m *BucketEventMapper) relist(ctx context.Context, log logr.Logger) error {
 					Namespace: bucketEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.BucketNamespaceLabel],
 				},
 			}
-			m.Eventf(involvedBucket, bucketEvent.Spec.Type, bucketEvent.Spec.Reason, bucketEvent.Spec.Message)
+			m.Eventf(involvedBucket, nil, bucketEvent.Spec.Type, bucketEvent.Spec.Reason, bucketEvent.Spec.Action, bucketEvent.Spec.Message)
 		}
 	}
 
@@ -81,7 +81,7 @@ func setBucketEventMapperOptionsDefaults(o *BucketEventMapperOptions) {
 	}
 }
 
-func NewBucketEventMapper(client client.Client, runtime bucket.RuntimeService, recorder record.EventRecorder, opts BucketEventMapperOptions) *BucketEventMapper {
+func NewBucketEventMapper(client client.Client, runtime bucket.RuntimeService, recorder events.EventRecorder, opts BucketEventMapperOptions) *BucketEventMapper {
 	setBucketEventMapperOptionsDefaults(&opts)
 	return &BucketEventMapper{
 		Client:        client,

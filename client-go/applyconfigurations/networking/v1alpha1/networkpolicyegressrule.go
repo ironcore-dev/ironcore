@@ -7,9 +7,17 @@ package v1alpha1
 
 // NetworkPolicyEgressRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyEgressRule type for use
 // with apply.
+//
+// NetworkPolicyEgressRule describes a rule to regulate egress traffic with.
 type NetworkPolicyEgressRuleApplyConfiguration struct {
+	// Ports specifies the list of destination ports that can be called with
+	// this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+	// As soon as a single item is present, only these ports are allowed.
 	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
-	To    []NetworkPolicyPeerApplyConfiguration `json:"to,omitempty"`
+	// To specifies the list of destinations which the selected network interfaces should be
+	// able to send traffic to. Fields are combined using a logical OR. Empty matches all destinations.
+	// As soon as a single item is present, only these peers are allowed.
+	To []NetworkPolicyPeerApplyConfiguration `json:"to,omitempty"`
 }
 
 // NetworkPolicyEgressRuleApplyConfiguration constructs a declarative configuration of the NetworkPolicyEgressRule type for use with

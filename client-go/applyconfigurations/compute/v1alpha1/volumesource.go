@@ -11,10 +11,18 @@ import (
 
 // VolumeSourceApplyConfiguration represents a declarative configuration of the VolumeSource type for use
 // with apply.
+//
+// VolumeSource specifies the source to use for a Volume.
 type VolumeSourceApplyConfiguration struct {
-	VolumeRef *v1.LocalObjectReference                 `json:"volumeRef,omitempty"`
+	// VolumeRef instructs to use the specified Volume as source for the attachment.
+	VolumeRef *v1.LocalObjectReference `json:"volumeRef,omitempty"`
+	// Deprecated: Use LocalDisk instead
+	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
 	EmptyDisk *EmptyDiskVolumeSourceApplyConfiguration `json:"emptyDisk,omitempty"`
+	// LocalDisk instructs to use a Volume offered by the machine pool provider.
 	LocalDisk *LocalDiskVolumeSourceApplyConfiguration `json:"localDisk,omitempty"`
+	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
+	// Volume to use.
 	Ephemeral *EphemeralVolumeSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 

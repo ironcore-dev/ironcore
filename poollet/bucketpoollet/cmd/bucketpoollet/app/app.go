@@ -217,7 +217,7 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	// Metrics endpoint is enabled in 'config/bucketpoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
 	// More info:
-	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html
 	metricsServerOptions := metricsserver.Options{
 		BindAddress:   opts.MetricsAddr,
@@ -228,7 +228,7 @@ func Run(ctx context.Context, opts Options) error {
 		// FilterProvider is used to protect the metrics endpoint with authn/authz.
 		// These configurations ensure that only authorized users and service accounts
 		// can access the metrics endpoint. The RBAC are configured in 'config/bucketpoollet-broker/broker-rbac/kustomization.yaml'. More info:
-		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
 		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
 	}
 
@@ -298,7 +298,7 @@ func Run(ctx context.Context, opts Options) error {
 		return fmt.Errorf("error adding bucket class mapper: %w", err)
 	}
 
-	bucketEventMapper := bem.NewBucketEventMapper(mgr.GetClient(), bucketRuntime, mgr.GetEventRecorderFor("bucket-cluster-events"), bem.BucketEventMapperOptions{})
+	bucketEventMapper := bem.NewBucketEventMapper(mgr.GetClient(), bucketRuntime, mgr.GetEventRecorder("bucket-cluster-events"), bem.BucketEventMapperOptions{})
 	if err := mgr.Add(bucketEventMapper); err != nil {
 		return fmt.Errorf("error adding bucket event mapper: %w", err)
 	}
@@ -330,7 +330,7 @@ func Run(ctx context.Context, opts Options) error {
 		}
 
 		if err := (&controllers.BucketReconciler{
-			EventRecorder:           mgr.GetEventRecorderFor("buckets"),
+			EventRecorder:           mgr.GetEventRecorder("buckets"),
 			Client:                  mgr.GetClient(),
 			Scheme:                  scheme,
 			BucketRuntime:           bucketRuntime,

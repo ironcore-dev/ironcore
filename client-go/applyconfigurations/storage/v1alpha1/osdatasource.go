@@ -8,7 +8,9 @@ package v1alpha1
 // OSDataSourceApplyConfiguration represents a declarative configuration of the OSDataSource type for use
 // with apply.
 type OSDataSourceApplyConfiguration struct {
-	Image        *string `json:"image,omitempty"`
+	// Image is an optional image to bootstrap the volume with.
+	Image *string `json:"image,omitempty"`
+	// Architecture defines the architecture of the OS which should be used
 	Architecture *string `json:"architecture,omitempty"`
 }
 

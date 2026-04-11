@@ -13,12 +13,19 @@ import (
 
 // NetworkPolicySpecApplyConfiguration represents a declarative configuration of the NetworkPolicySpec type for use
 // with apply.
+//
+// NetworkPolicySpec defines the desired state of NetworkPolicy.
 type NetworkPolicySpecApplyConfiguration struct {
-	NetworkRef               *v1.LocalObjectReference                     `json:"networkRef,omitempty"`
-	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration      `json:"networkInterfaceSelector,omitempty"`
-	Ingress                  []NetworkPolicyIngressRuleApplyConfiguration `json:"ingress,omitempty"`
-	Egress                   []NetworkPolicyEgressRuleApplyConfiguration  `json:"egress,omitempty"`
-	PolicyTypes              []networkingv1alpha1.PolicyType              `json:"policyTypes,omitempty"`
+	// NetworkRef is the network to regulate using this policy.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// NetworkInterfaceSelector selects the network interfaces that are subject to this policy.
+	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration `json:"networkInterfaceSelector,omitempty"`
+	// Ingress specifies rules for ingress traffic.
+	Ingress []NetworkPolicyIngressRuleApplyConfiguration `json:"ingress,omitempty"`
+	// Egress specifies rules for egress traffic.
+	Egress []NetworkPolicyEgressRuleApplyConfiguration `json:"egress,omitempty"`
+	// PolicyTypes specifies the types of policies this network policy contains.
+	PolicyTypes []networkingv1alpha1.PolicyType `json:"policyTypes,omitempty"`
 }
 
 // NetworkPolicySpecApplyConfiguration constructs a declarative configuration of the NetworkPolicySpec type for use with

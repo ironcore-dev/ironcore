@@ -11,13 +11,21 @@ import (
 
 // MachineStatusApplyConfiguration represents a declarative configuration of the MachineStatus type for use
 // with apply.
+//
+// MachineStatus defines the observed state of Machine
 type MachineStatusApplyConfiguration struct {
-	MachineID          *string                                    `json:"machineID,omitempty"`
-	ObservedGeneration *int64                                     `json:"observedGeneration,omitempty"`
-	Conditions         []MachineConditionApplyConfiguration       `json:"conditions,omitempty"`
-	State              *computev1alpha1.MachineState              `json:"state,omitempty"`
-	NetworkInterfaces  []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
-	Volumes            []VolumeStatusApplyConfiguration           `json:"volumes,omitempty"`
+	// MachineID is the provider specific machine ID in the format 'TYPE://MACHINE_ID'.
+	MachineID *string `json:"machineID,omitempty"`
+	// ObservedGeneration is the last generation the MachinePool observed of the Machine.
+	ObservedGeneration *int64 `json:"observedGeneration,omitempty"`
+	// Conditions are the conditions of a machine.
+	Conditions []MachineConditionApplyConfiguration `json:"conditions,omitempty"`
+	// State is the infrastructure state of the machine.
+	State *computev1alpha1.MachineState `json:"state,omitempty"`
+	// NetworkInterfaces is the list of network interface states for the machine.
+	NetworkInterfaces []NetworkInterfaceStatusApplyConfiguration `json:"networkInterfaces,omitempty"`
+	// Volumes is the list of volume states for the machine.
+	Volumes []VolumeStatusApplyConfiguration `json:"volumes,omitempty"`
 }
 
 // MachineStatusApplyConfiguration constructs a declarative configuration of the MachineStatus type for use with

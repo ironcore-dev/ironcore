@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"strings"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -124,7 +125,7 @@ func (r *MachineReconciler) prepareIRINetworkInterfacesForMachine(
 		expectedNicNames := utilslices.ToSetFunc(machine.Spec.NetworkInterfaces, func(v computev1alpha1.NetworkInterface) string { return v.Name })
 		actualNicNames := utilslices.ToSetFunc(iriNics, (*iri.NetworkInterface).GetName)
 		missingNicNames := sets.List(expectedNicNames.Difference(actualNicNames))
-		r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Machine network interfaces are not ready: %v", missingNicNames)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Machine network interfaces are not ready: %s", strings.Join(missingNicNames, ", "))
 		return nil, nil, false, nil
 	}
 
@@ -182,17 +183,17 @@ func (r *MachineReconciler) getNetworkInterfaceIP(
 				return commonv1alpha1.IP{}, false, fmt.Errorf("error getting prefix %s: %w", prefixName, err)
 			}
 
-			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s not found", prefixName)
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s not found", prefixName)
 			return commonv1alpha1.IP{}, false, nil
 		}
 
 		if !metav1.IsControlledBy(prefix, nic) {
-			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s not controlled by network interface", prefixName, nic.Name)
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s not controlled by network interface", prefixName, nic.Name)
 			return commonv1alpha1.IP{}, false, nil
 		}
 
 		if prefix.Status.Phase != ipamv1alpha1.PrefixPhaseAllocated {
-			r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s is not yet allocated", prefixName)
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface prefix %s is not yet allocated", prefixName)
 			return commonv1alpha1.IP{}, false, nil
 		}
 
@@ -259,7 +260,7 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		if !apierrors.IsNotFound(err) {
 			return nil, false, fmt.Errorf("error getting network %s: %w", networkKey.Name, err)
 		}
-		r.Eventf(machine, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s network %s not found", nic.Name, networkKey.Name)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, events.NetworkInterfaceNotReady, "Network interface %s network %s not found", nic.Name, networkKey.Name)
 		return nil, false, nil
 	}
 	nicLabels, err := r.iriNetworkInterfaceLabels(nic)

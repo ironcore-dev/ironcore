@@ -13,13 +13,21 @@ import (
 
 // MachinePoolConditionApplyConfiguration represents a declarative configuration of the MachinePoolCondition type for use
 // with apply.
+//
+// MachinePoolCondition is one of the conditions of a MachinePool.
 type MachinePoolConditionApplyConfiguration struct {
-	Type               *computev1alpha1.MachinePoolConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus                       `json:"status,omitempty"`
-	Reason             *string                                   `json:"reason,omitempty"`
-	Message            *string                                   `json:"message,omitempty"`
-	ObservedGeneration *int64                                    `json:"observedGeneration,omitempty"`
-	LastTransitionTime *metav1.Time                              `json:"lastTransitionTime,omitempty"`
+	// Type is the type of the condition.
+	Type *computev1alpha1.MachinePoolConditionType `json:"type,omitempty"`
+	// Status is the status of the condition.
+	Status *v1.ConditionStatus `json:"status,omitempty"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason *string `json:"reason,omitempty"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message *string `json:"message,omitempty"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration *int64 `json:"observedGeneration,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // MachinePoolConditionApplyConfiguration constructs a declarative configuration of the MachinePoolCondition type for use with

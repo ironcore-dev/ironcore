@@ -11,7 +11,11 @@ import (
 
 // EphemeralNetworkInterfaceSourceApplyConfiguration represents a declarative configuration of the EphemeralNetworkInterfaceSource type for use
 // with apply.
+//
+// EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding
+// object) networking.NetworkInterface.
 type EphemeralNetworkInterfaceSourceApplyConfiguration struct {
+	// NetworkInterfaceTemplate is the template definition of the networking.NetworkInterface.
 	NetworkInterfaceTemplate *networkingv1alpha1.NetworkInterfaceTemplateSpecApplyConfiguration `json:"networkInterfaceTemplate,omitempty"`
 }
 

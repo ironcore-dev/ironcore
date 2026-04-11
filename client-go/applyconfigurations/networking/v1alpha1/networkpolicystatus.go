@@ -7,7 +7,10 @@ package v1alpha1
 
 // NetworkPolicyStatusApplyConfiguration represents a declarative configuration of the NetworkPolicyStatus type for use
 // with apply.
+//
+// NetworkPolicyStatus defines the observed state of NetworkPolicy.
 type NetworkPolicyStatusApplyConfiguration struct {
+	// Conditions are various conditions of the NetworkPolicy.
 	Conditions []NetworkPolicyConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 

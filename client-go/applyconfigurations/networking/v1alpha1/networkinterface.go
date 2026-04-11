@@ -16,6 +16,8 @@ import (
 
 // NetworkInterfaceApplyConfiguration represents a declarative configuration of the NetworkInterface type for use
 // with apply.
+//
+// NetworkInterface is the Schema for the networkinterfaces API
 type NetworkInterfaceApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func NetworkInterface(name, namespace string) *NetworkInterfaceApplyConfiguratio
 	return b
 }
 
-// ExtractNetworkInterface extracts the applied configuration owned by fieldManager from
-// networkInterface. If no managedFields are found in networkInterface for fieldManager, a
-// NetworkInterfaceApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractNetworkInterfaceFrom extracts the applied configuration owned by fieldManager from
+// networkInterface for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // networkInterface must be a unmodified NetworkInterface API object that was retrieved from the Kubernetes API.
-// ExtractNetworkInterface provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractNetworkInterfaceFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractNetworkInterface(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string) (*NetworkInterfaceApplyConfiguration, error) {
-	return extractNetworkInterface(networkInterface, fieldManager, "")
-}
-
-// ExtractNetworkInterfaceStatus is the same as ExtractNetworkInterface except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractNetworkInterfaceStatus(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string) (*NetworkInterfaceApplyConfiguration, error) {
-	return extractNetworkInterface(networkInterface, fieldManager, "status")
-}
-
-func extractNetworkInterface(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string, subresource string) (*NetworkInterfaceApplyConfiguration, error) {
+func ExtractNetworkInterfaceFrom(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string, subresource string) (*NetworkInterfaceApplyConfiguration, error) {
 	b := &NetworkInterfaceApplyConfiguration{}
 	err := managedfields.ExtractInto(networkInterface, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.networking.v1alpha1.NetworkInterface"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractNetworkInterface(networkInterface *networkingv1alpha1.NetworkInterfa
 	b.WithAPIVersion("networking.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractNetworkInterface extracts the applied configuration owned by fieldManager from
+// networkInterface. If no managedFields are found in networkInterface for fieldManager, a
+// NetworkInterfaceApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// networkInterface must be a unmodified NetworkInterface API object that was retrieved from the Kubernetes API.
+// ExtractNetworkInterface provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractNetworkInterface(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string) (*NetworkInterfaceApplyConfiguration, error) {
+	return ExtractNetworkInterfaceFrom(networkInterface, fieldManager, "")
+}
+
+// ExtractNetworkInterfaceStatus extracts the applied configuration owned by fieldManager from
+// networkInterface for the status subresource.
+func ExtractNetworkInterfaceStatus(networkInterface *networkingv1alpha1.NetworkInterface, fieldManager string) (*NetworkInterfaceApplyConfiguration, error) {
+	return ExtractNetworkInterfaceFrom(networkInterface, fieldManager, "status")
+}
+
 func (b NetworkInterfaceApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -21,6 +21,21 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
+type terminalSizeQueueAdapter struct {
+	queue term.TerminalSizeQueue
+}
+
+func (a *terminalSizeQueueAdapter) Next() *remotecommand.TerminalSize {
+	size := a.queue.Next()
+	if size == nil {
+		return nil
+	}
+	return &remotecommand.TerminalSize{
+		Width:  size.Width,
+		Height: size.Height,
+	}
+}
+
 func Command(streams clicommon.Streams, clientFactory common.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "exec machine-id",
@@ -79,7 +94,7 @@ func Run(ctx context.Context, streams clicommon.Streams, client iri.MachineRunti
 		sizePlusOne.Height++
 
 		// this call spawns a goroutine to monitor/update the terminal size
-		sizeQueue = tty.MonitorSize(&sizePlusOne, size)
+		sizeQueue = &terminalSizeQueueAdapter{queue: tty.MonitorSize(&sizePlusOne, size)}
 	}
 
 	roundTripper, err := spdy.NewRoundTripperWithConfig(spdy.RoundTripperConfig{

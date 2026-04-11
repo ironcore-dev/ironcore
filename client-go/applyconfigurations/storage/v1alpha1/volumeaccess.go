@@ -11,11 +11,17 @@ import (
 
 // VolumeAccessApplyConfiguration represents a declarative configuration of the VolumeAccess type for use
 // with apply.
+//
+// VolumeAccess represents information on how to access a volume.
 type VolumeAccessApplyConfiguration struct {
-	SecretRef        *v1.LocalObjectReference `json:"secretRef,omitempty"`
-	Driver           *string                  `json:"driver,omitempty"`
-	Handle           *string                  `json:"handle,omitempty"`
-	VolumeAttributes map[string]string        `json:"volumeAttributes,omitempty"`
+	// SecretRef references the Secret containing the access credentials to consume a Volume.
+	SecretRef *v1.LocalObjectReference `json:"secretRef,omitempty"`
+	// Driver is the name of the drive to use for this volume. Required.
+	Driver *string `json:"driver,omitempty"`
+	// Handle is the unique handle of the volume.
+	Handle *string `json:"handle,omitempty"`
+	// VolumeAttributes are attributes of the volume to use.
+	VolumeAttributes map[string]string `json:"volumeAttributes,omitempty"`
 }
 
 // VolumeAccessApplyConfiguration constructs a declarative configuration of the VolumeAccess type for use with
