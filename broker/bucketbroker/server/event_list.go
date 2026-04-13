@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -27,7 +27,7 @@ const (
 
 func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	log := ctrl.LoggerFrom(ctx)
-	bucketEventList := &v1.EventList{}
+	bucketEventList := &corev1.EventList{}
 	selectorField := fields.Set{
 		InvolvedObjectKindSelector:       InvolvedObjectKind,
 		InvolvedObjectAPIVersionSelector: storagev1alpha1.SchemeGroupVersion.String(),

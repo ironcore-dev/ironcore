@@ -8,25 +8,25 @@ import (
 	"encoding/pem"
 	"fmt"
 
-	authv1 "k8s.io/api/authorization/v1"
+	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 )
 
 type CertificateSigningRequestRecognizer interface {
 	Recognize(csr *certificatesv1.CertificateSigningRequest, x509CR *x509.CertificateRequest) bool
-	Permission() authv1.ResourceAttributes
+	Permission() authorizationv1.ResourceAttributes
 	SuccessMessage() string
 }
 
 type certificateSigningRequestRecognizer struct {
 	recognize      func(csr *certificatesv1.CertificateSigningRequest, x509CR *x509.CertificateRequest) bool
-	permission     authv1.ResourceAttributes
+	permission     authorizationv1.ResourceAttributes
 	successMessage string
 }
 
 func NewCertificateSigningRequestRecognizer(
 	recognize func(csr *certificatesv1.CertificateSigningRequest, x509CR *x509.CertificateRequest) bool,
-	permission authv1.ResourceAttributes,
+	permission authorizationv1.ResourceAttributes,
 	successMessage string,
 ) CertificateSigningRequestRecognizer {
 	return &certificateSigningRequestRecognizer{
@@ -40,7 +40,7 @@ func (r *certificateSigningRequestRecognizer) Recognize(csr *certificatesv1.Cert
 	return r.recognize(csr, x509CR)
 }
 
-func (r *certificateSigningRequestRecognizer) Permission() authv1.ResourceAttributes {
+func (r *certificateSigningRequestRecognizer) Permission() authorizationv1.ResourceAttributes {
 	return r.permission
 }
 
