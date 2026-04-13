@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/generic"
-	authv1 "k8s.io/api/authorization/v1"
+	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -81,14 +81,14 @@ func (r *CertificateApprovalReconciler) Reconcile(ctx context.Context, req ctrl.
 	return ctrl.Result{}, nil
 }
 
-func (r *CertificateApprovalReconciler) authorize(ctx context.Context, csr *certificatesv1.CertificateSigningRequest, attrs authv1.ResourceAttributes) (bool, error) {
-	extra := make(map[string]authv1.ExtraValue)
+func (r *CertificateApprovalReconciler) authorize(ctx context.Context, csr *certificatesv1.CertificateSigningRequest, attrs authorizationv1.ResourceAttributes) (bool, error) {
+	extra := make(map[string]authorizationv1.ExtraValue)
 	for k, v := range csr.Spec.Extra {
-		extra[k] = authv1.ExtraValue(v)
+		extra[k] = authorizationv1.ExtraValue(v)
 	}
 
-	sar := &authv1.SubjectAccessReview{
-		Spec: authv1.SubjectAccessReviewSpec{
+	sar := &authorizationv1.SubjectAccessReview{
+		Spec: authorizationv1.SubjectAccessReviewSpec{
 			User:               csr.Spec.Username,
 			UID:                csr.Spec.UID,
 			Groups:             csr.Spec.Groups,

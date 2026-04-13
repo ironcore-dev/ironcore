@@ -11,7 +11,7 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/generic"
 	"golang.org/x/exp/slices"
-	authv1 "k8s.io/api/authorization/v1"
+	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -64,7 +64,7 @@ func ValidateMachinePoolClientCSR(req *x509.CertificateRequest, usages sets.Set[
 var (
 	MachinePoolRecognizer = generic.NewCertificateSigningRequestRecognizer(
 		IsMachinePoolClientCert,
-		authv1.ResourceAttributes{
+		authorizationv1.ResourceAttributes{
 			Group:       certificatesv1.GroupName,
 			Resource:    "certificatesigningrequests",
 			Verb:        "create",

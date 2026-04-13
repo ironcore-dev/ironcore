@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -30,7 +30,7 @@ const (
 
 func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 	log := ctrl.LoggerFrom(ctx)
-	machineEventList := &v1.EventList{}
+	machineEventList := &corev1.EventList{}
 	selectorField := fields.Set{
 		InvolvedObjectKindSelector:       InvolvedObjectKind,
 		InvolvedObjectAPIVersionSelector: computev1alpha1.SchemeGroupVersion.String(),

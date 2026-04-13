@@ -16,7 +16,7 @@ import (
 	. "github.com/ironcore-dev/ironcore/utils/rest"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	v1 "k8s.io/api/authorization/v1"
+	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -119,8 +119,8 @@ var _ = Describe("ConfigRotator", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("asserting we are not authenticated")
-		_, err = c.AuthorizationV1().SelfSubjectRulesReviews().Create(ctx, &v1.SelfSubjectRulesReview{
-			Spec: v1.SelfSubjectRulesReviewSpec{
+		_, err = c.AuthorizationV1().SelfSubjectRulesReviews().Create(ctx, &authorizationv1.SelfSubjectRulesReview{
+			Spec: authorizationv1.SelfSubjectRulesReviewSpec{
 				Namespace: corev1.NamespaceDefault,
 			},
 		}, metav1.CreateOptions{})
@@ -141,8 +141,8 @@ var _ = Describe("ConfigRotator", func() {
 		}).Should(Succeed())
 
 		By("asserting we are now authenticated")
-		_, err = c.AuthorizationV1().SelfSubjectRulesReviews().Create(ctx, &v1.SelfSubjectRulesReview{
-			Spec: v1.SelfSubjectRulesReviewSpec{
+		_, err = c.AuthorizationV1().SelfSubjectRulesReviews().Create(ctx, &authorizationv1.SelfSubjectRulesReview{
+			Spec: authorizationv1.SelfSubjectRulesReviewSpec{
 				Namespace: corev1.NamespaceDefault,
 			},
 		}, metav1.CreateOptions{})
