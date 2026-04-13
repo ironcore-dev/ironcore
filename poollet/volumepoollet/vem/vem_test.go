@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -66,13 +66,13 @@ var _ = Describe("VolumeEventMapper", func() {
 		})
 		Expect(k8sManager.Add(volumeClassMapper)).To(Succeed())
 
-		volumeEventMapper := vem.NewVolumeEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorderFor("test"), vem.VolumeEventMapperOptions{
+		volumeEventMapper := vem.NewVolumeEventMapper(k8sManager.GetClient(), srv, k8sManager.GetEventRecorder("test"), vem.VolumeEventMapperOptions{
 			RelistPeriod: 2 * time.Second,
 		})
 		Expect(k8sManager.Add(volumeEventMapper)).To(Succeed())
 
 		Expect((&controllers.VolumeReconciler{
-			EventRecorder:     &record.FakeRecorder{},
+			EventRecorder:     &events.FakeRecorder{},
 			Client:            k8sManager.GetClient(),
 			VolumeRuntime:     srv,
 			VolumeRuntimeName: fakevolume.FakeRuntimeName,
@@ -128,6 +128,7 @@ var _ = Describe("VolumeEventMapper", func() {
 					Reason:    "testing",
 					Message:   "this is test event",
 					Type:      "Normal",
+					Action:    "Synced",
 					EventTime: time.Now().Unix(),
 				}},
 		},
@@ -147,6 +148,7 @@ var _ = Describe("VolumeEventMapper", func() {
 		}).Should(ContainElement(SatisfyAll(
 			HaveField("Reason", Equal("testing")),
 			HaveField("Message", Equal("this is test event")),
+			HaveField("Action", Equal("Synced")),
 			HaveField("Type", Equal(corev1.EventTypeNormal)),
 		)))
 	})

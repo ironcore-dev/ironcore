@@ -12,11 +12,20 @@ import (
 
 // BucketSpecApplyConfiguration represents a declarative configuration of the BucketSpec type for use
 // with apply.
+//
+// BucketSpec defines the desired state of Bucket
 type BucketSpecApplyConfiguration struct {
-	BucketClassRef     *v1.LocalObjectReference    `json:"bucketClassRef,omitempty"`
-	BucketPoolSelector map[string]string           `json:"bucketPoolSelector,omitempty"`
-	BucketPoolRef      *v1.LocalObjectReference    `json:"bucketPoolRef,omitempty"`
-	Tolerations        []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	// BucketClassRef is the BucketClass of a bucket
+	// If empty, an external controller has to provision the bucket.
+	BucketClassRef *v1.LocalObjectReference `json:"bucketClassRef,omitempty"`
+	// BucketPoolSelector selects a suitable BucketPoolRef by the given labels.
+	BucketPoolSelector map[string]string `json:"bucketPoolSelector,omitempty"`
+	// BucketPoolRef indicates which BucketPool to use for a bucket.
+	// If unset, the scheduler will figure out a suitable BucketPoolRef.
+	BucketPoolRef *v1.LocalObjectReference `json:"bucketPoolRef,omitempty"`
+	// Tolerations define tolerations the Bucket has. Only any BucketPool whose taints
+	// covered by Tolerations will be considered to host the Bucket.
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
 }
 
 // BucketSpecApplyConfiguration constructs a declarative configuration of the BucketSpec type for use with

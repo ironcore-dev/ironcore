@@ -13,13 +13,21 @@ import (
 
 // NetworkPolicyConditionApplyConfiguration represents a declarative configuration of the NetworkPolicyCondition type for use
 // with apply.
+//
+// NetworkPolicyCondition is one of the conditions of a network policy.
 type NetworkPolicyConditionApplyConfiguration struct {
-	Type               *networkingv1alpha1.NetworkPolicyConditionType `json:"type,omitempty"`
-	Status             *v1.ConditionStatus                            `json:"status,omitempty"`
-	Reason             *string                                        `json:"reason,omitempty"`
-	Message            *string                                        `json:"message,omitempty"`
-	ObservedGeneration *int64                                         `json:"observedGeneration,omitempty"`
-	LastTransitionTime *metav1.Time                                   `json:"lastTransitionTime,omitempty"`
+	// Type is the type of the condition.
+	Type *networkingv1alpha1.NetworkPolicyConditionType `json:"type,omitempty"`
+	// Status is the status of the condition.
+	Status *v1.ConditionStatus `json:"status,omitempty"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason *string `json:"reason,omitempty"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message *string `json:"message,omitempty"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration *int64 `json:"observedGeneration,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // NetworkPolicyConditionApplyConfiguration constructs a declarative configuration of the NetworkPolicyCondition type for use with

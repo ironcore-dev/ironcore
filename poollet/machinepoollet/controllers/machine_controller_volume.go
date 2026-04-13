@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-logr/logr"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -107,7 +108,7 @@ func (r *MachineReconciler) getVolumesForMachine(ctx context.Context, machine *c
 		}
 
 		if volume.Status.State != storagev1alpha1.VolumeStateAvailable || volume.Status.Access == nil {
-			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not access information", volume.Name)
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not have access information", volume.Name)
 			continue
 		}
 
@@ -157,7 +158,7 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 ) (*iri.Volume, bool, error) {
 	access := volume.Status.Access
 	if access == nil {
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volume.Name)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s does not report status access", volume.Name)
 		return nil, false, nil
 	}
 
@@ -170,7 +171,7 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 				return nil, false, fmt.Errorf("error getting volume access secret %s: %w", secretKey.Name, err)
 			}
 
-			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.VolumeNotReady,
 				"Volume %s access secret %s not found",
 				volume.Name,
 				secretKey.Name,
@@ -190,7 +191,7 @@ func (r *MachineReconciler) prepareRemoteIRIVolume(
 				return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", secretKey.Name, err)
 			}
 
-			r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady,
+			r.Eventf(machine, nil, corev1.EventTypeNormal, events.VolumeNotReady,
 				"Volume %s encryption secret %s not found",
 				volume.Name,
 				secretKey.Name,
@@ -290,7 +291,7 @@ func (r *MachineReconciler) prepareIRIVolumes(
 		expectedVolumeNames := utilslices.ToSetFunc(machine.Spec.Volumes, func(v computev1alpha1.Volume) string { return v.Name })
 		actualVolumeNames := utilslices.ToSetFunc(iriVolumes, (*iri.Volume).GetName)
 		missingVolumeNames := sets.List(expectedVolumeNames.Difference(actualVolumeNames))
-		r.Eventf(machine, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %v", missingVolumeNames)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, events.VolumeNotReady, "Machine volumes are not ready: %s", strings.Join(missingVolumeNames, ", "))
 		return iriVolumes, false, nil
 	}
 	return iriVolumes, true, nil

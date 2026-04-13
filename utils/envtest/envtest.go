@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	corev1apply "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
@@ -179,21 +180,11 @@ func (o *APIServerInstallOptions) generateService(cfg *rest.Config) (namespace, 
 		name = "aggregated-apiserver"
 	}
 
-	service := &corev1.Service{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: corev1.SchemeGroupVersion.String(),
-			Kind:       "Service",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      name,
-		},
-		Spec: corev1.ServiceSpec{
-			Type:         corev1.ServiceTypeExternalName,
-			ExternalName: host,
-		},
-	}
-	if err := c.Patch(ctx, service, client.Apply, client.ForceOwnership, fieldOwner); err != nil {
+	serviceApply := corev1apply.Service(name, namespace).
+		WithSpec(corev1apply.ServiceSpec().
+			WithType(corev1.ServiceTypeExternalName).
+			WithExternalName(host))
+	if err := c.Apply(ctx, serviceApply, fieldOwner, client.ForceOwnership); err != nil {
 		return "", "", fmt.Errorf("error applying service: %w", err)
 	}
 

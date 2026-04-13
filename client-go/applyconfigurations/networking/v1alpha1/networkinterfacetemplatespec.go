@@ -13,6 +13,8 @@ import (
 
 // NetworkInterfaceTemplateSpecApplyConfiguration represents a declarative configuration of the NetworkInterfaceTemplateSpec type for use
 // with apply.
+//
+// NetworkInterfaceTemplateSpec is the specification of a NetworkInterface template.
 type NetworkInterfaceTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkInterfaceSpecApplyConfiguration `json:"spec,omitempty"`

@@ -17,11 +17,16 @@ import (
 
 // VolumeClassApplyConfiguration represents a declarative configuration of the VolumeClass type for use
 // with apply.
+//
+// VolumeClass is the Schema for the volumeclasses API
 type VolumeClassApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Capabilities                     *corev1alpha1.ResourceList    `json:"capabilities,omitempty"`
-	ResizePolicy                     *storagev1alpha1.ResizePolicy `json:"resizePolicy,omitempty"`
+	// Capabilities describes the capabilities of a VolumeClass.
+	Capabilities *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
+	// ResizePolicy describes the supported expansion policy of a VolumeClass.
+	// If not set default to Static expansion policy.
+	ResizePolicy *storagev1alpha1.ResizePolicy `json:"resizePolicy,omitempty"`
 }
 
 // VolumeClass constructs a declarative configuration of the VolumeClass type for use with
@@ -34,29 +39,14 @@ func VolumeClass(name string) *VolumeClassApplyConfiguration {
 	return b
 }
 
-// ExtractVolumeClass extracts the applied configuration owned by fieldManager from
-// volumeClass. If no managedFields are found in volumeClass for fieldManager, a
-// VolumeClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractVolumeClassFrom extracts the applied configuration owned by fieldManager from
+// volumeClass for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // volumeClass must be a unmodified VolumeClass API object that was retrieved from the Kubernetes API.
-// ExtractVolumeClass provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractVolumeClassFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
-	return extractVolumeClass(volumeClass, fieldManager, "")
-}
-
-// ExtractVolumeClassStatus is the same as ExtractVolumeClass except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractVolumeClassStatus(volumeClass *storagev1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
-	return extractVolumeClass(volumeClass, fieldManager, "status")
-}
-
-func extractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager string, subresource string) (*VolumeClassApplyConfiguration, error) {
+func ExtractVolumeClassFrom(volumeClass *storagev1alpha1.VolumeClass, fieldManager string, subresource string) (*VolumeClassApplyConfiguration, error) {
 	b := &VolumeClassApplyConfiguration{}
 	err := managedfields.ExtractInto(volumeClass, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeClass"), fieldManager, b, subresource)
 	if err != nil {
@@ -68,6 +58,21 @@ func extractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager s
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractVolumeClass extracts the applied configuration owned by fieldManager from
+// volumeClass. If no managedFields are found in volumeClass for fieldManager, a
+// VolumeClassApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// volumeClass must be a unmodified VolumeClass API object that was retrieved from the Kubernetes API.
+// ExtractVolumeClass provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractVolumeClass(volumeClass *storagev1alpha1.VolumeClass, fieldManager string) (*VolumeClassApplyConfiguration, error) {
+	return ExtractVolumeClassFrom(volumeClass, fieldManager, "")
+}
+
 func (b VolumeClassApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

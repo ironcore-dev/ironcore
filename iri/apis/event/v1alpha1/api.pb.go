@@ -74,6 +74,7 @@ type EventSpec struct {
 	Message            string                   `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	Type               string                   `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
 	EventTime          int64                    `protobuf:"varint,5,opt,name=event_time,json=eventTime,proto3" json:"event_time,omitempty"`
+	Action             string                   `protobuf:"bytes,6,opt,name=action,proto3" json:"action,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -143,20 +144,28 @@ func (x *EventSpec) GetEventTime() int64 {
 	return 0
 }
 
+func (x *EventSpec) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
 var File_event_v1alpha1_api_proto protoreflect.FileDescriptor
 
 const file_event_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"\x18event/v1alpha1/api.proto\x12\x0eevent.v1alpha1\x1a\x17meta/v1alpha1/api.proto\"6\n" +
 	"\x05Event\x12-\n" +
-	"\x04spec\x18\x02 \x01(\v2\x19.event.v1alpha1.EventSpecR\x04spec\"\xc1\x01\n" +
+	"\x04spec\x18\x02 \x01(\v2\x19.event.v1alpha1.EventSpecR\x04spec\"\xd9\x01\n" +
 	"\tEventSpec\x12O\n" +
 	"\x14involved_object_meta\x18\x01 \x01(\v2\x1d.meta.v1alpha1.ObjectMetadataR\x12involvedObjectMeta\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
-	"event_time\x18\x05 \x01(\x03R\teventTimeB:Z8github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1b\x06proto3"
+	"event_time\x18\x05 \x01(\x03R\teventTime\x12\x16\n" +
+	"\x06action\x18\x06 \x01(\tR\x06actionB:Z8github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1b\x06proto3"
 
 var (
 	file_event_v1alpha1_api_proto_rawDescOnce sync.Once

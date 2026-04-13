@@ -11,8 +11,13 @@ import (
 
 // ResourceQuotaSpecApplyConfiguration represents a declarative configuration of the ResourceQuotaSpec type for use
 // with apply.
+//
+// ResourceQuotaSpec defines the desired state of ResourceQuotaSpec
 type ResourceQuotaSpecApplyConfiguration struct {
-	Hard          *corev1alpha1.ResourceList               `json:"hard,omitempty"`
+	// Hard is a ResourceList of the strictly enforced amount of resources.
+	Hard *corev1alpha1.ResourceList `json:"hard,omitempty"`
+	// ScopeSelector selects the resources that are subject to this quota.
+	// Note: By using certain ScopeSelectors, only certain resources may be tracked.
 	ScopeSelector *ResourceScopeSelectorApplyConfiguration `json:"scopeSelector,omitempty"`
 }
 

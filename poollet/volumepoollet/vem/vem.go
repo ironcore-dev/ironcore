@@ -17,7 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -25,7 +25,7 @@ import (
 
 type VolumeEventMapper struct {
 	manager.Runnable
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	volumeRuntime volume.RuntimeService
@@ -54,7 +54,7 @@ func (m *VolumeEventMapper) relist(ctx context.Context, log logr.Logger) error {
 					Namespace: volumeEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.VolumeNamespaceLabel],
 				},
 			}
-			m.Eventf(involvedVolume, volumeEvent.Spec.Type, volumeEvent.Spec.Reason, volumeEvent.Spec.Message)
+			m.Eventf(involvedVolume, nil, volumeEvent.Spec.Type, volumeEvent.Spec.Reason, volumeEvent.Spec.Action, volumeEvent.Spec.Message)
 		}
 	}
 
@@ -62,7 +62,7 @@ func (m *VolumeEventMapper) relist(ctx context.Context, log logr.Logger) error {
 }
 
 func (m *VolumeEventMapper) Start(ctx context.Context) error {
-	log := ctrl.LoggerFrom(ctx).WithName("mem")
+	log := ctrl.LoggerFrom(ctx).WithName("vem")
 	m.lastFetched = time.Now()
 	wait.UntilWithContext(ctx, func(ctx context.Context) {
 		if err := m.relist(ctx, log); err != nil {
@@ -82,7 +82,7 @@ func setVolumeEventMapperOptionsDefaults(o *VolumeEventMapperOptions) {
 	}
 }
 
-func NewVolumeEventMapper(client client.Client, runtime volume.RuntimeService, recorder record.EventRecorder, opts VolumeEventMapperOptions) *VolumeEventMapper {
+func NewVolumeEventMapper(client client.Client, runtime volume.RuntimeService, recorder events.EventRecorder, opts VolumeEventMapperOptions) *VolumeEventMapper {
 	setVolumeEventMapperOptionsDefaults(&opts)
 	return &VolumeEventMapper{
 		Client:        client,

@@ -13,13 +13,22 @@ import (
 
 // LoadBalancerSpecApplyConfiguration represents a declarative configuration of the LoadBalancerSpec type for use
 // with apply.
+//
+// LoadBalancerSpec defines the desired state of LoadBalancer
 type LoadBalancerSpecApplyConfiguration struct {
-	Type                     *networkingv1alpha1.LoadBalancerType    `json:"type,omitempty"`
-	IPFamilies               []v1.IPFamily                           `json:"ipFamilies,omitempty"`
-	IPs                      []IPSourceApplyConfiguration            `json:"ips,omitempty"`
-	NetworkRef               *v1.LocalObjectReference                `json:"networkRef,omitempty"`
+	// Type is the type of LoadBalancer.
+	Type *networkingv1alpha1.LoadBalancerType `json:"type,omitempty"`
+	// IPFamilies are the ip families the load balancer should have.
+	IPFamilies []v1.IPFamily `json:"ipFamilies,omitempty"`
+	// IPs are the ips to use. Can only be used when Type is LoadBalancerTypeInternal.
+	IPs []IPSourceApplyConfiguration `json:"ips,omitempty"`
+	// NetworkRef is the Network this LoadBalancer should belong to.
+	NetworkRef *v1.LocalObjectReference `json:"networkRef,omitempty"`
+	// NetworkInterfaceSelector defines the NetworkInterfaces
+	// for which this LoadBalancer should be applied
 	NetworkInterfaceSelector *metav1.LabelSelectorApplyConfiguration `json:"networkInterfaceSelector,omitempty"`
-	Ports                    []LoadBalancerPortApplyConfiguration    `json:"ports,omitempty"`
+	// Ports are the ports the load balancer should allow.
+	Ports []LoadBalancerPortApplyConfiguration `json:"ports,omitempty"`
 }
 
 // LoadBalancerSpecApplyConfiguration constructs a declarative configuration of the LoadBalancerSpec type for use with

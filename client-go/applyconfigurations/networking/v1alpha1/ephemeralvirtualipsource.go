@@ -7,7 +7,11 @@ package v1alpha1
 
 // EphemeralVirtualIPSourceApplyConfiguration represents a declarative configuration of the EphemeralVirtualIPSource type for use
 // with apply.
+//
+// EphemeralVirtualIPSource contains the definition to create an ephemeral (i.e. coupled to the lifetime of the
+// surrounding object) VirtualIP.
 type EphemeralVirtualIPSourceApplyConfiguration struct {
+	// VirtualIPTemplate is the template for the VirtualIP.
 	VirtualIPTemplate *VirtualIPTemplateSpecApplyConfiguration `json:"virtualIPTemplate,omitempty"`
 }
 

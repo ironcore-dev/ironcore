@@ -7,9 +7,17 @@ package v1alpha1
 
 // NetworkPolicyIngressRuleApplyConfiguration represents a declarative configuration of the NetworkPolicyIngressRule type for use
 // with apply.
+//
+// NetworkPolicyIngressRule describes a rule to regulate ingress traffic with.
 type NetworkPolicyIngressRuleApplyConfiguration struct {
+	// Ports specifies the list of ports which should be made accessible for
+	// this rule. Each item in this list is combined using a logical OR. Empty matches all ports.
+	// As soon as a single item is present, only these ports are allowed.
 	Ports []NetworkPolicyPortApplyConfiguration `json:"ports,omitempty"`
-	From  []NetworkPolicyPeerApplyConfiguration `json:"from,omitempty"`
+	// From specifies the list of sources which should be able to send traffic to the
+	// selected network interfaces. Fields are combined using a logical OR. Empty matches all sources.
+	// As soon as a single item is present, only these peers are allowed.
+	From []NetworkPolicyPeerApplyConfiguration `json:"from,omitempty"`
 }
 
 // NetworkPolicyIngressRuleApplyConfiguration constructs a declarative configuration of the NetworkPolicyIngressRule type for use with

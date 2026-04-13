@@ -16,6 +16,8 @@ import (
 
 // MachinePoolApplyConfiguration represents a declarative configuration of the MachinePool type for use
 // with apply.
+//
+// MachinePool is the Schema for the machinepools API
 type MachinePoolApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -33,29 +35,14 @@ func MachinePool(name string) *MachinePoolApplyConfiguration {
 	return b
 }
 
-// ExtractMachinePool extracts the applied configuration owned by fieldManager from
-// machinePool. If no managedFields are found in machinePool for fieldManager, a
-// MachinePoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractMachinePoolFrom extracts the applied configuration owned by fieldManager from
+// machinePool for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // machinePool must be a unmodified MachinePool API object that was retrieved from the Kubernetes API.
-// ExtractMachinePool provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractMachinePoolFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractMachinePool(machinePool *computev1alpha1.MachinePool, fieldManager string) (*MachinePoolApplyConfiguration, error) {
-	return extractMachinePool(machinePool, fieldManager, "")
-}
-
-// ExtractMachinePoolStatus is the same as ExtractMachinePool except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractMachinePoolStatus(machinePool *computev1alpha1.MachinePool, fieldManager string) (*MachinePoolApplyConfiguration, error) {
-	return extractMachinePool(machinePool, fieldManager, "status")
-}
-
-func extractMachinePool(machinePool *computev1alpha1.MachinePool, fieldManager string, subresource string) (*MachinePoolApplyConfiguration, error) {
+func ExtractMachinePoolFrom(machinePool *computev1alpha1.MachinePool, fieldManager string, subresource string) (*MachinePoolApplyConfiguration, error) {
 	b := &MachinePoolApplyConfiguration{}
 	err := managedfields.ExtractInto(machinePool, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachinePool"), fieldManager, b, subresource)
 	if err != nil {
@@ -67,6 +54,27 @@ func extractMachinePool(machinePool *computev1alpha1.MachinePool, fieldManager s
 	b.WithAPIVersion("compute.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractMachinePool extracts the applied configuration owned by fieldManager from
+// machinePool. If no managedFields are found in machinePool for fieldManager, a
+// MachinePoolApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// machinePool must be a unmodified MachinePool API object that was retrieved from the Kubernetes API.
+// ExtractMachinePool provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractMachinePool(machinePool *computev1alpha1.MachinePool, fieldManager string) (*MachinePoolApplyConfiguration, error) {
+	return ExtractMachinePoolFrom(machinePool, fieldManager, "")
+}
+
+// ExtractMachinePoolStatus extracts the applied configuration owned by fieldManager from
+// machinePool for the status subresource.
+func ExtractMachinePoolStatus(machinePool *computev1alpha1.MachinePool, fieldManager string) (*MachinePoolApplyConfiguration, error) {
+	return ExtractMachinePoolFrom(machinePool, fieldManager, "status")
+}
+
 func (b MachinePoolApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

@@ -244,7 +244,7 @@ func Run(ctx context.Context, opts Options) error {
 	}
 	// Metrics endpoint is enabled in 'config/volumepoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
 	// More info:
-	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/server
+	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html
 	metricsServerOptions := metricsserver.Options{
 		BindAddress:   opts.MetricsAddr,
@@ -255,7 +255,7 @@ func Run(ctx context.Context, opts Options) error {
 		// FilterProvider is used to protect the metrics endpoint with authn/authz.
 		// These configurations ensure that only authorized users and service accounts
 		// can access the metrics endpoint. The RBAC are configured in 'config/volumepoollet-broker/broker-rbac/kustomization.yaml'. More info:
-		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
+		// https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/filters#WithAuthenticationAndAuthorization
 		metricsServerOptions.FilterProvider = filters.WithAuthenticationAndAuthorization
 	}
 
@@ -332,7 +332,7 @@ func Run(ctx context.Context, opts Options) error {
 		if err := mgr.Add(volumeClassMapper); err != nil {
 			return fmt.Errorf("error adding volume class mapper: %w", err)
 		}
-		volumeEventMapper = vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorderFor("volume-cluster-events"), vem.VolumeEventMapperOptions{})
+		volumeEventMapper = vem.NewVolumeEventMapper(mgr.GetClient(), volumeRuntime, mgr.GetEventRecorder("volume-cluster-events"), vem.VolumeEventMapperOptions{})
 		if err := mgr.Add(volumeEventMapper); err != nil {
 			return fmt.Errorf("error adding volume event mapper: %w", err)
 		}
@@ -395,7 +395,7 @@ func Run(ctx context.Context, opts Options) error {
 			}
 
 			if err := (&controllers.VolumeReconciler{
-				EventRecorder:           mgr.GetEventRecorderFor("volumes"),
+				EventRecorder:           mgr.GetEventRecorder("volumes"),
 				Client:                  mgr.GetClient(),
 				Scheme:                  scheme,
 				VolumeRuntime:           volumeRuntime,
@@ -444,7 +444,7 @@ func Run(ctx context.Context, opts Options) error {
 				return fmt.Errorf("error setting up volume snapshot annotator reconciler with manager: %w", err)
 			}
 			if err := (&controllers.VolumeSnapshotReconciler{
-				EventRecorder:           mgr.GetEventRecorderFor("volume-snapshots"),
+				EventRecorder:           mgr.GetEventRecorder("volume-snapshots"),
 				Client:                  mgr.GetClient(),
 				Scheme:                  scheme,
 				VolumeRuntime:           volumeRuntime,

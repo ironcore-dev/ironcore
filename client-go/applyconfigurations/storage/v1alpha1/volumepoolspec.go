@@ -11,9 +11,14 @@ import (
 
 // VolumePoolSpecApplyConfiguration represents a declarative configuration of the VolumePoolSpec type for use
 // with apply.
+//
+// VolumePoolSpec defines the desired state of VolumePool
 type VolumePoolSpecApplyConfiguration struct {
-	ProviderID *string                `json:"providerID,omitempty"`
-	Taints     []commonv1alpha1.Taint `json:"taints,omitempty"`
+	// ProviderID identifies the VolumePool on provider side.
+	ProviderID *string `json:"providerID,omitempty"`
+	// Taints of the VolumePool. Only Volumes who tolerate all the taints
+	// will land in the VolumePool.
+	Taints []commonv1alpha1.Taint `json:"taints,omitempty"`
 }
 
 // VolumePoolSpecApplyConfiguration constructs a declarative configuration of the VolumePoolSpec type for use with

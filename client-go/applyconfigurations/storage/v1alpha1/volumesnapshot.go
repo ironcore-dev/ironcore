@@ -16,6 +16,8 @@ import (
 
 // VolumeSnapshotApplyConfiguration represents a declarative configuration of the VolumeSnapshot type for use
 // with apply.
+//
+// VolumeSnapshot is the Schema for the VolumeSnapshots API
 type VolumeSnapshotApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
@@ -34,29 +36,14 @@ func VolumeSnapshot(name, namespace string) *VolumeSnapshotApplyConfiguration {
 	return b
 }
 
-// ExtractVolumeSnapshot extracts the applied configuration owned by fieldManager from
-// volumeSnapshot. If no managedFields are found in volumeSnapshot for fieldManager, a
-// VolumeSnapshotApplyConfiguration is returned with only the Name, Namespace (if applicable),
-// APIVersion and Kind populated. It is possible that no managed fields were found for because other
-// field managers have taken ownership of all the fields previously owned by fieldManager, or because
-// the fieldManager never owned fields any fields.
+// ExtractVolumeSnapshotFrom extracts the applied configuration owned by fieldManager from
+// volumeSnapshot for the specified subresource. Pass an empty string for subresource to extract
+// the main resource. Common subresources include "status", "scale", etc.
 // volumeSnapshot must be a unmodified VolumeSnapshot API object that was retrieved from the Kubernetes API.
-// ExtractVolumeSnapshot provides a way to perform a extract/modify-in-place/apply workflow.
+// ExtractVolumeSnapshotFrom provides a way to perform a extract/modify-in-place/apply workflow.
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
-// Experimental!
-func ExtractVolumeSnapshot(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string) (*VolumeSnapshotApplyConfiguration, error) {
-	return extractVolumeSnapshot(volumeSnapshot, fieldManager, "")
-}
-
-// ExtractVolumeSnapshotStatus is the same as ExtractVolumeSnapshot except
-// that it extracts the status subresource applied configuration.
-// Experimental!
-func ExtractVolumeSnapshotStatus(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string) (*VolumeSnapshotApplyConfiguration, error) {
-	return extractVolumeSnapshot(volumeSnapshot, fieldManager, "status")
-}
-
-func extractVolumeSnapshot(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string, subresource string) (*VolumeSnapshotApplyConfiguration, error) {
+func ExtractVolumeSnapshotFrom(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string, subresource string) (*VolumeSnapshotApplyConfiguration, error) {
 	b := &VolumeSnapshotApplyConfiguration{}
 	err := managedfields.ExtractInto(volumeSnapshot, internal.Parser().Type("com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeSnapshot"), fieldManager, b, subresource)
 	if err != nil {
@@ -69,6 +56,27 @@ func extractVolumeSnapshot(volumeSnapshot *storagev1alpha1.VolumeSnapshot, field
 	b.WithAPIVersion("storage.ironcore.dev/v1alpha1")
 	return b, nil
 }
+
+// ExtractVolumeSnapshot extracts the applied configuration owned by fieldManager from
+// volumeSnapshot. If no managedFields are found in volumeSnapshot for fieldManager, a
+// VolumeSnapshotApplyConfiguration is returned with only the Name, Namespace (if applicable),
+// APIVersion and Kind populated. It is possible that no managed fields were found for because other
+// field managers have taken ownership of all the fields previously owned by fieldManager, or because
+// the fieldManager never owned fields any fields.
+// volumeSnapshot must be a unmodified VolumeSnapshot API object that was retrieved from the Kubernetes API.
+// ExtractVolumeSnapshot provides a way to perform a extract/modify-in-place/apply workflow.
+// Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
+// applied if another fieldManager has updated or force applied any of the previously applied fields.
+func ExtractVolumeSnapshot(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string) (*VolumeSnapshotApplyConfiguration, error) {
+	return ExtractVolumeSnapshotFrom(volumeSnapshot, fieldManager, "")
+}
+
+// ExtractVolumeSnapshotStatus extracts the applied configuration owned by fieldManager from
+// volumeSnapshot for the status subresource.
+func ExtractVolumeSnapshotStatus(volumeSnapshot *storagev1alpha1.VolumeSnapshot, fieldManager string) (*VolumeSnapshotApplyConfiguration, error) {
+	return ExtractVolumeSnapshotFrom(volumeSnapshot, fieldManager, "status")
+}
+
 func (b VolumeSnapshotApplyConfiguration) IsApplyConfiguration() {}
 
 // WithKind sets the Kind field in the declarative configuration to the given value

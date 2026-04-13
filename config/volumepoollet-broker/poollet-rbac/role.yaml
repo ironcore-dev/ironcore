@@ -50,7 +50,9 @@ rules:
   resources:
   - volumepools
   verbs:
+  - apply
   - create
+  - delete
   - get
   - list
   - patch

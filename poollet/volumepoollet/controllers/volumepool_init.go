@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storagev1alpha1apply "github.com/ironcore-dev/ironcore/client-go/applyconfigurations/storage/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,29 +28,24 @@ type VolumePoolInit struct {
 	OnFailed      func(ctx context.Context, reason error) error
 }
 
-//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;create;update;patch
+//+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;create;update;patch;apply;delete
 
 func (i *VolumePoolInit) Start(ctx context.Context) error {
 	log := ctrl.LoggerFrom(ctx).WithName("volumepool").WithName("init")
 
 	log.V(1).Info("Applying volume pool")
-	volumePool := &storagev1alpha1.VolumePool{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: storagev1alpha1.SchemeGroupVersion.String(),
-			Kind:       "VolumePool",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name: i.VolumePoolName,
-		},
-		Spec: storagev1alpha1.VolumePoolSpec{
-			ProviderID: i.ProviderID,
-		},
-	}
+	volumePoolApply := storagev1alpha1apply.VolumePool(i.VolumePoolName).
+		WithSpec(storagev1alpha1apply.VolumePoolSpec().
+			WithProviderID(i.ProviderID))
 
 	log.V(1).Info("Initially setting topology labels")
-	poolletutils.SetTopologyLabels(log, &volumePool.ObjectMeta, i.TopologyLabels)
+	om := &metav1.ObjectMeta{}
+	poolletutils.SetTopologyLabels(log, om, i.TopologyLabels)
+	if len(om.Labels) > 0 {
+		volumePoolApply.WithLabels(om.Labels)
+	}
 
-	if err := i.Patch(ctx, volumePool, client.Apply, client.ForceOwnership, client.FieldOwner(volumepoolletv1alpha1.FieldOwner)); err != nil {
+	if err := i.Apply(ctx, volumePoolApply, client.ForceOwnership, client.FieldOwner(volumepoolletv1alpha1.FieldOwner)); err != nil {
 		if i.OnFailed != nil {
 			log.V(1).Info("Failed applying, calling OnFailed callback", "Error", err)
 			return i.OnFailed(ctx, err)

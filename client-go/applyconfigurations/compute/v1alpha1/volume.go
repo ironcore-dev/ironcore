@@ -11,9 +11,16 @@ import (
 
 // VolumeApplyConfiguration represents a declarative configuration of the Volume type for use
 // with apply.
+//
+// Volume defines a volume attachment of a machine
 type VolumeApplyConfiguration struct {
-	Name                           *string `json:"name,omitempty"`
-	Device                         *string `json:"device,omitempty"`
+	// Name is the name of the Volume
+	Name *string `json:"name,omitempty"`
+	// Device is the device name where the volume should be attached.
+	// Pointer to distinguish between explicit zero and not specified.
+	// If empty, an unused device name will be determined if possible.
+	Device *string `json:"device,omitempty"`
+	// VolumeSource is the source where the storage for the Volume resides at.
 	VolumeSourceApplyConfiguration `json:",inline"`
 }
 

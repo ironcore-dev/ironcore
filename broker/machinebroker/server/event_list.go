@@ -68,6 +68,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 				Reason:             machineEvent.Reason,
 				Message:            machineEvent.Message,
 				Type:               machineEvent.Type,
+				Action:             machineEvent.Action,
 				EventTime:          machineEvent.LastTimestamp.Unix(),
 			},
 		}

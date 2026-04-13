@@ -13,18 +13,35 @@ import (
 
 // VolumeSpecApplyConfiguration represents a declarative configuration of the VolumeSpec type for use
 // with apply.
+//
+// VolumeSpec defines the desired state of Volume
 type VolumeSpecApplyConfiguration struct {
-	VolumeClassRef     *v1.LocalObjectReference            `json:"volumeClassRef,omitempty"`
-	VolumePoolSelector map[string]string                   `json:"volumePoolSelector,omitempty"`
-	VolumePoolRef      *v1.LocalObjectReference            `json:"volumePoolRef,omitempty"`
-	ClaimRef           *commonv1alpha1.LocalUIDReference   `json:"claimRef,omitempty"`
-	Resources          *corev1alpha1.ResourceList          `json:"resources,omitempty"`
-	Image              *string                             `json:"image,omitempty"`
-	ImagePullSecretRef *v1.LocalObjectReference            `json:"imagePullSecretRef,omitempty"`
-	Unclaimable        *bool                               `json:"unclaimable,omitempty"`
-	Tolerations        []commonv1alpha1.Toleration         `json:"tolerations,omitempty"`
-	Encryption         *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
-	DataSource         *VolumeDataSourceApplyConfiguration `json:"dataSource,omitempty"`
+	// VolumeClassRef is the VolumeClass of a volume
+	// If empty, an external controller has to provision the volume.
+	VolumeClassRef *v1.LocalObjectReference `json:"volumeClassRef,omitempty"`
+	// VolumePoolSelector selects a suitable VolumePoolRef by the given labels.
+	VolumePoolSelector map[string]string `json:"volumePoolSelector,omitempty"`
+	// VolumePoolRef indicates which VolumePool to use for a volume.
+	// If unset, the scheduler will figure out a suitable VolumePoolRef.
+	VolumePoolRef *v1.LocalObjectReference `json:"volumePoolRef,omitempty"`
+	// ClaimRef is the reference to the claiming entity of the Volume.
+	ClaimRef *commonv1alpha1.LocalUIDReference `json:"claimRef,omitempty"`
+	// Resources is a description of the volume's resources and capacity.
+	Resources *corev1alpha1.ResourceList `json:"resources,omitempty"`
+	// Image is an optional image to bootstrap the volume with.
+	// To be deprecated
+	Image *string `json:"image,omitempty"`
+	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
+	ImagePullSecretRef *v1.LocalObjectReference `json:"imagePullSecretRef,omitempty"`
+	// Unclaimable marks the volume as unclaimable.
+	Unclaimable *bool `json:"unclaimable,omitempty"`
+	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
+	// covered by Tolerations will be considered to host the Volume.
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	// Encryption is an optional field which provides attributes to encrypt Volume.
+	Encryption *VolumeEncryptionApplyConfiguration `json:"encryption,omitempty"`
+	// DataSource contains the content to prepopulate the Volume with.
+	DataSource *VolumeDataSourceApplyConfiguration `json:"dataSource,omitempty"`
 }
 
 // VolumeSpecApplyConfiguration constructs a declarative configuration of the VolumeSpec type for use with

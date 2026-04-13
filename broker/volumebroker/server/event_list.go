@@ -55,6 +55,7 @@ func (s *Server) listEvents(ctx context.Context) ([]*irievent.Event, error) {
 				Reason:             volumeEvent.Reason,
 				Message:            volumeEvent.Message,
 				Type:               volumeEvent.Type,
+				Action:             volumeEvent.Action,
 				EventTime:          volumeEvent.LastTimestamp.Unix(),
 			},
 		}

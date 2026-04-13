@@ -13,6 +13,8 @@ import (
 
 // VirtualIPTemplateSpecApplyConfiguration represents a declarative configuration of the VirtualIPTemplateSpec type for use
 // with apply.
+//
+// VirtualIPTemplateSpec is the specification of a VirtualIP template.
 type VirtualIPTemplateSpecApplyConfiguration struct {
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *EphemeralVirtualIPSpecApplyConfiguration `json:"spec,omitempty"`

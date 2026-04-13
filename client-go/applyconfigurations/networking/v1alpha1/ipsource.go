@@ -11,8 +11,12 @@ import (
 
 // IPSourceApplyConfiguration represents a declarative configuration of the IPSource type for use
 // with apply.
+//
+// IPSource is the definition of how to obtain an IP.
 type IPSourceApplyConfiguration struct {
-	Value     *commonv1alpha1.IP                       `json:"value,omitempty"`
+	// Value specifies an IP by using an IP literal.
+	Value *commonv1alpha1.IP `json:"value,omitempty"`
+	// Ephemeral specifies an IP by creating an ephemeral Prefix to allocate the IP with.
 	Ephemeral *EphemeralPrefixSourceApplyConfiguration `json:"ephemeral,omitempty"`
 }
 

@@ -50,7 +50,9 @@ rules:
   resources:
   - bucketpools
   verbs:
+  - apply
   - create
+  - delete
   - get
   - list
   - patch

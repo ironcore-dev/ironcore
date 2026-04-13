@@ -16,7 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -24,7 +24,7 @@ import (
 
 type MachineEventMapper struct {
 	manager.Runnable
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 
 	machineRuntime machine.RuntimeService
@@ -53,7 +53,7 @@ func (m *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error 
 					Namespace: machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNamespaceLabel],
 				},
 			}
-			m.Eventf(involvedMachine, machineEvent.Spec.Type, machineEvent.Spec.Reason, machineEvent.Spec.Message)
+			m.Eventf(involvedMachine, nil, machineEvent.Spec.Type, machineEvent.Spec.Reason, machineEvent.Spec.Action, machineEvent.Spec.Message)
 		}
 	}
 
@@ -81,7 +81,7 @@ func setMachineEventMapperOptionsDefaults(o *MachineEventMapperOptions) {
 	}
 }
 
-func NewMachineEventMapper(client client.Client, runtime machine.RuntimeService, recorder record.EventRecorder, opts MachineEventMapperOptions) *MachineEventMapper {
+func NewMachineEventMapper(client client.Client, runtime machine.RuntimeService, recorder events.EventRecorder, opts MachineEventMapperOptions) *MachineEventMapper {
 	setMachineEventMapperOptionsDefaults(&opts)
 	return &MachineEventMapper{
 		Client:         client,

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/client-go/tools/events"
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
@@ -18,7 +19,7 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
-	"github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
+	volumepoolletevents "github.com/ironcore-dev/ironcore/poollet/volumepoollet/controllers/events"
 	ironcoreclient "github.com/ironcore-dev/ironcore/utils/client"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	"github.com/ironcore-dev/ironcore/utils/predicates"
@@ -29,7 +30,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
 	"k8s.io/kubectl/pkg/util/fieldpath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -39,7 +39,7 @@ import (
 )
 
 type VolumeSnapshotReconciler struct {
-	record.EventRecorder
+	events.EventRecorder
 	client.Client
 	Scheme *runtime.Scheme
 
@@ -256,7 +256,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	volume := &storagev1alpha1.Volume{}
 	if err := r.Get(ctx, client.ObjectKey{Namespace: volumeSnapshot.Namespace, Name: volumeSnapshot.Spec.VolumeRef.Name}, volume); err != nil {
 		if apierrors.IsNotFound(err) {
-			r.Eventf(volumeSnapshot, corev1.EventTypeNormal, events.SourceVolumeNotFound,
+			r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotFound,
 				"Source volume %s not found", volumeSnapshot.Spec.VolumeRef.Name)
 			return nil, false, nil
 		}
@@ -264,7 +264,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	}
 
 	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
-		r.Eventf(volumeSnapshot, corev1.EventTypeNormal, events.SourceVolumeNotAvailable,
+		r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotAvailable,
 			"Source volume %s is not available (state: %s)", volumeSnapshot.Spec.VolumeRef.Name, volume.Status.State)
 		return nil, false, nil
 	}

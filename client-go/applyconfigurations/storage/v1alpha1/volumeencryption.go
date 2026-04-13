@@ -11,7 +11,11 @@ import (
 
 // VolumeEncryptionApplyConfiguration represents a declarative configuration of the VolumeEncryption type for use
 // with apply.
+//
+// VolumeEncryption represents information to encrypt a volume.
 type VolumeEncryptionApplyConfiguration struct {
+	// SecretRef references the Secret containing the encryption key to encrypt a Volume.
+	// This secret is created by user with encryptionKey as Key and base64 encoded 256-bit encryption key as Value.
 	SecretRef *v1.LocalObjectReference `json:"secretRef,omitempty"`
 }
 
