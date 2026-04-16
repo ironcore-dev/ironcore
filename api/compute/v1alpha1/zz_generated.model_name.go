@@ -64,6 +64,11 @@ func (in MachineExecOptions) OpenAPIModelName() string {
 }
 
 // OpenAPIModelName returns the OpenAPI model name for this type.
+func (in MachineGuestConfig) OpenAPIModelName() string {
+	return "com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineGuestConfig"
+}
+
+// OpenAPIModelName returns the OpenAPI model name for this type.
 func (in MachineList) OpenAPIModelName() string {
 	return "com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList"
 }

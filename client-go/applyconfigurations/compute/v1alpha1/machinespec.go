@@ -42,7 +42,8 @@ type MachineSpecApplyConfiguration struct {
 	EFIVars []EFIVarApplyConfiguration `json:"efiVars,omitempty"`
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
-	Tolerations []commonv1alpha1.Toleration           `json:"tolerations,omitempty"`
+	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	// GuestConfig contains guest OS level configuration for the machine.
 	GuestConfig *MachineGuestConfigApplyConfiguration `json:"guestConfig,omitempty"`
 }
 
