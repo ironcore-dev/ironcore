@@ -7,7 +7,10 @@ package v1alpha1
 
 // MachineGuestConfigApplyConfiguration represents a declarative configuration of the MachineGuestConfig type for use
 // with apply.
+//
+// MachineGuestConfig contains guest OS level configuration for the machine.
 type MachineGuestConfigApplyConfiguration struct {
+	// Hostname is the desired hostname of the machine.
 	Hostname *string `json:"hostname,omitempty"`
 }
 
