@@ -46,6 +46,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		computev1alpha1.MachineClassList{}.OpenAPIModelName():                schema_ironcore_api_compute_v1alpha1_MachineClassList(ref),
 		computev1alpha1.MachineCondition{}.OpenAPIModelName():                schema_ironcore_api_compute_v1alpha1_MachineCondition(ref),
 		computev1alpha1.MachineExecOptions{}.OpenAPIModelName():              schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref),
+		computev1alpha1.MachineGuestConfig{}.OpenAPIModelName():              schema_ironcore_api_compute_v1alpha1_MachineGuestConfig(ref),
 		computev1alpha1.MachineList{}.OpenAPIModelName():                     schema_ironcore_api_compute_v1alpha1_MachineList(ref),
 		computev1alpha1.MachinePool{}.OpenAPIModelName():                     schema_ironcore_api_compute_v1alpha1_MachinePool(ref),
 		computev1alpha1.MachinePoolAddress{}.OpenAPIModelName():              schema_ironcore_api_compute_v1alpha1_MachinePoolAddress(ref),
@@ -1105,6 +1106,26 @@ func schema_ironcore_api_compute_v1alpha1_MachineExecOptions(ref common.Referenc
 	}
 }
 
+func schema_ironcore_api_compute_v1alpha1_MachineGuestConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "MachineGuestConfig contains guest OS level configuration for the machine.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"hostname": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostname is the desired hostname of the machine.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_ironcore_api_compute_v1alpha1_MachineList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -1630,12 +1651,18 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 							},
 						},
 					},
+					"guestConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "GuestConfig contains guest OS level configuration for the machine.",
+							Ref:         ref(computev1alpha1.MachineGuestConfig{}.OpenAPIModelName()),
+						},
+					},
 				},
 				Required: []string{"machineClassRef"},
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.SecretKeySelector{}.OpenAPIModelName(), v1alpha1.Toleration{}.OpenAPIModelName(), computev1alpha1.EFIVar{}.OpenAPIModelName(), computev1alpha1.NetworkInterface{}.OpenAPIModelName(), computev1alpha1.Volume{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
+			v1alpha1.SecretKeySelector{}.OpenAPIModelName(), v1alpha1.Toleration{}.OpenAPIModelName(), computev1alpha1.EFIVar{}.OpenAPIModelName(), computev1alpha1.MachineGuestConfig{}.OpenAPIModelName(), computev1alpha1.NetworkInterface{}.OpenAPIModelName(), computev1alpha1.Volume{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 

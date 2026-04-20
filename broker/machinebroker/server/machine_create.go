@@ -31,6 +31,11 @@ type IronCoreMachineConfig struct {
 	IgnitionData            []byte
 	NetworkInterfaceConfigs []*IronCoreNetworkInterfaceConfig
 	VolumeConfigs           []*IronCoreVolumeConfig
+	GuestConfig             *IroncoreGuestConfig
+}
+
+type IroncoreGuestConfig struct {
+	Hostname string
 }
 
 func (s *Server) ironcoreMachinePoolRef() *corev1.LocalObjectReference {
@@ -105,6 +110,12 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		return nil, fmt.Errorf("error preparing ironcore machine annotations: %w", err)
 	}
 
+	var ironcoreGuestConfig *IroncoreGuestConfig
+	if machine.Spec.GuestConfig != nil {
+		ironcoreGuestConfig = &IroncoreGuestConfig{
+			Hostname: machine.Spec.GuestConfig.Hostname,
+		}
+	}
 	return &IronCoreMachineConfig{
 		Labels:                  labels,
 		Annotations:             annotations,
@@ -113,6 +124,7 @@ func (s *Server) getIronCoreMachineConfig(machine *iri.Machine) (*IronCoreMachin
 		IgnitionData:            machine.Spec.IgnitionData,
 		NetworkInterfaceConfigs: ironcoreNicCfgs,
 		VolumeConfigs:           ironcoreVolumeCfgs,
+		GuestConfig:             ironcoreGuestConfig,
 	}, nil
 }
 
@@ -178,6 +190,13 @@ func (s *Server) createIronCoreMachine(
 		}
 	}
 
+	var ironcoreGuestConfig *computev1alpha1.MachineGuestConfig
+	if cfg.GuestConfig != nil {
+		ironcoreGuestConfig = &computev1alpha1.MachineGuestConfig{
+			Hostname: cfg.GuestConfig.Hostname,
+		}
+	}
+
 	ironcoreMachine := &computev1alpha1.Machine{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:   s.cluster.Namespace(),
@@ -196,6 +215,7 @@ func (s *Server) createIronCoreMachine(
 			NetworkInterfaces:   ironcoreMachineNics,
 			Volumes:             ironcoreMachineVolumes,
 			IgnitionRef:         ignitionRef,
+			GuestConfig:         ironcoreGuestConfig,
 		},
 	}
 	log.V(1).Info("Creating ironcore machine")
