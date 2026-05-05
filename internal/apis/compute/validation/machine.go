@@ -126,6 +126,14 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		allErrs = append(allErrs, validateNetworkInterface(&nwi, fldPath.Child("networkInterface").Index(i))...)
 	}
 
+	if machineSpec.GuestConfig != nil {
+		if machineSpec.GuestConfig.Hostname != "" {
+			for _, msg := range apivalidation.NameIsDNSLabel(machineSpec.GuestConfig.Hostname, false) {
+				allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), machineSpec.GuestConfig.Hostname, msg))
+			}
+		}
+	}
+
 	return allErrs
 }
 
@@ -332,6 +340,25 @@ func validateMachineSpecUpdate(new, old *compute.MachineSpec, fldPath *field.Pat
 						volPath,
 					)...)
 			}
+		}
+	}
+
+	if old.GuestConfig == nil && new.GuestConfig != nil && new.GuestConfig.Hostname != "" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), new.GuestConfig.Hostname, "hostname must not be set if it was not set before"))
+	}
+
+	if old.GuestConfig != nil && old.GuestConfig.Hostname == "" {
+		if new.GuestConfig != nil && new.GuestConfig.Hostname != "" {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), new.GuestConfig.Hostname, "hostname must not be set if it was not set before"))
+		}
+	}
+
+	if old.GuestConfig != nil && old.GuestConfig.Hostname != "" {
+		if new.GuestConfig == nil || new.GuestConfig.Hostname == "" {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("guestConfig").Child("hostname"), nil, "hostname must not be cleared"))
+		}
+		if new.GuestConfig != nil && new.GuestConfig.Hostname != "" {
+			allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.GuestConfig.Hostname, old.GuestConfig.Hostname, fldPath.Child("guestConfig").Child("hostname"))...)
 		}
 	}
 

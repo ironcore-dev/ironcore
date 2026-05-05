@@ -856,6 +856,13 @@ func (r *MachineReconciler) prepareIRIMachine(
 		errs = append(errs, fmt.Errorf("error preparing iri machine annotations: %w", err))
 	}
 
+	var iriGuestConfig *iri.GuestConfig
+	if guestConfig := machine.Spec.GuestConfig; guestConfig != nil {
+		iriGuestConfig = &iri.GuestConfig{
+			Hostname: guestConfig.Hostname,
+		}
+	}
+
 	switch {
 	case len(errs) > 0:
 		return nil, false, fmt.Errorf("error(s) preparing machine: %v", errs)
@@ -872,6 +879,7 @@ func (r *MachineReconciler) prepareIRIMachine(
 				IgnitionData:      ignitionData,
 				Volumes:           machineVolumes,
 				NetworkInterfaces: machineNics,
+				GuestConfig:       iriGuestConfig,
 			},
 		}, true, nil
 	}

@@ -50,6 +50,9 @@ type MachineSpec struct {
 	// Tolerations define tolerations the Machine has. Only MachinePools whose taints
 	// covered by Tolerations will be considered to run the Machine.
 	Tolerations []commonv1alpha1.Toleration `json:"tolerations,omitempty"`
+	// GuestConfig contains guest OS level configuration for the machine.
+	// +optional
+	GuestConfig *MachineGuestConfig `json:"guestConfig,omitempty"`
 }
 
 // Power is the desired power state of a Machine.
@@ -266,4 +269,11 @@ type MachineList struct {
 type MachineExecOptions struct {
 	metav1.TypeMeta              `json:",inline"`
 	InsecureSkipTLSVerifyBackend bool `json:"insecureSkipTLSVerifyBackend,omitempty"`
+}
+
+// MachineGuestConfig contains guest OS level configuration for the machine.
+type MachineGuestConfig struct {
+	// Hostname is the desired hostname of the machine.
+	// +optional
+	Hostname string `json:"hostname,omitempty"`
 }

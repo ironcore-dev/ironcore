@@ -344,6 +344,9 @@ var _ = Describe("MachineController", func() {
 						},
 					},
 				},
+				GuestConfig: &computev1alpha1.MachineGuestConfig{
+					Hostname: "machine-hostname",
+				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
@@ -360,6 +363,7 @@ var _ = Describe("MachineController", func() {
 		Expect(iriMachine.Metadata.Labels).To(HaveKeyWithValue(machinepoolletv1alpha1.MachineUIDLabel, string(machine.UID)))
 		Expect(iriMachine.Spec.Class).To(Equal(mc.Name))
 		Expect(iriMachine.Spec.Power).To(Equal(iri.Power_POWER_ON))
+		Expect(iriMachine.Spec.GuestConfig.Hostname).To(Equal("machine-hostname"))
 		Expect(iriMachine.Spec.Volumes).To(ConsistOf(ProtoEqual(&iri.Volume{
 			Name:   "primary",
 			Device: "oda",
