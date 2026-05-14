@@ -6,6 +6,11 @@ package v1alpha1
 import corev1 "k8s.io/api/core/v1"
 
 const (
+	NamespaceVolumePoolLease = "ironcore-volumepool-lease"
+	NamespaceBucketPoolLease = "ironcore-bucketpool-lease"
+)
+
+const (
 	VolumeVolumePoolRefNameField     = "spec.volumePoolRef.name"
 	VolumeVolumeClassRefNameField    = "spec.volumeClassRef.name"
 	VolumeVolumeSnapshotRefNameField = "spec.volumeSnapshotRef.name"

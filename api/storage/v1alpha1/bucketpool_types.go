@@ -22,9 +22,34 @@ type BucketPoolSpec struct {
 // BucketPoolStatus defines the observed state of BucketPool
 type BucketPoolStatus struct {
 	// State represents the infrastructure state of a BucketPool.
-	State BucketPoolState `json:"state,omitempty"`
+	State      BucketPoolState       `json:"state,omitempty"`
+	Conditions []BucketPoolCondition `json:"conditions,omitempty"`
 	// AvailableBucketClasses list the references of any supported BucketClass of this pool
 	AvailableBucketClasses []corev1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
+}
+
+// BucketPoolConditionType is a type a BucketPoolCondition can have.
+type BucketPoolConditionType string
+
+const (
+	// BucketPoolReady means the bucket pool is healthy and ready to accept buckets.
+	BucketPoolReady BucketPoolConditionType = "Ready"
+)
+
+// BucketPoolCondition is one of the conditions of a BucketPool.
+type BucketPoolCondition struct {
+	// Type is the type of the condition.
+	Type BucketPoolConditionType `json:"type"`
+	// Status is the status of the condition.
+	Status corev1.ConditionStatus `json:"status"`
+	// Reason is a machine-readable indication of why the condition is in a certain state.
+	Reason string `json:"reason"`
+	// Message is a human-readable explanation of why the condition has a certain reason / state.
+	Message string `json:"message"`
+	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 type BucketPoolState string

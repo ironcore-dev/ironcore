@@ -43,6 +43,11 @@ const (
 // VolumePoolConditionType is a type a VolumePoolCondition can have.
 type VolumePoolConditionType string
 
+const (
+	// VolumePoolReady means the volume pool is healthy and ready to accept volumes.
+	VolumePoolReady VolumePoolConditionType = "Ready"
+)
+
 // VolumePoolCondition is one of the conditions of a volume.
 type VolumePoolCondition struct {
 	// Type is the type of the condition.

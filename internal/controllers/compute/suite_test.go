@@ -26,6 +26,7 @@ import (
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -82,7 +83,7 @@ var _ = BeforeSuite(func() {
 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "bin", "k8s",
 			fmt.Sprintf("1.35.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
@@ -168,10 +169,22 @@ var _ = BeforeSuite(func() {
 		APIReader: k8sManager.GetAPIReader(),
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
+	Expect((&MachinePoolLifecycleReconciler{
+		Client:      k8sManager.GetClient(),
+		GracePeriod: 2 * time.Second,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
 	go func() {
 		defer GinkgoRecover()
 		Expect(k8sManager.Start(ctx)).To(Succeed(), "failed to start manager")
 	}()
+
+	leaseNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "ironcore-machinepool-lease",
+		},
+	}
+	Expect(k8sClient.Create(ctx, leaseNamespace)).To(Succeed(), "failed to create lease namespace")
 })
 
 func SetupMachineClass() *computev1alpha1.MachineClass {
