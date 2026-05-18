@@ -34,9 +34,10 @@ type MachinePoolLifecycleReconciler struct {
 }
 
 type MachinePoolHealth struct {
-	probeTime      time.Time
-	readyCondition *computev1alpha1.MachinePoolCondition
-	leaseRenewTime time.Time
+	lastObservedTime       time.Time
+	lastChangeDetectedTime time.Time
+	readyCondition         *computev1alpha1.MachinePoolCondition
+	leaseRenewTime         time.Time
 }
 
 func (r *MachinePoolLifecycleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -130,8 +131,9 @@ func (r *MachinePoolLifecycleReconciler) getCurrentLeaseRenewTime(ctx context.Co
 }
 
 func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
-	machinePoolHealth := r.getMachinePoolHealth(machinePool.Name)
-	prevReadyCondition, prevLeaseRenewTime := getPreviousHealthValues(machinePoolHealth)
+	now := time.Now()
+	prev := r.getMachinePoolHealth(machinePool.Name)
+	prevReadyCondition, prevLeaseRenewTime := getPreviousHealthValues(prev)
 
 	currentReadyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 	currentLeaseRenewTime, err := r.getCurrentLeaseRenewTime(ctx, machinePool.Name)
@@ -141,71 +143,55 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 
 	changed := !ptr.Equal(prevLeaseRenewTime, currentLeaseRenewTime) || !equality.Semantic.DeepEqual(prevReadyCondition, currentReadyCondition)
 
+	next := &MachinePoolHealth{
+		lastObservedTime: now,
+		readyCondition:   currentReadyCondition,
+		leaseRenewTime:   ptr.Deref(currentLeaseRenewTime, time.Time{}),
+	}
+
 	switch {
-	case machinePoolHealth == nil && !changed:
-		log.V(1).Info("First observation of machine pool, no prior health data or changes")
-		r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-			probeTime: time.Now(),
-		})
-	case machinePoolHealth == nil && changed:
-		log.V(1).Info("First observation of machine pool with existing lease/condition data")
-		r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-			probeTime:      time.Now(),
-			readyCondition: currentReadyCondition,
-			leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
-		})
+	case prev == nil:
+		log.V(1).Info("First observation of machine pool")
+		next.lastChangeDetectedTime = now
 	case changed:
-		log.V(1).Info("Lease or ready condition changed, updating probe time")
-		r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-			probeTime:      time.Now(),
-			readyCondition: currentReadyCondition,
-			leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
-		})
-	case !changed && currentReadyCondition != nil && currentReadyCondition.Status == corev1.ConditionUnknown:
-		log.V(1).Info("No change but ready condition already unknown, refreshing probe time")
-		r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-			probeTime:      time.Now(),
-			readyCondition: currentReadyCondition,
-			leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
-		})
+		log.V(1).Info("Lease or ready condition changed")
+		next.lastChangeDetectedTime = now
+	default:
+		next.lastChangeDetectedTime = prev.lastChangeDetectedTime
 
-	case !changed:
-		if time.Since(machinePoolHealth.probeTime) > r.GracePeriod {
-			log.Info("Grace period exceeded without health update, marking machine pool status unknown", "gracePeriod", r.GracePeriod, "lastProbe", machinePoolHealth.probeTime)
-			patch := client.StrategicMergeFrom(machinePool.DeepCopy())
-			newReadyCondition := computev1alpha1.MachinePoolCondition{
-				Type:               computev1alpha1.MachinePoolReady,
-				Status:             corev1.ConditionUnknown,
-				Reason:             "MachinePoolStatusUnknown",
-				Message:            "machinepoollet stopped posting machine pool status.",
-				ObservedGeneration: machinePool.Generation,
+		if time.Since(prev.lastChangeDetectedTime) > r.GracePeriod {
+			if currentReadyCondition != nil && currentReadyCondition.Status == corev1.ConditionUnknown {
+				log.V(1).Info("Grace period exceeded, ready condition already unknown — no patch needed",
+					"gracePeriod", r.GracePeriod, "lastChangeDetected", prev.lastChangeDetectedTime)
+			} else {
+				log.Info("Grace period exceeded without health update, marking machine pool status unknown",
+					"gracePeriod", r.GracePeriod, "lastChangeDetected", prev.lastChangeDetectedTime)
+				patch := client.StrategicMergeFrom(machinePool.DeepCopy())
+				newReadyCondition := computev1alpha1.MachinePoolCondition{
+					Type:               computev1alpha1.MachinePoolReady,
+					Status:             corev1.ConditionUnknown,
+					Reason:             "MachinePoolStatusUnknown",
+					Message:            "machinepoollet stopped posting machine pool status.",
+					ObservedGeneration: machinePool.Generation,
+				}
+				machinePool.Status.Conditions = SetMachinePoolCondition(machinePool.Status.Conditions, newReadyCondition)
+
+				if err := r.Status().Patch(ctx, machinePool, patch); err != nil {
+					// On patch failure, leave health state untouched so the next reconcile retries.
+					return ctrl.Result{}, fmt.Errorf("error patching: %w", err)
+				}
+				next.readyCondition = &newReadyCondition
 			}
-			machinePool.Status.Conditions = SetMachinePoolCondition(machinePool.Status.Conditions, newReadyCondition)
-
-			if err := r.Status().Patch(ctx, machinePool, patch); err != nil {
-				//TODO in this case we don't update the probe time, we probably should probably update it here
-				// as well or store the probetime at the beginning or the end (and adjust where we use it for comparisons)
-				return ctrl.Result{}, fmt.Errorf("error patching: %w", err)
-			}
-
-			r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-				probeTime:      time.Now(),
-				readyCondition: &newReadyCondition,
-				leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
-			})
 		} else {
-			log.V(1).Info("No change, still within grace period", "gracePeriod", r.GracePeriod, "elapsed", time.Since(machinePoolHealth.probeTime))
-			r.setMachinePoolHealth(machinePool.Name, &MachinePoolHealth{
-				probeTime:      time.Now(),
-				readyCondition: currentReadyCondition,
-				leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
-			})
+			log.V(1).Info("No change, still within grace period",
+				"gracePeriod", r.GracePeriod, "elapsed", time.Since(prev.lastChangeDetectedTime))
 		}
 	}
 
-	currentHealth := r.getMachinePoolHealth(machinePool.Name)
+	r.setMachinePoolHealth(machinePool.Name, next)
+
 	// requeue when this pool's grace period runs out, but never sooner than 50ms from now.
-	return ctrl.Result{RequeueAfter: max(50*time.Millisecond, time.Until(currentHealth.probeTime.Add(r.GracePeriod)))}, nil
+	return ctrl.Result{RequeueAfter: max(50*time.Millisecond, time.Until(next.lastChangeDetectedTime.Add(r.GracePeriod)))}, nil
 }
 
 func (r *MachinePoolLifecycleReconciler) SetupWithManager(mgr ctrl.Manager) error {
