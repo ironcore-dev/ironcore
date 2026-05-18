@@ -713,6 +713,7 @@ func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(i
 	out.Reason = in.Reason
 	out.Message = in.Message
 	out.ObservedGeneration = in.ObservedGeneration
+	out.LastUpdateTime = in.LastUpdateTime
 	out.LastTransitionTime = in.LastTransitionTime
 	return nil
 }
@@ -728,6 +729,7 @@ func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(i
 	out.Reason = in.Reason
 	out.Message = in.Message
 	out.ObservedGeneration = in.ObservedGeneration
+	out.LastUpdateTime = in.LastUpdateTime
 	out.LastTransitionTime = in.LastTransitionTime
 	return nil
 }

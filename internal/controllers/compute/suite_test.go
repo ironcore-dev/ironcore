@@ -47,10 +47,11 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	pollingInterval      = 50 * time.Millisecond
-	eventuallyTimeout    = 3 * time.Second
-	consistentlyDuration = 1 * time.Second
-	apiServiceTimeout    = 5 * time.Minute
+	pollingInterval                 = 50 * time.Millisecond
+	eventuallyTimeout               = 3 * time.Second
+	consistentlyDuration            = 1 * time.Second
+	apiServiceTimeout               = 5 * time.Minute
+	machinePoolLifecycleGracePeriod = 500 * time.Millisecond
 )
 
 var (
@@ -171,7 +172,7 @@ var _ = BeforeSuite(func() {
 
 	Expect((&MachinePoolLifecycleReconciler{
 		Client:      k8sManager.GetClient(),
-		GracePeriod: 2 * time.Second,
+		GracePeriod: machinePoolLifecycleGracePeriod,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
 	go func() {
@@ -213,6 +214,16 @@ func SetupVolumeClass() *storagev1alpha1.VolumeClass {
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceIOPS: resource.MustParse("500"),
 				corev1alpha1.ResourceTPS:  resource.MustParse("500Mi"),
+			},
+		}
+	})
+}
+
+func SetupMachinePool() *computev1alpha1.MachinePool {
+	return SetupObjectStruct[*computev1alpha1.MachinePool](&k8sClient, func(machinePool *computev1alpha1.MachinePool) {
+		*machinePool = computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
 			},
 		}
 	})
