@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
+// SPDX-License-Identifier: Apache-2.0
+
 package compute
 
 import (
@@ -167,7 +170,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 		})
 
 	case !changed:
-		if time.Now().Sub(machinePoolHealth.probeTime) > r.GracePeriod {
+		if time.Since(machinePoolHealth.probeTime) > r.GracePeriod {
 			log.Info("Grace period exceeded without health update, marking machine pool status unknown", "gracePeriod", r.GracePeriod, "lastProbe", machinePoolHealth.probeTime)
 			patch := client.StrategicMergeFrom(machinePool.DeepCopy())
 			newReadyCondition := computev1alpha1.MachinePoolCondition{
@@ -202,7 +205,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 
 	currentHealth := r.getMachinePoolHealth(machinePool.Name)
 	// requeue when this pool's grace period runs out, but never sooner than 50ms from now.
-	return ctrl.Result{RequeueAfter: max(50*time.Millisecond, currentHealth.probeTime.Add(r.GracePeriod).Sub(time.Now()))}, nil
+	return ctrl.Result{RequeueAfter: max(50*time.Millisecond, time.Until(currentHealth.probeTime.Add(r.GracePeriod)))}, nil
 }
 
 func (r *MachinePoolLifecycleReconciler) SetupWithManager(mgr ctrl.Manager) error {

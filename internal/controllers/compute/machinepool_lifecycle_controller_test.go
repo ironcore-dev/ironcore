@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 SAP SE or an SAP affiliate company and IronCore contributors
+// SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
 // SPDX-License-Identifier: Apache-2.0
 
 package compute
@@ -18,11 +18,11 @@ import (
 	coordinationv1 "k8s.io/api/coordination/v1"
 )
 
-var _ = FDescribe("machinepool lifecycle controller", func() {
+var _ = Describe("machinepool lifecycle controller", func() {
 	machinePool := SetupMachinePool()
 
 	Context("when neither lease nor ready condition see progress within the grace period", func() {
-		It("should set the ready condition to Unknown (Lease w/o RenewTime) and update Unknwon only once", func(ctx SpecContext) {
+		It("should set the ready condition to Unknown (Lease w/o RenewTime) and update Unknown only once", func(ctx SpecContext) {
 			By("creating a lease for the machine pool without RenewTime")
 			lease := &coordinationv1.Lease{
 				ObjectMeta: metav1.ObjectMeta{
