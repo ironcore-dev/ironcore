@@ -45,7 +45,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
 				g.Expect(err).NotTo(HaveOccurred())
 
-				readyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
@@ -87,7 +87,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
 				g.Expect(err).NotTo(HaveOccurred())
 
-				readyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
@@ -101,7 +101,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
 				g.Expect(err).NotTo(HaveOccurred())
 
-				readyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
@@ -160,7 +160,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
 				g.Expect(err).NotTo(HaveOccurred())
 
-				readyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 				if readyCondition != nil {
 					g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
 				}
@@ -185,7 +185,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 					pool := &computev1alpha1.MachinePool{}
 					g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
 
-					readyCondition := FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
+					readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
 					g.Expect(readyCondition).NotTo(BeNil())
 					g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
 				}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
@@ -227,7 +227,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				pool := &computev1alpha1.MachinePool{}
 				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
 
-				readyCondition := FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
 			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
@@ -264,7 +264,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				pool := &computev1alpha1.MachinePool{}
 				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
 
-				readyCondition := FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
 			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
@@ -279,7 +279,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				pool := &computev1alpha1.MachinePool{}
 				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
 
-				readyCondition := FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
 			}).WithTimeout(2 * machinePoolLifecycleGracePeriod).Should(Succeed())
@@ -292,7 +292,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				current := &computev1alpha1.MachinePool{}
 				g.Expect(k8sClient.Get(ctx, machinePoolKey, current)).To(Succeed())
 
-				readyCondition := FindMachinePoolCondition(current.Status.Conditions, computev1alpha1.MachinePoolReady)
+				readyCondition := computev1alpha1.FindMachinePoolCondition(current.Status.Conditions, computev1alpha1.MachinePoolReady)
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
 			}).WithTimeout(machinePoolLifecycleGracePeriod / 2).Should(Succeed())
@@ -306,7 +306,7 @@ func patchReadyCondition(ctx SpecContext, key client.ObjectKey, status corev1.Co
 	Expect(k8sClient.Get(ctx, key, pool)).To(Succeed())
 
 	patch := client.MergeFrom(pool.DeepCopy())
-	pool.Status.Conditions = SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
+	pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
 		Type:    computev1alpha1.MachinePoolReady,
 		Status:  status,
 		Reason:  reason,
@@ -334,7 +334,7 @@ func startReadyConditionRenewer(ctx SpecContext, key client.ObjectKey, status co
 				}
 				patch := client.MergeFrom(pool.DeepCopy())
 				counter++
-				pool.Status.Conditions = SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
+				pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
 					Type:    computev1alpha1.MachinePoolReady,
 					Status:  status,
 					Reason:  "MachinePoolReadyChanged",

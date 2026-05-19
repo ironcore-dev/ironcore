@@ -6,7 +6,6 @@ package compute
 import (
 	"context"
 	"fmt"
-	"slices"
 	"sync"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	coordinationv1 "k8s.io/api/coordination/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -69,36 +67,6 @@ func (r *MachinePoolLifecycleReconciler) setMachinePoolHealth(machinePoolName st
 	r.healthData[machinePoolName] = machinePoolHealh
 }
 
-func FindMachinePoolCondition(conditions []computev1alpha1.MachinePoolCondition, typ computev1alpha1.MachinePoolConditionType) *computev1alpha1.MachinePoolCondition {
-	idx := slices.IndexFunc(conditions, func(cond computev1alpha1.MachinePoolCondition) bool {
-		return cond.Type == typ
-	})
-
-	if idx < 0 {
-		return nil
-	}
-
-	return &conditions[idx]
-}
-
-func SetMachinePoolCondition(conditions []computev1alpha1.MachinePoolCondition, cond computev1alpha1.MachinePoolCondition) []computev1alpha1.MachinePoolCondition {
-	idx := slices.IndexFunc(conditions, func(c computev1alpha1.MachinePoolCondition) bool {
-		return c.Type == cond.Type
-	})
-
-	cond.LastUpdateTime = metav1.Now()
-
-	if idx < 0 || conditions[idx].Status != cond.Status {
-		cond.LastTransitionTime = metav1.Now()
-	}
-
-	if idx < 0 {
-		return append(conditions, cond)
-	}
-	conditions[idx] = cond
-	return conditions
-}
-
 func getPreviousHealthValues(machinePoolHealth *MachinePoolHealth) (*computev1alpha1.MachinePoolCondition, *time.Time) {
 	var (
 		prevReadyCondition *computev1alpha1.MachinePoolCondition
@@ -135,7 +103,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 	prev := r.getMachinePoolHealth(machinePool.Name)
 	prevReadyCondition, prevLeaseRenewTime := getPreviousHealthValues(prev)
 
-	currentReadyCondition := FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
+	currentReadyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
 	currentLeaseRenewTime, err := r.getCurrentLeaseRenewTime(ctx, machinePool.Name)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -174,7 +142,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 					Message:            "machinepoollet stopped posting machine pool status.",
 					ObservedGeneration: machinePool.Generation,
 				}
-				machinePool.Status.Conditions = SetMachinePoolCondition(machinePool.Status.Conditions, newReadyCondition)
+				machinePool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(machinePool.Status.Conditions, newReadyCondition)
 
 				if err := r.Status().Patch(ctx, machinePool, patch); err != nil {
 					// On patch failure, leave health state untouched so the next reconcile retries.
