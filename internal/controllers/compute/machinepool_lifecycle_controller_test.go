@@ -60,7 +60,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
 				g.Expect(err).NotTo(HaveOccurred())
 				g.Expect(machinePool.ResourceVersion).To(Equal(resourceVersion))
-			}).WithTimeout(5 * time.Second).WithPolling(500 * time.Millisecond).Should(Succeed())
+			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
 		})
 
 		It("should set the ready condition to Unknown (Lease with RenewTime)", func(ctx SpecContext) {
@@ -295,7 +295,7 @@ var _ = Describe("machinepool lifecycle controller", func() {
 				readyCondition := FindMachinePoolCondition(current.Status.Conditions, computev1alpha1.MachinePoolReady)
 				g.Expect(readyCondition).NotTo(BeNil())
 				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(machinePoolLifecycleGracePeriod / 2).WithPolling(50 * time.Millisecond).Should(Succeed())
+			}).WithTimeout(machinePoolLifecycleGracePeriod / 2).Should(Succeed())
 		})
 	})
 })
