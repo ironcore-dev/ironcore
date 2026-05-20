@@ -182,7 +182,7 @@ var _ = BeforeSuite(func() {
 
 	leaseNamespace := &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "ironcore-machinepool-lease",
+			Name: computev1alpha1.NamespaceMachinePoolLease,
 		},
 	}
 	Expect(k8sClient.Create(ctx, leaseNamespace)).To(Succeed(), "failed to create lease namespace")
