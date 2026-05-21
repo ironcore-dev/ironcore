@@ -1,6 +1,5 @@
 resources:
 - manager.yaml
-- lease-namespace.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

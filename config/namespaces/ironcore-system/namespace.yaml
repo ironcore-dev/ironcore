@@ -1,7 +1,10 @@
 # SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
 # SPDX-License-Identifier: Apache-2.0
 
+# The namespace where the ironcore apiserver and controller manager run.
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ironcore-machinepool-lease
+  name: ironcore-system
+  labels:
+    control-plane: apiserver-controller
