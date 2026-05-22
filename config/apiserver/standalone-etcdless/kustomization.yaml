@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Standalone install of the ironcore apiserver against an external etcd
+# (no in-cluster etcd StatefulSet): same content as config/apiserver/etcdless
+# plus the ironcore-system Namespace.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../etcdless
+  - ../../namespaces/ironcore-system
