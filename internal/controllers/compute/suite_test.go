@@ -26,6 +26,7 @@ import (
 	. "github.com/ironcore-dev/ironcore/utils/testing"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -46,10 +47,11 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 const (
-	pollingInterval      = 50 * time.Millisecond
-	eventuallyTimeout    = 3 * time.Second
-	consistentlyDuration = 1 * time.Second
-	apiServiceTimeout    = 5 * time.Minute
+	pollingInterval                 = 50 * time.Millisecond
+	eventuallyTimeout               = 3 * time.Second
+	consistentlyDuration            = 1 * time.Second
+	apiServiceTimeout               = 5 * time.Minute
+	machinePoolLifecycleGracePeriod = 500 * time.Millisecond
 )
 
 var (
@@ -82,7 +84,7 @@ var _ = BeforeSuite(func() {
 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
+		BinaryAssetsDirectory: filepath.Join("..", "..", "..", "bin", "k8s",
 			fmt.Sprintf("1.35.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
 	}
 	testEnvExt = &utilsenvtest.EnvironmentExtensions{
@@ -168,10 +170,22 @@ var _ = BeforeSuite(func() {
 		APIReader: k8sManager.GetAPIReader(),
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
+	Expect((&MachinePoolLifecycleReconciler{
+		Client:      k8sManager.GetClient(),
+		GracePeriod: machinePoolLifecycleGracePeriod,
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
 	go func() {
 		defer GinkgoRecover()
 		Expect(k8sManager.Start(ctx)).To(Succeed(), "failed to start manager")
 	}()
+
+	leaseNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: computev1alpha1.NamespaceMachinePoolLease,
+		},
+	}
+	Expect(k8sClient.Create(ctx, leaseNamespace)).To(Succeed(), "failed to create lease namespace")
 })
 
 func SetupMachineClass() *computev1alpha1.MachineClass {
@@ -200,6 +214,16 @@ func SetupVolumeClass() *storagev1alpha1.VolumeClass {
 			Capabilities: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceIOPS: resource.MustParse("500"),
 				corev1alpha1.ResourceTPS:  resource.MustParse("500Mi"),
+			},
+		}
+	})
+}
+
+func SetupMachinePool() *computev1alpha1.MachinePool {
+	return SetupObjectStruct[*computev1alpha1.MachinePool](&k8sClient, func(machinePool *computev1alpha1.MachinePool) {
+		*machinePool = computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
 			},
 		}
 	})

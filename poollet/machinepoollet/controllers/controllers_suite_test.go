@@ -146,6 +146,13 @@ var _ = BeforeSuite(func() {
 
 	Expect(ctrlMgr.Start()).To(Succeed())
 	DeferCleanup(ctrlMgr.Stop)
+
+	leaseNamespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: computev1alpha1.NamespaceMachinePoolLease,
+		},
+	}
+	Expect(k8sClient.Create(context.TODO(), leaseNamespace)).To(Succeed(), "failed to create lease namespace")
 })
 
 func SetupTest() (*corev1.Namespace, *computev1alpha1.MachinePool, *computev1alpha1.MachineClass, *machine.FakeRuntimeService) {

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Combined install: apiserver (with bundled etcd) + controller manager.
-# Both bases are namespace-free; the namespace kustomization is referenced
+# Both bases are namespace-free; the namespace kustomizations are referenced
 # directly here. This replaces the previous remove-namespace.yaml patch dance.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -11,3 +11,4 @@ resources:
   - ../apiserver/default
   - ../controller/default
   - ../namespaces/ironcore-system
+  - ../namespaces/machinepool-lease

@@ -135,6 +135,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		storagev1alpha1.BucketCondition{}.OpenAPIModelName():                 schema_ironcore_api_storage_v1alpha1_BucketCondition(ref),
 		storagev1alpha1.BucketList{}.OpenAPIModelName():                      schema_ironcore_api_storage_v1alpha1_BucketList(ref),
 		storagev1alpha1.BucketPool{}.OpenAPIModelName():                      schema_ironcore_api_storage_v1alpha1_BucketPool(ref),
+		storagev1alpha1.BucketPoolCondition{}.OpenAPIModelName():             schema_ironcore_api_storage_v1alpha1_BucketPoolCondition(ref),
 		storagev1alpha1.BucketPoolList{}.OpenAPIModelName():                  schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref),
 		storagev1alpha1.BucketPoolSpec{}.OpenAPIModelName():                  schema_ironcore_api_storage_v1alpha1_BucketPoolSpec(ref),
 		storagev1alpha1.BucketPoolStatus{}.OpenAPIModelName():                schema_ironcore_api_storage_v1alpha1_BucketPoolStatus(ref),
@@ -1293,6 +1294,12 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolCondition(ref common.Refere
 							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
 							Type:        []string{"integer"},
 							Format:      "int64",
+						},
+					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastUpdateTime is the last time this condition was updated.",
+							Ref:         ref(metav1.Time{}.OpenAPIModelName()),
 						},
 					},
 					"lastTransitionTime": {
@@ -5112,6 +5119,73 @@ func schema_ironcore_api_storage_v1alpha1_BucketPool(ref common.ReferenceCallbac
 	}
 }
 
+func schema_ironcore_api_storage_v1alpha1_BucketPoolCondition(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BucketPoolCondition is one of the conditions of a BucketPool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type is the type of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the status of the condition.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"reason": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Reason is a machine-readable indication of why the condition is in a certain state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"message": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Message is a human-readable explanation of why the condition has a certain reason / state.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"observedGeneration": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
+							Type:        []string{"integer"},
+							Format:      "int64",
+						},
+					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastUpdateTime is the last time this condition was updated.",
+							Ref:         ref(metav1.Time{}.OpenAPIModelName()),
+						},
+					},
+					"lastTransitionTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",
+							Ref:         ref(metav1.Time{}.OpenAPIModelName()),
+						},
+					},
+				},
+				Required: []string{"type", "status", "reason", "message"},
+			},
+		},
+		Dependencies: []string{
+			metav1.Time{}.OpenAPIModelName()},
+	}
+}
+
 func schema_ironcore_api_storage_v1alpha1_BucketPoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5213,6 +5287,19 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolStatus(ref common.ReferenceC
 							Format:      "",
 						},
 					},
+					"conditions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(storagev1alpha1.BucketPoolCondition{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
 					"availableBucketClasses": {
 						SchemaProps: spec.SchemaProps{
 							Description: "AvailableBucketClasses list the references of any supported BucketClass of this pool",
@@ -5231,7 +5318,7 @@ func schema_ironcore_api_storage_v1alpha1_BucketPoolStatus(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			v1.LocalObjectReference{}.OpenAPIModelName()},
+			storagev1alpha1.BucketPoolCondition{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -5855,6 +5942,12 @@ func schema_ironcore_api_storage_v1alpha1_VolumePoolCondition(ref common.Referen
 							Description: "ObservedGeneration represents the .metadata.generation that the condition was set based upon.",
 							Type:        []string{"integer"},
 							Format:      "int64",
+						},
+					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastUpdateTime is the last time this condition was updated.",
+							Ref:         ref(metav1.Time{}.OpenAPIModelName()),
 						},
 					},
 					"lastTransitionTime": {

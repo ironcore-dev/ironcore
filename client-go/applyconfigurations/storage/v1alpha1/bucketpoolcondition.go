@@ -11,13 +11,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VolumePoolConditionApplyConfiguration represents a declarative configuration of the VolumePoolCondition type for use
+// BucketPoolConditionApplyConfiguration represents a declarative configuration of the BucketPoolCondition type for use
 // with apply.
 //
-// VolumePoolCondition is one of the conditions of a volume.
-type VolumePoolConditionApplyConfiguration struct {
+// BucketPoolCondition is one of the conditions of a BucketPool.
+type BucketPoolConditionApplyConfiguration struct {
 	// Type is the type of the condition.
-	Type *storagev1alpha1.VolumePoolConditionType `json:"type,omitempty"`
+	Type *storagev1alpha1.BucketPoolConditionType `json:"type,omitempty"`
 	// Status is the status of the condition.
 	Status *v1.ConditionStatus `json:"status,omitempty"`
 	// Reason is a machine-readable indication of why the condition is in a certain state.
@@ -32,16 +32,16 @@ type VolumePoolConditionApplyConfiguration struct {
 	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
-// VolumePoolConditionApplyConfiguration constructs a declarative configuration of the VolumePoolCondition type for use with
+// BucketPoolConditionApplyConfiguration constructs a declarative configuration of the BucketPoolCondition type for use with
 // apply.
-func VolumePoolCondition() *VolumePoolConditionApplyConfiguration {
-	return &VolumePoolConditionApplyConfiguration{}
+func BucketPoolCondition() *BucketPoolConditionApplyConfiguration {
+	return &BucketPoolConditionApplyConfiguration{}
 }
 
 // WithType sets the Type field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Type field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithType(value storagev1alpha1.VolumePoolConditionType) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithType(value storagev1alpha1.BucketPoolConditionType) *BucketPoolConditionApplyConfiguration {
 	b.Type = &value
 	return b
 }
@@ -49,7 +49,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithType(value storagev1alpha1.V
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithStatus(value v1.ConditionStatus) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithStatus(value v1.ConditionStatus) *BucketPoolConditionApplyConfiguration {
 	b.Status = &value
 	return b
 }
@@ -57,7 +57,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithStatus(value v1.ConditionSta
 // WithReason sets the Reason field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Reason field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithReason(value string) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithReason(value string) *BucketPoolConditionApplyConfiguration {
 	b.Reason = &value
 	return b
 }
@@ -65,7 +65,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithReason(value string) *Volume
 // WithMessage sets the Message field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Message field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithMessage(value string) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithMessage(value string) *BucketPoolConditionApplyConfiguration {
 	b.Message = &value
 	return b
 }
@@ -73,7 +73,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithMessage(value string) *Volum
 // WithObservedGeneration sets the ObservedGeneration field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the ObservedGeneration field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithObservedGeneration(value int64) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithObservedGeneration(value int64) *BucketPoolConditionApplyConfiguration {
 	b.ObservedGeneration = &value
 	return b
 }
@@ -81,7 +81,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithObservedGeneration(value int
 // WithLastUpdateTime sets the LastUpdateTime field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LastUpdateTime field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithLastUpdateTime(value metav1.Time) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithLastUpdateTime(value metav1.Time) *BucketPoolConditionApplyConfiguration {
 	b.LastUpdateTime = &value
 	return b
 }
@@ -89,7 +89,7 @@ func (b *VolumePoolConditionApplyConfiguration) WithLastUpdateTime(value metav1.
 // WithLastTransitionTime sets the LastTransitionTime field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LastTransitionTime field is set to the value of the last call.
-func (b *VolumePoolConditionApplyConfiguration) WithLastTransitionTime(value metav1.Time) *VolumePoolConditionApplyConfiguration {
+func (b *BucketPoolConditionApplyConfiguration) WithLastTransitionTime(value metav1.Time) *BucketPoolConditionApplyConfiguration {
 	b.LastTransitionTime = &value
 	return b
 }

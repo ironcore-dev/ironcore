@@ -11,3 +11,4 @@ resources:
   - ../apiserver/etcdless
   - ../controller/default
   - ../namespaces/ironcore-system
+  - ../namespaces/machinepool-lease
