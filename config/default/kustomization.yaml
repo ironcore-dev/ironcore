@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
-# SPDX-License-Identifier: Apache-2.0
-
 # Combined install: apiserver (with bundled etcd) + controller manager.
 # Both bases are namespace-free; the namespace kustomization is referenced
 # directly here. This replaces the previous remove-namespace.yaml patch dance.

@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
-# SPDX-License-Identifier: Apache-2.0
-
 # Standalone install of the ironcore apiserver (with the bundled etcd
 # StatefulSet): same content as config/apiserver/default plus the
 # ironcore-system Namespace. Use this when deploying the apiserver without
