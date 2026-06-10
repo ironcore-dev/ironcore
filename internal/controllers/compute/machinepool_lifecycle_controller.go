@@ -42,7 +42,11 @@ func (r *MachinePoolLifecycleReconciler) Reconcile(ctx context.Context, req ctrl
 
 	machinePool := &computev1alpha1.MachinePool{}
 	if err := r.Get(ctx, req.NamespacedName, machinePool); err != nil {
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		if apierrors.IsNotFound(err) {
+			r.deleteMachinePoolHealth(req.Name)
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
 	}
 
 	return r.reconcileExists(ctx, log, machinePool)
@@ -64,6 +68,13 @@ func (r *MachinePoolLifecycleReconciler) setMachinePoolHealth(machinePoolName st
 	}
 
 	r.healthData[machinePoolName] = machinePoolHealh
+}
+
+func (r *MachinePoolLifecycleReconciler) deleteMachinePoolHealth(machinePoolName string) {
+	r.healthDataMu.Lock()
+	defer r.healthDataMu.Unlock()
+
+	delete(r.healthData, machinePoolName)
 }
 
 func getPreviousHealthValues(machinePoolHealth *MachinePoolHealth) (*computev1alpha1.MachinePoolCondition, *time.Time) {
