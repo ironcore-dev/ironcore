@@ -1,7 +1,10 @@
+# Combined install: apiserver (with bundled etcd) + controller manager.
+# Both bases are namespace-free; the namespace kustomization is referenced
+# directly here. This replaces the previous remove-namespace.yaml patch dance.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - namespace.yaml
-  - apiserver
-  - controller
+  - ../apiserver/default
+  - ../controller/default
+  - ../namespaces/ironcore-system

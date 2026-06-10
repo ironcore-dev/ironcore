@@ -227,20 +227,20 @@ docker-push: ## Push docker image with the manager.
 .PHONY: install
 install: manifests kustomize ## Install API server & API services into the K8s cluster specified in ~/.kube/config. This requires APISERVER_IMG to be available for the cluster.
 	cd config/apiserver/server && $(KUSTOMIZE) edit set image apiserver=${APISERVER_IMG}
-	kubectl apply -k config/apiserver/default
+	kubectl apply -k config/apiserver/standalone
 
 .PHONY: uninstall
 uninstall: manifests kustomize ## Uninstall API server & API services from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/apiserver/default
+	kubectl delete -k config/apiserver/standalone
 
 .PHONY: deploy
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/controller/manager && $(KUSTOMIZE) edit set image controller=${CONTROLLER_IMG}
-	kubectl apply -k config/controller/default
+	kubectl apply -k config/controller/standalone
 
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
-	kubectl delete -k config/controller/default
+	kubectl delete -k config/controller/standalone
 
 ##@ Kind Deployment plumbing
 

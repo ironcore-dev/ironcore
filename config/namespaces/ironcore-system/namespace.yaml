@@ -1,3 +1,4 @@
+# The namespace where the ironcore apiserver and controller manager run.
 apiVersion: v1
 kind: Namespace
 metadata:
