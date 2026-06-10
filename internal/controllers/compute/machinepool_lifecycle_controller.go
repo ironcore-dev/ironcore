@@ -32,7 +32,6 @@ type MachinePoolLifecycleReconciler struct {
 }
 
 type MachinePoolHealth struct {
-	lastObservedTime       time.Time
 	lastChangeDetectedTime time.Time
 	readyCondition         *computev1alpha1.MachinePoolCondition
 	leaseRenewTime         time.Time
@@ -112,9 +111,8 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 	changed := !ptr.Equal(prevLeaseRenewTime, currentLeaseRenewTime) || !equality.Semantic.DeepEqual(prevReadyCondition, currentReadyCondition)
 
 	next := &MachinePoolHealth{
-		lastObservedTime: now,
-		readyCondition:   currentReadyCondition,
-		leaseRenewTime:   ptr.Deref(currentLeaseRenewTime, time.Time{}),
+		readyCondition: currentReadyCondition,
+		leaseRenewTime: ptr.Deref(currentLeaseRenewTime, time.Time{}),
 	}
 
 	switch {
