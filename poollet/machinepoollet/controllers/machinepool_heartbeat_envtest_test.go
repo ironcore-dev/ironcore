@@ -9,11 +9,14 @@ import (
 	"sync/atomic"
 	"time"
 
+	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	"github.com/ironcore-dev/ironcore/iri/apis/machine"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	fakemachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/mcm"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,6 +28,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlconfig "sigs.k8s.io/controller-runtime/pkg/config"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	metricserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
@@ -76,8 +80,30 @@ var _ = Describe("MachinePoolHeartbeat", func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
+		// The reconciler needs the same indexer the production wiring sets up.
+		Expect(computeclient.SetupMachineSpecMachinePoolRefNameFieldIndexer(ctx, mgr.GetFieldIndexer())).To(Succeed())
+
+		machineClassMapper := mcm.NewGeneric(runner, mcm.GenericOptions{
+			RelistPeriod: 2 * time.Second,
+		})
+		Expect(mgr.Add(machineClassMapper)).To(Succeed())
+
+		readyState := controllers.NewMachinePoolReadyState()
+		heartbeatEvents := make(chan event.GenericEvent, 1)
+
+		Expect((&controllers.MachinePoolReconciler{
+			Client:             mgr.GetClient(),
+			MachinePoolName:    mp.Name,
+			MachineRuntime:     runner,
+			MachineClassMapper: machineClassMapper,
+			TopologyLabels:     map[commonv1alpha1.TopologyLabel]string{},
+			ReadyState:         readyState,
+			HeartbeatEvents:    heartbeatEvents,
+		}).SetupWithManager(mgr)).To(Succeed())
+
 		hb := controllers.NewMachinePoolHeartbeat(
 			mgr.GetClient(), mp.Name, runner,
+			readyState, heartbeatEvents,
 			500*time.Millisecond, // interval
 			3*time.Second,        // lease duration
 			200*time.Millisecond, // status probe timeout

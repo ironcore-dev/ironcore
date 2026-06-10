@@ -45,6 +45,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
@@ -490,6 +491,9 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}
 
+		readyState := controllers.NewMachinePoolReadyState()
+		heartbeatEvents := make(chan event.GenericEvent, 1)
+
 		if err := (&controllers.MachinePoolReconciler{
 			Client:             mgr.GetClient(),
 			MachinePoolName:    opts.MachinePoolName,
@@ -498,6 +502,8 @@ func Run(ctx context.Context, opts Options) error {
 			MachineRuntime:     machineRuntime,
 			MachineClassMapper: machineClassMapper,
 			TopologyLabels:     topologyLabels,
+			ReadyState:         readyState,
+			HeartbeatEvents:    heartbeatEvents,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
 		}
@@ -506,6 +512,8 @@ func Run(ctx context.Context, opts Options) error {
 			mgr.GetClient(),
 			opts.MachinePoolName,
 			machineRuntime,
+			readyState,
+			heartbeatEvents,
 			opts.HeartbeatInterval,
 			opts.HeartbeatLeaseDuration,
 			opts.HeartbeatStatusTimeout,

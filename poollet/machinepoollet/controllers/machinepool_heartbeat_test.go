@@ -70,3 +70,42 @@ var _ = Describe("ReadyConditionsDiffer", func() {
 		Entry("observedGeneration", func(c *computev1alpha1.MachinePoolCondition) { c.ObservedGeneration = 6 }),
 	)
 })
+
+var _ = Describe("MachinePoolReadyState", func() {
+	It("reports hasResult=false until the first Set", func() {
+		s := controllers.NewMachinePoolReadyState()
+		err, hasResult := s.Get()
+		Expect(hasResult).To(BeFalse())
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("reports changed=true on the first Set, even with a nil error", func() {
+		s := controllers.NewMachinePoolReadyState()
+		Expect(s.Set(nil)).To(BeTrue())
+		err, hasResult := s.Get()
+		Expect(hasResult).To(BeTrue())
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("reports changed=false when the error string is unchanged", func() {
+		s := controllers.NewMachinePoolReadyState()
+		Expect(s.Set(nil)).To(BeTrue())
+		Expect(s.Set(nil)).To(BeFalse())
+
+		Expect(s.Set(errors.New("boom"))).To(BeTrue())
+		Expect(s.Set(errors.New("boom"))).To(BeFalse())
+	})
+
+	It("reports changed=true when the error string changes", func() {
+		s := controllers.NewMachinePoolReadyState()
+		Expect(s.Set(errors.New("first"))).To(BeTrue())
+		Expect(s.Set(errors.New("second"))).To(BeTrue())
+	})
+
+	It("reports changed=true when transitioning from success to failure and back", func() {
+		s := controllers.NewMachinePoolReadyState()
+		Expect(s.Set(nil)).To(BeTrue())
+		Expect(s.Set(errors.New("boom"))).To(BeTrue())
+		Expect(s.Set(nil)).To(BeTrue())
+	})
+})
