@@ -1,8 +1,5 @@
-# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
-# SPDX-License-Identifier: Apache-2.0
-
 # Combined install: apiserver (with bundled etcd) + controller manager.
-# Both bases are namespace-free; the namespace kustomizations are referenced
+# Both bases are namespace-free; the namespace kustomization is referenced
 # directly here. This replaces the previous remove-namespace.yaml patch dance.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization

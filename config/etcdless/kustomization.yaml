@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
-# SPDX-License-Identifier: Apache-2.0
-
 # Combined install with an external etcd (no in-cluster etcd StatefulSet):
 # apiserver/etcdless + controller manager. Same shape as config/default but
 # pulls the etcdless apiserver base.

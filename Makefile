@@ -90,14 +90,13 @@ manifests: controller-gen ## Generate ClusterRole and CustomResourceDefinition o
 	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
 
 .PHONY: generate
-generate: vgopath models-schema openapi-gen proto
-	VGOPATH=$(VGOPATH) \
+generate: models-schema openapi-gen proto
 	MODELS_SCHEMA=$(MODELS_SCHEMA) \
 	OPENAPI_GEN=$(OPENAPI_GEN) \
 	./hack/update-codegen.sh
 
 .PHONY: proto
-proto: goimports vgopath buf protoc-gen-go protoc-gen-go-grpc
+proto: goimports buf protoc-gen-go protoc-gen-go-grpc
 	$(BUF) generate --template buf.gen.yaml
 	$(GOIMPORTS) -w ./iri
 
@@ -346,7 +345,6 @@ CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 OPENAPI_EXTRACTOR ?= $(LOCALBIN)/openapi-extractor
 OPENAPI_GEN ?= $(LOCALBIN)/openapi-gen
-VGOPATH ?= $(LOCALBIN)/vgopath
 GEN_CRD_API_REFERENCE_DOCS ?= $(LOCALBIN)/gen-crd-api-reference-docs
 ADDLICENSE ?= $(LOCALBIN)/addlicense
 BUF ?= $(LOCALBIN)/buf
@@ -358,7 +356,6 @@ PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-VGOPATH_VERSION ?= v0.1.10
 CONTROLLER_TOOLS_VERSION ?= v0.20.0
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
@@ -386,12 +383,6 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
 	$(call go-install-tool,$(OPENAPI_GEN),k8s.io/kube-openapi/cmd/openapi-gen,$(OPENAPI_GEN_VERSION))
-
-.PHONY: vgopath
-vgopath: $(VGOPATH) ## Download vgopath locally if necessary.
-.PHONY: $(VGOPATH)
-$(VGOPATH): $(LOCALBIN)
-	$(call go-install-tool,$(VGOPATH),github.com/ironcore-dev/vgopath,$(VGOPATH_VERSION))
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
