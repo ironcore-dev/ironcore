@@ -39,7 +39,6 @@ API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/netwo
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NetworkStatus,Peerings
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,BucketPoolSpec,Taints
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,BucketPoolStatus,AvailableBucketClasses
-API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,BucketPoolStatus,Conditions
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,BucketSpec,Tolerations
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,BucketStatus,Conditions
 API rule violation: list_type_missing,github.com/ironcore-dev/ironcore/api/storage/v1alpha1,VolumePoolSpec,Taints

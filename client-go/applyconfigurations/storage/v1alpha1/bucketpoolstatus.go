@@ -16,8 +16,7 @@ import (
 // BucketPoolStatus defines the observed state of BucketPool
 type BucketPoolStatusApplyConfiguration struct {
 	// State represents the infrastructure state of a BucketPool.
-	State      *storagev1alpha1.BucketPoolState        `json:"state,omitempty"`
-	Conditions []BucketPoolConditionApplyConfiguration `json:"conditions,omitempty"`
+	State *storagev1alpha1.BucketPoolState `json:"state,omitempty"`
 	// AvailableBucketClasses list the references of any supported BucketClass of this pool
 	AvailableBucketClasses []v1.LocalObjectReference `json:"availableBucketClasses,omitempty"`
 }
@@ -33,19 +32,6 @@ func BucketPoolStatus() *BucketPoolStatusApplyConfiguration {
 // If called multiple times, the State field is set to the value of the last call.
 func (b *BucketPoolStatusApplyConfiguration) WithState(value storagev1alpha1.BucketPoolState) *BucketPoolStatusApplyConfiguration {
 	b.State = &value
-	return b
-}
-
-// WithConditions adds the given value to the Conditions field in the declarative configuration
-// and returns the receiver, so that objects can be build by chaining "With" function invocations.
-// If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *BucketPoolStatusApplyConfiguration) WithConditions(values ...*BucketPoolConditionApplyConfiguration) *BucketPoolStatusApplyConfiguration {
-	for i := range values {
-		if values[i] == nil {
-			panic("nil value passed to WithConditions")
-		}
-		b.Conditions = append(b.Conditions, *values[i])
-	}
 	return b
 }
 

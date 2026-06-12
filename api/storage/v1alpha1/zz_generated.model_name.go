@@ -44,11 +44,6 @@ func (in BucketPool) OpenAPIModelName() string {
 }
 
 // OpenAPIModelName returns the OpenAPI model name for this type.
-func (in BucketPoolCondition) OpenAPIModelName() string {
-	return "com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolCondition"
-}
-
-// OpenAPIModelName returns the OpenAPI model name for this type.
 func (in BucketPoolList) OpenAPIModelName() string {
 	return "com.github.ironcore-dev.ironcore.api.storage.v1alpha1.BucketPoolList"
 }
