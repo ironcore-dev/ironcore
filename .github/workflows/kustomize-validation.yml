@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - uses: imranismail/setup-kustomize@v3
         with:
           kustomize-version: '5.0.0'
