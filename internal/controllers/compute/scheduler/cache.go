@@ -200,6 +200,9 @@ func (c *Cache) ForgetInstance(instance *v1alpha1.Machine) error {
 	}
 	log = log.WithValues("InstanceKey", key)
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	currState, ok := c.instanceStates[key]
 	if ok {
 		oldContainerKey := c.strategy.ContainerKey(currState.instance)
@@ -211,6 +214,7 @@ func (c *Cache) ForgetInstance(instance *v1alpha1.Machine) error {
 
 	if ok && c.assumedInstances.Has(key) {
 		c.removeInstance(log, key, instance)
+		return nil
 	}
 	return fmt.Errorf("instance %s(%v) wasn't assumed so cannot be forgotten", key, klog.KObj(instance))
 }
@@ -223,8 +227,8 @@ func (c *Cache) FinishBinding(instance *v1alpha1.Machine) error {
 	}
 	log = log.WithValues("InstanceKey", key)
 
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	log.V(5).Info("Finished binding for instance, can be expired")
 	currState, ok := c.instanceStates[key]
