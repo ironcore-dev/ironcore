@@ -12,7 +12,6 @@ import (
 	volumepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/volumepoollet/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -88,20 +87,6 @@ var _ = Describe("ListVolumes", func() {
 			poolletutils.DownwardAPILabel(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, "root-volume-uid"): "foobar",
 			volumebrokerv1alpha1.CreatedLabel: "true",
 			volumebrokerv1alpha1.ManagerLabel: volumebrokerv1alpha1.VolumeBrokerManager,
-		}))
-
-		log := ctrl.LoggerFrom(ctx)
-		Expect(srv.SetVolumeUIDLabelToAllVolumes(ctx, log)).NotTo(HaveOccurred())
-
-		By("getting the ironcore volume")
-		Expect(k8sClient.Get(ctx, ironcoreVolumeKey, ironcoreVolume)).To(Succeed())
-
-		By("inspecting the ironcore volume")
-		Expect(ironcoreVolume.Labels).To(Equal(map[string]string{
-			poolletutils.DownwardAPILabel(volumepoolletv1alpha1.VolumeDownwardAPIPrefix, "root-volume-uid"): "foobar",
-			volumebrokerv1alpha1.CreatedLabel:    "true",
-			volumebrokerv1alpha1.ManagerLabel:    volumebrokerv1alpha1.VolumeBrokerManager,
-			volumepoolletv1alpha1.VolumeUIDLabel: "foobar",
 		}))
 	})
 })
