@@ -10,11 +10,9 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	computeclient "github.com/ironcore-dev/ironcore/internal/client/compute"
 	"github.com/ironcore-dev/ironcore/internal/controllers/compute/scheduler"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/workqueue"
@@ -89,14 +87,8 @@ func (s *MachineScheduler) tolerateTaints(_ context.Context, pool *scheduler.Con
 }
 
 func (s *MachineScheduler) fitsPool(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
-	machineClassName := machine.Spec.MachineClassRef.Name
 
-	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClassName)]
-	if !ok {
-		return false
-	}
-
-	return allocatable.Cmp(*resource.NewQuantity(1, resource.DecimalSI)) >= 0
+	return pool.MaxAllocatable(machine.Spec.MachineClassRef.Name) > 0
 }
 
 func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger, machine *computev1alpha1.Machine) (ctrl.Result, error) {
@@ -242,6 +234,14 @@ func (s *MachineScheduler) handleMachine() handler.EventHandler {
 
 			oldInstance := evt.ObjectOld.(*computev1alpha1.Machine)
 			newInstance := evt.ObjectNew.(*computev1alpha1.Machine)
+
+			if oldInstance.Spec.MachinePoolRef == nil && newInstance.Spec.MachinePoolRef != nil {
+				if err := s.Cache.AddInstance(newInstance); err != nil {
+					log.Error(err, "Error adding machine to cache")
+				}
+				return
+			}
+
 			if err := s.Cache.UpdateInstance(oldInstance, newInstance); err != nil {
 				log.Error(err, "Error updating machine in cache")
 			}
