@@ -240,4 +240,58 @@ var _ = Describe("NetworkInterfaceEphemeralVirtualIP", func() {
 		By("waiting for the undesired virtual IP to be gone")
 		Eventually(Get(undesiredVip)).Should(Satisfy(apierrors.IsNotFound))
 	})
+
+	It("should not delete an ephemeral virtual IP that belongs to a different network interface", func(ctx SpecContext) {
+		By("creating a network interface that owns a Retain-policy ephemeral virtual IP")
+		retainVipSrc := networkingv1alpha1.VirtualIPSource{
+			Ephemeral: &networkingv1alpha1.EphemeralVirtualIPSource{
+				VirtualIPTemplate: &networkingv1alpha1.VirtualIPTemplateSpec{
+					Spec: networkingv1alpha1.EphemeralVirtualIPSpec{
+						ReclaimPolicy: networkingv1alpha1.ReclaimPolicyTypeRetain,
+						VirtualIPSpec: networkingv1alpha1.VirtualIPSpec{
+							Type:     networkingv1alpha1.VirtualIPTypePublic,
+							IPFamily: corev1.IPv4Protocol,
+						},
+					},
+				},
+			},
+		}
+		ownerNic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "owner-nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
+				VirtualIP:  &retainVipSrc,
+			},
+		}
+		Expect(k8sClient.Create(ctx, ownerNic)).To(Succeed())
+
+		By("waiting for the ephemeral virtual IP to exist with no controller reference")
+		ownerVip := &networkingv1alpha1.VirtualIP{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      networkingv1alpha1.NetworkInterfaceVirtualIPName(ownerNic.Name, retainVipSrc),
+			},
+		}
+		Eventually(Object(ownerVip)).Should(HaveField("ObjectMeta.OwnerReferences", BeEmpty()))
+
+		By("creating a second network interface in the same namespace without an ephemeral virtual IP")
+		otherNic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "other-nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
+				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.2")}},
+			},
+		}
+		Expect(k8sClient.Create(ctx, otherNic)).To(Succeed())
+
+		By("ensuring the first NIC's ephemeral virtual IP is not deleted by reconciliation of the second NIC")
+		Consistently(Object(ownerVip)).Should(HaveField("ObjectMeta.DeletionTimestamp", BeNil()))
+	})
 })
