@@ -45,6 +45,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
@@ -97,6 +98,10 @@ type Options struct {
 	DialTimeout                          time.Duration
 	MachineClassMapperSyncTimeout        time.Duration
 
+	HeartbeatInterval      time.Duration
+	HeartbeatLeaseDuration time.Duration
+	HeartbeatStatusTimeout time.Duration
+
 	ChannelCapacity int
 	RelistPeriod    time.Duration
 	RelistThreshold time.Duration
@@ -148,6 +153,10 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.DurationVar(&o.MachineRuntimeSocketDiscoveryTimeout, "machine-runtime-socket-discovery-timeout", 20*time.Second, "Timeout for discovering the machine runtime socket.")
 	fs.DurationVar(&o.DialTimeout, "dial-timeout", 1*time.Second, "Timeout for dialing to the machine runtime endpoint.")
 	fs.DurationVar(&o.MachineClassMapperSyncTimeout, "mcm-sync-timeout", 10*time.Second, "Timeout waiting for the machine class mapper to sync.")
+
+	fs.DurationVar(&o.HeartbeatInterval, "heartbeat-interval", 10*time.Second, "Interval between machine pool heartbeats.")
+	fs.DurationVar(&o.HeartbeatLeaseDuration, "heartbeat-lease-duration", 40*time.Second, "leaseDurationSeconds to publish on the machine pool lease.")
+	fs.DurationVar(&o.HeartbeatStatusTimeout, "heartbeat-status-timeout", 5*time.Second, "Timeout for the IRI Status probe used as the heartbeat readiness check.")
 
 	fs.IntVar(&o.ChannelCapacity, "channel-capacity", 1024, "channel capacity for the machine event generator.")
 	fs.DurationVar(&o.RelistPeriod, "relist-period", 5*time.Second, "event channel relisting period.")
@@ -226,6 +235,18 @@ func Run(ctx context.Context, opts Options) error {
 	port, err := getPort(opts.ServerFlags.Serving.Address)
 	if err != nil {
 		return fmt.Errorf("error getting port from address: %w", err)
+	}
+
+	if opts.HeartbeatInterval <= 0 {
+		return fmt.Errorf("--heartbeat-interval must be > 0, got %s", opts.HeartbeatInterval)
+	}
+	if opts.HeartbeatLeaseDuration <= opts.HeartbeatInterval {
+		return fmt.Errorf("--heartbeat-lease-duration (%s) must be greater than --heartbeat-interval (%s)",
+			opts.HeartbeatLeaseDuration, opts.HeartbeatInterval)
+	}
+	if opts.HeartbeatStatusTimeout <= 0 || opts.HeartbeatStatusTimeout >= opts.HeartbeatInterval {
+		return fmt.Errorf("--heartbeat-status-timeout (%s) must be > 0 and less than --heartbeat-interval (%s)",
+			opts.HeartbeatStatusTimeout, opts.HeartbeatInterval)
 	}
 
 	getter, err := machinepoolletconfig.NewGetter(opts.MachinePoolName)
@@ -470,6 +491,9 @@ func Run(ctx context.Context, opts Options) error {
 			return fmt.Errorf("error setting up machine annotator reconciler with manager: %w", err)
 		}
 
+		readyState := controllers.NewMachinePoolReadyState()
+		heartbeatEvents := make(chan event.GenericEvent, 1)
+
 		if err := (&controllers.MachinePoolReconciler{
 			Client:             mgr.GetClient(),
 			MachinePoolName:    opts.MachinePoolName,
@@ -478,8 +502,23 @@ func Run(ctx context.Context, opts Options) error {
 			MachineRuntime:     machineRuntime,
 			MachineClassMapper: machineClassMapper,
 			TopologyLabels:     topologyLabels,
+			ReadyState:         readyState,
+			HeartbeatEvents:    heartbeatEvents,
 		}).SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("error setting up machine pool reconciler with manager: %w", err)
+		}
+
+		if err := mgr.Add(controllers.NewMachinePoolHeartbeat(
+			mgr.GetClient(),
+			opts.MachinePoolName,
+			machineRuntime,
+			readyState,
+			heartbeatEvents,
+			opts.HeartbeatInterval,
+			opts.HeartbeatLeaseDuration,
+			opts.HeartbeatStatusTimeout,
+		)); err != nil {
+			return fmt.Errorf("error adding machine pool heartbeat: %w", err)
 		}
 
 		if err := (&controllers.MachinePoolAnnotatorReconciler{

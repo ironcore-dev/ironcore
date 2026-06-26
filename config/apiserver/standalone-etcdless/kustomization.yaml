@@ -7,3 +7,4 @@ kind: Kustomization
 resources:
   - ../etcdless
   - ../../namespaces/ironcore-system
+  - ../../namespaces/machinepool-lease

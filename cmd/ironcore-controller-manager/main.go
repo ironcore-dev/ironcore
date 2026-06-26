@@ -64,6 +64,7 @@ const (
 	machineEphemeralVolumeController           = "machineephemeralvolume"
 	machineSchedulerController                 = "machinescheduler"
 	machineClassController                     = "machineclass"
+	machinePoolLifecycleController             = "machinepoollifecycle"
 
 	// storage controllers
 	bucketScheduler           = "bucketscheduler"
@@ -114,6 +115,7 @@ func main() {
 	var volumeBindTimeout time.Duration
 	var virtualIPBindTimeout time.Duration
 	var networkInterfaceBindTimeout time.Duration
+	var machinePoolLifecycleGracePeriod time.Duration
 	var tlsOpts []func(*tls.Config)
 	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
 		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
@@ -134,6 +136,7 @@ func main() {
 	flag.DurationVar(&volumeBindTimeout, "volume-bind-timeout", 10*time.Second, "Time to wait until considering a volume bind to be failed.")
 	flag.DurationVar(&virtualIPBindTimeout, "virtual-ip-bind-timeout", 10*time.Second, "Time to wait until considering a virtual ip bind to be failed.")
 	flag.DurationVar(&networkInterfaceBindTimeout, "network-interface-bind-timeout", 10*time.Second, "Time to wait until considering a network interface bind to be failed.")
+	flag.DurationVar(&machinePoolLifecycleGracePeriod, "machine-pool-lifecycle-grace-period", 50*time.Second, "Grace period without a heartbeat before a machine pool's Ready condition is marked Unknown.")
 
 	controllers := switches.New(
 		// compute controllers
@@ -141,6 +144,7 @@ func main() {
 		machineEphemeralVolumeController,
 		machineSchedulerController,
 		machineClassController,
+		machinePoolLifecycleController,
 
 		// storage controllers
 		bucketScheduler,
@@ -317,6 +321,16 @@ func main() {
 			APIReader: mgr.GetAPIReader(),
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineClass")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(machinePoolLifecycleController) {
+		if err := (&computecontrollers.MachinePoolLifecycleReconciler{
+			Client:      mgr.GetClient(),
+			GracePeriod: machinePoolLifecycleGracePeriod,
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "MachinePoolLifecycle")
 			os.Exit(1)
 		}
 	}
