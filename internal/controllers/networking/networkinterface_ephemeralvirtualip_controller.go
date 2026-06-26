@@ -86,9 +86,23 @@ func (r *NetworkInterfaceEphemeralVirtualIPReconciler) ephemeralNetworkInterface
 	return res
 }
 
+// isManagedByNIC reports whether the given VirtualIP is an ephemeral VIP managed by this NIC.
+// A VIP qualifies when the NIC is its controller (ReclaimPolicy: Delete) or when it carries the
+// default ephemeral-managed-by annotation and its TargetRef UID matches the NIC (ReclaimPolicy:
+// Retain, which omits the controller ref). The annotation alone is not sufficient as it is
+// identical on every ephemeral VIP in the namespace.
+func isManagedByNIC(virtualIP *networkingv1alpha1.VirtualIP, nic *networkingv1alpha1.NetworkInterface) bool {
+	if metav1.IsControlledBy(virtualIP, nic) {
+		return true
+	}
+	if !annotations.IsEphemeralManagedBy(virtualIP, commonv1alpha1.DefaultEphemeralManager) {
+		return false
+	}
+	return virtualIP.Spec.TargetRef != nil && virtualIP.Spec.TargetRef.UID == nic.UID
+}
+
 func (r *NetworkInterfaceEphemeralVirtualIPReconciler) handleExistingVirtualIP(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface, shouldManage bool, virtualIP *networkingv1alpha1.VirtualIP, ephemeVip *networkingv1alpha1.VirtualIP) error {
-	log.WithValues("VirtualIP", klog.KObj(virtualIP), "ShouldManage", shouldManage)
-	if annotations.IsDefaultEphemeralOrControlledBy(virtualIP, nic) {
+	if isManagedByNIC(virtualIP, nic) {
 		if shouldManage {
 			log.V(1).Info("Ephemeral virtual IP is present")
 
