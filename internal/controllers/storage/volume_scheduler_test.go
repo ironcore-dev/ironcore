@@ -464,4 +464,82 @@ var _ = Describe("VolumeScheduler", func() {
 			HaveField("Spec.VolumePoolRef", Equal(&corev1.LocalObjectReference{Name: volumePool.Name})),
 		))
 	})
+
+	It("should correctly track cache state", func(ctx SpecContext) {
+		By("creating a volume pool")
+		volumePool := &storagev1alpha1.VolumePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, volumePool)).To(Succeed(), "failed to create volume pool")
+
+		By("patching the volume pool status to contain capacity for 2 volumes")
+		Eventually(UpdateStatus(volumePool, func() {
+			volumePool.Status.AvailableVolumeClasses = []corev1.LocalObjectReference{{Name: volumeClass.Name}}
+			volumePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name): resource.MustParse("2Gi"),
+			}
+		})).Should(Succeed())
+
+		By("creating the first volume")
+		volume1 := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-volume-1-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume1)).To(Succeed(), "failed to create first volume")
+
+		By("waiting for the first volume to be scheduled")
+		Eventually(Object(volume1)).Should(SatisfyAll(
+			HaveField("Spec.VolumePoolRef", Equal(&corev1.LocalObjectReference{Name: volumePool.Name})),
+		))
+
+		By("creating the second volume")
+		volume2 := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-volume-2-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume2)).To(Succeed(), "failed to create second volume")
+
+		By("waiting for the second volume to be scheduled")
+		Eventually(Object(volume2)).Should(SatisfyAll(
+			HaveField("Spec.VolumePoolRef", Equal(&corev1.LocalObjectReference{Name: volumePool.Name})),
+		))
+
+		By("creating a third volume that should NOT be scheduled (capacity exhausted)")
+		volume3 := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-volume-3-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("1Gi"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume3)).To(Succeed(), "failed to create third volume")
+
+		By("verifying the third volume remains unscheduled")
+		Consistently(Object(volume3)).Should(SatisfyAll(
+			HaveField("Spec.VolumePoolRef", BeNil()),
+		))
+	})
 })
