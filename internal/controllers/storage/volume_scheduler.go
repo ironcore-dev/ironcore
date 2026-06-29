@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	"github.com/ironcore-dev/ironcore/internal/controllers/storage/scheduler"
@@ -41,6 +40,7 @@ type VolumeScheduler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
+//+kubebuilder:rbac:groups=events.k8s.io,resources=events,verbs=create;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes,verbs=get;list;watch;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumes/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=storage.ironcore.dev,resources=volumepools,verbs=get;list;watch
@@ -94,14 +94,8 @@ func (s *VolumeScheduler) tolerateTaints(_ context.Context, pool *scheduler.Cont
 }
 
 func (s *VolumeScheduler) fitsPool(_ context.Context, pool *scheduler.ContainerInfo, volume *storagev1alpha1.Volume) bool {
-	volumeClassName := volume.Spec.VolumeClassRef.Name
-
-	allocatable, ok := pool.Node().Status.Allocatable[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClassName)]
-	if !ok {
-		return false
-	}
-
-	return allocatable.Cmp(*volume.Spec.Resources.Storage()) >= 0
+	remaining := pool.MaxAllocatable(volume.Spec.VolumeClassRef.Name)
+	return remaining.Cmp(*volume.Spec.Resources.Storage()) >= 0
 }
 
 func (s *VolumeScheduler) updateSnapshot() {
@@ -248,6 +242,14 @@ func (s *VolumeScheduler) handleVolume() handler.EventHandler {
 
 			oldInstance := evt.ObjectOld.(*storagev1alpha1.Volume)
 			newInstance := evt.ObjectNew.(*storagev1alpha1.Volume)
+
+			if oldInstance.Spec.VolumePoolRef == nil && newInstance.Spec.VolumePoolRef != nil {
+				if err := s.Cache.AddInstance(newInstance); err != nil {
+					log.Error(err, "Error adding volume to cache")
+				}
+				return
+			}
+
 			if err := s.Cache.UpdateInstance(oldInstance, newInstance); err != nil {
 				log.Error(err, "Error updating volume in cache")
 			}

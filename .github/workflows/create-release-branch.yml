@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Create release branch
         run: |
           TAG="${GITHUB_REF#refs/tags/}"

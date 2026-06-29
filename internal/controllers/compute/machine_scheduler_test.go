@@ -49,7 +49,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image:           "my-image",
 				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 			},
 		}
@@ -70,7 +69,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image:           "my-image",
 				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
 			},
 		}
@@ -148,7 +146,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
 				MachinePoolSelector: map[string]string{
 					"foo": "bar",
 				},
@@ -203,7 +200,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: machineClass.Name,
 				},
@@ -302,7 +298,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: machineClass.Name,
 				},
@@ -360,7 +355,6 @@ var _ = Describe("MachineScheduler", func() {
 					GenerateName: fmt.Sprintf("test-machine-%d-", i),
 				},
 				Spec: computev1alpha1.MachineSpec{
-					Image: "my-image",
 					MachineClassRef: corev1.LocalObjectReference{
 						Name: machineClass.Name,
 					},
@@ -409,7 +403,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: machineClass.Name,
 				},
@@ -432,6 +425,75 @@ var _ = Describe("MachineScheduler", func() {
 		By("checking that the machine is scheduled onto the machine pool")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+		))
+	})
+
+	It("should correctly track cache state", func(ctx SpecContext) {
+		By("creating a machine pool")
+		machinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
+
+		By("patching the machine pool status to contain capacity for 2 machines")
+		Eventually(UpdateStatus(machinePool, func() {
+			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("2"),
+			}
+		})).Should(Succeed())
+
+		By("creating the first machine")
+		machine1 := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-1-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine1)).To(Succeed(), "failed to create first machine")
+
+		By("waiting for the first machine to be scheduled")
+		Eventually(Object(machine1)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+		))
+
+		By("creating the second machine")
+		machine2 := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-2-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine2)).To(Succeed(), "failed to create second machine")
+
+		By("waiting for the second machine to be scheduled")
+		Eventually(Object(machine2)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+		))
+
+		By("creating a third machine that should NOT be scheduled (capacity exhausted)")
+		machine3 := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-3-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine3)).To(Succeed(), "failed to create third machine")
+
+		By("verifying the third machine remains unscheduled")
+		Consistently(Object(machine3)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef", BeNil()),
 		))
 	})
 
@@ -492,7 +554,6 @@ var _ = Describe("MachineScheduler", func() {
 				GenerateName: "test-machine-",
 			},
 			Spec: computev1alpha1.MachineSpec{
-				Image: "my-image",
 				MachineClassRef: corev1.LocalObjectReference{
 					Name: secondMachineClass.Name,
 				},
