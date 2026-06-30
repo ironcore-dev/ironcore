@@ -36,11 +36,11 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/client/config"
 
 	"github.com/ironcore-dev/controller-utils/configutils"
+	coordinationv1 "k8s.io/api/coordination/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
@@ -366,15 +366,20 @@ func Run(ctx context.Context, opts Options) error {
 		LeaderElectionID:        "bfafcebe.ironcore.dev",
 		LeaderElectionNamespace: opts.LeaderElectionNamespace,
 		LeaderElectionConfig:    leaderElectionCfg,
-		Cache:                   cache.Options{ByObject: map[client.Object]cache.ByObject{}},
-		NewCache: func(config *rest.Config, cacheOpts cache.Options) (cache.Cache, error) {
-			cacheOpts.ByObject[&computev1alpha1.Machine{}] = cache.ByObject{
-				Field: fields.OneTermEqualSelector(
-					computev1alpha1.MachineMachinePoolRefNameField,
-					opts.MachinePoolName,
-				),
-			}
-			return cache.New(config, cacheOpts)
+		Cache: cache.Options{
+			ByObject: map[client.Object]cache.ByObject{
+				&computev1alpha1.Machine{}: {
+					Field: fields.OneTermEqualSelector(
+						computev1alpha1.MachineMachinePoolRefNameField,
+						opts.MachinePoolName,
+					),
+				},
+				&coordinationv1.Lease{}: {
+					Namespaces: map[string]cache.Config{
+						computev1alpha1.NamespaceMachinePoolLease: {},
+					},
+				},
+			},
 		},
 	})
 	if err != nil {
