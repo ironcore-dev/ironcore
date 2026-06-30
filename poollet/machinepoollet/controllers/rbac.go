@@ -15,4 +15,4 @@ package controllers
 //+kubebuilder:rbac:groups=authorization.k8s.io,resources=subjectaccessreviews,verbs=create
 
 // Rules required for machine pool heartbeat
-//+kubebuilder:rbac:groups=coordination.k8s.io,namespace=ironcore-machinepool-lease,resources=leases,verbs=get;create;update;patch
+//+kubebuilder:rbac:groups=coordination.k8s.io,namespace=ironcore-machinepool-lease,resources=leases,verbs=get;list;watch;create;update;patch
