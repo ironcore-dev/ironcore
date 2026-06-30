@@ -146,7 +146,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 
 		if time.Since(prev.lastChangeDetectedTime) > r.GracePeriod {
 			if currentReadyCondition != nil && currentReadyCondition.Status == corev1.ConditionUnknown {
-				log.V(1).Info("Grace period exceeded, ready condition already unknown — no patch needed",
+				log.V(2).Info("Grace period exceeded, ready condition already unknown, no patch needed",
 					"gracePeriod", r.GracePeriod, "lastChangeDetected", prev.lastChangeDetectedTime)
 			} else {
 				log.Info("Grace period exceeded without health update, marking machine pool status unknown",
@@ -168,7 +168,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 				next.readyCondition = &newReadyCondition
 			}
 		} else {
-			log.V(1).Info("No change, still within grace period",
+			log.V(3).Info("No change, still within grace period",
 				"gracePeriod", r.GracePeriod, "elapsed", time.Since(prev.lastChangeDetectedTime))
 		}
 	}
