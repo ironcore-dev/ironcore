@@ -74,6 +74,7 @@ rules:
   - compute.ironcore.dev
   resources:
   - machineclasses/status
+  - machinepools/status
   - machines/status
   verbs:
   - get

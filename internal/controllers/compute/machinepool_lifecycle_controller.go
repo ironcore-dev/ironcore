@@ -37,6 +37,14 @@ type MachinePoolHealth struct {
 	leaseRenewTime         time.Time
 }
 
+// Cluster-scope RBAC for the MachinePool lifecycle controller.
+// Lease access in NamespaceMachinePoolLease is granted by a hand-written
+// namespace-scoped Role+RoleBinding under config/namespaces/machinepool-lease/,
+// and the manager's cache is scoped to that namespace, so no cluster-wide
+// lease permissions are required here.
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools,verbs=get;list;watch
+//+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machinepools/status,verbs=get;update;patch
+
 func (r *MachinePoolLifecycleReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx)
 
