@@ -42,6 +42,8 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -50,6 +52,7 @@ import (
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	coordinationv1 "k8s.io/api/coordination/v1"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -261,6 +264,19 @@ func main() {
 		PprofBindAddress:       pprofAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "d0ae00be.ironcore.dev",
+		Cache: cache.Options{
+			ByObject: map[client.Object]cache.ByObject{
+				// The MachinePool lifecycle controller watches Leases only in
+				// NamespaceMachinePoolLease. Scoping the cache here keeps the
+				// underlying informer namespaced so the controller's RBAC can
+				// stay namespaced too.
+				&coordinationv1.Lease{}: {
+					Namespaces: map[string]cache.Config{
+						computev1alpha1.NamespaceMachinePoolLease: {},
+					},
+				},
+			},
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to create manager")
