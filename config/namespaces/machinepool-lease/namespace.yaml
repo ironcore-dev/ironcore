@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Cluster-shared namespace where every machine poollet renews its pool Lease.
+# Lifecycle controllers in the ironcore-system namespace watch leases here to
+# detect failed pools.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ironcore-machinepool-lease

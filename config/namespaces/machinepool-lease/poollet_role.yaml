@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Role granting the rights every machine poollet needs in the lease namespace
+# to renew its pool lease. Bound by the matching RoleBinding in this directory
+# to the `compute.ironcore.dev:system:machinepools` Group, which every poollet
+# joins via its client cert organization.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: compute.ironcore.dev:system:machinepools
+  namespace: ironcore-machinepool-lease
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch

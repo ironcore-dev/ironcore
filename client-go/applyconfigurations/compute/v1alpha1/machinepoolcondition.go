@@ -26,6 +26,8 @@ type MachinePoolConditionApplyConfiguration struct {
 	Message *string `json:"message,omitempty"`
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration *int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time this condition was updated.
+	LastUpdateTime *metav1.Time `json:"lastUpdateTime,omitempty"`
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty"`
 }
@@ -73,6 +75,14 @@ func (b *MachinePoolConditionApplyConfiguration) WithMessage(value string) *Mach
 // If called multiple times, the ObservedGeneration field is set to the value of the last call.
 func (b *MachinePoolConditionApplyConfiguration) WithObservedGeneration(value int64) *MachinePoolConditionApplyConfiguration {
 	b.ObservedGeneration = &value
+	return b
+}
+
+// WithLastUpdateTime sets the LastUpdateTime field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the LastUpdateTime field is set to the value of the last call.
+func (b *MachinePoolConditionApplyConfiguration) WithLastUpdateTime(value metav1.Time) *MachinePoolConditionApplyConfiguration {
+	b.LastUpdateTime = &value
 	return b
 }
 

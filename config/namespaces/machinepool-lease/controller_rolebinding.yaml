@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and IronCore contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Cross-namespace binding: the controller runs in ironcore-system but needs to
+# read leases in ironcore-machinepool-lease. The subject name is hard-coded with
+# the `ironcore-` prefix because this binding lives outside the layer that
+# applies `namePrefix: ironcore-`. If that prefix is ever changed in
+# config/controller/default, this name must be updated too.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ironcore-controller-manager:lease-reader
+  namespace: ironcore-machinepool-lease
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ironcore-controller-manager:lease-reader
+subjects:
+  - kind: ServiceAccount
+    name: ironcore-controller-manager
+    namespace: ironcore-system
