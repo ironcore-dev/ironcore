@@ -72,23 +72,7 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(ForbiddenField("spec.claimRef")),
 		),
-		Entry("classless: image pull secret ref",
-			&storage.Volume{
-				Spec: storage.VolumeSpec{
-					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo"},
-				},
-			},
-			ContainElement(ForbiddenField("spec.imagePullSecretRef")),
-		),
-		Entry("classful: invalid image pull secret ref name",
-			&storage.Volume{
-				Spec: storage.VolumeSpec{
-					VolumeClassRef:     &corev1.LocalObjectReference{Name: "foo"},
-					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
-				},
-			},
-			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
-		),
+
 		Entry("classless: no resources[storage]",
 			&storage.Volume{},
 			Not(ContainElement(RequiredField("spec.resources[storage]"))),

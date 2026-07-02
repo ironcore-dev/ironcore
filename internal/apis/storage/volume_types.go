@@ -30,11 +30,6 @@ type VolumeSpec struct {
 	ClaimRef *commonv1alpha1.LocalUIDReference
 	// Resources is a description of the volume's resources and capacity.
 	Resources core.ResourceList
-	// Image is an optional image to bootstrap the volume with.
-	// To be deprecated
-	Image string
-	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
-	ImagePullSecretRef *corev1.LocalObjectReference
 	// Unclaimable marks the volume as unclaimable.
 	Unclaimable bool
 	// Tolerations define tolerations the Volume has. Only a VolumePool whose taints

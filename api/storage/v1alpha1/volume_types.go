@@ -31,11 +31,6 @@ type VolumeSpec struct {
 	ClaimRef *commonv1alpha1.LocalUIDReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources corev1alpha1.ResourceList `json:"resources,omitempty"`
-	// Image is an optional image to bootstrap the volume with.
-	// To be deprecated
-	Image string `json:"image,omitempty"`
-	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
-	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecretRef,omitempty"`
 	// Unclaimable marks the volume as unclaimable.
 	Unclaimable bool `json:"unclaimable,omitempty"`
 	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
@@ -58,7 +53,6 @@ type VolumeDataSource struct {
 type OSDataSource struct {
 	// Image is an optional image to bootstrap the volume with.
 	Image string `json:"image,omitempty"`
-
 	// Architecture defines the architecture of the OS which should be used
 	Architecture *string `json:"architecture,omitempty"`
 }

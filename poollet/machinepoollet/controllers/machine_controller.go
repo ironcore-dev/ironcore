@@ -338,10 +338,6 @@ func (r *MachineReconciler) create(
 		return ctrl.Result{}, nil
 	}
 
-	if machine.Spec.Image != "" { //nolint:staticcheck
-		r.Eventf(machine, nil, corev1.EventTypeWarning, "ImageRefDeprecated", "Image reference in %s is deprecated", machine.Spec.Image) //nolint:staticcheck
-	}
-
 	log.V(1).Info("Creating machine")
 	res, err := r.MachineRuntime.CreateMachine(ctx, &iri.CreateMachineRequest{
 		Machine: iriMachine,

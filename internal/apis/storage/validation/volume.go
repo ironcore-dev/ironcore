@@ -48,11 +48,6 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 			allErrs = append(allErrs, field.Required(fldPath.Child("resources").Key(string(core.ResourceStorage)), fmt.Sprintf("must specify %s", core.ResourceStorage)))
 		}
 
-		if spec.ImagePullSecretRef != nil {
-			for _, msg := range apivalidation.NameIsDNSSubdomain(spec.ImagePullSecretRef.Name, false) {
-				allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), spec.ImagePullSecretRef.Name, msg))
-			}
-		}
 	} else {
 		if spec.VolumePoolSelector != nil {
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("volumePoolSelector"), "must not specify if volume class is empty"))
@@ -64,14 +59,6 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 
 		if spec.Resources != nil {
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("resources"), "must not specify if volume class is empty"))
-		}
-
-		if spec.Image != "" {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("image"), "must not specify if volume class is empty"))
-		}
-
-		if spec.ImagePullSecretRef != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("imagePullSecretRef"), "must not specify if volume class is empty"))
 		}
 
 		if spec.Tolerations != nil {

@@ -1161,8 +1161,6 @@ func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.V
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
-	out.Image = in.Image
-	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
@@ -1183,8 +1181,6 @@ func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpe
 	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
 	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
 	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
-	out.Image = in.Image
-	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.Unclaimable = in.Unclaimable
 	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
 	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))

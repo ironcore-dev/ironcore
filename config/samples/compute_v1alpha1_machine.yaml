@@ -7,7 +7,6 @@ spec:
     name: machineclass-sample
   #  machinePoolRef:
   #    name: default
-  image: my-image
   volumes:
     - name: rootdisk # first disk is root disk
       # priority: 0 # optional

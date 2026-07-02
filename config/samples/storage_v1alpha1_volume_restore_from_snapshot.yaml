@@ -1,7 +1,7 @@
 apiVersion: storage.ironcore.dev/v1alpha1
 kind: Volume
 metadata:
-  name: volume-sample
+  name: restored-volume
 spec:
   volumeClassRef:
     name: volumeclass-sample
@@ -9,6 +9,6 @@ spec:
   #   name: volumepool-sample
   resources:
     storage: 100Gi
-  # dataSource:
-  #   osImage:
-  #     image: gardenlinux:rootfs-image
+  dataSource:
+    volumeSnapshotRef:
+      name: volume-snapshot-sample
