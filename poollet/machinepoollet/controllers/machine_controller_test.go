@@ -11,6 +11,7 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
@@ -994,6 +995,139 @@ var _ = Describe("MachineController", func() {
 		})))
 	})
 
+	It("should reconcile machine when prefix transitions to allocated", func(ctx SpecContext) {
+		By("creating a network")
+		network := &networkingv1alpha1.Network{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "network-",
+			},
+			Spec: networkingv1alpha1.NetworkSpec{
+				ProviderID: "test-network-provider",
+			},
+		}
+		Expect(k8sClient.Create(ctx, network)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, network)
+
+		By("patching the network to be available")
+		Eventually(UpdateStatus(network, func() {
+			network.Status.State = networkingv1alpha1.NetworkStateAvailable
+		})).Should(Succeed())
+
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, volume)
+
+		By("patching the volume to be available")
+		Eventually(UpdateStatus(volume, func() {
+			volume.Status.State = storagev1alpha1.VolumeStateAvailable
+			volume.Status.Access = &storagev1alpha1.VolumeAccess{
+				Driver: "test",
+				Handle: "testhandle",
+			}
+		})).Should(Succeed())
+
+		By("creating a network interface with an ephemeral prefix IP")
+		nic := &networkingv1alpha1.NetworkInterface{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "nic-",
+			},
+			Spec: networkingv1alpha1.NetworkInterfaceSpec{
+				NetworkRef: corev1.LocalObjectReference{Name: network.Name},
+				IPFamilies: []corev1.IPFamily{corev1.IPv4Protocol},
+				IPs: []networkingv1alpha1.IPSource{
+					{
+						Ephemeral: &networkingv1alpha1.EphemeralPrefixSource{
+							PrefixTemplate: &ipamv1alpha1.PrefixTemplateSpec{
+								Spec: ipamv1alpha1.PrefixSpec{
+									IPFamily: corev1.IPv4Protocol,
+									ParentRef: &corev1.LocalObjectReference{
+										Name: "parent-prefix",
+									},
+									PrefixLength: 32,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, nic)
+
+		By("creating a machine referencing the NIC and volume")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "root",
+						VolumeSource: computev1alpha1.VolumeSource{
+							VolumeRef: &corev1.LocalObjectReference{Name: volume.Name},
+						},
+					},
+				},
+				NetworkInterfaces: []computev1alpha1.NetworkInterface{
+					{
+						Name: "primary",
+						NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+							NetworkInterfaceRef: &corev1.LocalObjectReference{Name: nic.Name},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
+
+		By("waiting for the machine to have a finalizer but no machineID (blocked on prefix)")
+		Eventually(Object(machine)).Should(HaveField("Finalizers", ContainElement("machinepoollet.ironcore.dev/machine")))
+		Consistently(Object(machine), "2s").Should(HaveField("Status.MachineID", BeEmpty()))
+
+		By("ensuring no IRI machine was created yet")
+		Expect(srv.Machines).To(BeEmpty())
+
+		By("waiting for the prefix to be created by the ephemeral manager")
+		prefixName := networkingv1alpha1.NetworkInterfaceIPIPAMPrefixName(nic.Name, 0)
+		prefix := &ipamv1alpha1.Prefix{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      prefixName,
+			},
+		}
+		Eventually(Object(prefix)).Should(HaveField("Spec.PrefixLength", BeNumerically(">", 0)))
+
+		By("setting the prefix value to simulate IPAM allocation")
+		Eventually(Update(prefix, func() {
+			prefix.Spec.Prefix = commonv1alpha1.MustParseNewIPPrefix("10.0.0.99/32")
+		})).Should(Succeed())
+
+		By("patching the prefix status to allocated")
+		Eventually(UpdateStatus(prefix, func() {
+			prefix.Status.Phase = ipamv1alpha1.PrefixPhaseAllocated
+		})).Should(Succeed())
+
+		By("waiting for the machine to be created on the IRI runtime")
+		Eventually(srv).Should(HaveField("Machines", HaveLen(1)))
+
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+		By("verifying the IRI machine has a NIC with an IP")
+		Expect(iriMachine.Spec.NetworkInterfaces).To(HaveLen(1))
+		Expect(iriMachine.Spec.NetworkInterfaces[0].Ips).To(HaveLen(1))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
