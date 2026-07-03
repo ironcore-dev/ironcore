@@ -152,6 +152,64 @@ var _ = Describe("VolumeEventMapper", func() {
 			HaveField("Type", Equal(corev1.EventTypeNormal)),
 		)))
 	})
+
+	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+		By("creating a volume")
+		volume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("250"),
+				},
+				VolumeClassRef: &corev1.LocalObjectReference{Name: vc.Name},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: vp.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volume)).To(Succeed(), "failed to create volume")
+
+		By("waiting for the runtime to report the volume")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Volumes", HaveLen(1)),
+		))
+		_, iriVolume := GetSingleMapEntry(srv.Volumes)
+
+		By("setting an iri event with an empty action")
+		eventList := []*fakevolume.FakeEvent{{
+			Event: irievent.Event{
+				Spec: &irievent.EventSpec{
+					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+						Labels: iriVolume.Metadata.Labels,
+					},
+					Reason:    "VolumeReconcileFailed",
+					Message:   "reconcile failed",
+					Type:      "Warning",
+					Action:    "",
+					EventTime: time.Now().Unix(),
+				}},
+		},
+		}
+		srv.SetEvents(eventList)
+
+		By("validating the emitted event uses the reason as its action")
+		volumeEventList := &corev1.EventList{}
+		selectorField := fields.Set{}
+		selectorField["involvedObject.name"] = volume.GetName()
+		Eventually(func(g Gomega) []corev1.Event {
+			err := k8sClient.List(ctx, volumeEventList,
+				client.InNamespace(ns.Name), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
+			)
+			g.Expect(err).NotTo(HaveOccurred())
+			return volumeEventList.Items
+		}).Should(ContainElement(SatisfyAll(
+			HaveField("Reason", Equal("VolumeReconcileFailed")),
+			HaveField("Message", Equal("reconcile failed")),
+			HaveField("Action", Equal("VolumeReconcileFailed")),
+			HaveField("Type", Equal(corev1.EventTypeWarning)),
+		)))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {

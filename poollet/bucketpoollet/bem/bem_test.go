@@ -140,6 +140,61 @@ var _ = Describe("BucketEventMapper", func() {
 			HaveField("Action", Equal("Synced")),
 		)))
 	})
+
+	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+		By("creating a bucket")
+		bucket := &storagev1alpha1.Bucket{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "bucket-",
+			},
+			Spec: storagev1alpha1.BucketSpec{
+				BucketClassRef: &corev1.LocalObjectReference{Name: bc.Name},
+				BucketPoolRef:  &corev1.LocalObjectReference{Name: bp.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, bucket)).To(Succeed())
+
+		By("waiting for the runtime to report the bucket")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Buckets", HaveLen(1)),
+		))
+		_, iriBucket := GetSingleMapEntry(srv.Buckets)
+
+		By("setting an iri event with an empty action")
+		eventList := []*fakebucket.FakeEvent{{
+			Event: irievent.Event{
+				Spec: &irievent.EventSpec{
+					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+						Labels: iriBucket.Metadata.Labels,
+					},
+					Reason:    "BucketReconcileFailed",
+					Message:   "reconcile failed",
+					Type:      "Warning",
+					Action:    "",
+					EventTime: time.Now().Unix(),
+				}},
+		},
+		}
+		srv.SetEvents(eventList)
+
+		By("validating the emitted event uses the reason as its action")
+		bucketEventList := &corev1.EventList{}
+		selectorField := fields.Set{}
+		selectorField["involvedObject.name"] = bucket.GetName()
+		Eventually(func(g Gomega) []corev1.Event {
+			err := k8sClient.List(ctx, bucketEventList,
+				client.InNamespace(ns.Name), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
+			)
+			g.Expect(err).NotTo(HaveOccurred())
+			return bucketEventList.Items
+		}).Should(ContainElement(SatisfyAll(
+			HaveField("Reason", Equal("BucketReconcileFailed")),
+			HaveField("Message", Equal("reconcile failed")),
+			HaveField("Type", Equal(corev1.EventTypeWarning)),
+			HaveField("Action", Equal("BucketReconcileFailed")),
+		)))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {

@@ -154,6 +154,62 @@ var _ = Describe("MachineEventMapper", func() {
 			HaveField("Type", Equal(corev1.EventTypeNormal)),
 		)))
 	})
+
+	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+		By("creating a machine")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: mc.Name},
+				MachinePoolRef:  &corev1.LocalObjectReference{Name: mp.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+		DeferCleanup(k8sClient.Delete, machine)
+
+		By("waiting for the runtime to report the machine")
+		Eventually(srv).Should(SatisfyAll(
+			HaveField("Machines", HaveLen(1)),
+		))
+		_, iriMachine := GetSingleMapEntry(srv.Machines)
+
+		By("setting an iri event with an empty action")
+		eventList := []*fakemachine.FakeEvent{{
+			Event: irievent.Event{
+				Spec: &irievent.EventSpec{
+					InvolvedObjectMeta: &v1alpha1.ObjectMetadata{
+						Labels: iriMachine.Metadata.Labels,
+					},
+					Reason:    "DomainDestroySucceeded",
+					Message:   "Domain destroyed",
+					Type:      "Warning",
+					Action:    "",
+					EventTime: time.Now().Unix(),
+				}},
+		},
+		}
+		srv.SetEvents(eventList)
+
+		By("validating the emitted event uses the reason as its action")
+		machineEventList := &corev1.EventList{}
+		selectorField := fields.Set{}
+		selectorField["involvedObject.name"] = machine.GetName()
+		Eventually(func(g Gomega) []corev1.Event {
+			err := k8sClient.List(ctx, machineEventList,
+				client.InNamespace(ns.Name), client.MatchingFieldsSelector{Selector: selectorField.AsSelector()},
+			)
+			g.Expect(err).NotTo(HaveOccurred())
+			return machineEventList.Items
+		}).Should(ContainElement(SatisfyAll(
+			HaveField("Reason", Equal("DomainDestroySucceeded")),
+			HaveField("Message", Equal("Domain destroyed")),
+			HaveField("Action", Equal("DomainDestroySucceeded")),
+			HaveField("Type", Equal(corev1.EventTypeWarning)),
+		)))
+	})
 })
 
 func GetSingleMapEntry[K comparable, V any](m map[K]V) (K, V) {
