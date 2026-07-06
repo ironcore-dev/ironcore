@@ -58,7 +58,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -85,7 +85,7 @@ BucketSpec
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -110,7 +110,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -185,7 +185,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -244,7 +244,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -343,7 +343,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -370,7 +370,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -395,7 +395,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -447,7 +447,7 @@ To be deprecated</p>
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -558,7 +558,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -631,7 +631,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -730,7 +730,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -757,7 +757,7 @@ VolumeSnapshotSpec
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -803,7 +803,7 @@ VolumeSnapshotStatus
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -858,7 +858,7 @@ BucketConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -904,7 +904,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1021,7 +1021,7 @@ BucketPoolState
 <td>
 <code>availableBucketClasses</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1052,7 +1052,7 @@ BucketPoolState
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1077,7 +1077,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1173,7 +1173,7 @@ BucketState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1228,7 +1228,7 @@ This is set by the bucket provider when the bucket is provisioned.</p>
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -1255,7 +1255,7 @@ BucketSpec
 <td>
 <code>bucketClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1280,7 +1280,7 @@ map[string]string
 <td>
 <code>bucketPoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1391,7 +1391,7 @@ string
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1468,7 +1468,7 @@ VolumeConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -1514,7 +1514,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1553,7 +1553,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>volumeSnapshotRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1597,7 +1597,7 @@ OSDataSource
 <td>
 <code>secretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1642,7 +1642,7 @@ VolumePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -1688,7 +1688,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1816,7 +1816,7 @@ VolumePoolState
 <td>
 <code>availableVolumeClasses</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1873,7 +1873,7 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1954,7 +1954,7 @@ VolumeSnapshotState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1998,7 +1998,7 @@ k8s.io/apimachinery/pkg/api/resource.Quantity
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2023,7 +2023,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2075,7 +2075,7 @@ To be deprecated</p>
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2207,7 +2207,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -2275,7 +2275,7 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -2302,7 +2302,7 @@ VolumeSpec
 <td>
 <code>volumeClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2327,7 +2327,7 @@ map[string]string
 <td>
 <code>volumePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -2379,7 +2379,7 @@ To be deprecated</p>
 <td>
 <code>imagePullSecretRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
