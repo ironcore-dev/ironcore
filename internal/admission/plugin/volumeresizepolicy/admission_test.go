@@ -5,6 +5,7 @@ package volumeresizepolicy_test
 
 import (
 	"context"
+	"time"
 
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
@@ -38,7 +39,9 @@ var _ = Describe("Admission", func() {
 			},
 			ResizePolicy: storagev1alpha1.ResizePolicyExpandOnly,
 		}
-		Expect(k8sClient.Create(ctx, volumeClassExpandOnly)).To(Succeed())
+		Eventually(func() error {
+			return k8sClient.Create(ctx, volumeClassExpandOnly)
+		}).WithTimeout(30 * time.Second).WithPolling(pollingInterval).Should(Succeed())
 		DeferCleanup(func(ctx context.Context) error {
 			return client.IgnoreNotFound(k8sClient.Delete(ctx, volumeClassExpandOnly))
 		})
@@ -54,7 +57,9 @@ var _ = Describe("Admission", func() {
 			},
 			ResizePolicy: storagev1alpha1.ResizePolicyStatic,
 		}
-		Expect(k8sClient.Create(ctx, volumeClassStatic)).To(Succeed())
+		Eventually(func() error {
+			return k8sClient.Create(ctx, volumeClassStatic)
+		}).WithTimeout(30 * time.Second).WithPolling(pollingInterval).Should(Succeed())
 		DeferCleanup(func(ctx context.Context) error {
 			return client.IgnoreNotFound(k8sClient.Delete(ctx, volumeClassStatic))
 		})
