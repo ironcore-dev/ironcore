@@ -50,7 +50,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -77,7 +77,7 @@ MachineSpec
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -101,7 +101,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -142,7 +142,7 @@ Image is the optional URL providing the operating system image of the machine.</
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -221,6 +221,20 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 covered by Tolerations will be considered to run the Machine.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>guestConfig</code><br/>
+<em>
+<a href="#compute.ironcore.dev/v1alpha1.MachineGuestConfig">
+MachineGuestConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>GuestConfig contains guest OS level configuration for the machine.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -272,7 +286,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -330,7 +344,7 @@ string
 <td>
 <code>metadata</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -652,7 +666,7 @@ MachineConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -687,7 +701,7 @@ string
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -727,6 +741,36 @@ bool
 </em>
 </td>
 <td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="compute.ironcore.dev/v1alpha1.MachineGuestConfig">MachineGuestConfig
+</h3>
+<p>
+(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.MachineSpec">MachineSpec</a>)
+</p>
+<div>
+<p>MachineGuestConfig contains guest OS level configuration for the machine.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>hostname</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Hostname is the desired hostname of the machine.</p>
 </td>
 </tr>
 </tbody>
@@ -845,7 +889,7 @@ MachinePoolConditionType
 <td>
 <code>status</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#conditionstatus-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#conditionstatus-v1-core">
 Kubernetes core/v1.ConditionStatus
 </a>
 </em>
@@ -891,7 +935,7 @@ int64
 <td>
 <code>lastTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1058,7 +1102,7 @@ MachinePoolState
 <td>
 <code>availableMachineClasses</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1138,7 +1182,7 @@ github.com/ironcore-dev/ironcore/api/core/v1alpha1.ResourceList
 <td>
 <code>machineClassRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1162,7 +1206,7 @@ map[string]string
 <td>
 <code>machinePoolRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1203,7 +1247,7 @@ Image is the optional URL providing the operating system image of the machine.</
 <td>
 <code>imagePullSecret</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1280,6 +1324,20 @@ If key is empty, DefaultIgnitionKey will be used as fallback.</p>
 <td>
 <p>Tolerations define tolerations the Machine has. Only MachinePools whose taints
 covered by Tolerations will be considered to run the Machine.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>guestConfig</code><br/>
+<em>
+<a href="#compute.ironcore.dev/v1alpha1.MachineGuestConfig">
+MachineGuestConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>GuestConfig contains guest OS level configuration for the machine.</p>
 </td>
 </tr>
 </tbody>
@@ -1474,7 +1532,7 @@ NetworkInterfaceSource
 <td>
 <code>networkInterfaceRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1577,7 +1635,7 @@ NetworkInterfaceState
 <td>
 <code>networkInterfaceRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1590,7 +1648,7 @@ Kubernetes core/v1.LocalObjectReference
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1702,7 +1760,7 @@ VolumeSource
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1832,7 +1890,7 @@ VolumeState
 <td>
 <code>lastStateTransitionTime</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1845,7 +1903,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>volumeRef</code><br/>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.35/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>

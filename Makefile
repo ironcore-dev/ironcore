@@ -22,9 +22,6 @@ VOLUMEBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/volumebroker/versi
 BUCKETBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Version
 BUCKETBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Commit
 
-# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.35.0
-
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -356,7 +353,12 @@ PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.1.1
-CONTROLLER_TOOLS_VERSION ?= v0.20.0
+CONTROLLER_TOOLS_VERSION ?= v0.21.0
+#ENVTEST_VERSION is the version of controller-runtime release branch to fetch the envtest setup script (i.e. release-0.20)
+ENVTEST_VERSION ?= $(shell go list -m -f "{{ .Version }}" sigs.k8s.io/controller-runtime | awk -F'[v.]' '{printf "release-%d.%d", $$2, $$3}')
+#ENVTEST_K8S_VERSION is the version of Kubernetes to use for setting up ENVTEST binaries (i.e. 1.31)
+ENVTEST_K8S_VERSION ?= $(shell go list -m -f "{{ .Version }}" k8s.io/api | awk -F'[v.]' '{printf "1.%d.%d",$$3, $$2}')
+
 GEN_CRD_API_REFERENCE_DOCS_VERSION ?= v0.3.0
 ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GO_VERSION ?= v1.36.11
@@ -364,7 +366,6 @@ PROTOC_GEN_GO_GRPC_VERSION ?= v1.6.0
 GOIMPORTS_VERSION ?= v0.41.0
 GOLANGCI_LINT_VERSION ?= v2.11
 OPENAPI_EXTRACTOR_VERSION ?= v0.2.0
-SETUP_ENVTEST_VERSION ?= release-0.23
 BUF_VERSION ?= v1.63.0
 MODELS_SCHEMA_VERSION ?= latest
 OPENAPI_GEN_VERSION ?= latest
@@ -387,7 +388,7 @@ $(OPENAPI_GEN): $(LOCALBIN)
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
-	$(call go-install-tool,$(ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest,$(SETUP_ENVTEST_VERSION))
+	$(call go-install-tool,$(ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest,$(ENVTEST_VERSION))
 
 .PHONY: openapi-extractor
 openapi-extractor: $(OPENAPI_EXTRACTOR) ## Download openapi-extractor locally if necessary.
