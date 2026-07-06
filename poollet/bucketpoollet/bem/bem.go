@@ -53,12 +53,12 @@ func (m *BucketEventMapper) relist(ctx context.Context, log logr.Logger) error {
 					Namespace: bucketEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.BucketNamespaceLabel],
 				},
 			}
-			// events.k8s.io/v1 requires a non-empty action field. Providers do not always populate
-			// Spec.Action on IRI events, so fall back to the reason to keep events acceptable to the
-			// API server.
+			// events.k8s.io/v1 requires a non-empty action field. Providers should populate
+			// Spec.Action on IRI events; fall back to "Unknown" so a forgotten value is
+			// obvious in the emitted event rather than silently dropped by the API server.
 			action := bucketEvent.Spec.Action
 			if action == "" {
-				action = bucketEvent.Spec.Reason
+				action = "Unknown"
 			}
 			m.Eventf(involvedBucket, nil, bucketEvent.Spec.Type, bucketEvent.Spec.Reason, action, bucketEvent.Spec.Message)
 		}

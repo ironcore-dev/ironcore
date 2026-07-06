@@ -53,12 +53,12 @@ func (m *MachineEventMapper) relist(ctx context.Context, log logr.Logger) error 
 					Namespace: machineEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.MachineNamespaceLabel],
 				},
 			}
-			// events.k8s.io/v1 requires a non-empty action field. Providers do not always populate
-			// Spec.Action on IRI events, so fall back to the reason to keep events acceptable to the
-			// API server.
+			// events.k8s.io/v1 requires a non-empty action field. Providers should populate
+			// Spec.Action on IRI events; fall back to "Unknown" so a forgotten value is
+			// obvious in the emitted event rather than silently dropped by the API server.
 			action := machineEvent.Spec.Action
 			if action == "" {
-				action = machineEvent.Spec.Reason
+				action = "Unknown"
 			}
 			m.Eventf(involvedMachine, nil, machineEvent.Spec.Type, machineEvent.Spec.Reason, action, machineEvent.Spec.Message)
 		}

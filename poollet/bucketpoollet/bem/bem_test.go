@@ -141,7 +141,7 @@ var _ = Describe("BucketEventMapper", func() {
 		)))
 	})
 
-	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+	It("should fall back to Unknown when the iri event has no action set", func(ctx SpecContext) {
 		By("creating a bucket")
 		bucket := &storagev1alpha1.Bucket{
 			ObjectMeta: metav1.ObjectMeta{
@@ -178,7 +178,7 @@ var _ = Describe("BucketEventMapper", func() {
 		}
 		srv.SetEvents(eventList)
 
-		By("validating the emitted event uses the reason as its action")
+		By("validating the emitted event has action set to Unknown")
 		bucketEventList := &corev1.EventList{}
 		selectorField := fields.Set{}
 		selectorField["involvedObject.name"] = bucket.GetName()
@@ -192,7 +192,7 @@ var _ = Describe("BucketEventMapper", func() {
 			HaveField("Reason", Equal("BucketReconcileFailed")),
 			HaveField("Message", Equal("reconcile failed")),
 			HaveField("Type", Equal(corev1.EventTypeWarning)),
-			HaveField("Action", Equal("BucketReconcileFailed")),
+			HaveField("Action", Equal("Unknown")),
 		)))
 	})
 })

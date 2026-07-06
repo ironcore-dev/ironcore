@@ -153,7 +153,7 @@ var _ = Describe("VolumeEventMapper", func() {
 		)))
 	})
 
-	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+	It("should fall back to Unknown when the iri event has no action set", func(ctx SpecContext) {
 		By("creating a volume")
 		volume := &storagev1alpha1.Volume{
 			ObjectMeta: metav1.ObjectMeta{
@@ -193,7 +193,7 @@ var _ = Describe("VolumeEventMapper", func() {
 		}
 		srv.SetEvents(eventList)
 
-		By("validating the emitted event uses the reason as its action")
+		By("validating the emitted event has action set to Unknown")
 		volumeEventList := &corev1.EventList{}
 		selectorField := fields.Set{}
 		selectorField["involvedObject.name"] = volume.GetName()
@@ -206,7 +206,7 @@ var _ = Describe("VolumeEventMapper", func() {
 		}).Should(ContainElement(SatisfyAll(
 			HaveField("Reason", Equal("VolumeReconcileFailed")),
 			HaveField("Message", Equal("reconcile failed")),
-			HaveField("Action", Equal("VolumeReconcileFailed")),
+			HaveField("Action", Equal("Unknown")),
 			HaveField("Type", Equal(corev1.EventTypeWarning)),
 		)))
 	})

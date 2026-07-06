@@ -155,7 +155,7 @@ var _ = Describe("MachineEventMapper", func() {
 		)))
 	})
 
-	It("should fall back to reason when the iri event has no action set", func(ctx SpecContext) {
+	It("should fall back to Unknown when the iri event has no action set", func(ctx SpecContext) {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
@@ -193,7 +193,7 @@ var _ = Describe("MachineEventMapper", func() {
 		}
 		srv.SetEvents(eventList)
 
-		By("validating the emitted event uses the reason as its action")
+		By("validating the emitted event has action set to Unknown")
 		machineEventList := &corev1.EventList{}
 		selectorField := fields.Set{}
 		selectorField["involvedObject.name"] = machine.GetName()
@@ -206,7 +206,7 @@ var _ = Describe("MachineEventMapper", func() {
 		}).Should(ContainElement(SatisfyAll(
 			HaveField("Reason", Equal("DomainDestroySucceeded")),
 			HaveField("Message", Equal("Domain destroyed")),
-			HaveField("Action", Equal("DomainDestroySucceeded")),
+			HaveField("Action", Equal("Unknown")),
 			HaveField("Type", Equal(corev1.EventTypeWarning)),
 		)))
 	})
