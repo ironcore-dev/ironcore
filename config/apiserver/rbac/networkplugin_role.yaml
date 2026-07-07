@@ -8,3 +8,18 @@ rules:
   - apiGroups: ["core.apinet.ironcore.dev"]
     resources: ["networkinterfaces"]
     verbs: ["create","get", "update", "patch", "delete", "watch", "list"]
+  # Allow already-authenticated network plugins to request renewal of their
+  # own client certificate. The auto-approver
+  # (internal/controllers/core/certificate/networking/networkplugin.go) performs
+  # a SubjectAccessReview against the `networkpluginclient` subresource, so both
+  # the base resource create and the subresource create must be granted here.
+  # Without this, only the initial bootstrap (via the bootstrapper role bound to
+  # the bootstrap-token group) works, and cert rotation fails once the plugin
+  # has switched from its bootstrap kubeconfig to its issued client cert.
+  # Mirrors the machinepool / volumepool / bucketpool roles.
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["certificatesigningrequests"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["certificatesigningrequests/networkpluginclient"]
+    verbs: ["create"]
