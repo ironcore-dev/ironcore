@@ -66,7 +66,7 @@ func validateVolumeSpec(spec *storage.VolumeSpec, fldPath *field.Path) field.Err
 		}
 
 		if spec.DataSource.OSImage != nil {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("osImage"), "must not specify if volume class is empty"))
+			allErrs = append(allErrs, field.Forbidden(fldPath.Child("dataSource").Child("osImage"), "must not specify if volume class is empty"))
 		}
 	}
 

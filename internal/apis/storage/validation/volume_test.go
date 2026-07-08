@@ -146,7 +146,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			Not(ContainElement(ForbiddenField("spec.osImage"))),
+			Not(ContainElement(ForbiddenField("spec.dataSource.osImage"))),
 		),
 		Entry("classless: invalid os image as volume data source",
 			&storage.Volume{
@@ -158,7 +158,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.osImage")),
+			ContainElement(ForbiddenField("spec.dataSource.osImage")),
 		),
 		Entry("invalid os image as single volume data source",
 			&storage.Volume{
@@ -171,7 +171,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.osImage")),
+			ContainElement(ForbiddenField("spec.dataSource.osImage")),
 		),
 	)
 

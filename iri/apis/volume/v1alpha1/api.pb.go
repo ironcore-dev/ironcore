@@ -2000,7 +2000,7 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"snapshotId\"\xb7\x01\n" +
 	"\x10VolumeDataSource\x12L\n" +
 	"\x11image_data_source\x18\x01 \x01(\v2 .volume.v1alpha1.ImageDataSourceR\x0fimageDataSource\x12U\n" +
-	"\x14snapshot_data_source\x18\x02 \x01(\v2#.volume.v1alpha1.SnapshotDataSourceR\x12snapshotDataSource\"\xf4\x01\n" +
+	"\x14snapshot_data_source\x18\x02 \x01(\v2#.volume.v1alpha1.SnapshotDataSourceR\x12snapshotDataSource\"\x81\x02\n" +
 	"\n" +
 	"VolumeSpec\x12\x14\n" +
 	"\x05class\x18\x02 \x01(\tR\x05class\x12>\n" +
@@ -2008,7 +2008,7 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"encryption\x18\x04 \x01(\v2\x1f.volume.v1alpha1.EncryptionSpecR\n" +
 	"encryption\x12O\n" +
-	"\x12volume_data_source\x18\x05 \x01(\v2!.volume.v1alpha1.VolumeDataSourceR\x10volumeDataSource\"\xb9\x01\n" +
+	"\x12volume_data_source\x18\x05 \x01(\v2!.volume.v1alpha1.VolumeDataSourceR\x10volumeDataSourceJ\x04\b\x01\x10\x02R\x05image\"\xb9\x01\n" +
 	"\fVolumeStatus\x122\n" +
 	"\x05state\x18\x01 \x01(\x0e2\x1c.volume.v1alpha1.VolumeStateR\x05state\x125\n" +
 	"\x06access\x18\x02 \x01(\v2\x1d.volume.v1alpha1.VolumeAccessR\x06access\x12>\n" +

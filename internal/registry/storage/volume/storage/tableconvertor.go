@@ -56,6 +56,11 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 		} else {
 			cells = append(cells, "<none>")
 		}
+		if volume.Spec.DataSource.OSImage != nil && volume.Spec.DataSource.OSImage.Image != "" {
+			cells = append(cells, volume.Spec.DataSource.OSImage.Image)
+		} else {
+			cells = append(cells, "<none>")
+		}
 		if volumeClassRef := volume.Spec.VolumeClassRef; volumeClassRef != nil {
 			cells = append(cells, volumeClassRef.Name)
 		} else {
