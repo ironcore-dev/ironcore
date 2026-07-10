@@ -690,15 +690,15 @@ const serveReadinessStableDuration = 500 * time.Millisecond
 // aggregated server, so it observes the transient 503 startup window and absorbs
 // it before the test suite proceeds.
 func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
-	var lists []client.ObjectList
+	var listGVKs []schema.GroupVersionKind
 	for _, gv := range gvs {
-		list, ok := newListForGroupVersion(scheme, gv)
+		listGVK, ok := firstListGVKForGroupVersion(scheme, gv)
 		if !ok {
 			continue
 		}
-		lists = append(lists, list)
+		listGVKs = append(listGVKs, listGVK)
 	}
-	if len(lists) == 0 {
+	if len(listGVKs) == 0 {
 		return nil
 	}
 
@@ -710,8 +710,18 @@ func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *r
 	successes := 0
 	var lastErr error
 	if err := wait.PollUntilContextCancel(ctx, serveReadinessPollInterval, true, func(ctx context.Context) (bool, error) {
-		for _, list := range lists {
-			if err := c.List(ctx, list); err != nil {
+		for _, listGVK := range listGVKs {
+			// Instantiate a fresh list per probe via the scheme so no state
+			// (ResourceVersion, Continue, Items) leaks across probes.
+			list, err := scheme.New(listGVK)
+			if err != nil {
+				return false, fmt.Errorf("unexpected error constructing list for %s: %w", listGVK, err)
+			}
+			objectList, ok := list.(client.ObjectList)
+			if !ok {
+				return false, fmt.Errorf("unexpected type %T for %s: not a client.ObjectList", list, listGVK)
+			}
+			if err := c.List(ctx, objectList); err != nil {
 				if !isTransientServeError(err) {
 					return false, fmt.Errorf("unexpected error probing aggregated api server: %w", err)
 				}
@@ -731,10 +741,11 @@ func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *r
 	return nil
 }
 
-// newListForGroupVersion returns a fresh list object for the first list kind
-// registered for the given group version (e.g. *VolumeList), constructed via the
-// scheme so the scheme stays the single source of truth for type instantiation.
-func newListForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (client.ObjectList, bool) {
+// firstListGVKForGroupVersion returns the GroupVersionKind of the first list kind
+// registered for the given group version (e.g. VolumeList). Kind resolution is
+// deterministic (sorted) and the scheme is the single source of truth for type
+// discovery. Callers construct fresh list objects from the GVK via scheme.New.
+func firstListGVKForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (schema.GroupVersionKind, bool) {
 	kinds := make([]string, 0, len(scheme.KnownTypes(gv)))
 	for kind := range scheme.KnownTypes(gv) {
 		kinds = append(kinds, kind)
@@ -745,11 +756,11 @@ func newListForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (cli
 		if err != nil {
 			continue
 		}
-		if list, ok := obj.(client.ObjectList); ok {
-			return list, true
+		if _, ok := obj.(client.ObjectList); ok {
+			return gv.WithKind(kind), true
 		}
 	}
-	return nil, false
+	return schema.GroupVersionKind{}, false
 }
 
 // isTransientServeError reports whether an error returned while probing the
