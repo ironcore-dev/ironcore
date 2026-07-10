@@ -667,51 +667,36 @@ func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, 
 	return nil
 }
 
-// serveReadinessPollInterval is the interval at which the aggregated API server
-// is probed for serving real resource round-trips.
+// poll interval for the aggregated API server serve probe.
 const serveReadinessPollInterval = 100 * time.Millisecond
 
-// serveReadinessStableDuration is how long the aggregated API server must
-// continuously serve real resource round-trips before startup is considered
-// complete.
-//
-// The APIService Available condition and group discovery can report ready
-// while the aggregated server still returns transient 503 ServiceUnavailable
-// responses for a short window afterwards. Requiring sustained success absorbs
-// that window so tests observe a genuinely serving API server.
+// sustained success window to absorb the 503 startup race after APIService goes Available.
 const serveReadinessStableDuration = 500 * time.Millisecond
 
-// waitUntilGroupVersionsServe waits until the aggregated API server actually
-// serves resource round-trips for each of the given group versions by issuing a
-// real List per group.
-//
-// Unlike the APIService Available condition and group discovery (which are
-// reported by / served from the kube-apiserver), a List is proxied to the
-// aggregated server, so it observes the transient 503 startup window and absorbs
-// it before the test suite proceeds.
+// waitUntilGroupVersionsServe polls a real List per GV until it succeeds for
+// serveReadinessStableDuration, absorbing the aggregated server's 503 window
+// after APIService reports Available.
 func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
-	var lists []client.ObjectList
+	var listGVKs []schema.GroupVersionKind
 	for _, gv := range gvs {
-		list, ok := newListForGroupVersion(scheme, gv)
-		if !ok {
-			continue
+		if listGVK, ok := firstListGVKForGroupVersion(scheme, gv); ok {
+			listGVKs = append(listGVKs, listGVK)
 		}
-		lists = append(lists, list)
 	}
-	if len(lists) == 0 {
+	if len(listGVKs) == 0 {
 		return nil
 	}
 
 	requiredSuccesses := int(serveReadinessStableDuration / serveReadinessPollInterval)
-	if requiredSuccesses < 1 {
-		requiredSuccesses = 1
-	}
-
 	successes := 0
 	var lastErr error
 	if err := wait.PollUntilContextCancel(ctx, serveReadinessPollInterval, true, func(ctx context.Context) (bool, error) {
-		for _, list := range lists {
-			if err := c.List(ctx, list); err != nil {
+		for _, listGVK := range listGVKs {
+			list, err := scheme.New(listGVK)
+			if err != nil {
+				return false, fmt.Errorf("unexpected error constructing list for %s: %w", listGVK, err)
+			}
+			if err := c.List(ctx, list.(client.ObjectList)); err != nil {
 				if !isTransientServeError(err) {
 					return false, fmt.Errorf("unexpected error probing aggregated api server: %w", err)
 				}
@@ -731,10 +716,8 @@ func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *r
 	return nil
 }
 
-// newListForGroupVersion returns a fresh list object for the first list kind
-// registered for the given group version (e.g. *VolumeList), constructed via the
-// scheme so the scheme stays the single source of truth for type instantiation.
-func newListForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (client.ObjectList, bool) {
+// firstListGVKForGroupVersion returns the first list-kind GVK registered for gv, sorted for determinism.
+func firstListGVKForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (schema.GroupVersionKind, bool) {
 	kinds := make([]string, 0, len(scheme.KnownTypes(gv)))
 	for kind := range scheme.KnownTypes(gv) {
 		kinds = append(kinds, kind)
@@ -745,28 +728,26 @@ func newListForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (cli
 		if err != nil {
 			continue
 		}
-		if list, ok := obj.(client.ObjectList); ok {
-			return list, true
+		if _, ok := obj.(client.ObjectList); ok {
+			return gv.WithKind(kind), true
 		}
 	}
-	return nil, false
+	return schema.GroupVersionKind{}, false
 }
 
-// isTransientServeError reports whether an error returned while probing the
-// aggregated API server is a transient startup condition worth retrying.
+// isTransientServeError reports whether err is a transient startup condition worth retrying.
 func isTransientServeError(err error) bool {
 	if err == nil {
 		return false
 	}
-	if apierrors.IsServiceUnavailable(err) ||
-		apierrors.IsServerTimeout(err) ||
-		apierrors.IsTimeout(err) ||
-		apierrors.IsTooManyRequests(err) ||
-		apierrors.IsInternalError(err) {
+	switch {
+	case apierrors.IsServiceUnavailable(err),
+		apierrors.IsServerTimeout(err),
+		apierrors.IsTimeout(err),
+		apierrors.IsTooManyRequests(err),
+		apierrors.IsInternalError(err):
 		return true
 	}
-	// Transport-level errors (connection refused, EOF, reset) while the
-	// aggregated server is still coming up.
 	var urlErr *url.Error
 	return errors.As(err, &urlErr)
 }
