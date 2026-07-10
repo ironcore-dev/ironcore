@@ -33,6 +33,11 @@ const (
 	MachineEphemeralVolumeManager = "machine-ephemeral-volume"
 )
 
+var poolSelectorTopologyLabels = []string{
+	string(commonv1alpha1.TopologyLabelZone),
+	string(commonv1alpha1.TopologyLabelRegion),
+}
+
 type MachineEphemeralVolumeReconciler struct {
 	k8sevents.EventRecorder
 	client.Client
@@ -60,6 +65,22 @@ func (r *MachineEphemeralVolumeReconciler) reconcileExists(ctx context.Context, 
 	return r.reconcile(ctx, log, machine)
 }
 
+func (r *MachineEphemeralVolumeReconciler) copyTopologyLabels(machine *computev1alpha1.Machine, volume *storagev1alpha1.Volume) {
+	for _, key := range poolSelectorTopologyLabels {
+		if _, ok := volume.Spec.VolumePoolSelector[key]; ok {
+			// Do not overwrite existing topology labels
+			continue
+		}
+		if val, ok := machine.Spec.MachinePoolSelector[key]; ok {
+			if volume.Spec.VolumePoolSelector == nil {
+				volume.Spec.VolumePoolSelector = make(map[string]string)
+			}
+
+			volume.Spec.VolumePoolSelector[key] = val
+		}
+	}
+}
+
 func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine *computev1alpha1.Machine) map[string]*storagev1alpha1.Volume {
 	res := make(map[string]*storagev1alpha1.Volume)
 	for _, machineVolume := range machine.Spec.Volumes {
@@ -78,8 +99,10 @@ func (r *MachineEphemeralVolumeReconciler) ephemeralMachineVolumeByName(machine 
 			},
 			Spec: ephemeral.VolumeTemplate.Spec,
 		}
+		volume.Spec.VolumePoolSelector = maps.Clone(ephemeral.VolumeTemplate.Spec.VolumePoolSelector)
 		annotations.SetDefaultEphemeralManagedBy(volume)
 		_ = ctrl.SetControllerReference(machine, volume, r.Scheme())
+		r.copyTopologyLabels(machine, volume)
 		res[volumeName] = volume
 	}
 	return res
