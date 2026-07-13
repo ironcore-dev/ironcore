@@ -68,16 +68,13 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 	)
 	labels[volumepoolletv1alpha1.VolumeUIDLabel] = volume.GetMetadata().GetLabels()[volumepoolletv1alpha1.VolumeUIDLabel]
 
-	var image string
 	var volumeSnapshotRef *corev1.LocalObjectReference
 	var osImageDataSource *storagev1alpha1.OSDataSource
-	image = volume.Spec.Image // TODO: Remove this once volume.Spec.Image is deprecated
 
 	if dataSource := volume.Spec.VolumeDataSource; dataSource != nil {
 		switch {
 		case dataSource.SnapshotDataSource != nil:
 			volumeSnapshotRef = &corev1.LocalObjectReference{Name: dataSource.SnapshotDataSource.SnapshotId}
-			image = "" // TODO: Remove this once volume.Spec.Image is deprecated
 		case dataSource.ImageDataSource != nil:
 			var architecture *string
 			if dataSource.ImageDataSource.Architecture != "" {
@@ -88,7 +85,6 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 				Image:        dataSource.ImageDataSource.Image,
 				Architecture: architecture,
 			}
-			image = dataSource.ImageDataSource.Image
 		}
 	}
 
@@ -107,9 +103,7 @@ func (s *Server) getIronCoreVolumeConfig(_ context.Context, volume *iri.Volume) 
 			Resources: corev1alpha1.ResourceList{
 				corev1alpha1.ResourceStorage: *resource.NewQuantity(volume.Spec.Resources.StorageBytes, resource.DecimalSI),
 			},
-			Image:              image, // TODO: Remove this once volume.Spec.Image is deprecated
-			ImagePullSecretRef: nil,   // TODO: Fill if necessary
-			Encryption:         encryption,
+			Encryption: encryption,
 			DataSource: storagev1alpha1.VolumeDataSource{
 				VolumeSnapshotRef: volumeSnapshotRef,
 				OSImage:           osImageDataSource,

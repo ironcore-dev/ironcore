@@ -42,7 +42,6 @@ func (s *Server) convertAggregateIronCoreVolume(volume *AggregateIronCoreVolume)
 	return &iri.Volume{
 		Metadata: metadata,
 		Spec: &iri.VolumeSpec{
-			Image:            volume.Volume.Spec.Image,
 			Class:            volume.Volume.Spec.VolumeClassRef.Name,
 			Resources:        resources,
 			Encryption:       s.convertIronCoreVolumeEncryption(volume),

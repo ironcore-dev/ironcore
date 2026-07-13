@@ -4375,6 +4375,16 @@
 					}
 				}
 			},
+			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineGuestConfig": {
+				"description": "MachineGuestConfig contains guest OS level configuration for the machine.",
+				"type": "object",
+				"properties": {
+					"hostname": {
+						"description": "Hostname is the desired hostname of the machine.",
+						"type": "string"
+					}
+				}
+			},
 			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineList": {
 				"description": "MachineList contains a list of Machine",
 				"type": "object",
@@ -4701,23 +4711,19 @@
 						"x-kubernetes-patch-merge-key": "name",
 						"x-kubernetes-patch-strategy": "merge,retainKeys"
 					},
+					"guestConfig": {
+						"description": "GuestConfig contains guest OS level configuration for the machine.",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.MachineGuestConfig"
+							}
+						]
+					},
 					"ignitionRef": {
 						"description": "IgnitionRef is a reference to a secret containing the ignition YAML for the machine to boot up. If key is empty, DefaultIgnitionKey will be used as fallback.",
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.common.v1alpha1.SecretKeySelector"
-							}
-						]
-					},
-					"image": {
-						"description": "Deprecated: Use LocalDisk to provide a bootable disk Image is the optional URL providing the operating system image of the machine.",
-						"type": "string"
-					},
-					"imagePullSecret": {
-						"description": "ImagePullSecretRef is an optional secret for pulling the image of a machine.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 							}
 						]
 					},
@@ -5414,18 +5420,6 @@
 						"allOf": [
 							{
 								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.storage.v1alpha1.VolumeEncryption"
-							}
-						]
-					},
-					"image": {
-						"description": "Image is an optional image to bootstrap the volume with. To be deprecated",
-						"type": "string"
-					},
-					"imagePullSecretRef": {
-						"description": "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
 							}
 						]
 					},

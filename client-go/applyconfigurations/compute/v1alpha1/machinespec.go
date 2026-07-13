@@ -26,11 +26,6 @@ type MachineSpecApplyConfiguration struct {
 	// Power is the desired machine power state.
 	// Defaults to PowerOn.
 	Power *computev1alpha1.Power `json:"power,omitempty"`
-	// Deprecated: Use LocalDisk to provide a bootable disk
-	// Image is the optional URL providing the operating system image of the machine.
-	Image *string `json:"image,omitempty"`
-	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
-	ImagePullSecretRef *v1.LocalObjectReference `json:"imagePullSecret,omitempty"`
 	// NetworkInterfaces define a list of network interfaces present on the machine
 	NetworkInterfaces []NetworkInterfaceApplyConfiguration `json:"networkInterfaces,omitempty"`
 	// Volumes are volumes attached to this machine.
@@ -88,22 +83,6 @@ func (b *MachineSpecApplyConfiguration) WithMachinePoolRef(value v1.LocalObjectR
 // If called multiple times, the Power field is set to the value of the last call.
 func (b *MachineSpecApplyConfiguration) WithPower(value computev1alpha1.Power) *MachineSpecApplyConfiguration {
 	b.Power = &value
-	return b
-}
-
-// WithImage sets the Image field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Image field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithImage(value string) *MachineSpecApplyConfiguration {
-	b.Image = &value
-	return b
-}
-
-// WithImagePullSecretRef sets the ImagePullSecretRef field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ImagePullSecretRef field is set to the value of the last call.
-func (b *MachineSpecApplyConfiguration) WithImagePullSecretRef(value v1.LocalObjectReference) *MachineSpecApplyConfiguration {
-	b.ImagePullSecretRef = &value
 	return b
 }
 

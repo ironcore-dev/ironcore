@@ -480,7 +480,6 @@ func (x *VolumeDataSource) GetSnapshotDataSource() *SnapshotDataSource {
 
 type VolumeSpec struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Image            string                 `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	Class            string                 `protobuf:"bytes,2,opt,name=class,proto3" json:"class,omitempty"`
 	Resources        *VolumeResources       `protobuf:"bytes,3,opt,name=resources,proto3" json:"resources,omitempty"`
 	Encryption       *EncryptionSpec        `protobuf:"bytes,4,opt,name=encryption,proto3" json:"encryption,omitempty"`
@@ -517,13 +516,6 @@ func (x *VolumeSpec) ProtoReflect() protoreflect.Message {
 // Deprecated: Use VolumeSpec.ProtoReflect.Descriptor instead.
 func (*VolumeSpec) Descriptor() ([]byte, []int) {
 	return file_volume_v1alpha1_api_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *VolumeSpec) GetImage() string {
-	if x != nil {
-		return x.Image
-	}
-	return ""
 }
 
 func (x *VolumeSpec) GetClass() string {
@@ -2008,16 +2000,15 @@ const file_volume_v1alpha1_api_proto_rawDesc = "" +
 	"snapshotId\"\xb7\x01\n" +
 	"\x10VolumeDataSource\x12L\n" +
 	"\x11image_data_source\x18\x01 \x01(\v2 .volume.v1alpha1.ImageDataSourceR\x0fimageDataSource\x12U\n" +
-	"\x14snapshot_data_source\x18\x02 \x01(\v2#.volume.v1alpha1.SnapshotDataSourceR\x12snapshotDataSource\"\x8a\x02\n" +
+	"\x14snapshot_data_source\x18\x02 \x01(\v2#.volume.v1alpha1.SnapshotDataSourceR\x12snapshotDataSource\"\x81\x02\n" +
 	"\n" +
 	"VolumeSpec\x12\x14\n" +
-	"\x05image\x18\x01 \x01(\tR\x05image\x12\x14\n" +
 	"\x05class\x18\x02 \x01(\tR\x05class\x12>\n" +
 	"\tresources\x18\x03 \x01(\v2 .volume.v1alpha1.VolumeResourcesR\tresources\x12?\n" +
 	"\n" +
 	"encryption\x18\x04 \x01(\v2\x1f.volume.v1alpha1.EncryptionSpecR\n" +
 	"encryption\x12O\n" +
-	"\x12volume_data_source\x18\x05 \x01(\v2!.volume.v1alpha1.VolumeDataSourceR\x10volumeDataSource\"\xb9\x01\n" +
+	"\x12volume_data_source\x18\x05 \x01(\v2!.volume.v1alpha1.VolumeDataSourceR\x10volumeDataSourceJ\x04\b\x01\x10\x02R\x05image\"\xb9\x01\n" +
 	"\fVolumeStatus\x122\n" +
 	"\x05state\x18\x01 \x01(\x0e2\x1c.volume.v1alpha1.VolumeStateR\x05state\x125\n" +
 	"\x06access\x18\x02 \x01(\v2\x1d.volume.v1alpha1.VolumeAccessR\x06access\x12>\n" +

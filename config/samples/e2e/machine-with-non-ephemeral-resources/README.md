@@ -39,9 +39,11 @@ metadata:
 spec:
   volumeClassRef:
     name: new-volumeClass
-  image: new-image:rootfs
   volumePoolRef:
     name: new-volumePool
+  dataSource:
+    osImage:
+      image: gardenlinux:rootfs-dev-20231025
 ```
 6. Update the `kustomization.yaml` with below content
 ```
