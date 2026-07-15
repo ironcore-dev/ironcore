@@ -5,11 +5,9 @@ package bucket
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/wait"
+	"github.com/ironcore-dev/ironcore/iri/remote/common"
 )
 
 const (
@@ -18,36 +16,13 @@ const (
 
 var WellKnownEndpoints = []string{
 	"/var/run/iri-bucketbroker.sock",
-	"/var/run/iri-cephd.sock",
+	"/var/run/iri-bucketprovider.sock",
 }
 
 func GetAddressWithTimeout(timeout time.Duration, explicitAddress string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	return GetAddress(ctx, explicitAddress)
+	return common.GetAddressWithTimeout(timeout, explicitAddress, AddressEnv, WellKnownEndpoints)
 }
 
 func GetAddress(ctx context.Context, explicitAddress string) (string, error) {
-	if explicitAddress != "" {
-		return explicitAddress, nil
-	}
-
-	if address := os.Getenv(AddressEnv); address != "" {
-		return address, nil
-	}
-
-	var endpoint string
-	if err := wait.PollUntilContextCancel(ctx, 1*time.Second, true, func(ctx context.Context) (done bool, err error) {
-		for _, wellKnownEndpoint := range WellKnownEndpoints {
-			if stat, err := os.Stat(wellKnownEndpoint); err == nil && stat.Mode().Type()&os.ModeSocket != 0 {
-				endpoint = wellKnownEndpoint
-				return true, nil
-			}
-		}
-		return false, nil
-	}); err != nil {
-		return "", fmt.Errorf("could not determine which enpdoint to use")
-	}
-
-	return fmt.Sprintf("unix://%s", endpoint), nil
+	return common.GetAddress(ctx, explicitAddress, AddressEnv, WellKnownEndpoints)
 }
