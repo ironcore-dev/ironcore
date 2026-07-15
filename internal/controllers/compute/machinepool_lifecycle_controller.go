@@ -67,7 +67,7 @@ func (r *MachinePoolLifecycleReconciler) getMachinePoolHealth(machinePoolName st
 	return r.healthData[machinePoolName]
 }
 
-func (r *MachinePoolLifecycleReconciler) setMachinePoolHealth(machinePoolName string, machinePoolHealh *MachinePoolHealth) {
+func (r *MachinePoolLifecycleReconciler) setMachinePoolHealth(machinePoolName string, machinePoolHealth *MachinePoolHealth) {
 	r.healthDataMu.Lock()
 	defer r.healthDataMu.Unlock()
 
@@ -75,7 +75,7 @@ func (r *MachinePoolLifecycleReconciler) setMachinePoolHealth(machinePoolName st
 		r.healthData = make(map[string]*MachinePoolHealth)
 	}
 
-	r.healthData[machinePoolName] = machinePoolHealh
+	r.healthData[machinePoolName] = machinePoolHealth
 }
 
 func (r *MachinePoolLifecycleReconciler) deleteMachinePoolHealth(machinePoolName string) {
