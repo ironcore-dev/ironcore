@@ -11,7 +11,6 @@ import (
 
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
-	"github.com/ironcore-dev/ironcore/utils/equality"
 	coordinationv1 "k8s.io/api/coordination/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -125,6 +124,23 @@ func leaseRenewTimeChanged(a, b *time.Time) bool {
 	return !a.Equal(*b)
 }
 
+// readyConditionChanged reports whether two optional ready conditions differ,
+// using ObservedGeneration to detect changes even if the Status is the same.
+// Used in edge-case scenarios where the Lease is not updated but the Ready condition is still updated,
+// e.g. when the MachinePool controller is restarted and re-sets the Ready condition.
+func readyConditionChanged(a, b *computev1alpha1.MachinePoolCondition) bool {
+	if a == nil && b == nil {
+		return false
+	}
+	if a == nil || b == nil {
+		return true
+	}
+	// ObservedGeneration is set to the MachinePool's generation when the condition is updated in the MachinePool controller,
+	// so we can use it to detect changes in the condition even if the Status is the same.
+	changed := a.Status != b.Status || a.ObservedGeneration != b.ObservedGeneration
+	return changed
+}
+
 func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	now := time.Now()
 	prev := r.getMachinePoolHealth(machinePool.Name)
@@ -136,7 +152,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 		return ctrl.Result{}, err
 	}
 
-	changed := leaseRenewTimeChanged(prevLeaseRenewTime, currentLeaseRenewTime) || !equality.Semantic.DeepEqual(prevReadyCondition, currentReadyCondition)
+	changed := leaseRenewTimeChanged(prevLeaseRenewTime, currentLeaseRenewTime) || readyConditionChanged(prevReadyCondition, currentReadyCondition)
 
 	next := &MachinePoolHealth{
 		readyCondition: currentReadyCondition,

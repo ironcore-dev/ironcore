@@ -335,10 +335,11 @@ func startReadyConditionRenewer(ctx SpecContext, key client.ObjectKey, status co
 				patch := client.MergeFrom(pool.DeepCopy())
 				counter++
 				pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
-					Type:    computev1alpha1.MachinePoolReady,
-					Status:  status,
-					Reason:  "MachinePoolReadyChanged",
-					Message: fmt.Sprintf("machinepool ready changed: %s %d", status, counter),
+					Type:               computev1alpha1.MachinePoolReady,
+					Status:             status,
+					Reason:             "MachinePoolReadyChanged",
+					Message:            fmt.Sprintf("machinepool ready changed: %s %d", status, counter),
+					ObservedGeneration: int64(counter),
 				})
 				_ = k8sClient.Status().Patch(ctx, pool, patch)
 			}
