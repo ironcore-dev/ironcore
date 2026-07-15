@@ -672,7 +672,7 @@ func schema_ironcore_api_common_v1alpha1_Toleration(ref common.ReferenceCallback
 					},
 					"effect": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule.",
+							Description: "Effect indicates the taint effect to match. Empty means match all taint effects. When specified, allowed values are NoSchedule, NoExecute.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
