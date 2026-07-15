@@ -184,8 +184,12 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 
 	r.setMachinePoolHealth(machinePool.Name, next)
 
-	// requeue when this pool's grace period runs out, but never sooner than 50ms from now.
-	return ctrl.Result{RequeueAfter: max(50*time.Millisecond, time.Until(next.lastChangeDetectedTime.Add(r.GracePeriod)))}, nil
+	requeueAfter := time.Until(next.lastChangeDetectedTime.Add(r.GracePeriod))
+	if requeueAfter <= 0 {
+		// Grace period has already expired, requeue after the full grace period to avoid a tight loop.
+		requeueAfter = r.GracePeriod
+	}
+	return ctrl.Result{RequeueAfter: requeueAfter}, nil
 }
 
 func (r *MachinePoolLifecycleReconciler) SetupWithManager(mgr ctrl.Manager) error {
