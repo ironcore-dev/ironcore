@@ -17,6 +17,7 @@ import (
 	"github.com/ironcore-dev/controller-utils/clientutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	irimachine "github.com/ironcore-dev/ironcore/iri/apis/machine"
@@ -335,10 +336,6 @@ func (r *MachineReconciler) create(
 	if !ok {
 		log.V(1).Info("Machine is not yet ready")
 		return ctrl.Result{}, nil
-	}
-
-	if machine.Spec.Image != "" { //nolint:staticcheck
-		r.Eventf(machine, nil, corev1.EventTypeWarning, "ImageRefDeprecated", "Image reference in %s is deprecated", machine.Spec.Image) //nolint:staticcheck
 	}
 
 	log.V(1).Info("Creating machine")
@@ -975,6 +972,32 @@ func (r *MachineReconciler) enqueueMachinesReferencingNetworkInterface() handler
 	})
 }
 
+func (r *MachineReconciler) enqueueMachinesReferencingPrefix() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		prefix := obj.(*ipamv1alpha1.Prefix)
+		log := ctrl.LoggerFrom(ctx)
+
+		owner := metav1.GetControllerOf(prefix)
+		if owner == nil || owner.Kind != "NetworkInterface" {
+			return nil
+		}
+
+		machineList := &computev1alpha1.MachineList{}
+		if err := r.List(ctx, machineList,
+			client.InNamespace(prefix.Namespace),
+			client.MatchingFields{
+				machinepoolletclient.MachineSpecNetworkInterfaceNamesField: owner.Name,
+			},
+			r.matchingWatchLabel(),
+		); err != nil {
+			log.Error(err, "Error listing machines referencing prefix", "PrefixKey", client.ObjectKeyFromObject(prefix))
+			return nil
+		}
+
+		return utilclient.ReconcileRequestsFromObjectStructSlice[*computev1alpha1.Machine](machineList.Items)
+	})
+}
+
 func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("machinepoollet")
 
@@ -998,6 +1021,10 @@ func (r *MachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&storagev1alpha1.Volume{},
 			r.enqueueMachinesReferencingVolume(),
+		).
+		Watches(
+			&ipamv1alpha1.Prefix{},
+			r.enqueueMachinesReferencingPrefix(),
 		).
 		WithOptions(
 			controller.Options{

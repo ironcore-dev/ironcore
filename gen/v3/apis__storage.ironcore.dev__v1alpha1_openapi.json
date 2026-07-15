@@ -10627,18 +10627,6 @@
 							}
 						]
 					},
-					"image": {
-						"description": "Image is an optional image to bootstrap the volume with. To be deprecated",
-						"type": "string"
-					},
-					"imagePullSecretRef": {
-						"description": "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.api.core.v1.LocalObjectReference"
-							}
-						]
-					},
 					"resources": {
 						"description": "Resources is a description of the volume's resources and capacity.",
 						"type": "object",

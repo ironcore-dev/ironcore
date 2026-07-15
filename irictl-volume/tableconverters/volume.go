@@ -29,7 +29,6 @@ var (
 			return api.Row{
 				volume.Metadata.Id,
 				volume.Spec.Class,
-				volume.Spec.Image,
 				volume.Status.State.String(),
 				duration.HumanDuration(time.Since(time.Unix(0, volume.Metadata.CreatedAt))),
 			}, nil

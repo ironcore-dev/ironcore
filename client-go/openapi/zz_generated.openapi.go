@@ -1564,19 +1564,6 @@ func schema_ironcore_api_compute_v1alpha1_MachineSpec(ref common.ReferenceCallba
 							Format:      "",
 						},
 					},
-					"image": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Deprecated: Use LocalDisk to provide a bootable disk Image is the optional URL providing the operating system image of the machine.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"imagePullSecret": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ImagePullSecretRef is an optional secret for pulling the image of a machine.",
-							Ref:         ref(v1.LocalObjectReference{}.OpenAPIModelName()),
-						},
-					},
 					"networkInterfaces": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -6253,19 +6240,6 @@ func schema_ironcore_api_storage_v1alpha1_VolumeSpec(ref common.ReferenceCallbac
 									},
 								},
 							},
-						},
-					},
-					"image": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Image is an optional image to bootstrap the volume with. To be deprecated",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"imagePullSecretRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ImagePullSecretRef is an optional secret for pulling the image of a volume.",
-							Ref:         ref(v1.LocalObjectReference{}.OpenAPIModelName()),
 						},
 					},
 					"unclaimable": {

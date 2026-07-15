@@ -72,23 +72,7 @@ var _ = Describe("Volume", func() {
 			},
 			ContainElement(ForbiddenField("spec.claimRef")),
 		),
-		Entry("classless: image pull secret ref",
-			&storage.Volume{
-				Spec: storage.VolumeSpec{
-					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo"},
-				},
-			},
-			ContainElement(ForbiddenField("spec.imagePullSecretRef")),
-		),
-		Entry("classful: invalid image pull secret ref name",
-			&storage.Volume{
-				Spec: storage.VolumeSpec{
-					VolumeClassRef:     &corev1.LocalObjectReference{Name: "foo"},
-					ImagePullSecretRef: &corev1.LocalObjectReference{Name: "foo*"},
-				},
-			},
-			ContainElement(InvalidField("spec.imagePullSecretRef.name")),
-		),
+
 		Entry("classless: no resources[storage]",
 			&storage.Volume{},
 			Not(ContainElement(RequiredField("spec.resources[storage]"))),
@@ -162,7 +146,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			Not(ContainElement(ForbiddenField("spec.osImage"))),
+			Not(ContainElement(ForbiddenField("spec.dataSource.osImage"))),
 		),
 		Entry("classless: invalid os image as volume data source",
 			&storage.Volume{
@@ -174,7 +158,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.osImage")),
+			ContainElement(ForbiddenField("spec.dataSource.osImage")),
 		),
 		Entry("invalid os image as single volume data source",
 			&storage.Volume{
@@ -187,7 +171,7 @@ var _ = Describe("Volume", func() {
 					},
 				},
 			},
-			ContainElement(ForbiddenField("spec.osImage")),
+			ContainElement(ForbiddenField("spec.dataSource.osImage")),
 		),
 	)
 

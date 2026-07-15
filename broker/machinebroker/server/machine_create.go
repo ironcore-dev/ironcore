@@ -211,7 +211,6 @@ func (s *Server) createIronCoreMachine(
 			MachinePoolSelector: s.cluster.MachinePoolSelector(),
 			MachinePoolRef:      s.ironcoreMachinePoolRef(),
 			Power:               cfg.Power,
-			ImagePullSecretRef:  nil, // TODO: Specify as soon as available.
 			NetworkInterfaces:   ironcoreMachineNics,
 			Volumes:             ironcoreMachineVolumes,
 			IgnitionRef:         ignitionRef,

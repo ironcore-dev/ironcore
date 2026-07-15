@@ -887,11 +887,6 @@ func (in *VolumeSpec) DeepCopyInto(out *VolumeSpec) {
 			(*out)[key] = val.DeepCopy()
 		}
 	}
-	if in.ImagePullSecretRef != nil {
-		in, out := &in.ImagePullSecretRef, &out.ImagePullSecretRef
-		*out = new(v1.LocalObjectReference)
-		**out = **in
-	}
 	if in.Tolerations != nil {
 		in, out := &in.Tolerations, &out.Tolerations
 		*out = make([]v1alpha1.Toleration, len(*in))

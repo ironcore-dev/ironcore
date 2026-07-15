@@ -54,7 +54,14 @@ func (m *VolumeEventMapper) relist(ctx context.Context, log logr.Logger) error {
 					Namespace: volumeEvent.Spec.InvolvedObjectMeta.Labels[v1alpha1.VolumeNamespaceLabel],
 				},
 			}
-			m.Eventf(involvedVolume, nil, volumeEvent.Spec.Type, volumeEvent.Spec.Reason, volumeEvent.Spec.Action, volumeEvent.Spec.Message)
+			// events.k8s.io/v1 requires a non-empty action field. Providers should populate
+			// Spec.Action on IRI events; fall back to "Unknown" so a forgotten value is
+			// obvious in the emitted event rather than silently dropped by the API server.
+			action := volumeEvent.Spec.Action
+			if action == "" {
+				action = "Unknown"
+			}
+			m.Eventf(involvedVolume, nil, volumeEvent.Spec.Type, volumeEvent.Spec.Reason, action, volumeEvent.Spec.Message)
 		}
 	}
 

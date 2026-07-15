@@ -55,7 +55,8 @@ message VolumeDataSource {
 }
 
 message VolumeSpec {
-  string image = 1;
+  reserved 1;
+  reserved "image";
   string class = 2;
   VolumeResources resources = 3;
   EncryptionSpec encryption = 4;

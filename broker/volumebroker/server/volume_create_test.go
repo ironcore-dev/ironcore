@@ -112,7 +112,6 @@ var _ = Describe("CreateVolume", func() {
 				Image:        "test-image",
 				Architecture: ptr.To("amd64"),
 			}),
-			HaveField("Spec.Image", "test-image"),
 			HaveField("Spec.Resources", HaveLen(1)),
 		))
 	})
