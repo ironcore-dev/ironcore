@@ -85,11 +85,7 @@ func (r *MachinePoolLifecycleReconciler) deleteMachinePoolHealth(machinePoolName
 	delete(r.healthData, machinePoolName)
 }
 
-func getPreviousHealthValues(machinePoolHealth *MachinePoolHealth) (*computev1alpha1.MachinePoolCondition, *time.Time) {
-	var (
-		prevReadyCondition *computev1alpha1.MachinePoolCondition
-		prevLeaseRenewTime *time.Time
-	)
+func getPreviousHealthValues(machinePoolHealth *MachinePoolHealth) (prevReadyCondition *computev1alpha1.MachinePoolCondition, prevLeaseRenewTime *time.Time) {
 	if machinePoolHealth != nil {
 		prevReadyCondition = machinePoolHealth.readyCondition
 		if !machinePoolHealth.leaseRenewTime.IsZero() {
@@ -116,6 +112,19 @@ func (r *MachinePoolLifecycleReconciler) getCurrentLeaseRenewTime(ctx context.Co
 	return nil, nil
 }
 
+// leaseRenewTimeChanged reports whether two optional lease renew times differ,
+// using time.Time.Equal to avoid false positives from monotonic clock or
+// location pointer differences.
+func leaseRenewTimeChanged(a, b *time.Time) bool {
+	if a == nil && b == nil {
+		return false
+	}
+	if a == nil || b == nil {
+		return true
+	}
+	return !a.Equal(*b)
+}
+
 func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
 	now := time.Now()
 	prev := r.getMachinePoolHealth(machinePool.Name)
@@ -127,7 +136,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 		return ctrl.Result{}, err
 	}
 
-	changed := !ptr.Equal(prevLeaseRenewTime, currentLeaseRenewTime) || !equality.Semantic.DeepEqual(prevReadyCondition, currentReadyCondition)
+	changed := leaseRenewTimeChanged(prevLeaseRenewTime, currentLeaseRenewTime) || !equality.Semantic.DeepEqual(prevReadyCondition, currentReadyCondition)
 
 	next := &MachinePoolHealth{
 		readyCondition: currentReadyCondition,
