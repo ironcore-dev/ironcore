@@ -3,9 +3,6 @@ name: Kustomize Validation
 on:
   pull_request:
     types: [ assigned, opened, synchronize, reopened ]
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
 
 jobs:
   kustomize-validation:
