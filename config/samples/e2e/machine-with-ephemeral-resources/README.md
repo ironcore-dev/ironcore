@@ -36,9 +36,11 @@ spec:
             name: new-volumeClass
           volumePoolRef:
             name: new-volumePool
-          image: gardenlinux:rootfs-dev-20231025
           resources:
             storage: 15Gi
+          dataSource:
+            osImage:
+              image: gardenlinux:rootfs-dev-20231025
 ```
 
 5. Update the `kustomization.yaml` with below content

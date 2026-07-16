@@ -32,7 +32,9 @@ spec:
         spec:
           volumeClassRef:
             name: volumeclass-sample
-          image: gardenlinux:rootfs-image
           resources:
             storage: 10Gi
+          dataSource:
+            osImage:
+              image: gardenlinux:rootfs-image
 

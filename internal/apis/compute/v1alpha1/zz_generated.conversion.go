@@ -846,8 +846,6 @@ func autoConvert_v1alpha1_MachineSpec_To_compute_MachineSpec(in *computev1alpha1
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.Power = compute.Power(in.Power)
-	out.Image = in.Image
-	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]compute.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes
@@ -877,8 +875,6 @@ func autoConvert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.Machine
 	out.MachinePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.MachinePoolSelector))
 	out.MachinePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.MachinePoolRef))
 	out.Power = computev1alpha1.Power(in.Power)
-	out.Image = in.Image
-	out.ImagePullSecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.ImagePullSecretRef))
 	out.NetworkInterfaces = *(*[]computev1alpha1.NetworkInterface)(unsafe.Pointer(&in.NetworkInterfaces))
 	if in.Volumes != nil {
 		in, out := &in.Volumes, &out.Volumes

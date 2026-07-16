@@ -28,11 +28,6 @@ type VolumeSpecApplyConfiguration struct {
 	ClaimRef *commonv1alpha1.LocalUIDReference `json:"claimRef,omitempty"`
 	// Resources is a description of the volume's resources and capacity.
 	Resources *corev1alpha1.ResourceList `json:"resources,omitempty"`
-	// Image is an optional image to bootstrap the volume with.
-	// To be deprecated
-	Image *string `json:"image,omitempty"`
-	// ImagePullSecretRef is an optional secret for pulling the image of a volume.
-	ImagePullSecretRef *v1.LocalObjectReference `json:"imagePullSecretRef,omitempty"`
 	// Unclaimable marks the volume as unclaimable.
 	Unclaimable *bool `json:"unclaimable,omitempty"`
 	// Tolerations define tolerations the Volume has. Only any VolumePool whose taints
@@ -93,22 +88,6 @@ func (b *VolumeSpecApplyConfiguration) WithClaimRef(value commonv1alpha1.LocalUI
 // If called multiple times, the Resources field is set to the value of the last call.
 func (b *VolumeSpecApplyConfiguration) WithResources(value corev1alpha1.ResourceList) *VolumeSpecApplyConfiguration {
 	b.Resources = &value
-	return b
-}
-
-// WithImage sets the Image field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the Image field is set to the value of the last call.
-func (b *VolumeSpecApplyConfiguration) WithImage(value string) *VolumeSpecApplyConfiguration {
-	b.Image = &value
-	return b
-}
-
-// WithImagePullSecretRef sets the ImagePullSecretRef field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the ImagePullSecretRef field is set to the value of the last call.
-func (b *VolumeSpecApplyConfiguration) WithImagePullSecretRef(value v1.LocalObjectReference) *VolumeSpecApplyConfiguration {
-	b.ImagePullSecretRef = &value
 	return b
 }
 

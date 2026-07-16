@@ -68,10 +68,6 @@ func MachineVolumeNames(machine *Machine) []string {
 func MachineSecretNames(machine *Machine) []string {
 	var names []string
 
-	if imagePullSecretRef := machine.Spec.ImagePullSecretRef; imagePullSecretRef != nil {
-		names = append(names, imagePullSecretRef.Name)
-	}
-
 	if ignitionRef := machine.Spec.IgnitionRef; ignitionRef != nil {
 		names = append(names, ignitionRef.Name)
 	}

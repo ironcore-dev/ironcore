@@ -455,7 +455,6 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 	return &iri.Volume{
 		Metadata: metadata,
 		Spec: &iri.VolumeSpec{
-			Image:            volume.Spec.Image,
 			Class:            class,
 			Resources:        resources,
 			Encryption:       encryption,

@@ -15,7 +15,6 @@ metadata:
 spec:
   machineClassRef:
     name: machineclass-sample
-  image: my-image
   volumes:
     - name: rootdisk # first disk is the root disk
       volumeRef:
@@ -33,7 +32,6 @@ spec:
 
 - machineClassRef (`string`): machineClassRef is a reference to the machine class/flavor of the machine.
 - machinePoolRef (`string`): machinePoolRef defines the machine pool to run the machine in. If empty, a scheduler will figure out an appropriate pool to run the machine in.
-- image (`string`): image is the optional URL providing the operating system image of the machine.
 - volumes (`list`): volumes are list volumes(storage) attached to this machine.
 - networkInterfaces (`list`): networkInterfaces define a list of network interfaces present on the machine
 - ignitionRef (`string`): ignitionRef is a reference to a `secret` containing the ignition YAML for the machine to boot up. If a key is empty, `DefaultIgnitionKey` will be used as a fallback. (`Note`: Refer to <a href="https://github.com/ironcore-dev/ironcore/tree/main/config/samples/e2e/bases/ignition">Sample Ignition</a> for creating ignition secret)
@@ -68,6 +66,6 @@ The `MachineScheduler` controller continuously watches for `Machines` without an
 A Machine can be in the following states:
 1. **Pending**:  A Machine is in a Pending state when the Machine has been accepted by the system, but not yet completely started. This includes time before being bound to a MachinePool, as well as time spent setting up the Machine on that MachinePool. 
 2. **Running**: A Machine in Running state when the machine is running on a MachinePool.
-2. **Shutdown**: A Machine is in a Shutdown state.
-3. **Terminating**: A Machine is Terminating.
-2. **Terminated**: A Machine is in the Terminated state when the machine has been permanently stopped and cannot be started.
+3. **Shutdown**: A Machine is in a Shutdown state.
+4. **Terminating**: A Machine is Terminating.
+5. **Terminated**: A Machine is in the Terminated state when the machine has been permanently stopped and cannot be started.

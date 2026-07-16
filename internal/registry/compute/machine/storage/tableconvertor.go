@@ -32,6 +32,15 @@ func newTableConvertor() *convertor {
 	return &convertor{}
 }
 
+func volumeImage(machine *compute.Machine) string {
+	for _, volume := range machine.Spec.Volumes {
+		if volume.LocalDisk != nil && volume.LocalDisk.Image != "" {
+			return volume.LocalDisk.Image
+		}
+	}
+	return ""
+}
+
 func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tableOptions runtime.Object) (*metav1.Table, error) {
 	tab := &metav1.Table{
 		ColumnDefinitions: headers,
@@ -52,7 +61,7 @@ func (c *convertor) ConvertToTable(ctx context.Context, obj runtime.Object, tabl
 
 		cells = append(cells, name)
 		cells = append(cells, machine.Spec.MachineClassRef.Name)
-		if image := machine.Spec.Image; image != "" {
+		if image := volumeImage(machine); image != "" {
 			cells = append(cells, image)
 		} else {
 			cells = append(cells, "<none>")

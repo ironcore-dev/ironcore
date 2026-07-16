@@ -92,12 +92,6 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		}
 	}
 
-	if machineSpec.ImagePullSecretRef != nil {
-		for _, msg := range apivalidation.NameIsDNSSubdomain(machineSpec.ImagePullSecretRef.Name, false) {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("imagePullSecretRef").Child("name"), machineSpec.ImagePullSecretRef.Name, msg))
-		}
-	}
-
 	seenNames := sets.NewString()
 	seenDevices := sets.NewString()
 	for i, vol := range machineSpec.Volumes {
@@ -308,7 +302,6 @@ func validateVolumeTemplateSpecForMachine(template *storage.VolumeTemplateSpec, 
 func validateMachineSpecUpdate(new, old *compute.MachineSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
-	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.Image, old.Image, fldPath.Child("image"))...)
 	allErrs = append(allErrs, ironcorevalidation.ValidateImmutableField(new.MachineClassRef, old.MachineClassRef, fldPath.Child("machineClassRef"))...)
 	allErrs = append(allErrs, ironcorevalidation.ValidateSetOnceField(new.MachinePoolRef, old.MachinePoolRef, fldPath.Child("machinePoolRef"))...)
 

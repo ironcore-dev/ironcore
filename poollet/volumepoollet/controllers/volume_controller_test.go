@@ -66,7 +66,6 @@ var _ = Describe("VolumeController", func() {
 
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(iriVolume.Spec.Image).To(Equal(""))
 		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(iriVolume.Spec.Encryption).To(BeNil())
 		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
@@ -158,7 +157,6 @@ var _ = Describe("VolumeController", func() {
 
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(iriVolume.Spec.Image).To(Equal(""))
 		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 		Expect(iriVolume.Spec.Encryption.SecretData).NotTo(HaveKeyWithValue(encryptionDataKey, encryptionData))
@@ -193,7 +191,6 @@ var _ = Describe("VolumeController", func() {
 
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(iriVolume.Spec.Image).To(Equal(""))
 		Expect(iriVolume.Spec.Class).To(Equal(expandableVc.Name))
 		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))
 
@@ -984,7 +981,6 @@ var _ = Describe("VolumeController", func() {
 
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 
-		Expect(iriVolume.Spec.Image).To(Equal(""))
 		Expect(iriVolume.Spec.Class).To(Equal(vc.Name))
 		Expect(iriVolume.Spec.Encryption).To(BeNil())
 		Expect(iriVolume.Spec.Resources.StorageBytes).To(Equal(size.Value()))

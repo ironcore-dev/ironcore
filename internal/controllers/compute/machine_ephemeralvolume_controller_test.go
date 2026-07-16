@@ -146,6 +146,103 @@ var _ = Describe("MachineEphemeralVolumeController", func() {
 		))
 	})
 
+	It("should propagate topology labels from machine pool selector to ephemeral volume pool selector", func(ctx SpecContext) {
+		By("creating a machine with zone topology label in pool selector")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-topology-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+				MachinePoolSelector: map[string]string{
+					"topology.ironcore.dev/zone":   "zone-a",
+					"topology.ironcore.dev/region": "region-1",
+				},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "ephem-volume",
+						VolumeSource: computev1alpha1.VolumeSource{
+							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
+								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
+									Spec: storagev1alpha1.VolumeSpec{
+										VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+										Resources: corev1alpha1.ResourceList{
+											corev1alpha1.ResourceStorage: resource.MustParse("500Mi"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the ephemeral volume to exist with propagated topology labels")
+		ephemVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, "ephem-volume"),
+			},
+		}
+		Eventually(Object(ephemVolume)).Should(SatisfyAll(
+			HaveField("Spec.VolumePoolSelector", HaveKeyWithValue("topology.ironcore.dev/zone", "zone-a")),
+			HaveField("Spec.VolumePoolSelector", HaveKeyWithValue("topology.ironcore.dev/region", "region-1")),
+		))
+	})
+
+	It("should not overwrite user-specified topology labels in ephemeral volume pool selector", func(ctx SpecContext) {
+		By("creating a machine with topology labels in both machine pool selector and volume template")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "machine-override-topology-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+				MachinePoolSelector: map[string]string{
+					"topology.ironcore.dev/zone":   "zone-a",
+					"topology.ironcore.dev/region": "region-1",
+				},
+				Volumes: []computev1alpha1.Volume{
+					{
+						Name: "ephem-volume",
+						VolumeSource: computev1alpha1.VolumeSource{
+							Ephemeral: &computev1alpha1.EphemeralVolumeSource{
+								VolumeTemplate: &storagev1alpha1.VolumeTemplateSpec{
+									Spec: storagev1alpha1.VolumeSpec{
+										VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+										Resources: corev1alpha1.ResourceList{
+											corev1alpha1.ResourceStorage: resource.MustParse("500Mi"),
+										},
+										VolumePoolSelector: map[string]string{
+											"topology.ironcore.dev/zone": "zone-b",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed())
+
+		By("waiting for the ephemeral volume with user-specified zone taking precedence and region propagated")
+		ephemVolume := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns.Name,
+				Name:      computev1alpha1.MachineEphemeralVolumeName(machine.Name, "ephem-volume"),
+			},
+		}
+		Eventually(Object(ephemVolume)).Should(SatisfyAll(
+			HaveField("Spec.VolumePoolSelector", HaveKeyWithValue("topology.ironcore.dev/zone", "zone-b")),
+			HaveField("Spec.VolumePoolSelector", HaveKeyWithValue("topology.ironcore.dev/region", "region-1")),
+		))
+	})
+
 	It("should not delete externally managed volumes for a machine", func(ctx SpecContext) {
 		By("creating a machine")
 		machine := &computev1alpha1.Machine{

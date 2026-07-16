@@ -23,12 +23,6 @@ type MachineSpec struct {
 	// Power is the desired machine power state.
 	// Defaults to PowerOn.
 	Power Power `json:"power,omitempty"`
-	// Deprecated: Use LocalDisk to provide a bootable disk
-	// Image is the optional URL providing the operating system image of the machine.
-	// +optional
-	Image string `json:"image,omitempty"`
-	// ImagePullSecretRef is an optional secret for pulling the image of a machine.
-	ImagePullSecretRef *corev1.LocalObjectReference `json:"imagePullSecret,omitempty"`
 	// NetworkInterfaces define a list of network interfaces present on the machine
 	// +optional
 	// +patchMergeKey=name
