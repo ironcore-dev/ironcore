@@ -91,7 +91,6 @@ func (r *MachineEvictionReconciler) enqueueMachinesInPool() handler.MapFunc {
 		if err := r.List(ctx, machineList,
 			client.MatchingFields{computeclient.MachineSpecMachinePoolRefNameField: obj.GetName()},
 		); err != nil {
-
 			log.Error(err, "Error listing machines bound to pool", "MachinePool", obj.GetName())
 			return nil
 		}
