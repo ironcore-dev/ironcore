@@ -66,6 +66,7 @@ const (
 	machineEphemeralNetworkInterfaceController = "machineephemeralnetworkinterface"
 	machineEphemeralVolumeController           = "machineephemeralvolume"
 	machineSchedulerController                 = "machinescheduler"
+	machineEvictionController                  = "machineeviction"
 	machineClassController                     = "machineclass"
 	machinePoolLifecycleController             = "machinepoollifecycle"
 
@@ -327,6 +328,16 @@ func main() {
 			Cache:         schedulerCache,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MachineScheduler")
+			os.Exit(1)
+		}
+	}
+
+	if controllers.Enabled(machineEvictionController) {
+		if err := (&computecontrollers.MachineEvictionReconciler{
+			Client:        mgr.GetClient(),
+			EventRecorder: mgr.GetEventRecorder("machine-eviction"),
+		}).SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "MachineEviction")
 			os.Exit(1)
 		}
 	}

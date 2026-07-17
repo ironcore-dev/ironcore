@@ -93,6 +93,7 @@ rules:
   resources:
   - machines
   verbs:
+  - delete
   - get
   - list
   - patch

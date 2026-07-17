@@ -175,6 +175,11 @@ var _ = BeforeSuite(func() {
 		GracePeriod: machinePoolLifecycleGracePeriod,
 	}).SetupWithManager(k8sManager)).To(Succeed())
 
+	Expect((&MachineEvictionReconciler{
+		EventRecorder: &events.FakeRecorder{},
+		Client:        k8sManager.GetClient(),
+	}).SetupWithManager(k8sManager)).To(Succeed())
+
 	go func() {
 		defer GinkgoRecover()
 		Expect(k8sManager.Start(ctx)).To(Succeed(), "failed to start manager")
