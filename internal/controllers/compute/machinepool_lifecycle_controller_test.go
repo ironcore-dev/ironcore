@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	. "sigs.k8s.io/controller-runtime/pkg/envtest/komega"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	coordinationv1 "k8s.io/api/coordination/v1"
@@ -40,27 +41,19 @@ var _ = Describe("machinepool lifecycle controller", func() {
 			})
 
 			By("checking that the MachinePool Ready condition is set to Unknown")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			Eventually(func(g Gomega) {
-				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
-				g.Expect(err).NotTo(HaveOccurred())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
-
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(2 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Eventually(ctx, Object(machinePool)).WithTimeout(2 * machinePoolLifecycleGracePeriod).Should(
+				HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				))),
+			)
 
 			By("verifying the Unknown status is only set once (no further status patches)")
-			Expect(k8sClient.Get(ctx, machinePoolKey, machinePool)).To(Succeed())
-
 			resourceVersion := machinePool.ResourceVersion
 
-			Consistently(func(g Gomega) {
-				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
-				g.Expect(err).NotTo(HaveOccurred())
-				g.Expect(machinePool.ResourceVersion).To(Equal(resourceVersion))
-			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Consistently(ctx, Object(machinePool)).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(
+				HaveField("ResourceVersion", Equal(resourceVersion)),
+			)
 		})
 
 		It("should set the ready condition to Unknown (Lease with RenewTime)", func(ctx SpecContext) {
@@ -82,30 +75,22 @@ var _ = Describe("machinepool lifecycle controller", func() {
 			})
 
 			By("checking that the MachinePool Ready condition is set to Unknown")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			Eventually(func(g Gomega) {
-				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
-				g.Expect(err).NotTo(HaveOccurred())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
-
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
-			}).Should(Succeed())
+			Eventually(ctx, Object(machinePool)).Should(
+				HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				))),
+			)
 		})
 
 		It("should set the ready condition to Unknown (No lease)", func(ctx SpecContext) {
 			By("checking that the MachinePool Ready condition is set to Unknown")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			Eventually(func(g Gomega) {
-				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
-				g.Expect(err).NotTo(HaveOccurred())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
-
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
-			}).Should(Succeed())
+			Eventually(ctx, Object(machinePool)).Should(
+				HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				))),
+			)
 		})
 	})
 
@@ -129,66 +114,36 @@ var _ = Describe("machinepool lifecycle controller", func() {
 			})
 
 			By("continuously renewing the lease well within the grace period")
-			stopCh := make(chan struct{})
-			done := make(chan struct{})
-			go func() {
-				defer close(done)
-				ticker := time.NewTicker(50 * time.Millisecond)
-				defer ticker.Stop()
-				for {
-					select {
-					case <-stopCh:
-						return
-					case <-ticker.C:
-						fresh := &coordinationv1.Lease{}
-						if err := k8sClient.Get(ctx, client.ObjectKeyFromObject(lease), fresh); err != nil {
-							return
-						}
-						fresh.Spec.RenewTime = ptr.To(metav1.NowMicro())
-						_ = k8sClient.Update(ctx, fresh)
-					}
-				}
-			}()
-			DeferCleanup(func(_ SpecContext) {
-				close(stopCh)
-				<-done
-			})
+			stop := startLeaseRenewer(lease)
+			DeferCleanup(stop)
 
 			By("verifying the ready condition never becomes Unknown over 15 seconds")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			Consistently(func(g Gomega) {
-				err := k8sClient.Get(ctx, machinePoolKey, machinePool)
-				g.Expect(err).NotTo(HaveOccurred())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(machinePool.Status.Conditions, computev1alpha1.MachinePoolReady)
-				if readyCondition != nil {
-					g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-				}
-			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Consistently(ctx, Object(machinePool)).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(
+				Not(HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				)))),
+			)
 		})
-
 	})
 
 	Context("when the ready condition progresses", func() {
 		DescribeTable("should not flip a freshly-progressing ready condition to Unknown",
 			func(ctx SpecContext, initialStatus corev1.ConditionStatus, nextStatus corev1.ConditionStatus) {
 				By("setting the initial ready condition on the machine pool")
-				machinePoolKey := client.ObjectKeyFromObject(machinePool)
-				patchReadyCondition(ctx, machinePoolKey, initialStatus, "Initial", "initial state")
+				patchReadyCondition(ctx, machinePool, initialStatus, "Initial", "initial state")
 
 				By("continuously refreshing the ready condition well within the grace period")
-				stop := startReadyConditionRenewer(ctx, machinePoolKey, nextStatus)
+				stop := startReadyConditionRenewer(machinePool, nextStatus)
 				DeferCleanup(stop)
 
 				By("verifying the ready condition never becomes Unknown")
-				Consistently(func(g Gomega) {
-					pool := &computev1alpha1.MachinePool{}
-					g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
-
-					readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
-					g.Expect(readyCondition).NotTo(BeNil())
-					g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-				}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
+				Consistently(ctx, Object(machinePool)).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(
+					Not(HaveField("Status.Conditions", ContainElement(SatisfyAll(
+						HaveField("Type", computev1alpha1.MachinePoolReady),
+						HaveField("Status", corev1.ConditionUnknown),
+					)))),
+				)
 			},
 			Entry("True remains True", corev1.ConditionTrue, corev1.ConditionTrue),
 			Entry("False remains False", corev1.ConditionFalse, corev1.ConditionFalse),
@@ -217,26 +172,22 @@ var _ = Describe("machinepool lifecycle controller", func() {
 			})
 
 			By("continuously refreshing the ready condition")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			patchReadyCondition(ctx, machinePoolKey, corev1.ConditionTrue, "Healthy", "machinepoollet healthy")
-			stop := startReadyConditionRenewer(ctx, machinePoolKey, corev1.ConditionTrue)
+			patchReadyCondition(ctx, machinePool, corev1.ConditionTrue, "Healthy", "machinepoollet healthy")
+			stop := startReadyConditionRenewer(machinePool, corev1.ConditionTrue)
 			DeferCleanup(stop)
 
 			By("verifying the ready condition never becomes Unknown")
-			Consistently(func(g Gomega) {
-				pool := &computev1alpha1.MachinePool{}
-				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Consistently(ctx, Object(machinePool)).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(
+				Not(HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				)))),
+			)
 		})
 
 		It("should keep the ready condition healthy when the ready condition is stale but the lease is renewed", func(ctx SpecContext) {
 			By("seeding a stale ready condition on the machine pool")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			patchReadyCondition(ctx, machinePoolKey, corev1.ConditionTrue, "Healthy", "machinepoollet healthy")
+			patchReadyCondition(ctx, machinePool, corev1.ConditionTrue, "Healthy", "machinepoollet healthy")
 
 			By("creating a lease for the machine pool")
 			lease := &coordinationv1.Lease{
@@ -256,66 +207,56 @@ var _ = Describe("machinepool lifecycle controller", func() {
 			})
 
 			By("continuously renewing the lease, while the ready condition stays untouched")
-			stop := startLeaseRenewer(ctx, client.ObjectKeyFromObject(lease))
+			stop := startLeaseRenewer(lease)
 			DeferCleanup(stop)
 
 			By("verifying the ready condition never becomes Unknown")
-			Consistently(func(g Gomega) {
-				pool := &computev1alpha1.MachinePool{}
-				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Consistently(ctx, Object(machinePool)).WithTimeout(3 * machinePoolLifecycleGracePeriod).Should(
+				Not(HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				)))),
+			)
 		})
 	})
 
 	Context("when a fresh signal arrives after the controller marked the pool Unknown", func() {
 		It("should stop patching the status once the machinepoollet posts a fresh ready condition", func(ctx SpecContext) {
 			By("waiting for the controller to set the ready condition to Unknown (no lease, no progress)")
-			machinePoolKey := client.ObjectKeyFromObject(machinePool)
-			Eventually(func(g Gomega) {
-				pool := &computev1alpha1.MachinePool{}
-				g.Expect(k8sClient.Get(ctx, machinePoolKey, pool)).To(Succeed())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolReady)
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).To(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(2 * machinePoolLifecycleGracePeriod).Should(Succeed())
+			Eventually(ctx, Object(machinePool)).WithTimeout(2 * machinePoolLifecycleGracePeriod).Should(
+				HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				))),
+			)
 
 			By("posting a fresh ready=True condition as the machinepoollet would")
-			patchReadyCondition(ctx, machinePoolKey, corev1.ConditionTrue, "Healthy", "machinepoollet recovered")
+			patchReadyCondition(ctx, machinePool, corev1.ConditionTrue, "Healthy", "machinepoollet recovered")
 
 			By("verifying the controller does not flip the fresh ready condition back to Unknown within the grace period")
-			Consistently(func(g Gomega) {
-				current := &computev1alpha1.MachinePool{}
-				g.Expect(k8sClient.Get(ctx, machinePoolKey, current)).To(Succeed())
-
-				readyCondition := computev1alpha1.FindMachinePoolCondition(current.Status.Conditions, computev1alpha1.MachinePoolReady)
-				g.Expect(readyCondition).NotTo(BeNil())
-				g.Expect(readyCondition.Status).NotTo(Equal(corev1.ConditionUnknown))
-			}).WithTimeout(machinePoolLifecycleGracePeriod / 2).Should(Succeed())
+			Consistently(ctx, Object(machinePool)).WithTimeout(machinePoolLifecycleGracePeriod / 2).Should(
+				Not(HaveField("Status.Conditions", ContainElement(SatisfyAll(
+					HaveField("Type", computev1alpha1.MachinePoolReady),
+					HaveField("Status", corev1.ConditionUnknown),
+				)))),
+			)
 		})
 	})
 })
 
-func patchReadyCondition(ctx SpecContext, key client.ObjectKey, status corev1.ConditionStatus, reason, message string) {
+func patchReadyCondition(ctx SpecContext, pool *computev1alpha1.MachinePool, status corev1.ConditionStatus, reason, message string) {
 	GinkgoHelper()
-	pool := &computev1alpha1.MachinePool{}
-	Expect(k8sClient.Get(ctx, key, pool)).To(Succeed())
-
-	patch := client.MergeFrom(pool.DeepCopy())
-	pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
-		Type:    computev1alpha1.MachinePoolReady,
-		Status:  status,
-		Reason:  reason,
-		Message: message,
-	})
-	Expect(k8sClient.Status().Patch(ctx, pool, patch)).To(Succeed())
+	Eventually(ctx, UpdateStatus(pool, func() {
+		pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
+			Type:    computev1alpha1.MachinePoolReady,
+			Status:  status,
+			Reason:  reason,
+			Message: message,
+		})
+	})).Should(Succeed())
 }
 
-func startReadyConditionRenewer(ctx SpecContext, key client.ObjectKey, status corev1.ConditionStatus) func(SpecContext) {
+func startReadyConditionRenewer(pool *computev1alpha1.MachinePool, status corev1.ConditionStatus) func(SpecContext) {
 	stopCh := make(chan struct{})
 	done := make(chan struct{})
 	go func() {
@@ -328,20 +269,17 @@ func startReadyConditionRenewer(ctx SpecContext, key client.ObjectKey, status co
 			case <-stopCh:
 				return
 			case <-ticker.C:
-				pool := &computev1alpha1.MachinePool{}
-				if err := k8sClient.Get(ctx, key, pool); err != nil {
-					return
-				}
-				patch := client.MergeFrom(pool.DeepCopy())
 				counter++
-				pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
-					Type:               computev1alpha1.MachinePoolReady,
-					Status:             status,
-					Reason:             "MachinePoolReadyChanged",
-					Message:            fmt.Sprintf("machinepool ready changed: %s %d", status, counter),
-					ObservedGeneration: int64(counter),
-				})
-				_ = k8sClient.Status().Patch(ctx, pool, patch)
+				c := counter
+				_ = UpdateStatus(pool, func() {
+					pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
+						Type:               computev1alpha1.MachinePoolReady,
+						Status:             status,
+						Reason:             "MachinePoolReadyChanged",
+						Message:            fmt.Sprintf("machinepool ready changed: %s %d", status, c),
+						ObservedGeneration: int64(c),
+					})
+				})()
 			}
 		}
 	}()
@@ -351,7 +289,7 @@ func startReadyConditionRenewer(ctx SpecContext, key client.ObjectKey, status co
 	}
 }
 
-func startLeaseRenewer(ctx SpecContext, key client.ObjectKey) func(SpecContext) {
+func startLeaseRenewer(lease *coordinationv1.Lease) func(SpecContext) {
 	stopCh := make(chan struct{})
 	done := make(chan struct{})
 	go func() {
@@ -363,12 +301,9 @@ func startLeaseRenewer(ctx SpecContext, key client.ObjectKey) func(SpecContext) 
 			case <-stopCh:
 				return
 			case <-ticker.C:
-				fresh := &coordinationv1.Lease{}
-				if err := k8sClient.Get(ctx, key, fresh); err != nil {
-					return
-				}
-				fresh.Spec.RenewTime = ptr.To(metav1.NowMicro())
-				_ = k8sClient.Update(ctx, fresh)
+				_ = Update(lease, func() {
+					lease.Spec.RenewTime = ptr.To(metav1.NowMicro())
+				})()
 			}
 		}
 	}()
