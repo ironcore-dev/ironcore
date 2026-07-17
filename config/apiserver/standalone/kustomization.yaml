@@ -8,3 +8,4 @@ kind: Kustomization
 resources:
   - ../default
   - ../../namespaces/ironcore-system
+  - ../../namespaces/machinepool-lease

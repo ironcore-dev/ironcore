@@ -85,6 +85,11 @@ type MachinePoolAddress struct {
 // MachinePoolConditionType is a type a MachinePoolCondition can have.
 type MachinePoolConditionType string
 
+const (
+	// MachinePoolReady means the machine pool is healthy and ready to accept machines.
+	MachinePoolReady MachinePoolConditionType = "Ready"
+)
+
 // MachinePoolCondition is one of the conditions of a MachinePool.
 type MachinePoolCondition struct {
 	// Type is the type of the condition.
@@ -97,6 +102,8 @@ type MachinePoolCondition struct {
 	Message string `json:"message"`
 	// ObservedGeneration represents the .metadata.generation that the condition was set based upon.
 	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	// LastUpdateTime is the last time this condition was updated.
+	LastUpdateTime metav1.Time `json:"lastUpdateTime,omitempty"`
 	// LastTransitionTime is the last time the status of a condition has transitioned from one state to another.
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }

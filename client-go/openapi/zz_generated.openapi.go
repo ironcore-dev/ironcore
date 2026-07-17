@@ -1295,6 +1295,12 @@ func schema_ironcore_api_compute_v1alpha1_MachinePoolCondition(ref common.Refere
 							Format:      "int64",
 						},
 					},
+					"lastUpdateTime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LastUpdateTime is the last time this condition was updated.",
+							Ref:         ref(metav1.Time{}.OpenAPIModelName()),
+						},
+					},
 					"lastTransitionTime": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LastTransitionTime is the last time the status of a condition has transitioned from one state to another.",

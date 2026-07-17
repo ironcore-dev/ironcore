@@ -10,6 +10,10 @@ import (
 )
 
 const (
+	NamespaceMachinePoolLease = "ironcore-machinepool-lease"
+)
+
+const (
 	MachineMachinePoolRefNameField  = "spec.machinePoolRef.name"
 	MachineMachineClassRefNameField = "spec.machineClassRef.name"
 
