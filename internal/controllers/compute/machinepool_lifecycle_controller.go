@@ -137,8 +137,7 @@ func readyConditionChanged(a, b *computev1alpha1.MachinePoolCondition) bool {
 	}
 	// ObservedGeneration is set to the MachinePool's generation when the condition is updated in the MachinePool controller,
 	// so we can use it to detect changes in the condition even if the Status is the same.
-	changed := a.Status != b.Status || a.ObservedGeneration != b.ObservedGeneration
-	return changed
+	return a.Status != b.Status || a.ObservedGeneration != b.ObservedGeneration
 }
 
 func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, log logr.Logger, machinePool *computev1alpha1.MachinePool) (ctrl.Result, error) {
