@@ -463,6 +463,10 @@ const (
 	// TaintEffectNoSchedule is not allowing new resources to be scheduled onto the resource pool unless they tolerate
 	// the taint, but allow all already-running resources to continue running. This is enforced by the scheduler.
 	TaintEffectNoSchedule TaintEffect = "NoSchedule"
+
+	// TaintEffectNoExecute signals that running resources that do not tolerate the taint
+	// must be evicted from the pool. This is enforced by the taint eviction controller.
+	TaintEffectNoExecute TaintEffect = "NoExecute"
 )
 
 // Toleration is attached to tolerate any taint that matches the triple {key,value,effect} using
@@ -480,7 +484,7 @@ type Toleration struct {
 	// If the operator is Exists, the value should be empty, otherwise just a regular string.
 	Value string `json:"value,omitempty"`
 	// Effect indicates the taint effect to match. Empty means match all taint effects.
-	// When specified, allowed values are NoSchedule.
+	// When specified, allowed values are NoSchedule, NoExecute.
 	Effect TaintEffect `json:"effect,omitempty"`
 }
 
@@ -523,16 +527,22 @@ const (
 	TolerationOpExists TolerationOperator = "Exists"
 )
 
-// TolerateTaints returns if tolerations tolerate all taints
-func TolerateTaints(tolerations []Toleration, taints []Taint) bool {
-Outer:
-	for _, taint := range taints {
-		for _, toleration := range tolerations {
-			if toleration.ToleratesTaint(&taint) {
-				continue Outer
-			}
+// ToleratesTaint returns whether any of the tolerations tolerates the taint.
+func ToleratesTaint(tolerations []Toleration, taint *Taint) bool {
+	for _, toleration := range tolerations {
+		if toleration.ToleratesTaint(taint) {
+			return true
 		}
-		return false
+	}
+	return false
+}
+
+// TolerateTaints returns whether the tolerations tolerate all the taints.
+func TolerateTaints(tolerations []Toleration, taints []Taint) bool {
+	for i := range taints {
+		if !ToleratesTaint(tolerations, &taints[i]) {
+			return false
+		}
 	}
 	return true
 }
