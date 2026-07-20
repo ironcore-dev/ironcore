@@ -261,6 +261,10 @@ func startReadyConditionRenewer(pool *computev1alpha1.MachinePool, status corev1
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+		// Use a private copy so that komega's UpdateStatus (which calls client.Get
+		// into this object) does not race with the Consistently poller, which also
+		// calls client.Get into the caller-owned *pool pointer.
+		localPool := pool.DeepCopy()
 		ticker := time.NewTicker(50 * time.Millisecond)
 		defer ticker.Stop()
 		counter := 0
@@ -271,8 +275,8 @@ func startReadyConditionRenewer(pool *computev1alpha1.MachinePool, status corev1
 			case <-ticker.C:
 				counter++
 				c := counter
-				_ = UpdateStatus(pool, func() {
-					pool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(pool.Status.Conditions, computev1alpha1.MachinePoolCondition{
+				_ = UpdateStatus(localPool, func() {
+					localPool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(localPool.Status.Conditions, computev1alpha1.MachinePoolCondition{
 						Type:               computev1alpha1.MachinePoolReady,
 						Status:             status,
 						Reason:             "MachinePoolReadyChanged",
@@ -294,6 +298,10 @@ func startLeaseRenewer(lease *coordinationv1.Lease) func(SpecContext) {
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
+		// Use a private copy so that komega's Update (which calls client.Get
+		// into this object) does not race with any concurrent reader of the
+		// caller-owned *lease pointer.
+		localLease := lease.DeepCopy()
 		ticker := time.NewTicker(50 * time.Millisecond)
 		defer ticker.Stop()
 		for {
@@ -301,8 +309,8 @@ func startLeaseRenewer(lease *coordinationv1.Lease) func(SpecContext) {
 			case <-stopCh:
 				return
 			case <-ticker.C:
-				_ = Update(lease, func() {
-					lease.Spec.RenewTime = ptr.To(metav1.NowMicro())
+				_ = Update(localLease, func() {
+					localLease.Spec.RenewTime = ptr.To(metav1.NowMicro())
 				})()
 			}
 		}
