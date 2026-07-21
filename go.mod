@@ -7,7 +7,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.24.6
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.3.1
-	github.com/go-logr/logr v1.4.3
+	github.com/go-logr/logr v1.4.4
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.12.0
@@ -19,7 +19,7 @@ require (
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
-	google.golang.org/grpc v1.82.0
+	google.golang.org/grpc v1.82.1
 	google.golang.org/protobuf v1.36.11
 	k8s.io/api v0.35.3
 	k8s.io/apimachinery v0.35.3
