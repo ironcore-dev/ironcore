@@ -7,19 +7,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ironcore-dev/ironcore/iri/apis/volume"
-	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/ironcore-dev/ironcore/iri/apis/volume"
+	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
 )
 
 type remoteRuntime struct {
 	client iri.VolumeRuntimeClient
 }
 
-func NewRemoteRuntime(endpoint string) (volume.RuntimeService, error) {
+func NewRemoteRuntime(endpoint string, size int) (volume.RuntimeService, error) {
 	conn, err := grpc.NewClient(endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(size)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error dialing: %w", err)
@@ -33,9 +35,11 @@ func NewRemoteRuntime(endpoint string) (volume.RuntimeService, error) {
 func (r *remoteRuntime) Version(ctx context.Context, req *iri.VersionRequest) (*iri.VersionResponse, error) {
 	return r.client.Version(ctx, req)
 }
+
 func (r *remoteRuntime) ListEvents(ctx context.Context, req *iri.ListEventsRequest) (*iri.ListEventsResponse, error) {
 	return r.client.ListEvents(ctx, req)
 }
+
 func (r *remoteRuntime) ListVolumes(ctx context.Context, request *iri.ListVolumesRequest) (*iri.ListVolumesResponse, error) {
 	return r.client.ListVolumes(ctx, request)
 }
