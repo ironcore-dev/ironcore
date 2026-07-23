@@ -163,7 +163,7 @@ func (r *MachinePoolLifecycleReconciler) reconcileExists(ctx context.Context, lo
 		log.V(1).Info("First observation of machine pool")
 		next.lastChangeDetectedTime = now
 	case changed:
-		log.V(1).Info("Lease or ready condition changed")
+		log.V(2).Info("Lease or ready condition changed")
 		next.lastChangeDetectedTime = now
 	default:
 		next.lastChangeDetectedTime = prev.lastChangeDetectedTime
