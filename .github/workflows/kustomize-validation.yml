@@ -12,6 +12,6 @@ jobs:
         uses: actions/checkout@v7
       - uses: imranismail/setup-kustomize@v3
         with:
-          kustomize-version: '5.0.0'
+          kustomize-version: '5.7.1'
       - run: |
           ./hack/validate-kustomize.sh
