@@ -2,15 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - bases
-  - service.yaml
+- bases
+- service.yaml
 
 patches:
-  - path: patch-apiservice.yaml
-    target:
-      group: apiregistration.k8s.io
-      version: v1
-      kind: APIService
+- path: patch-apiservice.yaml
+  target:
+    group: apiregistration.k8s.io
+    kind: APIService
+    version: v1
 
 configurations:
-  - kustomizeconfig.yaml
+- kustomizeconfig.yaml
