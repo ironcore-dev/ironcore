@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -18,6 +19,7 @@ import (
 	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/addr"
 	"github.com/ironcore-dev/ironcore/utils/envtest/internal/testing/certs"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -591,6 +593,10 @@ func WaitUntilGroupVersionsDiscoverable(ctx context.Context, cfg *rest.Config, c
 		return fmt.Errorf("error waiting for GVKs to be discoverable: %w", err)
 	}
 
+	if err := waitUntilGroupVersionsServe(ctx, c, scheme, gvs...); err != nil {
+		return fmt.Errorf("error waiting for aggregated api server to serve requests: %w", err)
+	}
+
 	log.Info("All group versions and REST mappings are discoverable", "gvs", gvs)
 	return nil
 }
@@ -659,6 +665,121 @@ func WaitUntilAPIServicesReady(ctx context.Context, ext *EnvironmentExtensions, 
 	}
 
 	return nil
+}
+
+// serveReadinessPollInterval is the interval at which the aggregated API server
+// is probed for serving real resource round-trips.
+const serveReadinessPollInterval = 100 * time.Millisecond
+
+// serveReadinessStableDuration is how long the aggregated API server must
+// continuously serve real resource round-trips before startup is considered
+// complete.
+//
+// The APIService Available condition and group discovery can report ready
+// while the aggregated server still returns transient 503 ServiceUnavailable
+// responses for a short window afterwards. Requiring sustained success absorbs
+// that window so tests observe a genuinely serving API server.
+const serveReadinessStableDuration = 500 * time.Millisecond
+
+// waitUntilGroupVersionsServe waits until the aggregated API server actually
+// serves resource round-trips for each of the given group versions by issuing a
+// real List per group.
+//
+// Unlike the APIService Available condition and group discovery (which are
+// reported by / served from the kube-apiserver), a List is proxied to the
+// aggregated server, so it observes the transient 503 startup window and absorbs
+// it before the test suite proceeds.
+func waitUntilGroupVersionsServe(ctx context.Context, c client.Client, scheme *runtime.Scheme, gvs ...schema.GroupVersion) error {
+	var listGVKs []schema.GroupVersionKind
+	for _, gv := range gvs {
+		listGVK, ok := firstListGVKForGroupVersion(scheme, gv)
+		if !ok {
+			continue
+		}
+		listGVKs = append(listGVKs, listGVK)
+	}
+	if len(listGVKs) == 0 {
+		return nil
+	}
+
+	requiredSuccesses := int(serveReadinessStableDuration / serveReadinessPollInterval)
+	if requiredSuccesses < 1 {
+		requiredSuccesses = 1
+	}
+
+	successes := 0
+	var lastErr error
+	if err := wait.PollUntilContextCancel(ctx, serveReadinessPollInterval, true, func(ctx context.Context) (bool, error) {
+		for _, listGVK := range listGVKs {
+			// Instantiate a fresh list per probe via the scheme so no state
+			// (ResourceVersion, Continue, Items) leaks across probes.
+			list, err := scheme.New(listGVK)
+			if err != nil {
+				return false, fmt.Errorf("unexpected error constructing list for %s: %w", listGVK, err)
+			}
+			objectList, ok := list.(client.ObjectList)
+			if !ok {
+				return false, fmt.Errorf("unexpected type %T for %s: not a client.ObjectList", list, listGVK)
+			}
+			if err := c.List(ctx, objectList); err != nil {
+				if !isTransientServeError(err) {
+					return false, fmt.Errorf("unexpected error probing aggregated api server: %w", err)
+				}
+				lastErr = err
+				successes = 0
+				return false, nil
+			}
+		}
+		successes++
+		return successes >= requiredSuccesses, nil
+	}); err != nil {
+		if lastErr != nil {
+			return fmt.Errorf("%w (last error: %v)", err, lastErr)
+		}
+		return err
+	}
+	return nil
+}
+
+// firstListGVKForGroupVersion returns the GroupVersionKind of the first list kind
+// registered for the given group version (e.g. VolumeList). Kind resolution is
+// deterministic (sorted) and the scheme is the single source of truth for type
+// discovery. Callers construct fresh list objects from the GVK via scheme.New.
+func firstListGVKForGroupVersion(scheme *runtime.Scheme, gv schema.GroupVersion) (schema.GroupVersionKind, bool) {
+	kinds := make([]string, 0, len(scheme.KnownTypes(gv)))
+	for kind := range scheme.KnownTypes(gv) {
+		kinds = append(kinds, kind)
+	}
+	sort.Strings(kinds)
+	for _, kind := range kinds {
+		obj, err := scheme.New(gv.WithKind(kind))
+		if err != nil {
+			continue
+		}
+		if _, ok := obj.(client.ObjectList); ok {
+			return gv.WithKind(kind), true
+		}
+	}
+	return schema.GroupVersionKind{}, false
+}
+
+// isTransientServeError reports whether an error returned while probing the
+// aggregated API server is a transient startup condition worth retrying.
+func isTransientServeError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if apierrors.IsServiceUnavailable(err) ||
+		apierrors.IsServerTimeout(err) ||
+		apierrors.IsTimeout(err) ||
+		apierrors.IsTooManyRequests(err) ||
+		apierrors.IsInternalError(err) {
+		return true
+	}
+	// Transport-level errors (connection refused, EOF, reset) while the
+	// aggregated server is still coming up.
+	var urlErr *url.Error
+	return errors.As(err, &urlErr)
 }
 
 func WaitUntilAPIServicesReadyWithTimeout(timeout time.Duration, ext *EnvironmentExtensions, cfg *rest.Config, c client.Client, scheme *runtime.Scheme) error {
