@@ -147,6 +147,7 @@ func main() {
 		machineEphemeralNetworkInterfaceController,
 		machineEphemeralVolumeController,
 		machineSchedulerController,
+		machineEvictionController,
 		machineClassController,
 		machinePoolLifecycleController,
 
