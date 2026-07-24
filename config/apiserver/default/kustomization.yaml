@@ -98,7 +98,8 @@ vars: # We unfortunately have to use vars here as
   # * Env substitution won't work in distroless containers
   # * Prefix / Suffix concatenation does not exist yet for replacements
   # Monitor the following issue(s) and switch to replacements as soon as implemented:
-  # * https://github.com/kubernetes-sigs/kustomize/issues/4080
+  # * https://github.com/kubernetes-sigs/kustomize/issues/4080 - still open
+  # * https://github.com/kubernetes-sigs/kustomize/pull/6090 - implementation ongoing
   # * https://github.com/kubernetes-sigs/kustomize/pull/4558
 - fieldref: {}
   name: IRONCORE_APISERVER_ETCD_SERVICE_NAME
