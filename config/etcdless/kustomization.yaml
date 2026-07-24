@@ -5,7 +5,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../apiserver/etcdless
-  - ../controller/default
-  - ../namespaces/ironcore-system
-  - ../namespaces/machinepool-lease
+- ../apiserver/etcdless
+- ../controller/default
+- ../namespaces/ironcore-system
+- ../namespaces/machinepool-lease

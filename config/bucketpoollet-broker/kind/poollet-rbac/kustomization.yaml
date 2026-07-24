@@ -5,7 +5,7 @@ namespace: bucketpoollet-system
 namePrefix: bucketpoollet-
 
 resources:
-  - ../../poollet-rbac
+- ../../poollet-rbac
 
-patchesStrategicMerge:
-  - delete_service_account.yaml
+patches:
+- path: delete_service_account.yaml
