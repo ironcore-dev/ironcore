@@ -1,11 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
 - manager.yaml
 - service.yaml
 
 configMapGenerator:
-- name: irictl-machine-config
-  files:
+- files:
   - config=irictl-machine-config.yaml
+  name: irictl-machine-config
 
 generatorOptions:
   disableNameSuffixHash: true
