@@ -107,7 +107,35 @@ var _ = Describe("MachinePoolController", func() {
 			})),
 		))
 
-		By("creating a second machine")
+		By("creating a second machine of same class")
+		machine_sameclass := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-machine-sameclass",
+				Namespace:    ns.Name,
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{
+					Name: machineClass2.Name,
+				},
+				MachinePoolRef: &corev1.LocalObjectReference{
+					Name: machinePool.Name,
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine_sameclass)).To(Succeed(), "failed to create machine")
+		DeferCleanup(k8sClient.Delete, machine_sameclass)
+
+		By("checking if the allocatable resources are correct")
+		Eventually(Object(machinePool)).Should(SatisfyAll(
+			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
+				return quota.Contains(allocatable, corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):  *resource.NewQuantity(machineClassCapacity, resource.DecimalSI),
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity-2, resource.DecimalSI),
+				})
+			})),
+		))
+
+		By("creating a machine with second machineclass")
 		machine2 := &computev1alpha1.Machine{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: "test-machine",
@@ -130,7 +158,7 @@ var _ = Describe("MachinePoolController", func() {
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Contains(allocatable, corev1alpha1.ResourceList{
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):  *resource.NewQuantity(machineClassCapacity-1, resource.DecimalSI),
-					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity-1, resource.DecimalSI),
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass2.Name): *resource.NewQuantity(machineClass2Capacity-2, resource.DecimalSI),
 				})
 			})),
 		))
