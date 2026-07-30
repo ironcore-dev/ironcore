@@ -121,6 +121,7 @@ func (r *MachinePoolReconciler) calculateCapacity(
 	}
 
 	usedResources := corev1alpha1.ResourceList{}
+	newQuantity := resource.MustParse("1")
 	for _, machine := range machines {
 		className := machine.Spec.MachineClassRef.Name
 		res, ok := usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, className)]
@@ -129,7 +130,8 @@ func (r *MachinePoolReconciler) calculateCapacity(
 			continue
 		}
 
-		res.Add(resource.MustParse("1"))
+		res.Add(newQuantity)
+		usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, className)] = res
 	}
 
 	return capacity, quota.SubtractWithNonNegativeResult(capacity, usedResources), supported, nil

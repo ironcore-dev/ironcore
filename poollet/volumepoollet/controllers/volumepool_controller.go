@@ -110,6 +110,7 @@ func (r *VolumePoolReconciler) calculateCapacity(
 		}
 
 		res.Add(*volume.Spec.Resources.Storage())
+		usedResources[corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, className)] = res
 	}
 
 	return capacity, quota.SubtractWithNonNegativeResult(capacity, usedResources), supported, nil

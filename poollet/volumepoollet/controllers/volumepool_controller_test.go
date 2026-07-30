@@ -247,7 +247,7 @@ var _ = Describe("VolumePoolController", func() {
 				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
 				VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool.Name},
 				Resources: corev1alpha1.ResourceList{
-					corev1alpha1.ResourceStorage: resource.MustParse("10Gi"),
+					corev1alpha1.ResourceStorage: resource.MustParse("5Gi"),
 				},
 			},
 		}
@@ -258,7 +258,34 @@ var _ = Describe("VolumePoolController", func() {
 		Eventually(Object(volumePool)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
-					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name):           resource.MustParse("2Gi"),
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name):           resource.MustParse("7Gi"),
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, expandableVolumeClass.Name): expandableVolumeClassCapacity,
+				})
+			})),
+		))
+
+		By("creating second volume of same class")
+		volumeSameClass := &storagev1alpha1.Volume{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "volume-same-class-",
+			},
+			Spec: storagev1alpha1.VolumeSpec{
+				VolumeClassRef: &corev1.LocalObjectReference{Name: volumeClass.Name},
+				VolumePoolRef:  &corev1.LocalObjectReference{Name: volumePool.Name},
+				Resources: corev1alpha1.ResourceList{
+					corev1alpha1.ResourceStorage: resource.MustParse("2Gi"),
+				},
+			},
+		}
+		Expect(k8sClient.Create(ctx, volumeSameClass)).To(Succeed(), "failed to create volume")
+		DeferCleanup(expectVolumeDeleted, volumeSameClass)
+
+		By("checking if the allocatable resources are correct")
+		Eventually(Object(volumePool)).Should(SatisfyAll(
+			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
+				return quota.Equals(allocatable, corev1alpha1.ResourceList{
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name):           resource.MustParse("5Gi"),
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, expandableVolumeClass.Name): expandableVolumeClassCapacity,
 				})
 			})),
@@ -285,7 +312,7 @@ var _ = Describe("VolumePoolController", func() {
 		Eventually(Object(volumePool)).Should(SatisfyAll(
 			HaveField("Status.Allocatable", Satisfy(func(allocatable corev1alpha1.ResourceList) bool {
 				return quota.Equals(allocatable, corev1alpha1.ResourceList{
-					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name):           resource.MustParse("2Gi"),
+					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, volumeClass.Name):           resource.MustParse("5Gi"),
 					corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeVolumeClass, expandableVolumeClass.Name): resource.MustParse("40Gi"),
 				})
 			})),
