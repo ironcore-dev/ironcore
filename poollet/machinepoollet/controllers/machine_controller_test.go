@@ -6,6 +6,7 @@ package controllers_test
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	. "github.com/afritzler/protoequal"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
@@ -18,6 +19,7 @@ import (
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
+	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -1147,3 +1149,92 @@ func mustMarshalJSON(v interface{}) string {
 	}
 	return string(data)
 }
+
+var _ = Describe("ComputeMachineConditions", func() {
+	findCondition := func(conditions []computev1alpha1.MachineCondition, typ computev1alpha1.MachineConditionType) *computev1alpha1.MachineCondition {
+		for i := range conditions {
+			if conditions[i].Type == typ {
+				return &conditions[i]
+			}
+		}
+		return nil
+	}
+
+	It("preserves a condition's LastTransitionTime when its status does not change", func() {
+		old := metav1.NewTime(time.Now().Add(-time.Hour))
+		conditions := []computev1alpha1.MachineCondition{
+			{Type: "Ready", Status: corev1.ConditionTrue, Reason: "Running", Message: "Machine is running", LastTransitionTime: old},
+		}
+
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, nil, nil)).To(Succeed())
+
+		ready := findCondition(conditions, "Ready")
+		Expect(ready).NotTo(BeNil())
+		Expect(ready.Status).To(Equal(corev1.ConditionTrue))
+		Expect(ready.LastTransitionTime.Time).To(BeTemporally("==", old.Time))
+	})
+
+	It("bumps a condition's LastTransitionTime when its status changes", func() {
+		old := metav1.NewTime(time.Now().Add(-time.Hour))
+		conditions := []computev1alpha1.MachineCondition{
+			{Type: "Ready", Status: corev1.ConditionTrue, Reason: "Running", Message: "Machine is running", LastTransitionTime: old},
+		}
+
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateTerminating, nil, nil)).To(Succeed())
+
+		ready := findCondition(conditions, "Ready")
+		Expect(ready).NotTo(BeNil())
+		Expect(ready.Status).To(Equal(corev1.ConditionFalse))
+		Expect(ready.Reason).To(Equal("Terminating"))
+		Expect(ready.LastTransitionTime.Time).To(BeTemporally(">", old.Time))
+	})
+
+	It("adds volume and network interface conditions and preserves their timestamps on an unchanged recompute", func() {
+		var conditions []computev1alpha1.MachineCondition
+		volumeStatuses := []computev1alpha1.VolumeStatus{{Name: "root", State: computev1alpha1.VolumeStateAttached}}
+		nicStatuses := []computev1alpha1.NetworkInterfaceStatus{{Name: "nic", State: computev1alpha1.NetworkInterfaceStateAttached}}
+
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, volumeStatuses, nicStatuses)).To(Succeed())
+
+		for _, typ := range []computev1alpha1.MachineConditionType{"Ready", "VolumesReady", "NetworkInterfacesReady"} {
+			cond := findCondition(conditions, typ)
+			Expect(cond).NotTo(BeNil(), "condition %s should be present", typ)
+			Expect(cond.Status).To(Equal(corev1.ConditionTrue))
+			Expect(cond.LastTransitionTime.IsZero()).To(BeFalse())
+		}
+
+		volumesBefore := findCondition(conditions, "VolumesReady").LastTransitionTime
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, volumeStatuses, nicStatuses)).To(Succeed())
+		Expect(findCondition(conditions, "VolumesReady").LastTransitionTime.Time).To(BeTemporally("==", volumesBefore.Time))
+	})
+
+	It("always sets VolumesReady and NetworkInterfacesReady, treating an empty status list as vacuously ready", func() {
+		var conditions []computev1alpha1.MachineCondition
+
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, nil, nil)).To(Succeed())
+
+		for _, typ := range []computev1alpha1.MachineConditionType{"VolumesReady", "NetworkInterfacesReady"} {
+			cond := findCondition(conditions, typ)
+			Expect(cond).NotTo(BeNil(), "condition %s should be present even with no volumes/network interfaces", typ)
+			Expect(cond.Status).To(Equal(corev1.ConditionTrue))
+		}
+	})
+
+	It("keeps VolumesReady present and resets it to True when volumes go from non-empty to empty", func() {
+		var conditions []computev1alpha1.MachineCondition
+		volumeStatuses := []computev1alpha1.VolumeStatus{{Name: "data", State: computev1alpha1.VolumeStatePending}}
+
+		By("computing conditions while a volume is not yet attached")
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, volumeStatuses, nil)).To(Succeed())
+		volumesReady := findCondition(conditions, "VolumesReady")
+		Expect(volumesReady).NotTo(BeNil())
+		Expect(volumesReady.Status).To(Equal(corev1.ConditionFalse))
+
+		By("recomputing after the volume list became empty")
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, nil, nil)).To(Succeed())
+
+		volumesReady = findCondition(conditions, "VolumesReady")
+		Expect(volumesReady).NotTo(BeNil(), "VolumesReady must not be left stale after volumes are removed")
+		Expect(volumesReady.Status).To(Equal(corev1.ConditionTrue))
+	})
+})
