@@ -1207,4 +1207,34 @@ var _ = Describe("ComputeMachineConditions", func() {
 		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, volumeStatuses, nicStatuses)).To(Succeed())
 		Expect(findCondition(conditions, "VolumesReady").LastTransitionTime.Time).To(BeTemporally("==", volumesBefore.Time))
 	})
+
+	It("always sets VolumesReady and NetworkInterfacesReady, treating an empty status list as vacuously ready", func() {
+		var conditions []computev1alpha1.MachineCondition
+
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, nil, nil)).To(Succeed())
+
+		for _, typ := range []computev1alpha1.MachineConditionType{"VolumesReady", "NetworkInterfacesReady"} {
+			cond := findCondition(conditions, typ)
+			Expect(cond).NotTo(BeNil(), "condition %s should be present even with no volumes/network interfaces", typ)
+			Expect(cond.Status).To(Equal(corev1.ConditionTrue))
+		}
+	})
+
+	It("keeps VolumesReady present and resets it to True when volumes go from non-empty to empty", func() {
+		var conditions []computev1alpha1.MachineCondition
+		volumeStatuses := []computev1alpha1.VolumeStatus{{Name: "data", State: computev1alpha1.VolumeStatePending}}
+
+		By("computing conditions while a volume is not yet attached")
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, volumeStatuses, nil)).To(Succeed())
+		volumesReady := findCondition(conditions, "VolumesReady")
+		Expect(volumesReady).NotTo(BeNil())
+		Expect(volumesReady.Status).To(Equal(corev1.ConditionFalse))
+
+		By("recomputing after the volume list became empty")
+		Expect(controllers.ComputeMachineConditions(&conditions, computev1alpha1.MachineStateRunning, nil, nil)).To(Succeed())
+
+		volumesReady = findCondition(conditions, "VolumesReady")
+		Expect(volumesReady).NotTo(BeNil(), "VolumesReady must not be left stale after volumes are removed")
+		Expect(volumesReady.Status).To(Equal(corev1.ConditionTrue))
+	})
 })

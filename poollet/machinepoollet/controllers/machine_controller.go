@@ -519,12 +519,10 @@ func ComputeMachineConditions(
 	volumeStatuses []computev1alpha1.VolumeStatus,
 	nicStatuses []computev1alpha1.NetworkInterfaceStatus,
 ) error {
-	desired := []computev1alpha1.MachineCondition{computeMachineReadyCondition(state)}
-	if len(volumeStatuses) > 0 {
-		desired = append(desired, computeVolumesReadyCondition(volumeStatuses))
-	}
-	if len(nicStatuses) > 0 {
-		desired = append(desired, computeNetworkInterfacesReadyCondition(nicStatuses))
+	desired := []computev1alpha1.MachineCondition{
+		computeVolumesReadyCondition(volumeStatuses),
+		computeNetworkInterfacesReadyCondition(nicStatuses),
+		computeMachineReadyCondition(state),
 	}
 
 	for _, cond := range desired {
