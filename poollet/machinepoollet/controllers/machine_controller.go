@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/ironcore-dev/controller-utils/clientutils"
+	"github.com/ironcore-dev/controller-utils/conditionutils"
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
@@ -502,7 +503,9 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 	machine.Status.ObservedGeneration = generation
 	machine.Status.Volumes = volumeStatuses
 	machine.Status.NetworkInterfaces = nicStatuses
-	machine.Status.Conditions = r.computeMachineConditions(state, volumeStatuses, nicStatuses, now)
+	if err := ComputeMachineConditions(&machine.Status.Conditions, state, volumeStatuses, nicStatuses); err != nil {
+		return fmt.Errorf("error computing machine conditions: %w", err)
+	}
 
 	if err := r.Status().Patch(ctx, machine, client.MergeFrom(base)); err != nil {
 		return fmt.Errorf("error patching status: %w", err)
@@ -510,35 +513,32 @@ func (r *MachineReconciler) updateMachineStatus(ctx context.Context, machine *co
 	return nil
 }
 
-// computeMachineConditions computes the conditions for the machine based on its current state.
-func (r *MachineReconciler) computeMachineConditions(
+func ComputeMachineConditions(
+	conditions *[]computev1alpha1.MachineCondition,
 	state computev1alpha1.MachineState,
 	volumeStatuses []computev1alpha1.VolumeStatus,
 	nicStatuses []computev1alpha1.NetworkInterfaceStatus,
-	now metav1.Time,
-) []computev1alpha1.MachineCondition {
-	var conditions []computev1alpha1.MachineCondition
-
-	conditions = append(conditions, r.computeMachineReadyCondition(state, now))
-
+) error {
+	desired := []computev1alpha1.MachineCondition{computeMachineReadyCondition(state)}
 	if len(volumeStatuses) > 0 {
-		if c := r.computeVolumesReadyCondition(volumeStatuses, now); c.Type != "" {
-			conditions = append(conditions, c)
-		}
+		desired = append(desired, computeVolumesReadyCondition(volumeStatuses))
 	}
-
 	if len(nicStatuses) > 0 {
-		if c := r.computeNetworkInterfacesReadyCondition(nicStatuses, now); c.Type != "" {
-			conditions = append(conditions, c)
-		}
+		desired = append(desired, computeNetworkInterfacesReadyCondition(nicStatuses))
 	}
 
-	return conditions
+	for _, cond := range desired {
+		if err := conditionutils.UpdateSlice(conditions, string(cond.Type),
+			conditionutils.UpdateFromCondition{Condition: cond},
+		); err != nil {
+			return fmt.Errorf("error updating %s condition: %w", cond.Type, err)
+		}
+	}
+	return nil
 }
 
-func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.MachineState, now metav1.Time) computev1alpha1.MachineCondition {
+func computeMachineReadyCondition(state computev1alpha1.MachineState) computev1alpha1.MachineCondition {
 	status, reason, message := corev1.ConditionFalse, "NotReady", "Machine is not ready"
-
 	switch state {
 	case computev1alpha1.MachineStateRunning:
 		status, reason, message = corev1.ConditionTrue, "Running", "Machine is running"
@@ -547,23 +547,11 @@ func (r *MachineReconciler) computeMachineReadyCondition(state computev1alpha1.M
 	case computev1alpha1.MachineStateTerminating, computev1alpha1.MachineStateTerminated:
 		status, reason, message = corev1.ConditionFalse, "Terminating", "Machine is terminating or terminated"
 	}
-
-	return computev1alpha1.MachineCondition{
-		Type:               "Ready",
-		Status:             status,
-		Reason:             reason,
-		Message:            message,
-		LastTransitionTime: now,
-	}
+	return computev1alpha1.MachineCondition{Type: "Ready", Status: status, Reason: reason, Message: message}
 }
 
-func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []computev1alpha1.VolumeStatus, now metav1.Time) computev1alpha1.MachineCondition {
-	if len(volumeStatuses) == 0 {
-		return computev1alpha1.MachineCondition{}
-	}
-
+func computeVolumesReadyCondition(volumeStatuses []computev1alpha1.VolumeStatus) computev1alpha1.MachineCondition {
 	status, reason, message := corev1.ConditionTrue, "VolumesReady", "All volumes are ready"
-
 	for _, vs := range volumeStatuses {
 		if vs.State != computev1alpha1.VolumeStateAttached {
 			status = corev1.ConditionFalse
@@ -572,23 +560,11 @@ func (r *MachineReconciler) computeVolumesReadyCondition(volumeStatuses []comput
 			break
 		}
 	}
-
-	return computev1alpha1.MachineCondition{
-		Type:               computev1alpha1.MachineConditionType("VolumesReady"),
-		Status:             status,
-		Reason:             reason,
-		Message:            message,
-		LastTransitionTime: now,
-	}
+	return computev1alpha1.MachineCondition{Type: "VolumesReady", Status: status, Reason: reason, Message: message}
 }
 
-func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses []computev1alpha1.NetworkInterfaceStatus, now metav1.Time) computev1alpha1.MachineCondition {
-	if len(nicStatuses) == 0 {
-		return computev1alpha1.MachineCondition{}
-	}
-
+func computeNetworkInterfacesReadyCondition(nicStatuses []computev1alpha1.NetworkInterfaceStatus) computev1alpha1.MachineCondition {
 	status, reason, message := corev1.ConditionTrue, "NetworkInterfacesReady", "All network interfaces are ready"
-
 	for _, nicStatus := range nicStatuses {
 		if nicStatus.State != computev1alpha1.NetworkInterfaceStateAttached {
 			status = corev1.ConditionFalse
@@ -597,14 +573,7 @@ func (r *MachineReconciler) computeNetworkInterfacesReadyCondition(nicStatuses [
 			break
 		}
 	}
-
-	return computev1alpha1.MachineCondition{
-		Type:               computev1alpha1.MachineConditionType("NetworkInterfacesReady"),
-		Status:             status,
-		Reason:             reason,
-		Message:            message,
-		LastTransitionTime: now,
-	}
+	return computev1alpha1.MachineCondition{Type: "NetworkInterfacesReady", Status: status, Reason: reason, Message: message}
 }
 
 func (r *MachineReconciler) prepareIRIPower(power computev1alpha1.Power) (iri.Power, error) {
