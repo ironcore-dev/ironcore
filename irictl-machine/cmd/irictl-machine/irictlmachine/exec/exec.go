@@ -15,9 +15,10 @@ import (
 	"github.com/ironcore-dev/ironcore/irictl-machine/cmd/irictl-machine/irictlmachine/common"
 	clicommon "github.com/ironcore-dev/ironcore/irictl/cmd"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/util/httpstream/spdy"
 	"k8s.io/client-go/tools/remotecommand"
+	transportspdy "k8s.io/client-go/transport/spdy"
 	"k8s.io/kubectl/pkg/util/term"
+	"k8s.io/streaming/pkg/httpstream/spdy"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -106,7 +107,7 @@ func Run(ctx context.Context, streams clicommon.Streams, client iri.MachineRunti
 		return err
 	}
 
-	exec, err := remotecommand.NewSPDYExecutorForTransports(roundTripper, roundTripper, http.MethodGet, u)
+	exec, err := remotecommand.NewSPDYExecutorForTransports(roundTripper, transportspdy.NewUpgraderForStreaming(roundTripper), http.MethodGet, u)
 	if err != nil {
 		return fmt.Errorf("error creating remote command executor: %w", err)
 	}
