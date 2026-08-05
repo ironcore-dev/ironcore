@@ -21,6 +21,14 @@ import (
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 )
 
+func setMachinePoolReady(machinePool *computev1alpha1.MachinePool, status corev1.ConditionStatus) {
+	machinePool.Status.Conditions = computev1alpha1.SetMachinePoolCondition(machinePool.Status.Conditions,
+		computev1alpha1.MachinePoolCondition{
+			Type:   computev1alpha1.MachinePoolReady,
+			Status: status,
+		})
+}
+
 var _ = Describe("MachineScheduler", func() {
 	ns := SetupNamespace(&k8sClient)
 	machineClass := SetupMachineClass()
@@ -40,6 +48,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine w/ the requested machine class")
@@ -94,6 +103,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("waiting for the machine to be scheduled onto the machine pool")
@@ -118,6 +128,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePoolNoMatchingLabels.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePoolNoMatchingLabels, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine pool w/ matching labels")
@@ -137,6 +148,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePoolMatchingLabels.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePoolMatchingLabels, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine w/ the requested machine class")
@@ -191,6 +203,7 @@ var _ = Describe("MachineScheduler", func() {
 			taintedMachinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(taintedMachinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine")
@@ -236,6 +249,11 @@ var _ = Describe("MachineScheduler", func() {
 		})
 		Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machineBase))).To(Succeed(), "failed to patch the machine's spec")
 
+		By("re-asserting the machine pool is ready")
+		Eventually(UpdateStatus(taintedMachinePool, func() {
+			setMachinePoolReady(taintedMachinePool, corev1.ConditionTrue)
+		})).Should(Succeed())
+
 		By("observing the machine is scheduled onto the machine pool")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: taintedMachinePool.Name})),
@@ -257,6 +275,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a second machine pool")
@@ -289,6 +308,7 @@ var _ = Describe("MachineScheduler", func() {
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):       resource.MustParse("5"),
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, secondMachineClass.Name): resource.MustParse("100"),
 			}
+			setMachinePoolReady(secondMachinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine")
@@ -326,6 +346,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("50"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a second machine pool")
@@ -344,6 +365,7 @@ var _ = Describe("MachineScheduler", func() {
 			secondMachinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("50"),
 			}
+			setMachinePoolReady(secondMachinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating machines")
@@ -394,6 +416,7 @@ var _ = Describe("MachineScheduler", func() {
 		By("patching the machine pool status to contain a machine class")
 		Eventually(UpdateStatus(machinePool, func() {
 			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine")
@@ -420,6 +443,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("checking that the machine is scheduled onto the machine pool")
@@ -443,6 +467,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("2"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating the first machine")
@@ -512,6 +537,7 @@ var _ = Describe("MachineScheduler", func() {
 			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("5"),
 			}
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a second machine pool")
@@ -545,6 +571,7 @@ var _ = Describe("MachineScheduler", func() {
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name):       resource.MustParse("5"),
 				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, secondMachineClass.Name): resource.MustParse("5"),
 			}
+			setMachinePoolReady(secondMachinePool, corev1.ConditionTrue)
 		})).Should(Succeed())
 
 		By("creating a machine")
@@ -564,6 +591,95 @@ var _ = Describe("MachineScheduler", func() {
 		By("checking that the machine is scheduled onto the machine pool")
 		Eventually(Object(machine)).Should(SatisfyAll(
 			HaveField("Spec.MachinePoolRef.Name", Equal(secondMachinePool.Name)),
+		))
+	})
+
+	It("should not schedule machines onto a machine pool that is not ready", func(ctx SpecContext) {
+		By("creating a machine pool")
+		machinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
+
+		By("patching the machine pool status to have capacity but no ready condition")
+		Eventually(UpdateStatus(machinePool, func() {
+			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
+			}
+		})).Should(Succeed())
+
+		By("creating a machine w/ the requested machine class")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
+
+		By("observing the machine isn't scheduled onto the not-ready machine pool")
+		Consistently(Object(machine)).Should(HaveField("Spec.MachinePoolRef", BeNil()))
+
+		By("marking the machine pool ready")
+		Eventually(UpdateStatus(machinePool, func() {
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
+		})).Should(Succeed())
+
+		By("waiting for the machine to be scheduled once the pool is ready")
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+			HaveField("Status.State", Equal(computev1alpha1.MachineStatePending)),
+		))
+	})
+
+	It("should not schedule machines onto a machine pool whose ready condition is false", func(ctx SpecContext) {
+		By("creating a machine pool")
+		machinePool := &computev1alpha1.MachinePool{
+			ObjectMeta: metav1.ObjectMeta{
+				GenerateName: "test-pool-",
+			},
+		}
+		Expect(k8sClient.Create(ctx, machinePool)).To(Succeed(), "failed to create machine pool")
+
+		By("patching the machine pool status to have capacity but a ready condition of false")
+		Eventually(UpdateStatus(machinePool, func() {
+			machinePool.Status.AvailableMachineClasses = []corev1.LocalObjectReference{{Name: machineClass.Name}}
+			machinePool.Status.Allocatable = corev1alpha1.ResourceList{
+				corev1alpha1.ClassCountFor(corev1alpha1.ClassTypeMachineClass, machineClass.Name): resource.MustParse("10"),
+			}
+			setMachinePoolReady(machinePool, corev1.ConditionFalse)
+		})).Should(Succeed())
+
+		By("creating a machine w/ the requested machine class")
+		machine := &computev1alpha1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace:    ns.Name,
+				GenerateName: "test-machine-",
+			},
+			Spec: computev1alpha1.MachineSpec{
+				MachineClassRef: corev1.LocalObjectReference{Name: machineClass.Name},
+			},
+		}
+		Expect(k8sClient.Create(ctx, machine)).To(Succeed(), "failed to create machine")
+
+		By("observing the machine isn't scheduled onto the not-ready machine pool")
+		Consistently(Object(machine)).Should(HaveField("Spec.MachinePoolRef", BeNil()))
+
+		By("marking the machine pool ready")
+		Eventually(UpdateStatus(machinePool, func() {
+			setMachinePoolReady(machinePool, corev1.ConditionTrue)
+		})).Should(Succeed())
+
+		By("waiting for the machine to be scheduled once the pool is ready")
+		Eventually(Object(machine)).Should(SatisfyAll(
+			HaveField("Spec.MachinePoolRef", Equal(&corev1.LocalObjectReference{Name: machinePool.Name})),
+			HaveField("Status.State", Equal(computev1alpha1.MachineStatePending)),
 		))
 	})
 })
