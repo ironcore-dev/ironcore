@@ -594,7 +594,7 @@ var _ = Describe("MachineScheduler", func() {
 		))
 	})
 
-	It("should not schedule machines onto a machine pool that is not ready", func(ctx SpecContext) {
+	It("should not schedule machines onto a machine pool without ready condition", func(ctx SpecContext) {
 		By("creating a machine pool")
 		machinePool := &computev1alpha1.MachinePool{
 			ObjectMeta: metav1.ObjectMeta{
