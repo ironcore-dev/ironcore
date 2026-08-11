@@ -82,12 +82,17 @@ func (s *MachineScheduler) matchesLabels(_ context.Context, pool *scheduler.Cont
 	return machinePoolSelector.Matches(nodeLabels)
 }
 
+func (s *MachineScheduler) poolReady(_ context.Context, pool *scheduler.ContainerInfo) bool {
+	cond := computev1alpha1.FindMachinePoolCondition(pool.Node().Status.Conditions, computev1alpha1.MachinePoolReady)
+
+	return cond != nil && cond.Status == corev1.ConditionTrue
+}
+
 func (s *MachineScheduler) tolerateTaints(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
 	return v1alpha1.TolerateTaints(machine.Spec.Tolerations, pool.Node().Spec.Taints)
 }
 
 func (s *MachineScheduler) fitsPool(_ context.Context, pool *scheduler.ContainerInfo, machine *computev1alpha1.Machine) bool {
-
 	return pool.MaxAllocatable(machine.Spec.MachineClassRef.Name) > 0
 }
 
@@ -102,6 +107,10 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 
 	var filteredNodes []*scheduler.ContainerInfo
 	for _, node := range nodes {
+		if !s.poolReady(ctx, node) {
+			log.Info("node filtered", "reason", "pool not ready")
+			continue
+		}
 		if !s.tolerateTaints(ctx, node, machine) {
 			log.Info("node filtered", "reason", "taints do not match")
 			continue
