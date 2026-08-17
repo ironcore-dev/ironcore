@@ -4,14 +4,14 @@ go 1.26.0
 
 require (
 	github.com/afritzler/protoequal v0.1.11
-	github.com/bits-and-blooms/bitset v1.24.6
+	github.com/bits-and-blooms/bitset v1.25.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-logr/logr v1.4.4
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.13.0
-	github.com/onsi/ginkgo/v2 v2.32.0
+	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
@@ -20,7 +20,7 @@ require (
 	golang.org/x/sync v0.22.0
 	golang.org/x/sys v0.47.0
 	google.golang.org/grpc v1.83.0
-	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
+	google.golang.org/protobuf v1.36.12
 	k8s.io/api v0.36.3
 	k8s.io/apimachinery v0.36.3
 	k8s.io/apiserver v0.36.3
