@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: compute.ironcore.dev:system:pool-lifecycle-controllers
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: compute.ironcore.dev:system:pool-lifecycle-controllers
+subjects:
+  - kind: Group
+    name: compute.ironcore.dev:system:pool-lifecycle-controllers
+    apiGroup: rbac.authorization.k8s.io

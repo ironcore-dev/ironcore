@@ -30,3 +30,9 @@ resources:
 - networkplugin_rolebinding.yaml
 - networkplugin_bootstrapper_role.yaml
 - networkplugin_bootstrapper_rolebinding.yaml
+
+# PoolLifecycle (bootstrapper) roles
+- poollifecycle_bootstrapper_role.yaml
+- poollifecycle_bootstrapper_rolebinding.yaml
+- poollifecycle_role.yaml
+- poollifecycle_rolebinding.yaml
