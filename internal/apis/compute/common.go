@@ -17,6 +17,12 @@ const (
 
 	// MachinePoolUserNamePrefix is the prefix all machine pool users should have.
 	MachinePoolUserNamePrefix = "compute.ironcore.dev:system:machinepool:"
+
+	// PoolLifecycleControllersGroup is the system rbac group the pool-lifecycle-controller is in.
+	PoolLifecycleControllersGroup = "compute.ironcore.dev:system:pool-lifecycle-controllers"
+
+	// PoolLifecycleControllerCommonName is the fixed common name of the pool-lifecycle-controller cert.
+	PoolLifecycleControllerCommonName = "compute.ironcore.dev:system:pool-lifecycle-controller"
 )
 
 // MachinePoolCommonName constructs the common name for a certificate of a machine pool user.
