@@ -16,6 +16,7 @@ import (
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	testingmachine "github.com/ironcore-dev/ironcore/iri/testing/machine"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
@@ -169,19 +170,28 @@ var _ = Describe("MachineController", func() {
 			},
 		})))
 
-		By("inspecting the iri machine's network interfaces to have correct labels and other properties")
+		By("inspecting the iri machine's network interfaces to have correct metadata, labels and other properties")
+		expectedNicLabels := map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+			machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+			machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+		}
 		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.11"},
+			// The metadata deliberately only identifies the network interface; labels and
+			// annotations are intentionally not passed through to avoid churn (detaches and
+			// re-attaches) on metadata changes.
+			Metadata: &irimeta.ObjectMetadata{
+				Id:        string(nic.UID),
+				Name:      nic.Name,
+				Namespace: nic.Namespace,
+			},
 			Attributes: map[string]string{
-				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
-					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
-					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
-					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
-					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
-				})),
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(expectedNicLabels)),
 				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
 					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
 					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),
@@ -384,18 +394,27 @@ var _ = Describe("MachineController", func() {
 				},
 			},
 		})))
+		expectedNicLabels := map[string]string{
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
+			poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
+			machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
+			machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
+			machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
+		}
 		Expect(iriMachine.Spec.NetworkInterfaces).To(ConsistOf(ProtoEqual(&iri.NetworkInterface{
 			Name:      "primary",
 			NetworkId: "foo",
 			Ips:       []string{"10.0.0.1"},
+			// The metadata deliberately only identifies the network interface; labels and
+			// annotations are intentionally not passed through to avoid churn (detaches and
+			// re-attaches) on metadata changes.
+			Metadata: &irimeta.ObjectMetadata{
+				Id:        string(nic.UID),
+				Name:      nic.Name,
+				Namespace: nic.Namespace,
+			},
 			Attributes: map[string]string{
-				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
-					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
-					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-nic-uid"):      string(nic.UID),
-					machinepoolletv1alpha1.NetworkInterfaceUIDLabel:                                                     string(nic.UID),
-					machinepoolletv1alpha1.NetworkInterfaceNamespaceLabel:                                               string(nic.Namespace),
-					machinepoolletv1alpha1.NetworkInterfaceNameLabel:                                                    string(nic.Name),
-				})),
+				machinepoolletv1alpha1.NICLabelsAttributeKey: string(mustMarshalJSON(expectedNicLabels)),
 				machinepoolletv1alpha1.NetworkLabelsAttributeKey: string(mustMarshalJSON(map[string]string{
 					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, fooDownwardAPILabel): fooAnnotationValue,
 					poolletutils.DownwardAPILabel(machinepoolletv1alpha1.MachineDownwardAPIPrefix, "root-network-uid"):  string(network.UID),

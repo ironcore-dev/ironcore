@@ -35,7 +35,18 @@ var _ = Describe("NetworkInterfaceReleaseReconciler", func() {
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
+		By("setting an available status on the network interface")
+		nic.Status = networkingv1alpha1.NetworkInterfaceStatus{
+			State: networkingv1alpha1.NetworkInterfaceStateAvailable,
+			IPs:   []commonv1alpha1.IP{*commonv1alpha1.MustParseNewIP("10.0.0.1")},
+		}
+		Expect(k8sClient.Status().Update(ctx, nic)).To(Succeed())
+
 		By("waiting for the network interface to be released")
-		Eventually(Object(nic)).Should(HaveField("Spec.MachineRef", BeNil()))
+		Eventually(Object(nic)).Should(SatisfyAll(
+			HaveField("Spec.MachineRef", BeNil()),
+			HaveField("Status.State", Equal(networkingv1alpha1.NetworkInterfaceStatePending)),
+			HaveField("Status.IPs", BeEmpty()),
+		))
 	})
 })
