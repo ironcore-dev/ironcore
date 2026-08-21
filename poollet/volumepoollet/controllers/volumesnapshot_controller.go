@@ -276,10 +276,14 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 		return nil, false, fmt.Errorf("error(s) preparing iri volume snapshot metadata: %v", errs)
 	}
 
+	volumeID, err := poolletutils.ParseID(volume.Status.VolumeID)
+	if err != nil {
+		return nil, false, fmt.Errorf("error parsing volume ID: %w", err)
+	}
 	return &iri.VolumeSnapshot{
 		Metadata: metadata,
 		Spec: &iri.VolumeSnapshotSpec{
-			VolumeId: volume.Name,
+			VolumeId: volumeID.ID,
 		},
 	}, true, nil
 }
