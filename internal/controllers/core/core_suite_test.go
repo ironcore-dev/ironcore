@@ -147,6 +147,8 @@ var _ = BeforeSuite(func() {
 		err = k8sManager.Start(mgrCtx)
 		Expect(err).ToNot(HaveOccurred())
 	}()
+
+	Expect(k8sManager.GetCache().WaitForCacheSync(mgrCtx)).To(BeTrue())
 })
 
 func SetupTest(ctx context.Context) *corev1.Namespace {

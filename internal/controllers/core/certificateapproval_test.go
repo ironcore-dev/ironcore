@@ -32,7 +32,13 @@ var _ = Describe("CertificateApprovalController", func() {
 						Organization: []string{organization},
 					},
 				},
-				utilcertificate.DefaultKubeAPIServerClientGetUsages,
+				func(_ any) []certificatesv1.KeyUsage {
+					return []certificatesv1.KeyUsage{
+						certificatesv1.UsageDigitalSignature,
+						certificatesv1.UsageKeyEncipherment,
+						certificatesv1.UsageClientAuth,
+					}
+				},
 				nil,
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -60,6 +66,41 @@ var _ = Describe("CertificateApprovalController", func() {
 		Entry("network plugin",
 			networkingv1alpha1.NetworkPluginCommonName("my-plugin"),
 			networkingv1alpha1.NetworkPluginsGroup,
+		),
+	)
+
+	DescribeTable("certificate denial",
+		func(ctx SpecContext, commonName, organization string) {
+			By("creating a non-conformant certificate signing request")
+			csr, _, _, err := utilcertificate.GenerateAndCreateCertificateSigningRequest(
+				ctx,
+				k8sClient,
+				certificatesv1.KubeAPIServerClientSignerName,
+				&x509.CertificateRequest{
+					Subject: pkix.Name{
+						CommonName:   commonName,
+						Organization: []string{organization},
+					},
+				},
+				utilcertificate.DefaultKubeAPIServerClientGetUsages,
+				nil,
+			)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("ensuring the csr is never approved")
+			Consistently(ctx, Object(csr)).Should(
+				HaveField("Status.Conditions", Not(ContainElement(
+					HaveField("Type", certificatesv1.CertificateApproved),
+				))),
+			)
+		},
+		Entry("non-conformant certificate",
+			"pwn",
+			"unknown-org",
+		),
+		Entry("elevated organization",
+			"kubernetes-admin",
+			"kubeadm:cluster-admins",
 		),
 	)
 })
