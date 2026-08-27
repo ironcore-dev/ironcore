@@ -50,7 +50,7 @@ func (r *CertificateApprovalReconciler) Reconcile(ctx context.Context, req ctrl.
 
 	var tried []string
 	for _, recognizer := range r.Recognizers {
-		if recognizer.Recognize(csr, x509CR) {
+		if !recognizer.Recognize(csr, x509CR) {
 			continue
 		}
 
