@@ -1,1 +1,0 @@
-# IronCore Architecture
