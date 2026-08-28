@@ -16,9 +16,9 @@ related to its GitHub page, nor its content under https://github.com/IronCoreLab
 
 ## To start developing Project IronCore
 
-> ⚠️ Before contributing, make sure you read the [contribution guidelines](docs/development/contribution.md)
+> ⚠️ Before contributing, make sure you read the [contribution guidelines](https://ironcore.dev/community/contributing.html)
 
-Please see our documentation in the `/docs` folder for more details.
+Please see our [documentation](https://ironcore.dev/iaas/getting-started) for more details.
 
 ## Proposals
 
@@ -35,4 +35,3 @@ copyright and license information. Detailed information including third-party co
 information is available [via the REUSE tool](https://api.reuse.software/info/github.com/ironcore-dev/ironcore).
 
 <p align="center"><img alt="Bundesministerium für Wirtschaft und Energie (BMWE)-EU funding logo" src="https://apeirora.eu/assets/img/BMWK-EU.png" width="400"/></p>
-
