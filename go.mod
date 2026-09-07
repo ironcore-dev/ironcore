@@ -137,5 +137,3 @@ require (
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 )
-
-replace github.com/ironcore-dev/controller-utils => ../controller-utils

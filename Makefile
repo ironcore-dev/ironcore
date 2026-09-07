@@ -303,7 +303,7 @@ PROTOC_GEN_GO_GRPC ?= $(LOCALBIN)/protoc-gen-go-grpc
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v5.7.1
-CONTROLLER_TOOLS_VERSION ?= v0.21.0
+CONTROLLER_TOOLS_VERSION ?= v0.22.0
 #ENVTEST_VERSION is the version of controller-runtime release branch to fetch the envtest setup script (i.e. release-0.20)
 ENVTEST_VERSION ?= $(shell go list -m -f "{{ .Version }}" sigs.k8s.io/controller-runtime | awk -F'[v.]' '{printf "release-%d.%d", $$2, $$3}')
 #ENVTEST_K8S_VERSION is the version of Kubernetes to use for setting up ENVTEST binaries (i.e. 1.31)
@@ -314,12 +314,10 @@ ADDLICENSE_VERSION ?= v1.1.1
 PROTOC_GEN_GO_VERSION ?= v1.36.11
 PROTOC_GEN_GO_GRPC_VERSION ?= v1.6.0
 GOIMPORTS_VERSION ?= v0.41.0
-GOLANGCI_LINT_VERSION ?= v2.11
+GOLANGCI_LINT_VERSION ?= v2.13
 OPENAPI_EXTRACTOR_VERSION ?= v0.2.0
 BUF_VERSION ?= v1.63.0
 MODELS_SCHEMA_VERSION ?= latest
-# Later version require go1.27, switch back to latest once on go1.27
-OPENAPI_GEN_VERSION ?= be32def86098a05c8a36333127c9b45300e7f33d
 
 .PHONY: kustomize
 kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary.
@@ -334,7 +332,7 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 .PHONY: openapi-gen
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
 $(OPENAPI_GEN): $(LOCALBIN)
-	$(call go-install-tool,$(OPENAPI_GEN),k8s.io/kube-openapi/cmd/openapi-gen,$(OPENAPI_GEN_VERSION))
+	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
