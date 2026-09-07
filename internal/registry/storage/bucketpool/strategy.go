@@ -85,11 +85,11 @@ func (bucketPoolStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Obje
 	return nil
 }
 
-func (bucketPoolStrategy) AllowCreateOnUpdate() bool {
+func (bucketPoolStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (bucketPoolStrategy) AllowUnconditionalUpdate() bool {
+func (bucketPoolStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

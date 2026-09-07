@@ -12,7 +12,7 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// ResourceQuotas returns a ResourceQuotaInformer.
-	ResourceQuotas() ResourceQuotaInformer
+	ResourceQuotas() TypedResourceQuotaInformer
 }
 
 type version struct {
@@ -26,7 +26,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ResourceQuotas returns a ResourceQuotaInformer.
-func (v *version) ResourceQuotas() ResourceQuotaInformer {
+// ResourceQuotas returns a TypedResourceQuotaInformer.
+func (v *version) ResourceQuotas() TypedResourceQuotaInformer {
 	return &resourceQuotaInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

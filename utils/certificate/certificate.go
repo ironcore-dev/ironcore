@@ -141,12 +141,12 @@ func WaitForCertificate(ctx context.Context, c client.WithWatch, name string, ui
 	fieldSelector := fields.OneTermEqualSelector("metadata.name", name).String()
 
 	lw := &cache.ListWatch{
-		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+		ListWithContextFunc: func(ctx context.Context, options metav1.ListOptions) (runtime.Object, error) {
 			options.FieldSelector = fieldSelector
 			list := &certificatesv1.CertificateSigningRequestList{}
 			return list, c.List(ctx, list, &client.ListOptions{Raw: &options})
 		},
-		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+		WatchFuncWithContext: func(ctx context.Context, options metav1.ListOptions) (watch.Interface, error) {
 			options.FieldSelector = fieldSelector
 			return c.Watch(ctx, &certificatesv1.CertificateSigningRequestList{}, &client.ListOptions{Raw: &options})
 		},

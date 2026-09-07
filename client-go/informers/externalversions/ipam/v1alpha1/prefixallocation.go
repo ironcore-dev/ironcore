@@ -21,11 +21,39 @@ import (
 )
 
 // PrefixAllocationInformer provides access to a shared informer and lister for
-// PrefixAllocations.
+// PrefixAllocations. Prefer using the type-safe variant (see [TypedPrefixAllocationInformer]).
 type PrefixAllocationInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() ipamv1alpha1.PrefixAllocationLister
 }
+
+// TypedPrefixAllocationInformer provides access to a shared informer and lister for
+// PrefixAllocations, including the type-safe TypedInformer variant.
+// It is a superset of PrefixAllocationInformer.
+type TypedPrefixAllocationInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() PrefixAllocationIndexInformer
+	Lister() ipamv1alpha1.PrefixAllocationLister
+}
+
+// PrefixAllocationIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type PrefixAllocationIndexInformer cache.TypedSharedIndexInformer[*apiipamv1alpha1.PrefixAllocation]
+
+// PrefixAllocationHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for PrefixAllocation.
+type PrefixAllocationHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiipamv1alpha1.PrefixAllocation]
+
+// PrefixAllocationDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for PrefixAllocation.
+type PrefixAllocationDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiipamv1alpha1.PrefixAllocation]
+
+// PrefixAllocationFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for PrefixAllocation.
+type PrefixAllocationFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiipamv1alpha1.PrefixAllocation]
+
+// PrefixAllocationIndexers is a specialization of [cache.TypedIndexers] for PrefixAllocation.
+type PrefixAllocationIndexers = cache.TypedIndexers[*apiipamv1alpha1.PrefixAllocation]
+
+// DeletedPrefixAllocation is a specialization of [cache.DeletedObject] for PrefixAllocation.
+type DeletedPrefixAllocation = cache.DeletedObject[*apiipamv1alpha1.PrefixAllocation]
 
 type prefixAllocationInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type prefixAllocationInformer struct {
 // NewPrefixAllocationInformer constructs a new informer for PrefixAllocation type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedPrefixAllocationInformer]).
 func NewPrefixAllocationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewPrefixAllocationInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedPrefixAllocationInformer constructs a new informer for PrefixAllocation type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedPrefixAllocationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers PrefixAllocationIndexers) PrefixAllocationIndexInformer {
+	return NewTypedPrefixAllocationInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredPrefixAllocationInformer constructs a new informer for PrefixAllocation type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredPrefixAllocationInformer]).
 func NewFilteredPrefixAllocationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewPrefixAllocationInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedPrefixAllocationInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredPrefixAllocationInformer constructs a new informer for PrefixAllocation type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredPrefixAllocationInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers PrefixAllocationIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) PrefixAllocationIndexInformer {
+	return NewTypedPrefixAllocationInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewPrefixAllocationInformerWithOptions constructs a new informer for PrefixAllocation type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedPrefixAllocationInformerWithOptions]).
 func NewPrefixAllocationInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedPrefixAllocationInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedPrefixAllocationInformerWithOptions constructs a new informer for PrefixAllocation type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedPrefixAllocationInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) PrefixAllocationIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "ipam.ironcore.dev", Version: "v1alpha1", Resource: "prefixallocations"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.PrefixAllocation](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewPrefixAllocationInformerWithOptions(client versioned.Interface, namespac
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *prefixAllocationInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewPrefixAllocationInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedPrefixAllocationInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *prefixAllocationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiipamv1alpha1.PrefixAllocation{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *prefixAllocationInformer) TypedInformer() PrefixAllocationIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.PrefixAllocation](f.factory.InformerFor(&apiipamv1alpha1.PrefixAllocation{}, f.defaultInformer))
 }
 
 func (f *prefixAllocationInformer) Lister() ipamv1alpha1.PrefixAllocationLister {
 	return ipamv1alpha1.NewPrefixAllocationLister(f.Informer().GetIndexer())
+}
+
+// ToTypedPrefixAllocationInformer converts an untyped informer into a TypedPrefixAllocationInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *PrefixAllocation. If that is not the case, calling type-safe methods of the returned
+// TypedPrefixAllocationInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedPrefixAllocationInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedPrefixAllocationInformer(informer PrefixAllocationInformer) TypedPrefixAllocationInformer {
+	if informer, ok := informer.(TypedPrefixAllocationInformer); ok {
+		return informer
+	}
+	return &prefixAllocationTypedInformerAdapter{informer}
+}
+
+type prefixAllocationTypedInformerAdapter struct {
+	PrefixAllocationInformer
+}
+
+func (a *prefixAllocationTypedInformerAdapter) TypedInformer() PrefixAllocationIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.PrefixAllocation](a.Informer())
+}
+
+// ToPrefixAllocationIndexInformer converts an untyped informer into a PrefixAllocationIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *PrefixAllocation. If that is not the case, calling type-safe methods of the returned
+// PrefixAllocationIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a PrefixAllocationIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToPrefixAllocationIndexInformer(informer cache.SharedIndexInformer) PrefixAllocationIndexInformer {
+	if informer, ok := informer.(PrefixAllocationIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.PrefixAllocation](informer)
 }

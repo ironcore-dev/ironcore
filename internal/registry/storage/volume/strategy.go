@@ -103,11 +103,11 @@ func (volumeStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) 
 	return nil
 }
 
-func (volumeStrategy) AllowCreateOnUpdate() bool {
+func (volumeStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (volumeStrategy) AllowUnconditionalUpdate() bool {
+func (volumeStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 
