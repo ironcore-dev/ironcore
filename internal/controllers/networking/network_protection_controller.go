@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	networkFinalizer = "networking.ironcore.dev/network"
+	networkFinalizer            = "networking.ironcore.dev/network"
+	networkInUseRequeueInterval = time.Second
 )
 
 type NetworkProtectionReconciler struct {
@@ -60,7 +61,7 @@ func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logge
 	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil {
 		return ctrl.Result{}, err
 	} else if ok {
-		return ctrl.Result{RequeueAfter: time.Nanosecond}, nil
+		return ctrl.Result{RequeueAfter: networkInUseRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Removing finalizer from Network as the Network is not in use")
