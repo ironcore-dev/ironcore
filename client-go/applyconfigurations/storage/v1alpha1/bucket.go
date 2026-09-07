@@ -19,7 +19,7 @@ import (
 //
 // Bucket is the Schema for the buckets API
 type BucketApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *BucketSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *BucketStatusApplyConfiguration `json:"status,omitempty"`

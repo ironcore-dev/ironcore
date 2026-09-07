@@ -19,7 +19,7 @@ import (
 //
 // NATGateway is the Schema for the NATGateway API
 type NATGatewayApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NATGatewaySpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *NATGatewayStatusApplyConfiguration `json:"status,omitempty"`

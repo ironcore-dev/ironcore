@@ -21,11 +21,39 @@ import (
 )
 
 // NetworkInterfaceInformer provides access to a shared informer and lister for
-// NetworkInterfaces.
+// NetworkInterfaces. Prefer using the type-safe variant (see [TypedNetworkInterfaceInformer]).
 type NetworkInterfaceInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() networkingv1alpha1.NetworkInterfaceLister
 }
+
+// TypedNetworkInterfaceInformer provides access to a shared informer and lister for
+// NetworkInterfaces, including the type-safe TypedInformer variant.
+// It is a superset of NetworkInterfaceInformer.
+type TypedNetworkInterfaceInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() NetworkInterfaceIndexInformer
+	Lister() networkingv1alpha1.NetworkInterfaceLister
+}
+
+// NetworkInterfaceIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type NetworkInterfaceIndexInformer cache.TypedSharedIndexInformer[*apinetworkingv1alpha1.NetworkInterface]
+
+// NetworkInterfaceHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for NetworkInterface.
+type NetworkInterfaceHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apinetworkingv1alpha1.NetworkInterface]
+
+// NetworkInterfaceDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for NetworkInterface.
+type NetworkInterfaceDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apinetworkingv1alpha1.NetworkInterface]
+
+// NetworkInterfaceFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for NetworkInterface.
+type NetworkInterfaceFilteringHandler = cache.TypedFilteringResourceEventHandler[*apinetworkingv1alpha1.NetworkInterface]
+
+// NetworkInterfaceIndexers is a specialization of [cache.TypedIndexers] for NetworkInterface.
+type NetworkInterfaceIndexers = cache.TypedIndexers[*apinetworkingv1alpha1.NetworkInterface]
+
+// DeletedNetworkInterface is a specialization of [cache.DeletedObject] for NetworkInterface.
+type DeletedNetworkInterface = cache.DeletedObject[*apinetworkingv1alpha1.NetworkInterface]
 
 type networkInterfaceInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type networkInterfaceInformer struct {
 // NewNetworkInterfaceInformer constructs a new informer for NetworkInterface type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNetworkInterfaceInformer]).
 func NewNetworkInterfaceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewNetworkInterfaceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedNetworkInterfaceInformer constructs a new informer for NetworkInterface type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNetworkInterfaceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NetworkInterfaceIndexers) NetworkInterfaceIndexInformer {
+	return NewTypedNetworkInterfaceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredNetworkInterfaceInformer constructs a new informer for NetworkInterface type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredNetworkInterfaceInformer]).
 func NewFilteredNetworkInterfaceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewNetworkInterfaceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedNetworkInterfaceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredNetworkInterfaceInformer constructs a new informer for NetworkInterface type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredNetworkInterfaceInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers NetworkInterfaceIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) NetworkInterfaceIndexInformer {
+	return NewTypedNetworkInterfaceInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewNetworkInterfaceInformerWithOptions constructs a new informer for NetworkInterface type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedNetworkInterfaceInformerWithOptions]).
 func NewNetworkInterfaceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedNetworkInterfaceInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedNetworkInterfaceInformerWithOptions constructs a new informer for NetworkInterface type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedNetworkInterfaceInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) NetworkInterfaceIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "networking.ironcore.dev", Version: "v1alpha1", Resource: "networkinterfaces"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.NetworkInterface](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewNetworkInterfaceInformerWithOptions(client versioned.Interface, namespac
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *networkInterfaceInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewNetworkInterfaceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedNetworkInterfaceInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *networkInterfaceInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apinetworkingv1alpha1.NetworkInterface{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *networkInterfaceInformer) TypedInformer() NetworkInterfaceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.NetworkInterface](f.factory.InformerFor(&apinetworkingv1alpha1.NetworkInterface{}, f.defaultInformer))
 }
 
 func (f *networkInterfaceInformer) Lister() networkingv1alpha1.NetworkInterfaceLister {
 	return networkingv1alpha1.NewNetworkInterfaceLister(f.Informer().GetIndexer())
+}
+
+// ToTypedNetworkInterfaceInformer converts an untyped informer into a TypedNetworkInterfaceInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NetworkInterface. If that is not the case, calling type-safe methods of the returned
+// TypedNetworkInterfaceInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedNetworkInterfaceInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedNetworkInterfaceInformer(informer NetworkInterfaceInformer) TypedNetworkInterfaceInformer {
+	if informer, ok := informer.(TypedNetworkInterfaceInformer); ok {
+		return informer
+	}
+	return &networkInterfaceTypedInformerAdapter{informer}
+}
+
+type networkInterfaceTypedInformerAdapter struct {
+	NetworkInterfaceInformer
+}
+
+func (a *networkInterfaceTypedInformerAdapter) TypedInformer() NetworkInterfaceIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.NetworkInterface](a.Informer())
+}
+
+// ToNetworkInterfaceIndexInformer converts an untyped informer into a NetworkInterfaceIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *NetworkInterface. If that is not the case, calling type-safe methods of the returned
+// NetworkInterfaceIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a NetworkInterfaceIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToNetworkInterfaceIndexInformer(informer cache.SharedIndexInformer) NetworkInterfaceIndexInformer {
+	if informer, ok := informer.(NetworkInterfaceIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.NetworkInterface](informer)
 }

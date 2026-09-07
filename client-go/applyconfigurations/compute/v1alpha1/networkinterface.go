@@ -17,7 +17,7 @@ type NetworkInterfaceApplyConfiguration struct {
 	// Name is the name of the network interface.
 	Name *string `json:"name,omitempty"`
 	// NetworkInterfaceSource is where to obtain the interface from.
-	NetworkInterfaceSourceApplyConfiguration `json:",inline"`
+	NetworkInterfaceSourceApplyConfiguration `json:""`
 }
 
 // NetworkInterfaceApplyConfiguration constructs a declarative configuration of the NetworkInterface type for use with

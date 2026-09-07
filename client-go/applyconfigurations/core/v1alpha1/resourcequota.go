@@ -19,7 +19,7 @@ import (
 //
 // ResourceQuota is the Schema for the resourcequotas API
 type ResourceQuotaApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *ResourceQuotaSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *ResourceQuotaStatusApplyConfiguration `json:"status,omitempty"`

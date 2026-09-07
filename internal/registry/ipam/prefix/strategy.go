@@ -66,11 +66,11 @@ func (prefixStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) 
 	return nil
 }
 
-func (prefixStrategy) AllowCreateOnUpdate() bool {
+func (prefixStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (prefixStrategy) AllowUnconditionalUpdate() bool {
+func (prefixStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

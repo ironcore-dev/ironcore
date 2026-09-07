@@ -19,7 +19,7 @@ import (
 //
 // VolumePool is the Schema for the volumepools API
 type VolumePoolApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumePoolSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *VolumePoolStatusApplyConfiguration `json:"status,omitempty"`

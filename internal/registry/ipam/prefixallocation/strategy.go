@@ -66,11 +66,11 @@ func (prefixAllocationStrategy) WarningsOnCreate(ctx context.Context, obj runtim
 	return nil
 }
 
-func (prefixAllocationStrategy) AllowCreateOnUpdate() bool {
+func (prefixAllocationStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (prefixAllocationStrategy) AllowUnconditionalUpdate() bool {
+func (prefixAllocationStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

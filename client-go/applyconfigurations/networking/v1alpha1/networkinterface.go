@@ -19,7 +19,7 @@ import (
 //
 // NetworkInterface is the Schema for the networkinterfaces API
 type NetworkInterfaceApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkInterfaceSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *NetworkInterfaceStatusApplyConfiguration `json:"status,omitempty"`

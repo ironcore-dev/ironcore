@@ -12,19 +12,19 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// LoadBalancers returns a LoadBalancerInformer.
-	LoadBalancers() LoadBalancerInformer
+	LoadBalancers() TypedLoadBalancerInformer
 	// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
-	LoadBalancerRoutings() LoadBalancerRoutingInformer
+	LoadBalancerRoutings() TypedLoadBalancerRoutingInformer
 	// NATGateways returns a NATGatewayInformer.
-	NATGateways() NATGatewayInformer
+	NATGateways() TypedNATGatewayInformer
 	// Networks returns a NetworkInformer.
-	Networks() NetworkInformer
+	Networks() TypedNetworkInformer
 	// NetworkInterfaces returns a NetworkInterfaceInformer.
-	NetworkInterfaces() NetworkInterfaceInformer
+	NetworkInterfaces() TypedNetworkInterfaceInformer
 	// NetworkPolicies returns a NetworkPolicyInformer.
-	NetworkPolicies() NetworkPolicyInformer
+	NetworkPolicies() TypedNetworkPolicyInformer
 	// VirtualIPs returns a VirtualIPInformer.
-	VirtualIPs() VirtualIPInformer
+	VirtualIPs() TypedVirtualIPInformer
 }
 
 type version struct {
@@ -38,37 +38,37 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// LoadBalancers returns a LoadBalancerInformer.
-func (v *version) LoadBalancers() LoadBalancerInformer {
+// LoadBalancers returns a TypedLoadBalancerInformer.
+func (v *version) LoadBalancers() TypedLoadBalancerInformer {
 	return &loadBalancerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// LoadBalancerRoutings returns a LoadBalancerRoutingInformer.
-func (v *version) LoadBalancerRoutings() LoadBalancerRoutingInformer {
+// LoadBalancerRoutings returns a TypedLoadBalancerRoutingInformer.
+func (v *version) LoadBalancerRoutings() TypedLoadBalancerRoutingInformer {
 	return &loadBalancerRoutingInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NATGateways returns a NATGatewayInformer.
-func (v *version) NATGateways() NATGatewayInformer {
+// NATGateways returns a TypedNATGatewayInformer.
+func (v *version) NATGateways() TypedNATGatewayInformer {
 	return &nATGatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// Networks returns a NetworkInformer.
-func (v *version) Networks() NetworkInformer {
+// Networks returns a TypedNetworkInformer.
+func (v *version) Networks() TypedNetworkInformer {
 	return &networkInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkInterfaces returns a NetworkInterfaceInformer.
-func (v *version) NetworkInterfaces() NetworkInterfaceInformer {
+// NetworkInterfaces returns a TypedNetworkInterfaceInformer.
+func (v *version) NetworkInterfaces() TypedNetworkInterfaceInformer {
 	return &networkInterfaceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// NetworkPolicies returns a NetworkPolicyInformer.
-func (v *version) NetworkPolicies() NetworkPolicyInformer {
+// NetworkPolicies returns a TypedNetworkPolicyInformer.
+func (v *version) NetworkPolicies() TypedNetworkPolicyInformer {
 	return &networkPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// VirtualIPs returns a VirtualIPInformer.
-func (v *version) VirtualIPs() VirtualIPInformer {
+// VirtualIPs returns a TypedVirtualIPInformer.
+func (v *version) VirtualIPs() TypedVirtualIPInformer {
 	return &virtualIPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

@@ -21,11 +21,39 @@ import (
 )
 
 // VolumePoolInformer provides access to a shared informer and lister for
-// VolumePools.
+// VolumePools. Prefer using the type-safe variant (see [TypedVolumePoolInformer]).
 type VolumePoolInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() storagev1alpha1.VolumePoolLister
 }
+
+// TypedVolumePoolInformer provides access to a shared informer and lister for
+// VolumePools, including the type-safe TypedInformer variant.
+// It is a superset of VolumePoolInformer.
+type TypedVolumePoolInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() VolumePoolIndexInformer
+	Lister() storagev1alpha1.VolumePoolLister
+}
+
+// VolumePoolIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type VolumePoolIndexInformer cache.TypedSharedIndexInformer[*apistoragev1alpha1.VolumePool]
+
+// VolumePoolHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for VolumePool.
+type VolumePoolHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apistoragev1alpha1.VolumePool]
+
+// VolumePoolDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for VolumePool.
+type VolumePoolDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apistoragev1alpha1.VolumePool]
+
+// VolumePoolFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for VolumePool.
+type VolumePoolFilteringHandler = cache.TypedFilteringResourceEventHandler[*apistoragev1alpha1.VolumePool]
+
+// VolumePoolIndexers is a specialization of [cache.TypedIndexers] for VolumePool.
+type VolumePoolIndexers = cache.TypedIndexers[*apistoragev1alpha1.VolumePool]
+
+// DeletedVolumePool is a specialization of [cache.DeletedObject] for VolumePool.
+type DeletedVolumePool = cache.DeletedObject[*apistoragev1alpha1.VolumePool]
 
 type volumePoolInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -35,25 +63,49 @@ type volumePoolInformer struct {
 // NewVolumePoolInformer constructs a new informer for VolumePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVolumePoolInformer]).
 func NewVolumePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedVolumePoolInformer constructs a new informer for VolumePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVolumePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers VolumePoolIndexers) VolumePoolIndexInformer {
+	return NewTypedVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredVolumePoolInformer constructs a new informer for VolumePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredVolumePoolInformer]).
 func NewFilteredVolumePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredVolumePoolInformer constructs a new informer for VolumePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredVolumePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers VolumePoolIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) VolumePoolIndexInformer {
+	return NewTypedVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewVolumePoolInformerWithOptions constructs a new informer for VolumePool type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVolumePoolInformerWithOptions]).
 func NewVolumePoolInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedVolumePoolInformerWithOptions(client, options)
+}
+
+// NewTypedVolumePoolInformerWithOptions constructs a new informer for VolumePool type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVolumePoolInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) VolumePoolIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "storage.ironcore.dev", Version: "v1alpha1", Resource: "volumepools"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.VolumePool](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -86,17 +138,57 @@ func NewVolumePoolInformerWithOptions(client versioned.Interface, options intern
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *volumePoolInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedVolumePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *volumePoolInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apistoragev1alpha1.VolumePool{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *volumePoolInformer) TypedInformer() VolumePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.VolumePool](f.factory.InformerFor(&apistoragev1alpha1.VolumePool{}, f.defaultInformer))
 }
 
 func (f *volumePoolInformer) Lister() storagev1alpha1.VolumePoolLister {
 	return storagev1alpha1.NewVolumePoolLister(f.Informer().GetIndexer())
+}
+
+// ToTypedVolumePoolInformer converts an untyped informer into a TypedVolumePoolInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *VolumePool. If that is not the case, calling type-safe methods of the returned
+// TypedVolumePoolInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedVolumePoolInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedVolumePoolInformer(informer VolumePoolInformer) TypedVolumePoolInformer {
+	if informer, ok := informer.(TypedVolumePoolInformer); ok {
+		return informer
+	}
+	return &volumePoolTypedInformerAdapter{informer}
+}
+
+type volumePoolTypedInformerAdapter struct {
+	VolumePoolInformer
+}
+
+func (a *volumePoolTypedInformerAdapter) TypedInformer() VolumePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.VolumePool](a.Informer())
+}
+
+// ToVolumePoolIndexInformer converts an untyped informer into a VolumePoolIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *VolumePool. If that is not the case, calling type-safe methods of the returned
+// VolumePoolIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a VolumePoolIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToVolumePoolIndexInformer(informer cache.SharedIndexInformer) VolumePoolIndexInformer {
+	if informer, ok := informer.(VolumePoolIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.VolumePool](informer)
 }

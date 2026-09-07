@@ -19,7 +19,7 @@ import (
 //
 // MachinePool is the Schema for the machinepools API
 type MachinePoolApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *MachinePoolSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *MachinePoolStatusApplyConfiguration `json:"status,omitempty"`

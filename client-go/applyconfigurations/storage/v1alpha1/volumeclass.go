@@ -20,7 +20,7 @@ import (
 //
 // VolumeClass is the Schema for the volumeclasses API
 type VolumeClassApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Capabilities describes the capabilities of a VolumeClass.
 	Capabilities *corev1alpha1.ResourceList `json:"capabilities,omitempty"`
