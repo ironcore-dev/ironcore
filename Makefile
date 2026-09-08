@@ -381,8 +381,8 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 
 .PHONY: openapi-gen
 openapi-gen: $(OPENAPI_GEN) ## Download openapi-gen locally if necessary.
-$(OPENAPI_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/openapi-gen || GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
+$(OPENAPI_GEN): go.mod go.sum | $(LOCALBIN)
+	GOBIN=$(LOCALBIN) go install k8s.io/kube-openapi/cmd/openapi-gen
 
 .PHONY: envtest
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
