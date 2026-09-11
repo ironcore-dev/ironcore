@@ -257,7 +257,7 @@ func (r *BucketReconciler) prepareIRIBucketClass(ctx context.Context, bucket *st
 			return "", false, fmt.Errorf("error getting bucket class %s: %w", bucketClassName, err)
 		}
 
-		r.Eventf(bucket, nil, corev1.EventTypeNormal, bucketpoolletevents.BucketClassNotReady, "Bucket class %s not found", bucketClassName)
+		r.Eventf(bucket, nil, corev1.EventTypeNormal, bucketpoolletevents.BucketClassNotReady, bucketpoolletevents.ResolvingBucketClass, "Bucket class %s not found", bucketClassName)
 		return "", false, nil
 	}
 

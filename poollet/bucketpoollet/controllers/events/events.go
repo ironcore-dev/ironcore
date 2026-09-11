@@ -3,6 +3,12 @@
 
 package events
 
+// Event reasons.
 const (
 	BucketClassNotReady = "BucketClassNotReady"
+)
+
+// Event actions.
+const (
+	ResolvingBucketClass = "ResolvingBucketClass"
 )

@@ -3,6 +3,7 @@
 
 package events
 
+// Event reasons.
 const (
 	VolumeClassNotReady            = "VolumeClassNotReady"
 	VolumeEncryptionSecretNotReady = "VolumeEncryptionSecretNotReady"
@@ -10,4 +11,13 @@ const (
 	VolumeSnapshotNotReady         = "VolumeSnapshotNotReady"
 	SourceVolumeNotFound           = "SourceVolumeNotFound"
 	SourceVolumeNotAvailable       = "SourceVolumeNotAvailable"
+)
+
+// Event actions.
+const (
+	ResolvingVolumeClass            = "ResolvingVolumeClass"
+	ResolvingVolumeSnapshot         = "ResolvingVolumeSnapshot"
+	ResolvingVolumeEncryptionSecret = "ResolvingVolumeEncryptionSecret"
+	ResolvingSourceVolume           = "ResolvingSourceVolume"
+	PreparingVolumeEncryption       = "PreparingVolumeEncryption"
 )

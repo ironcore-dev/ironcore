@@ -29,6 +29,7 @@ import (
 
 const (
 	outOfCapacity = "OutOfCapacity"
+	scheduling    = "Scheduling"
 )
 
 type MachineScheduler struct {
@@ -101,7 +102,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule %s on", machine.Name)
+		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, scheduling, "No nodes available to schedule %s on", machine.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -128,7 +129,7 @@ func (s *MachineScheduler) reconcileExists(ctx context.Context, log logr.Logger,
 	}
 
 	if len(filteredNodes) == 0 {
-		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule %s on", machine.Name)
+		s.Eventf(machine, nil, corev1.EventTypeNormal, outOfCapacity, scheduling, "No nodes available after filtering to schedule %s on", machine.Name)
 		return ctrl.Result{}, nil
 	}
 

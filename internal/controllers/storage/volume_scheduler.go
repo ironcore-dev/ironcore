@@ -29,6 +29,7 @@ import (
 
 const (
 	outOfCapacity = "OutOfCapacity"
+	scheduling    = "Scheduling"
 )
 
 type VolumeScheduler struct {
@@ -142,7 +143,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 
 	nodes := s.snapshot.ListNodes()
 	if len(nodes) == 0 {
-		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available to schedule %s on", volume.Name)
+		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, scheduling, "No nodes available to schedule %s on", volume.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -165,7 +166,7 @@ func (s *VolumeScheduler) reconcileExists(ctx context.Context, log logr.Logger, 
 	}
 
 	if len(filteredNodes) == 0 {
-		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, "No nodes available after filtering to schedule %s on", volume.Name)
+		s.Eventf(volume, nil, corev1.EventTypeNormal, outOfCapacity, scheduling, "No nodes available after filtering to schedule %s on", volume.Name)
 		return ctrl.Result{}, nil
 	}
 
