@@ -368,6 +368,7 @@ GOLANGCI_LINT_VERSION ?= v2.11
 OPENAPI_EXTRACTOR_VERSION ?= v0.2.0
 BUF_VERSION ?= v1.63.0
 MODELS_SCHEMA_VERSION ?= latest
+# Later version require go1.27, switch back to latest once on go1.27
 OPENAPI_GEN_VERSION ?= be32def86098a05c8a36333127c9b45300e7f33d
 
 .PHONY: kustomize
