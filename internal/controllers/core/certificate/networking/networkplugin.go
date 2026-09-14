@@ -22,6 +22,14 @@ var (
 		certificatesv1.UsageKeyEncipherment,
 		certificatesv1.UsageClientAuth,
 	)
+
+	// NetworkPluginRequiredUsagesNoEncipherment is the usage set for EC
+	// keys, which cannot perform key encipherment. Network plugins generate
+	// ECDSA keys, so their CSRs always carry this usage set.
+	NetworkPluginRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
+		certificatesv1.UsageDigitalSignature,
+		certificatesv1.UsageClientAuth,
+	)
 )
 
 func IsNetworkPluginClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
@@ -54,7 +62,7 @@ func ValidateNetworkPluginClientCSR(req *x509.CertificateRequest, usages sets.Se
 		return fmt.Errorf("subject common name does not begin with %s", networkingv1alpha1.NetworkPluginUserNamePrefix)
 	}
 
-	if !NetworkPluginRequiredUsages.Equal(usages) {
+	if !NetworkPluginRequiredUsages.Equal(usages) && !NetworkPluginRequiredUsagesNoEncipherment.Equal(usages) {
 		return fmt.Errorf("usages did not match %v", sets.List(NetworkPluginRequiredUsages))
 	}
 

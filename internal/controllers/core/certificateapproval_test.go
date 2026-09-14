@@ -32,13 +32,7 @@ var _ = Describe("CertificateApprovalController", func() {
 						Organization: []string{organization},
 					},
 				},
-				func(_ any) []certificatesv1.KeyUsage {
-					return []certificatesv1.KeyUsage{
-						certificatesv1.UsageDigitalSignature,
-						certificatesv1.UsageKeyEncipherment,
-						certificatesv1.UsageClientAuth,
-					}
-				},
+				utilcertificate.DefaultKubeAPIServerClientGetUsages,
 				nil,
 			)
 			Expect(err).NotTo(HaveOccurred())
@@ -62,6 +56,10 @@ var _ = Describe("CertificateApprovalController", func() {
 		Entry("bucket pool",
 			storagev1alpha1.BucketPoolCommonName("my-pool"),
 			storagev1alpha1.BucketPoolsGroup,
+		),
+		Entry("pool lifecycle controller",
+			computev1alpha1.PoolLifecycleControllerCommonName,
+			computev1alpha1.PoolLifecycleControllersGroup,
 		),
 		Entry("network plugin",
 			networkingv1alpha1.NetworkPluginCommonName("my-plugin"),
