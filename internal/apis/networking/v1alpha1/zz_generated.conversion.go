@@ -11,18 +11,10 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
-	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	core "github.com/ironcore-dev/ironcore/internal/apis/core"
-	ipam "github.com/ironcore-dev/ironcore/internal/apis/ipam"
 	networking "github.com/ironcore-dev/ironcore/internal/apis/networking"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-	types "k8s.io/apimachinery/pkg/types"
 )
 
 func init() {
@@ -526,7 +518,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1alpha1_EphemeralPrefixSource_To_networking_EphemeralPrefixSource(in *networkingv1alpha1.EphemeralPrefixSource, out *networking.EphemeralPrefixSource, s conversion.Scope) error {
-	out.PrefixTemplate = (*ipam.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplate))
+	*out = *(*networking.EphemeralPrefixSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -536,7 +528,7 @@ func Convert_v1alpha1_EphemeralPrefixSource_To_networking_EphemeralPrefixSource(
 }
 
 func autoConvert_networking_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(in *networking.EphemeralPrefixSource, out *networkingv1alpha1.EphemeralPrefixSource, s conversion.Scope) error {
-	out.PrefixTemplate = (*ipamv1alpha1.PrefixTemplateSpec)(unsafe.Pointer(in.PrefixTemplate))
+	*out = *(*networkingv1alpha1.EphemeralPrefixSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -546,7 +538,7 @@ func Convert_networking_EphemeralPrefixSource_To_v1alpha1_EphemeralPrefixSource(
 }
 
 func autoConvert_v1alpha1_EphemeralVirtualIPSource_To_networking_EphemeralVirtualIPSource(in *networkingv1alpha1.EphemeralVirtualIPSource, out *networking.EphemeralVirtualIPSource, s conversion.Scope) error {
-	out.VirtualIPTemplate = (*networking.VirtualIPTemplateSpec)(unsafe.Pointer(in.VirtualIPTemplate))
+	*out = *(*networking.EphemeralVirtualIPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -556,7 +548,7 @@ func Convert_v1alpha1_EphemeralVirtualIPSource_To_networking_EphemeralVirtualIPS
 }
 
 func autoConvert_networking_EphemeralVirtualIPSource_To_v1alpha1_EphemeralVirtualIPSource(in *networking.EphemeralVirtualIPSource, out *networkingv1alpha1.EphemeralVirtualIPSource, s conversion.Scope) error {
-	out.VirtualIPTemplate = (*networkingv1alpha1.VirtualIPTemplateSpec)(unsafe.Pointer(in.VirtualIPTemplate))
+	*out = *(*networkingv1alpha1.EphemeralVirtualIPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -566,10 +558,7 @@ func Convert_networking_EphemeralVirtualIPSource_To_v1alpha1_EphemeralVirtualIPS
 }
 
 func autoConvert_v1alpha1_EphemeralVirtualIPSpec_To_networking_EphemeralVirtualIPSpec(in *networkingv1alpha1.EphemeralVirtualIPSpec, out *networking.EphemeralVirtualIPSpec, s conversion.Scope) error {
-	if err := Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(&in.VirtualIPSpec, &out.VirtualIPSpec, s); err != nil {
-		return err
-	}
-	out.ReclaimPolicy = networking.ReclaimPolicyType(in.ReclaimPolicy)
+	*out = *(*networking.EphemeralVirtualIPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -579,10 +568,7 @@ func Convert_v1alpha1_EphemeralVirtualIPSpec_To_networking_EphemeralVirtualIPSpe
 }
 
 func autoConvert_networking_EphemeralVirtualIPSpec_To_v1alpha1_EphemeralVirtualIPSpec(in *networking.EphemeralVirtualIPSpec, out *networkingv1alpha1.EphemeralVirtualIPSpec, s conversion.Scope) error {
-	if err := Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(&in.VirtualIPSpec, &out.VirtualIPSpec, s); err != nil {
-		return err
-	}
-	out.ReclaimPolicy = networkingv1alpha1.ReclaimPolicyType(in.ReclaimPolicy)
+	*out = *(*networkingv1alpha1.EphemeralVirtualIPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -592,8 +578,7 @@ func Convert_networking_EphemeralVirtualIPSpec_To_v1alpha1_EphemeralVirtualIPSpe
 }
 
 func autoConvert_v1alpha1_IPBlock_To_networking_IPBlock(in *networkingv1alpha1.IPBlock, out *networking.IPBlock, s conversion.Scope) error {
-	out.CIDR = in.CIDR
-	out.Except = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Except))
+	*out = *(*networking.IPBlock)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -603,8 +588,7 @@ func Convert_v1alpha1_IPBlock_To_networking_IPBlock(in *networkingv1alpha1.IPBlo
 }
 
 func autoConvert_networking_IPBlock_To_v1alpha1_IPBlock(in *networking.IPBlock, out *networkingv1alpha1.IPBlock, s conversion.Scope) error {
-	out.CIDR = in.CIDR
-	out.Except = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Except))
+	*out = *(*networkingv1alpha1.IPBlock)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -614,8 +598,7 @@ func Convert_networking_IPBlock_To_v1alpha1_IPBlock(in *networking.IPBlock, out 
 }
 
 func autoConvert_v1alpha1_IPSource_To_networking_IPSource(in *networkingv1alpha1.IPSource, out *networking.IPSource, s conversion.Scope) error {
-	out.Value = (*commonv1alpha1.IP)(unsafe.Pointer(in.Value))
-	out.Ephemeral = (*networking.EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networking.IPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -625,8 +608,7 @@ func Convert_v1alpha1_IPSource_To_networking_IPSource(in *networkingv1alpha1.IPS
 }
 
 func autoConvert_networking_IPSource_To_v1alpha1_IPSource(in *networking.IPSource, out *networkingv1alpha1.IPSource, s conversion.Scope) error {
-	out.Value = (*commonv1alpha1.IP)(unsafe.Pointer(in.Value))
-	out.Ephemeral = (*networkingv1alpha1.EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networkingv1alpha1.IPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -668,8 +650,7 @@ func Convert_networking_LoadBalancer_To_v1alpha1_LoadBalancer(in *networking.Loa
 }
 
 func autoConvert_v1alpha1_LoadBalancerDestination_To_networking_LoadBalancerDestination(in *networkingv1alpha1.LoadBalancerDestination, out *networking.LoadBalancerDestination, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*networking.LoadBalancerTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*networking.LoadBalancerDestination)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -679,8 +660,7 @@ func Convert_v1alpha1_LoadBalancerDestination_To_networking_LoadBalancerDestinat
 }
 
 func autoConvert_networking_LoadBalancerDestination_To_v1alpha1_LoadBalancerDestination(in *networking.LoadBalancerDestination, out *networkingv1alpha1.LoadBalancerDestination, s conversion.Scope) error {
-	out.IP = in.IP
-	out.TargetRef = (*networkingv1alpha1.LoadBalancerTargetRef)(unsafe.Pointer(in.TargetRef))
+	*out = *(*networkingv1alpha1.LoadBalancerDestination)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -712,9 +692,7 @@ func Convert_networking_LoadBalancerList_To_v1alpha1_LoadBalancerList(in *networ
 }
 
 func autoConvert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(in *networkingv1alpha1.LoadBalancerPort, out *networking.LoadBalancerPort, s conversion.Scope) error {
-	out.Protocol = (*v1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*networking.LoadBalancerPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -724,9 +702,7 @@ func Convert_v1alpha1_LoadBalancerPort_To_networking_LoadBalancerPort(in *networ
 }
 
 func autoConvert_networking_LoadBalancerPort_To_v1alpha1_LoadBalancerPort(in *networking.LoadBalancerPort, out *networkingv1alpha1.LoadBalancerPort, s conversion.Scope) error {
-	out.Protocol = (*v1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*networkingv1alpha1.LoadBalancerPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -782,12 +758,7 @@ func Convert_networking_LoadBalancerRoutingList_To_v1alpha1_LoadBalancerRoutingL
 }
 
 func autoConvert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *networkingv1alpha1.LoadBalancerSpec, out *networking.LoadBalancerSpec, s conversion.Scope) error {
-	out.Type = networking.LoadBalancerType(in.Type)
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
-	out.Ports = *(*[]networking.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
+	*out = *(*networking.LoadBalancerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -797,12 +768,7 @@ func Convert_v1alpha1_LoadBalancerSpec_To_networking_LoadBalancerSpec(in *networ
 }
 
 func autoConvert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *networking.LoadBalancerSpec, out *networkingv1alpha1.LoadBalancerSpec, s conversion.Scope) error {
-	out.Type = networkingv1alpha1.LoadBalancerType(in.Type)
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]networkingv1alpha1.IPSource)(unsafe.Pointer(&in.IPs))
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = (*metav1.LabelSelector)(unsafe.Pointer(in.NetworkInterfaceSelector))
-	out.Ports = *(*[]networkingv1alpha1.LoadBalancerPort)(unsafe.Pointer(&in.Ports))
+	*out = *(*networkingv1alpha1.LoadBalancerSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -812,7 +778,7 @@ func Convert_networking_LoadBalancerSpec_To_v1alpha1_LoadBalancerSpec(in *networ
 }
 
 func autoConvert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(in *networkingv1alpha1.LoadBalancerStatus, out *networking.LoadBalancerStatus, s conversion.Scope) error {
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	*out = *(*networking.LoadBalancerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -822,7 +788,7 @@ func Convert_v1alpha1_LoadBalancerStatus_To_networking_LoadBalancerStatus(in *ne
 }
 
 func autoConvert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *networking.LoadBalancerStatus, out *networkingv1alpha1.LoadBalancerStatus, s conversion.Scope) error {
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	*out = *(*networkingv1alpha1.LoadBalancerStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -832,9 +798,7 @@ func Convert_networking_LoadBalancerStatus_To_v1alpha1_LoadBalancerStatus(in *ne
 }
 
 func autoConvert_v1alpha1_LoadBalancerTargetRef_To_networking_LoadBalancerTargetRef(in *networkingv1alpha1.LoadBalancerTargetRef, out *networking.LoadBalancerTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.ProviderID = in.ProviderID
+	*out = *(*networking.LoadBalancerTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -844,9 +808,7 @@ func Convert_v1alpha1_LoadBalancerTargetRef_To_networking_LoadBalancerTargetRef(
 }
 
 func autoConvert_networking_LoadBalancerTargetRef_To_v1alpha1_LoadBalancerTargetRef(in *networking.LoadBalancerTargetRef, out *networkingv1alpha1.LoadBalancerTargetRef, s conversion.Scope) error {
-	out.UID = types.UID(in.UID)
-	out.Name = in.Name
-	out.ProviderID = in.ProviderID
+	*out = *(*networkingv1alpha1.LoadBalancerTargetRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -910,10 +872,7 @@ func Convert_networking_NATGatewayList_To_v1alpha1_NATGatewayList(in *networking
 }
 
 func autoConvert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *networkingv1alpha1.NATGatewaySpec, out *networking.NATGatewaySpec, s conversion.Scope) error {
-	out.Type = networking.NATGatewayType(in.Type)
-	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.NetworkRef = in.NetworkRef
-	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
+	*out = *(*networking.NATGatewaySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -923,10 +882,7 @@ func Convert_v1alpha1_NATGatewaySpec_To_networking_NATGatewaySpec(in *networking
 }
 
 func autoConvert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking.NATGatewaySpec, out *networkingv1alpha1.NATGatewaySpec, s conversion.Scope) error {
-	out.Type = networkingv1alpha1.NATGatewayType(in.Type)
-	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.NetworkRef = in.NetworkRef
-	out.PortsPerNetworkInterface = (*int32)(unsafe.Pointer(in.PortsPerNetworkInterface))
+	*out = *(*networkingv1alpha1.NATGatewaySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -936,7 +892,7 @@ func Convert_networking_NATGatewaySpec_To_v1alpha1_NATGatewaySpec(in *networking
 }
 
 func autoConvert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *networkingv1alpha1.NATGatewayStatus, out *networking.NATGatewayStatus, s conversion.Scope) error {
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	*out = *(*networking.NATGatewayStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -946,7 +902,7 @@ func Convert_v1alpha1_NATGatewayStatus_To_networking_NATGatewayStatus(in *networ
 }
 
 func autoConvert_networking_NATGatewayStatus_To_v1alpha1_NATGatewayStatus(in *networking.NATGatewayStatus, out *networkingv1alpha1.NATGatewayStatus, s conversion.Scope) error {
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
+	*out = *(*networkingv1alpha1.NATGatewayStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1042,14 +998,7 @@ func Convert_networking_NetworkInterfaceList_To_v1alpha1_NetworkInterfaceList(in
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in *networkingv1alpha1.NetworkInterfaceSpec, out *networking.NetworkInterfaceSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.NetworkRef = in.NetworkRef
-	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]networking.IPSource)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]networking.PrefixSource)(unsafe.Pointer(&in.Prefixes))
-	out.VirtualIP = (*networking.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
-	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
+	*out = *(*networking.NetworkInterfaceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1059,14 +1008,7 @@ func Convert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(in
 }
 
 func autoConvert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in *networking.NetworkInterfaceSpec, out *networkingv1alpha1.NetworkInterfaceSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.NetworkRef = in.NetworkRef
-	out.MachineRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.MachineRef))
-	out.IPFamilies = *(*[]v1.IPFamily)(unsafe.Pointer(&in.IPFamilies))
-	out.IPs = *(*[]networkingv1alpha1.IPSource)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]networkingv1alpha1.PrefixSource)(unsafe.Pointer(&in.Prefixes))
-	out.VirtualIP = (*networkingv1alpha1.VirtualIPSource)(unsafe.Pointer(in.VirtualIP))
-	out.Attributes = *(*map[string]string)(unsafe.Pointer(&in.Attributes))
+	*out = *(*networkingv1alpha1.NetworkInterfaceSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1076,11 +1018,7 @@ func Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(in
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatus(in *networkingv1alpha1.NetworkInterfaceStatus, out *networking.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.State = networking.NetworkInterfaceState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
+	*out = *(*networking.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1090,11 +1028,7 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_networking_NetworkInterfaceStatu
 }
 
 func autoConvert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *networking.NetworkInterfaceStatus, out *networkingv1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.State = networkingv1alpha1.NetworkInterfaceState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.IPs = *(*[]commonv1alpha1.IP)(unsafe.Pointer(&in.IPs))
-	out.Prefixes = *(*[]commonv1alpha1.IPPrefix)(unsafe.Pointer(&in.Prefixes))
-	out.VirtualIP = (*commonv1alpha1.IP)(unsafe.Pointer(in.VirtualIP))
+	*out = *(*networkingv1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1104,10 +1038,7 @@ func Convert_networking_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatu
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceTemplateSpec_To_networking_NetworkInterfaceTemplateSpec(in *networkingv1alpha1.NetworkInterfaceTemplateSpec, out *networking.NetworkInterfaceTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_NetworkInterfaceSpec_To_networking_NetworkInterfaceSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*networking.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1117,10 +1048,7 @@ func Convert_v1alpha1_NetworkInterfaceTemplateSpec_To_networking_NetworkInterfac
 }
 
 func autoConvert_networking_NetworkInterfaceTemplateSpec_To_v1alpha1_NetworkInterfaceTemplateSpec(in *networking.NetworkInterfaceTemplateSpec, out *networkingv1alpha1.NetworkInterfaceTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_networking_NetworkInterfaceSpec_To_v1alpha1_NetworkInterfaceSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*networkingv1alpha1.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1152,11 +1080,7 @@ func Convert_networking_NetworkList_To_v1alpha1_NetworkList(in *networking.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkPeering_To_networking_NetworkPeering(in *networkingv1alpha1.NetworkPeering, out *networking.NetworkPeering, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(&in.NetworkRef, &out.NetworkRef, s); err != nil {
-		return err
-	}
-	out.Prefixes = *(*[]networking.PeeringPrefix)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*networking.NetworkPeering)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1166,11 +1090,7 @@ func Convert_v1alpha1_NetworkPeering_To_networking_NetworkPeering(in *networking
 }
 
 func autoConvert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in *networking.NetworkPeering, out *networkingv1alpha1.NetworkPeering, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(&in.NetworkRef, &out.NetworkRef, s); err != nil {
-		return err
-	}
-	out.Prefixes = *(*[]networkingv1alpha1.PeeringPrefix)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*networkingv1alpha1.NetworkPeering)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1180,9 +1100,7 @@ func Convert_networking_NetworkPeering_To_v1alpha1_NetworkPeering(in *networking
 }
 
 func autoConvert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRef(in *networkingv1alpha1.NetworkPeeringClaimRef, out *networking.NetworkPeeringClaimRef, s conversion.Scope) error {
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*networking.NetworkPeeringClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1192,9 +1110,7 @@ func Convert_v1alpha1_NetworkPeeringClaimRef_To_networking_NetworkPeeringClaimRe
 }
 
 func autoConvert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRef(in *networking.NetworkPeeringClaimRef, out *networkingv1alpha1.NetworkPeeringClaimRef, s conversion.Scope) error {
-	out.Namespace = in.Namespace
-	out.Name = in.Name
-	out.UID = types.UID(in.UID)
+	*out = *(*networkingv1alpha1.NetworkPeeringClaimRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1204,8 +1120,7 @@ func Convert_networking_NetworkPeeringClaimRef_To_v1alpha1_NetworkPeeringClaimRe
 }
 
 func autoConvert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetworkRef(in *networkingv1alpha1.NetworkPeeringNetworkRef, out *networking.NetworkPeeringNetworkRef, s conversion.Scope) error {
-	out.Namespace = in.Namespace
-	out.Name = in.Name
+	*out = *(*networking.NetworkPeeringNetworkRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1215,8 +1130,7 @@ func Convert_v1alpha1_NetworkPeeringNetworkRef_To_networking_NetworkPeeringNetwo
 }
 
 func autoConvert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetworkRef(in *networking.NetworkPeeringNetworkRef, out *networkingv1alpha1.NetworkPeeringNetworkRef, s conversion.Scope) error {
-	out.Namespace = in.Namespace
-	out.Name = in.Name
+	*out = *(*networkingv1alpha1.NetworkPeeringNetworkRef)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1226,9 +1140,7 @@ func Convert_networking_NetworkPeeringNetworkRef_To_v1alpha1_NetworkPeeringNetwo
 }
 
 func autoConvert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in *networkingv1alpha1.NetworkPeeringStatus, out *networking.NetworkPeeringStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.State = networking.NetworkPeeringState(in.State)
-	out.Prefixes = *(*[]networking.PeeringPrefixStatus)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*networking.NetworkPeeringStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1238,9 +1150,7 @@ func Convert_v1alpha1_NetworkPeeringStatus_To_networking_NetworkPeeringStatus(in
 }
 
 func autoConvert_networking_NetworkPeeringStatus_To_v1alpha1_NetworkPeeringStatus(in *networking.NetworkPeeringStatus, out *networkingv1alpha1.NetworkPeeringStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.State = networkingv1alpha1.NetworkPeeringState(in.State)
-	out.Prefixes = *(*[]networkingv1alpha1.PeeringPrefixStatus)(unsafe.Pointer(&in.Prefixes))
+	*out = *(*networkingv1alpha1.NetworkPeeringStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1282,12 +1192,7 @@ func Convert_networking_NetworkPolicy_To_v1alpha1_NetworkPolicy(in *networking.N
 }
 
 func autoConvert_v1alpha1_NetworkPolicyCondition_To_networking_NetworkPolicyCondition(in *networkingv1alpha1.NetworkPolicyCondition, out *networking.NetworkPolicyCondition, s conversion.Scope) error {
-	out.Type = networking.NetworkPolicyConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*networking.NetworkPolicyCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1297,12 +1202,7 @@ func Convert_v1alpha1_NetworkPolicyCondition_To_networking_NetworkPolicyConditio
 }
 
 func autoConvert_networking_NetworkPolicyCondition_To_v1alpha1_NetworkPolicyCondition(in *networking.NetworkPolicyCondition, out *networkingv1alpha1.NetworkPolicyCondition, s conversion.Scope) error {
-	out.Type = networkingv1alpha1.NetworkPolicyConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*networkingv1alpha1.NetworkPolicyCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1312,8 +1212,7 @@ func Convert_networking_NetworkPolicyCondition_To_v1alpha1_NetworkPolicyConditio
 }
 
 func autoConvert_v1alpha1_NetworkPolicyEgressRule_To_networking_NetworkPolicyEgressRule(in *networkingv1alpha1.NetworkPolicyEgressRule, out *networking.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]networking.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.To = *(*[]networking.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
+	*out = *(*networking.NetworkPolicyEgressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1323,8 +1222,7 @@ func Convert_v1alpha1_NetworkPolicyEgressRule_To_networking_NetworkPolicyEgressR
 }
 
 func autoConvert_networking_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressRule(in *networking.NetworkPolicyEgressRule, out *networkingv1alpha1.NetworkPolicyEgressRule, s conversion.Scope) error {
-	out.Ports = *(*[]networkingv1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.To = *(*[]networkingv1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.To))
+	*out = *(*networkingv1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1334,8 +1232,7 @@ func Convert_networking_NetworkPolicyEgressRule_To_v1alpha1_NetworkPolicyEgressR
 }
 
 func autoConvert_v1alpha1_NetworkPolicyIngressRule_To_networking_NetworkPolicyIngressRule(in *networkingv1alpha1.NetworkPolicyIngressRule, out *networking.NetworkPolicyIngressRule, s conversion.Scope) error {
-	out.Ports = *(*[]networking.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.From = *(*[]networking.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
+	*out = *(*networking.NetworkPolicyIngressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1345,8 +1242,7 @@ func Convert_v1alpha1_NetworkPolicyIngressRule_To_networking_NetworkPolicyIngres
 }
 
 func autoConvert_networking_NetworkPolicyIngressRule_To_v1alpha1_NetworkPolicyIngressRule(in *networking.NetworkPolicyIngressRule, out *networkingv1alpha1.NetworkPolicyIngressRule, s conversion.Scope) error {
-	out.Ports = *(*[]networkingv1alpha1.NetworkPolicyPort)(unsafe.Pointer(&in.Ports))
-	out.From = *(*[]networkingv1alpha1.NetworkPolicyPeer)(unsafe.Pointer(&in.From))
+	*out = *(*networkingv1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1378,8 +1274,7 @@ func Convert_networking_NetworkPolicyList_To_v1alpha1_NetworkPolicyList(in *netw
 }
 
 func autoConvert_v1alpha1_NetworkPolicyPeer_To_networking_NetworkPolicyPeer(in *networkingv1alpha1.NetworkPolicyPeer, out *networking.NetworkPolicyPeer, s conversion.Scope) error {
-	out.ObjectSelector = (*core.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.IPBlock = (*networking.IPBlock)(unsafe.Pointer(in.IPBlock))
+	*out = *(*networking.NetworkPolicyPeer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1389,8 +1284,7 @@ func Convert_v1alpha1_NetworkPolicyPeer_To_networking_NetworkPolicyPeer(in *netw
 }
 
 func autoConvert_networking_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *networking.NetworkPolicyPeer, out *networkingv1alpha1.NetworkPolicyPeer, s conversion.Scope) error {
-	out.ObjectSelector = (*corev1alpha1.ObjectSelector)(unsafe.Pointer(in.ObjectSelector))
-	out.IPBlock = (*networkingv1alpha1.IPBlock)(unsafe.Pointer(in.IPBlock))
+	*out = *(*networkingv1alpha1.NetworkPolicyPeer)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1400,9 +1294,7 @@ func Convert_networking_NetworkPolicyPeer_To_v1alpha1_NetworkPolicyPeer(in *netw
 }
 
 func autoConvert_v1alpha1_NetworkPolicyPort_To_networking_NetworkPolicyPort(in *networkingv1alpha1.NetworkPolicyPort, out *networking.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*v1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*networking.NetworkPolicyPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1412,9 +1304,7 @@ func Convert_v1alpha1_NetworkPolicyPort_To_networking_NetworkPolicyPort(in *netw
 }
 
 func autoConvert_networking_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(in *networking.NetworkPolicyPort, out *networkingv1alpha1.NetworkPolicyPort, s conversion.Scope) error {
-	out.Protocol = (*v1.Protocol)(unsafe.Pointer(in.Protocol))
-	out.Port = in.Port
-	out.EndPort = (*int32)(unsafe.Pointer(in.EndPort))
+	*out = *(*networkingv1alpha1.NetworkPolicyPort)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1424,11 +1314,7 @@ func Convert_networking_NetworkPolicyPort_To_v1alpha1_NetworkPolicyPort(in *netw
 }
 
 func autoConvert_v1alpha1_NetworkPolicySpec_To_networking_NetworkPolicySpec(in *networkingv1alpha1.NetworkPolicySpec, out *networking.NetworkPolicySpec, s conversion.Scope) error {
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
-	out.Ingress = *(*[]networking.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]networking.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
-	out.PolicyTypes = *(*[]networking.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
+	*out = *(*networking.NetworkPolicySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1438,11 +1324,7 @@ func Convert_v1alpha1_NetworkPolicySpec_To_networking_NetworkPolicySpec(in *netw
 }
 
 func autoConvert_networking_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *networking.NetworkPolicySpec, out *networkingv1alpha1.NetworkPolicySpec, s conversion.Scope) error {
-	out.NetworkRef = in.NetworkRef
-	out.NetworkInterfaceSelector = in.NetworkInterfaceSelector
-	out.Ingress = *(*[]networkingv1alpha1.NetworkPolicyIngressRule)(unsafe.Pointer(&in.Ingress))
-	out.Egress = *(*[]networkingv1alpha1.NetworkPolicyEgressRule)(unsafe.Pointer(&in.Egress))
-	out.PolicyTypes = *(*[]networkingv1alpha1.PolicyType)(unsafe.Pointer(&in.PolicyTypes))
+	*out = *(*networkingv1alpha1.NetworkPolicySpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1452,7 +1334,7 @@ func Convert_networking_NetworkPolicySpec_To_v1alpha1_NetworkPolicySpec(in *netw
 }
 
 func autoConvert_v1alpha1_NetworkPolicyStatus_To_networking_NetworkPolicyStatus(in *networkingv1alpha1.NetworkPolicyStatus, out *networking.NetworkPolicyStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]networking.NetworkPolicyCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*networking.NetworkPolicyStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1462,7 +1344,7 @@ func Convert_v1alpha1_NetworkPolicyStatus_To_networking_NetworkPolicyStatus(in *
 }
 
 func autoConvert_networking_NetworkPolicyStatus_To_v1alpha1_NetworkPolicyStatus(in *networking.NetworkPolicyStatus, out *networkingv1alpha1.NetworkPolicyStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]networkingv1alpha1.NetworkPolicyCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*networkingv1alpha1.NetworkPolicyStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1472,9 +1354,7 @@ func Convert_networking_NetworkPolicyStatus_To_v1alpha1_NetworkPolicyStatus(in *
 }
 
 func autoConvert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *networkingv1alpha1.NetworkSpec, out *networking.NetworkSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Peerings = *(*[]networking.NetworkPeering)(unsafe.Pointer(&in.Peerings))
-	out.PeeringClaimRefs = *(*[]networking.NetworkPeeringClaimRef)(unsafe.Pointer(&in.PeeringClaimRefs))
+	*out = *(*networking.NetworkSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1484,9 +1364,7 @@ func Convert_v1alpha1_NetworkSpec_To_networking_NetworkSpec(in *networkingv1alph
 }
 
 func autoConvert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.NetworkSpec, out *networkingv1alpha1.NetworkSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Peerings = *(*[]networkingv1alpha1.NetworkPeering)(unsafe.Pointer(&in.Peerings))
-	out.PeeringClaimRefs = *(*[]networkingv1alpha1.NetworkPeeringClaimRef)(unsafe.Pointer(&in.PeeringClaimRefs))
+	*out = *(*networkingv1alpha1.NetworkSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1496,8 +1374,7 @@ func Convert_networking_NetworkSpec_To_v1alpha1_NetworkSpec(in *networking.Netwo
 }
 
 func autoConvert_v1alpha1_NetworkStatus_To_networking_NetworkStatus(in *networkingv1alpha1.NetworkStatus, out *networking.NetworkStatus, s conversion.Scope) error {
-	out.State = networking.NetworkState(in.State)
-	out.Peerings = *(*[]networking.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	*out = *(*networking.NetworkStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1507,8 +1384,7 @@ func Convert_v1alpha1_NetworkStatus_To_networking_NetworkStatus(in *networkingv1
 }
 
 func autoConvert_networking_NetworkStatus_To_v1alpha1_NetworkStatus(in *networking.NetworkStatus, out *networkingv1alpha1.NetworkStatus, s conversion.Scope) error {
-	out.State = networkingv1alpha1.NetworkState(in.State)
-	out.Peerings = *(*[]networkingv1alpha1.NetworkPeeringStatus)(unsafe.Pointer(&in.Peerings))
+	*out = *(*networkingv1alpha1.NetworkStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1518,9 +1394,7 @@ func Convert_networking_NetworkStatus_To_v1alpha1_NetworkStatus(in *networking.N
 }
 
 func autoConvert_v1alpha1_PeeringPrefix_To_networking_PeeringPrefix(in *networkingv1alpha1.PeeringPrefix, out *networking.PeeringPrefix, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
-	out.PrefixRef = in.PrefixRef
+	*out = *(*networking.PeeringPrefix)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1530,9 +1404,7 @@ func Convert_v1alpha1_PeeringPrefix_To_networking_PeeringPrefix(in *networkingv1
 }
 
 func autoConvert_networking_PeeringPrefix_To_v1alpha1_PeeringPrefix(in *networking.PeeringPrefix, out *networkingv1alpha1.PeeringPrefix, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
-	out.PrefixRef = in.PrefixRef
+	*out = *(*networkingv1alpha1.PeeringPrefix)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1542,8 +1414,7 @@ func Convert_networking_PeeringPrefix_To_v1alpha1_PeeringPrefix(in *networking.P
 }
 
 func autoConvert_v1alpha1_PeeringPrefixStatus_To_networking_PeeringPrefixStatus(in *networkingv1alpha1.PeeringPrefixStatus, out *networking.PeeringPrefixStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	*out = *(*networking.PeeringPrefixStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1553,8 +1424,7 @@ func Convert_v1alpha1_PeeringPrefixStatus_To_networking_PeeringPrefixStatus(in *
 }
 
 func autoConvert_networking_PeeringPrefixStatus_To_v1alpha1_PeeringPrefixStatus(in *networking.PeeringPrefixStatus, out *networkingv1alpha1.PeeringPrefixStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Prefix = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Prefix))
+	*out = *(*networkingv1alpha1.PeeringPrefixStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1564,8 +1434,7 @@ func Convert_networking_PeeringPrefixStatus_To_v1alpha1_PeeringPrefixStatus(in *
 }
 
 func autoConvert_v1alpha1_PrefixSource_To_networking_PrefixSource(in *networkingv1alpha1.PrefixSource, out *networking.PrefixSource, s conversion.Scope) error {
-	out.Value = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Value))
-	out.Ephemeral = (*networking.EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networking.PrefixSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1575,8 +1444,7 @@ func Convert_v1alpha1_PrefixSource_To_networking_PrefixSource(in *networkingv1al
 }
 
 func autoConvert_networking_PrefixSource_To_v1alpha1_PrefixSource(in *networking.PrefixSource, out *networkingv1alpha1.PrefixSource, s conversion.Scope) error {
-	out.Value = (*commonv1alpha1.IPPrefix)(unsafe.Pointer(in.Value))
-	out.Ephemeral = (*networkingv1alpha1.EphemeralPrefixSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networkingv1alpha1.PrefixSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1640,8 +1508,7 @@ func Convert_networking_VirtualIPList_To_v1alpha1_VirtualIPList(in *networking.V
 }
 
 func autoConvert_v1alpha1_VirtualIPSource_To_networking_VirtualIPSource(in *networkingv1alpha1.VirtualIPSource, out *networking.VirtualIPSource, s conversion.Scope) error {
-	out.VirtualIPRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VirtualIPRef))
-	out.Ephemeral = (*networking.EphemeralVirtualIPSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networking.VirtualIPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1651,8 +1518,7 @@ func Convert_v1alpha1_VirtualIPSource_To_networking_VirtualIPSource(in *networki
 }
 
 func autoConvert_networking_VirtualIPSource_To_v1alpha1_VirtualIPSource(in *networking.VirtualIPSource, out *networkingv1alpha1.VirtualIPSource, s conversion.Scope) error {
-	out.VirtualIPRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VirtualIPRef))
-	out.Ephemeral = (*networkingv1alpha1.EphemeralVirtualIPSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*networkingv1alpha1.VirtualIPSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1662,9 +1528,7 @@ func Convert_networking_VirtualIPSource_To_v1alpha1_VirtualIPSource(in *networki
 }
 
 func autoConvert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(in *networkingv1alpha1.VirtualIPSpec, out *networking.VirtualIPSpec, s conversion.Scope) error {
-	out.Type = networking.VirtualIPType(in.Type)
-	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.TargetRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.TargetRef))
+	*out = *(*networking.VirtualIPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1674,9 +1538,7 @@ func Convert_v1alpha1_VirtualIPSpec_To_networking_VirtualIPSpec(in *networkingv1
 }
 
 func autoConvert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.VirtualIPSpec, out *networkingv1alpha1.VirtualIPSpec, s conversion.Scope) error {
-	out.Type = networkingv1alpha1.VirtualIPType(in.Type)
-	out.IPFamily = v1.IPFamily(in.IPFamily)
-	out.TargetRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.TargetRef))
+	*out = *(*networkingv1alpha1.VirtualIPSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1686,7 +1548,7 @@ func Convert_networking_VirtualIPSpec_To_v1alpha1_VirtualIPSpec(in *networking.V
 }
 
 func autoConvert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *networkingv1alpha1.VirtualIPStatus, out *networking.VirtualIPStatus, s conversion.Scope) error {
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	*out = *(*networking.VirtualIPStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1696,7 +1558,7 @@ func Convert_v1alpha1_VirtualIPStatus_To_networking_VirtualIPStatus(in *networki
 }
 
 func autoConvert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networking.VirtualIPStatus, out *networkingv1alpha1.VirtualIPStatus, s conversion.Scope) error {
-	out.IP = (*commonv1alpha1.IP)(unsafe.Pointer(in.IP))
+	*out = *(*networkingv1alpha1.VirtualIPStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1706,10 +1568,7 @@ func Convert_networking_VirtualIPStatus_To_v1alpha1_VirtualIPStatus(in *networki
 }
 
 func autoConvert_v1alpha1_VirtualIPTemplateSpec_To_networking_VirtualIPTemplateSpec(in *networkingv1alpha1.VirtualIPTemplateSpec, out *networking.VirtualIPTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_EphemeralVirtualIPSpec_To_networking_EphemeralVirtualIPSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*networking.VirtualIPTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1719,10 +1578,7 @@ func Convert_v1alpha1_VirtualIPTemplateSpec_To_networking_VirtualIPTemplateSpec(
 }
 
 func autoConvert_networking_VirtualIPTemplateSpec_To_v1alpha1_VirtualIPTemplateSpec(in *networking.VirtualIPTemplateSpec, out *networkingv1alpha1.VirtualIPTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_networking_EphemeralVirtualIPSpec_To_v1alpha1_EphemeralVirtualIPSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*networkingv1alpha1.VirtualIPTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 

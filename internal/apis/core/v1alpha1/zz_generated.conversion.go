@@ -98,8 +98,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.ObjectSelector, out *core.ObjectSelector, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.LabelSelector = in.LabelSelector
+	*out = *(*core.ObjectSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -109,8 +108,7 @@ func Convert_v1alpha1_ObjectSelector_To_core_ObjectSelector(in *corev1alpha1.Obj
 }
 
 func autoConvert_core_ObjectSelector_To_v1alpha1_ObjectSelector(in *core.ObjectSelector, out *corev1alpha1.ObjectSelector, s conversion.Scope) error {
-	out.Kind = in.Kind
-	out.LabelSelector = in.LabelSelector
+	*out = *(*corev1alpha1.ObjectSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -174,8 +172,7 @@ func Convert_core_ResourceQuotaList_To_v1alpha1_ResourceQuotaList(in *core.Resou
 }
 
 func autoConvert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *corev1alpha1.ResourceQuotaSpec, out *core.ResourceQuotaSpec, s conversion.Scope) error {
-	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.ScopeSelector = (*core.ResourceScopeSelector)(unsafe.Pointer(in.ScopeSelector))
+	*out = *(*core.ResourceQuotaSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -185,8 +182,7 @@ func Convert_v1alpha1_ResourceQuotaSpec_To_core_ResourceQuotaSpec(in *corev1alph
 }
 
 func autoConvert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.ResourceQuotaSpec, out *corev1alpha1.ResourceQuotaSpec, s conversion.Scope) error {
-	out.Hard = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.ScopeSelector = (*corev1alpha1.ResourceScopeSelector)(unsafe.Pointer(in.ScopeSelector))
+	*out = *(*corev1alpha1.ResourceQuotaSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -196,8 +192,7 @@ func Convert_core_ResourceQuotaSpec_To_v1alpha1_ResourceQuotaSpec(in *core.Resou
 }
 
 func autoConvert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *corev1alpha1.ResourceQuotaStatus, out *core.ResourceQuotaStatus, s conversion.Scope) error {
-	out.Hard = *(*core.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Used = *(*core.ResourceList)(unsafe.Pointer(&in.Used))
+	*out = *(*core.ResourceQuotaStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -207,8 +202,7 @@ func Convert_v1alpha1_ResourceQuotaStatus_To_core_ResourceQuotaStatus(in *corev1
 }
 
 func autoConvert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.ResourceQuotaStatus, out *corev1alpha1.ResourceQuotaStatus, s conversion.Scope) error {
-	out.Hard = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Hard))
-	out.Used = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Used))
+	*out = *(*corev1alpha1.ResourceQuotaStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -218,7 +212,7 @@ func Convert_core_ResourceQuotaStatus_To_v1alpha1_ResourceQuotaStatus(in *core.R
 }
 
 func autoConvert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *corev1alpha1.ResourceScopeSelector, out *core.ResourceScopeSelector, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]core.ResourceScopeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+	*out = *(*core.ResourceScopeSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -228,7 +222,7 @@ func Convert_v1alpha1_ResourceScopeSelector_To_core_ResourceScopeSelector(in *co
 }
 
 func autoConvert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *core.ResourceScopeSelector, out *corev1alpha1.ResourceScopeSelector, s conversion.Scope) error {
-	out.MatchExpressions = *(*[]corev1alpha1.ResourceScopeSelectorRequirement)(unsafe.Pointer(&in.MatchExpressions))
+	*out = *(*corev1alpha1.ResourceScopeSelector)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -238,9 +232,7 @@ func Convert_core_ResourceScopeSelector_To_v1alpha1_ResourceScopeSelector(in *co
 }
 
 func autoConvert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSelectorRequirement(in *corev1alpha1.ResourceScopeSelectorRequirement, out *core.ResourceScopeSelectorRequirement, s conversion.Scope) error {
-	out.ScopeName = core.ResourceScope(in.ScopeName)
-	out.Operator = core.ResourceScopeSelectorOperator(in.Operator)
-	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
+	*out = *(*core.ResourceScopeSelectorRequirement)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -250,9 +242,7 @@ func Convert_v1alpha1_ResourceScopeSelectorRequirement_To_core_ResourceScopeSele
 }
 
 func autoConvert_core_ResourceScopeSelectorRequirement_To_v1alpha1_ResourceScopeSelectorRequirement(in *core.ResourceScopeSelectorRequirement, out *corev1alpha1.ResourceScopeSelectorRequirement, s conversion.Scope) error {
-	out.ScopeName = corev1alpha1.ResourceScope(in.ScopeName)
-	out.Operator = corev1alpha1.ResourceScopeSelectorOperator(in.Operator)
-	out.Values = *(*[]string)(unsafe.Pointer(&in.Values))
+	*out = *(*corev1alpha1.ResourceScopeSelectorRequirement)(unsafe.Pointer(in))
 	return nil
 }
 

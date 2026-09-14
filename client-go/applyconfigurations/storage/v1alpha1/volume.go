@@ -19,7 +19,7 @@ import (
 //
 // Volume is the Schema for the volumes API
 type VolumeApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumeSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *VolumeStatusApplyConfiguration `json:"status,omitempty"`

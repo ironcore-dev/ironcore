@@ -9,6 +9,12 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"google.golang.org/grpc/codes"
+	grpcstatus "google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
@@ -19,11 +25,6 @@ import (
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
 	machinepoolletv1alpha1 "github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
-	"google.golang.org/grpc/codes"
-	grpcstatus "google.golang.org/grpc/status"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type IronCoreNetworkInterfaceConfig struct {
@@ -125,14 +126,11 @@ func (s *Server) createIronCoreNetworkInterface(
 	}
 
 	return &computev1alpha1.NetworkInterface{
-			Name: cfg.Name,
-			NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
-				NetworkInterfaceRef: &corev1.LocalObjectReference{Name: ironcoreNic.Name},
-			},
-		}, &AggregateIronCoreNetworkInterface{
-			Network:          ironcoreNetwork,
-			NetworkInterface: ironcoreNic,
-		}, nil
+		Name: cfg.Name,
+		NetworkInterfaceSource: computev1alpha1.NetworkInterfaceSource{
+			NetworkInterfaceRef: &corev1.LocalObjectReference{Name: ironcoreNic.Name},
+		},
+	}, &AggregateIronCoreNetworkInterface{Network: ironcoreNetwork, NetworkInterface: ironcoreNic}, nil
 }
 
 func (s *Server) attachIronCoreNetworkInterface(

@@ -59,7 +59,7 @@ var _ = Describe("Compute", func() {
 						{
 							Name: "foo",
 							VolumeSource: computev1alpha1.VolumeSource{
-								EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+								LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 							},
 						},
 					},
@@ -73,7 +73,7 @@ var _ = Describe("Compute", func() {
 					Name:   "foo",
 					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
-						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+						LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 					},
 				},
 			}))
@@ -83,7 +83,7 @@ var _ = Describe("Compute", func() {
 			machine.Spec.Volumes = append(machine.Spec.Volumes, computev1alpha1.Volume{
 				Name: "bar",
 				VolumeSource: computev1alpha1.VolumeSource{
-					EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+					LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 				},
 			})
 			Expect(k8sClient.Patch(ctx, machine, client.MergeFrom(machinebase), fieldOwner)).To(Succeed())
@@ -94,14 +94,14 @@ var _ = Describe("Compute", func() {
 					Name:   "foo",
 					Device: ptr.To("oda"),
 					VolumeSource: computev1alpha1.VolumeSource{
-						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+						LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 					},
 				},
 				{
 					Name:   "bar",
 					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
-						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+						LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 					},
 				},
 			}))
@@ -117,7 +117,7 @@ var _ = Describe("Compute", func() {
 					Name:   "bar",
 					Device: ptr.To("odb"),
 					VolumeSource: computev1alpha1.VolumeSource{
-						EmptyDisk: &computev1alpha1.EmptyDiskVolumeSource{},
+						LocalDisk: &computev1alpha1.LocalDiskVolumeSource{},
 					},
 				},
 			}))

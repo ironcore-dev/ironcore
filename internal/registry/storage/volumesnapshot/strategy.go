@@ -66,11 +66,11 @@ func (volumeSnapshotStrategy) WarningsOnCreate(ctx context.Context, obj runtime.
 	return nil
 }
 
-func (volumeSnapshotStrategy) AllowCreateOnUpdate() bool {
+func (volumeSnapshotStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (volumeSnapshotStrategy) AllowUnconditionalUpdate() bool {
+func (volumeSnapshotStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

@@ -66,11 +66,11 @@ func (resourceQuotaStrategy) WarningsOnCreate(ctx context.Context, obj runtime.O
 	return nil
 }
 
-func (resourceQuotaStrategy) AllowCreateOnUpdate() bool {
+func (resourceQuotaStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (resourceQuotaStrategy) AllowUnconditionalUpdate() bool {
+func (resourceQuotaStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

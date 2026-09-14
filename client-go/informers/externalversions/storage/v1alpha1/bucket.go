@@ -21,11 +21,39 @@ import (
 )
 
 // BucketInformer provides access to a shared informer and lister for
-// Buckets.
+// Buckets. Prefer using the type-safe variant (see [TypedBucketInformer]).
 type BucketInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() storagev1alpha1.BucketLister
 }
+
+// TypedBucketInformer provides access to a shared informer and lister for
+// Buckets, including the type-safe TypedInformer variant.
+// It is a superset of BucketInformer.
+type TypedBucketInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() BucketIndexInformer
+	Lister() storagev1alpha1.BucketLister
+}
+
+// BucketIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type BucketIndexInformer cache.TypedSharedIndexInformer[*apistoragev1alpha1.Bucket]
+
+// BucketHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for Bucket.
+type BucketHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apistoragev1alpha1.Bucket]
+
+// BucketDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for Bucket.
+type BucketDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apistoragev1alpha1.Bucket]
+
+// BucketFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for Bucket.
+type BucketFilteringHandler = cache.TypedFilteringResourceEventHandler[*apistoragev1alpha1.Bucket]
+
+// BucketIndexers is a specialization of [cache.TypedIndexers] for Bucket.
+type BucketIndexers = cache.TypedIndexers[*apistoragev1alpha1.Bucket]
+
+// DeletedBucket is a specialization of [cache.DeletedObject] for Bucket.
+type DeletedBucket = cache.DeletedObject[*apistoragev1alpha1.Bucket]
 
 type bucketInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type bucketInformer struct {
 // NewBucketInformer constructs a new informer for Bucket type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedBucketInformer]).
 func NewBucketInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewBucketInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedBucketInformer constructs a new informer for Bucket type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedBucketInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers BucketIndexers) BucketIndexInformer {
+	return NewTypedBucketInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredBucketInformer constructs a new informer for Bucket type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredBucketInformer]).
 func NewFilteredBucketInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewBucketInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedBucketInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredBucketInformer constructs a new informer for Bucket type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredBucketInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers BucketIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) BucketIndexInformer {
+	return NewTypedBucketInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewBucketInformerWithOptions constructs a new informer for Bucket type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedBucketInformerWithOptions]).
 func NewBucketInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedBucketInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedBucketInformerWithOptions constructs a new informer for Bucket type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedBucketInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) BucketIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "storage.ironcore.dev", Version: "v1alpha1", Resource: "buckets"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Bucket](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewBucketInformerWithOptions(client versioned.Interface, namespace string, 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *bucketInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewBucketInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedBucketInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *bucketInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apistoragev1alpha1.Bucket{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *bucketInformer) TypedInformer() BucketIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Bucket](f.factory.InformerFor(&apistoragev1alpha1.Bucket{}, f.defaultInformer))
 }
 
 func (f *bucketInformer) Lister() storagev1alpha1.BucketLister {
 	return storagev1alpha1.NewBucketLister(f.Informer().GetIndexer())
+}
+
+// ToTypedBucketInformer converts an untyped informer into a TypedBucketInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Bucket. If that is not the case, calling type-safe methods of the returned
+// TypedBucketInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedBucketInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedBucketInformer(informer BucketInformer) TypedBucketInformer {
+	if informer, ok := informer.(TypedBucketInformer); ok {
+		return informer
+	}
+	return &bucketTypedInformerAdapter{informer}
+}
+
+type bucketTypedInformerAdapter struct {
+	BucketInformer
+}
+
+func (a *bucketTypedInformerAdapter) TypedInformer() BucketIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Bucket](a.Informer())
+}
+
+// ToBucketIndexInformer converts an untyped informer into a BucketIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Bucket. If that is not the case, calling type-safe methods of the returned
+// BucketIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a BucketIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToBucketIndexInformer(informer cache.SharedIndexInformer) BucketIndexInformer {
+	if informer, ok := informer.(BucketIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Bucket](informer)
 }

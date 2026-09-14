@@ -11,14 +11,10 @@ package v1alpha1
 import (
 	unsafe "unsafe"
 
-	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
 	storage "github.com/ironcore-dev/ironcore/internal/apis/storage"
-	v1 "k8s.io/api/core/v1"
-	resource "k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -406,8 +402,7 @@ func Convert_storage_Bucket_To_v1alpha1_Bucket(in *storage.Bucket, out *storagev
 }
 
 func autoConvert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *storagev1alpha1.BucketAccess, out *storage.BucketAccess, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
-	out.Endpoint = in.Endpoint
+	*out = *(*storage.BucketAccess)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -417,8 +412,7 @@ func Convert_v1alpha1_BucketAccess_To_storage_BucketAccess(in *storagev1alpha1.B
 }
 
 func autoConvert_storage_BucketAccess_To_v1alpha1_BucketAccess(in *storage.BucketAccess, out *storagev1alpha1.BucketAccess, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
-	out.Endpoint = in.Endpoint
+	*out = *(*storagev1alpha1.BucketAccess)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -472,12 +466,7 @@ func Convert_storage_BucketClassList_To_v1alpha1_BucketClassList(in *storage.Buc
 }
 
 func autoConvert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *storagev1alpha1.BucketCondition, out *storage.BucketCondition, s conversion.Scope) error {
-	out.Type = storage.BucketConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storage.BucketCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -487,12 +476,7 @@ func Convert_v1alpha1_BucketCondition_To_storage_BucketCondition(in *storagev1al
 }
 
 func autoConvert_storage_BucketCondition_To_v1alpha1_BucketCondition(in *storage.BucketCondition, out *storagev1alpha1.BucketCondition, s conversion.Scope) error {
-	out.Type = storagev1alpha1.BucketConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storagev1alpha1.BucketCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -578,8 +562,7 @@ func Convert_storage_BucketPoolList_To_v1alpha1_BucketPoolList(in *storage.Bucke
 }
 
 func autoConvert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *storagev1alpha1.BucketPoolSpec, out *storage.BucketPoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*storage.BucketPoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -589,8 +572,7 @@ func Convert_v1alpha1_BucketPoolSpec_To_storage_BucketPoolSpec(in *storagev1alph
 }
 
 func autoConvert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.BucketPoolSpec, out *storagev1alpha1.BucketPoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*storagev1alpha1.BucketPoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -600,8 +582,7 @@ func Convert_storage_BucketPoolSpec_To_v1alpha1_BucketPoolSpec(in *storage.Bucke
 }
 
 func autoConvert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *storagev1alpha1.BucketPoolStatus, out *storage.BucketPoolStatus, s conversion.Scope) error {
-	out.State = storage.BucketPoolState(in.State)
-	out.AvailableBucketClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableBucketClasses))
+	*out = *(*storage.BucketPoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -611,8 +592,7 @@ func Convert_v1alpha1_BucketPoolStatus_To_storage_BucketPoolStatus(in *storagev1
 }
 
 func autoConvert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.BucketPoolStatus, out *storagev1alpha1.BucketPoolStatus, s conversion.Scope) error {
-	out.State = storagev1alpha1.BucketPoolState(in.State)
-	out.AvailableBucketClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableBucketClasses))
+	*out = *(*storagev1alpha1.BucketPoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -622,10 +602,7 @@ func Convert_storage_BucketPoolStatus_To_v1alpha1_BucketPoolStatus(in *storage.B
 }
 
 func autoConvert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *storagev1alpha1.BucketSpec, out *storage.BucketSpec, s conversion.Scope) error {
-	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
-	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
-	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	*out = *(*storage.BucketSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -635,10 +612,7 @@ func Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(in *storagev1alpha1.Bucke
 }
 
 func autoConvert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, out *storagev1alpha1.BucketSpec, s conversion.Scope) error {
-	out.BucketClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketClassRef))
-	out.BucketPoolSelector = *(*map[string]string)(unsafe.Pointer(&in.BucketPoolSelector))
-	out.BucketPoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.BucketPoolRef))
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
+	*out = *(*storagev1alpha1.BucketSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -648,11 +622,7 @@ func Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(in *storage.BucketSpec, o
 }
 
 func autoConvert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.BucketStatus, out *storage.BucketStatus, s conversion.Scope) error {
-	out.BucketID = in.BucketID
-	out.State = storage.BucketState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*storage.BucketAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]storage.BucketCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*storage.BucketStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -662,11 +632,7 @@ func Convert_v1alpha1_BucketStatus_To_storage_BucketStatus(in *storagev1alpha1.B
 }
 
 func autoConvert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketStatus, out *storagev1alpha1.BucketStatus, s conversion.Scope) error {
-	out.BucketID = in.BucketID
-	out.State = storagev1alpha1.BucketState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*storagev1alpha1.BucketAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]storagev1alpha1.BucketCondition)(unsafe.Pointer(&in.Conditions))
+	*out = *(*storagev1alpha1.BucketStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -676,10 +642,7 @@ func Convert_storage_BucketStatus_To_v1alpha1_BucketStatus(in *storage.BucketSta
 }
 
 func autoConvert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *storagev1alpha1.BucketTemplateSpec, out *storage.BucketTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_BucketSpec_To_storage_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*storage.BucketTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -689,10 +652,7 @@ func Convert_v1alpha1_BucketTemplateSpec_To_storage_BucketTemplateSpec(in *stora
 }
 
 func autoConvert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *storage.BucketTemplateSpec, out *storagev1alpha1.BucketTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_storage_BucketSpec_To_v1alpha1_BucketSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*storagev1alpha1.BucketTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -702,8 +662,7 @@ func Convert_storage_BucketTemplateSpec_To_v1alpha1_BucketTemplateSpec(in *stora
 }
 
 func autoConvert_v1alpha1_OSDataSource_To_storage_OSDataSource(in *storagev1alpha1.OSDataSource, out *storage.OSDataSource, s conversion.Scope) error {
-	out.Image = in.Image
-	out.Architecture = (*string)(unsafe.Pointer(in.Architecture))
+	*out = *(*storage.OSDataSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -713,8 +672,7 @@ func Convert_v1alpha1_OSDataSource_To_storage_OSDataSource(in *storagev1alpha1.O
 }
 
 func autoConvert_storage_OSDataSource_To_v1alpha1_OSDataSource(in *storage.OSDataSource, out *storagev1alpha1.OSDataSource, s conversion.Scope) error {
-	out.Image = in.Image
-	out.Architecture = (*string)(unsafe.Pointer(in.Architecture))
+	*out = *(*storagev1alpha1.OSDataSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -756,10 +714,7 @@ func Convert_storage_Volume_To_v1alpha1_Volume(in *storage.Volume, out *storagev
 }
 
 func autoConvert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *storagev1alpha1.VolumeAccess, out *storage.VolumeAccess, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
-	out.Driver = in.Driver
-	out.Handle = in.Handle
-	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
+	*out = *(*storage.VolumeAccess)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -769,10 +724,7 @@ func Convert_v1alpha1_VolumeAccess_To_storage_VolumeAccess(in *storagev1alpha1.V
 }
 
 func autoConvert_storage_VolumeAccess_To_v1alpha1_VolumeAccess(in *storage.VolumeAccess, out *storagev1alpha1.VolumeAccess, s conversion.Scope) error {
-	out.SecretRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.SecretRef))
-	out.Driver = in.Driver
-	out.Handle = in.Handle
-	out.VolumeAttributes = *(*map[string]string)(unsafe.Pointer(&in.VolumeAttributes))
+	*out = *(*storagev1alpha1.VolumeAccess)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -828,12 +780,7 @@ func Convert_storage_VolumeClassList_To_v1alpha1_VolumeClassList(in *storage.Vol
 }
 
 func autoConvert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *storagev1alpha1.VolumeCondition, out *storage.VolumeCondition, s conversion.Scope) error {
-	out.Type = storage.VolumeConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storage.VolumeCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -843,12 +790,7 @@ func Convert_v1alpha1_VolumeCondition_To_storage_VolumeCondition(in *storagev1al
 }
 
 func autoConvert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.VolumeCondition, out *storagev1alpha1.VolumeCondition, s conversion.Scope) error {
-	out.Type = storagev1alpha1.VolumeConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storagev1alpha1.VolumeCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -858,8 +800,7 @@ func Convert_storage_VolumeCondition_To_v1alpha1_VolumeCondition(in *storage.Vol
 }
 
 func autoConvert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1alpha1.VolumeDataSource, out *storage.VolumeDataSource, s conversion.Scope) error {
-	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
-	out.OSImage = (*storage.OSDataSource)(unsafe.Pointer(in.OSImage))
+	*out = *(*storage.VolumeDataSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -869,8 +810,7 @@ func Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(in *storagev1
 }
 
 func autoConvert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.VolumeDataSource, out *storagev1alpha1.VolumeDataSource, s conversion.Scope) error {
-	out.VolumeSnapshotRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeSnapshotRef))
-	out.OSImage = (*storagev1alpha1.OSDataSource)(unsafe.Pointer(in.OSImage))
+	*out = *(*storagev1alpha1.VolumeDataSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -880,7 +820,7 @@ func Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(in *storage.V
 }
 
 func autoConvert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *storagev1alpha1.VolumeEncryption, out *storage.VolumeEncryption, s conversion.Scope) error {
-	out.SecretRef = in.SecretRef
+	*out = *(*storage.VolumeEncryption)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -890,7 +830,7 @@ func Convert_v1alpha1_VolumeEncryption_To_storage_VolumeEncryption(in *storagev1
 }
 
 func autoConvert_storage_VolumeEncryption_To_v1alpha1_VolumeEncryption(in *storage.VolumeEncryption, out *storagev1alpha1.VolumeEncryption, s conversion.Scope) error {
-	out.SecretRef = in.SecretRef
+	*out = *(*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -954,12 +894,7 @@ func Convert_storage_VolumePool_To_v1alpha1_VolumePool(in *storage.VolumePool, o
 }
 
 func autoConvert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *storagev1alpha1.VolumePoolCondition, out *storage.VolumePoolCondition, s conversion.Scope) error {
-	out.Type = storage.VolumePoolConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storage.VolumePoolCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -969,12 +904,7 @@ func Convert_v1alpha1_VolumePoolCondition_To_storage_VolumePoolCondition(in *sto
 }
 
 func autoConvert_storage_VolumePoolCondition_To_v1alpha1_VolumePoolCondition(in *storage.VolumePoolCondition, out *storagev1alpha1.VolumePoolCondition, s conversion.Scope) error {
-	out.Type = storagev1alpha1.VolumePoolConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*storagev1alpha1.VolumePoolCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1006,8 +936,7 @@ func Convert_storage_VolumePoolList_To_v1alpha1_VolumePoolList(in *storage.Volum
 }
 
 func autoConvert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *storagev1alpha1.VolumePoolSpec, out *storage.VolumePoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*storage.VolumePoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1017,8 +946,7 @@ func Convert_v1alpha1_VolumePoolSpec_To_storage_VolumePoolSpec(in *storagev1alph
 }
 
 func autoConvert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.VolumePoolSpec, out *storagev1alpha1.VolumePoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*storagev1alpha1.VolumePoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1028,11 +956,7 @@ func Convert_storage_VolumePoolSpec_To_v1alpha1_VolumePoolSpec(in *storage.Volum
 }
 
 func autoConvert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *storagev1alpha1.VolumePoolStatus, out *storage.VolumePoolStatus, s conversion.Scope) error {
-	out.State = storage.VolumePoolState(in.State)
-	out.Conditions = *(*[]storage.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
-	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*core.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	*out = *(*storage.VolumePoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1042,11 +966,7 @@ func Convert_v1alpha1_VolumePoolStatus_To_storage_VolumePoolStatus(in *storagev1
 }
 
 func autoConvert_storage_VolumePoolStatus_To_v1alpha1_VolumePoolStatus(in *storage.VolumePoolStatus, out *storagev1alpha1.VolumePoolStatus, s conversion.Scope) error {
-	out.State = storagev1alpha1.VolumePoolState(in.State)
-	out.Conditions = *(*[]storagev1alpha1.VolumePoolCondition)(unsafe.Pointer(&in.Conditions))
-	out.AvailableVolumeClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableVolumeClasses))
-	out.Capacity = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	*out = *(*storagev1alpha1.VolumePoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1110,7 +1030,7 @@ func Convert_storage_VolumeSnapshotList_To_v1alpha1_VolumeSnapshotList(in *stora
 }
 
 func autoConvert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *storagev1alpha1.VolumeSnapshotSpec, out *storage.VolumeSnapshotSpec, s conversion.Scope) error {
-	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
+	*out = *(*storage.VolumeSnapshotSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1120,7 +1040,7 @@ func Convert_v1alpha1_VolumeSnapshotSpec_To_storage_VolumeSnapshotSpec(in *stora
 }
 
 func autoConvert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *storage.VolumeSnapshotSpec, out *storagev1alpha1.VolumeSnapshotSpec, s conversion.Scope) error {
-	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
+	*out = *(*storagev1alpha1.VolumeSnapshotSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1130,10 +1050,7 @@ func Convert_storage_VolumeSnapshotSpec_To_v1alpha1_VolumeSnapshotSpec(in *stora
 }
 
 func autoConvert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *storagev1alpha1.VolumeSnapshotStatus, out *storage.VolumeSnapshotStatus, s conversion.Scope) error {
-	out.SnapshotID = in.SnapshotID
-	out.State = storage.VolumeSnapshotState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Size = (*resource.Quantity)(unsafe.Pointer(in.Size))
+	*out = *(*storage.VolumeSnapshotStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1143,10 +1060,7 @@ func Convert_v1alpha1_VolumeSnapshotStatus_To_storage_VolumeSnapshotStatus(in *s
 }
 
 func autoConvert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in *storage.VolumeSnapshotStatus, out *storagev1alpha1.VolumeSnapshotStatus, s conversion.Scope) error {
-	out.SnapshotID = in.SnapshotID
-	out.State = storagev1alpha1.VolumeSnapshotState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Size = (*resource.Quantity)(unsafe.Pointer(in.Size))
+	*out = *(*storagev1alpha1.VolumeSnapshotStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1156,17 +1070,7 @@ func Convert_storage_VolumeSnapshotStatus_To_v1alpha1_VolumeSnapshotStatus(in *s
 }
 
 func autoConvert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.VolumeSpec, out *storage.VolumeSpec, s conversion.Scope) error {
-	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
-	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
-	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
-	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
-	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
-	out.Unclaimable = in.Unclaimable
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
-	out.Encryption = (*storage.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	if err := Convert_v1alpha1_VolumeDataSource_To_storage_VolumeDataSource(&in.DataSource, &out.DataSource, s); err != nil {
-		return err
-	}
+	*out = *(*storage.VolumeSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1176,17 +1080,7 @@ func Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(in *storagev1alpha1.Volum
 }
 
 func autoConvert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, out *storagev1alpha1.VolumeSpec, s conversion.Scope) error {
-	out.VolumeClassRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeClassRef))
-	out.VolumePoolSelector = *(*map[string]string)(unsafe.Pointer(&in.VolumePoolSelector))
-	out.VolumePoolRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumePoolRef))
-	out.ClaimRef = (*commonv1alpha1.LocalUIDReference)(unsafe.Pointer(in.ClaimRef))
-	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
-	out.Unclaimable = in.Unclaimable
-	out.Tolerations = *(*[]commonv1alpha1.Toleration)(unsafe.Pointer(&in.Tolerations))
-	out.Encryption = (*storagev1alpha1.VolumeEncryption)(unsafe.Pointer(in.Encryption))
-	if err := Convert_storage_VolumeDataSource_To_v1alpha1_VolumeDataSource(&in.DataSource, &out.DataSource, s); err != nil {
-		return err
-	}
+	*out = *(*storagev1alpha1.VolumeSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1196,12 +1090,7 @@ func Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(in *storage.VolumeSpec, o
 }
 
 func autoConvert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.VolumeStatus, out *storage.VolumeStatus, s conversion.Scope) error {
-	out.VolumeID = in.VolumeID
-	out.State = storage.VolumeState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*storage.VolumeAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]storage.VolumeCondition)(unsafe.Pointer(&in.Conditions))
-	out.Resources = *(*core.ResourceList)(unsafe.Pointer(&in.Resources))
+	*out = *(*storage.VolumeStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1211,12 +1100,7 @@ func Convert_v1alpha1_VolumeStatus_To_storage_VolumeStatus(in *storagev1alpha1.V
 }
 
 func autoConvert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeStatus, out *storagev1alpha1.VolumeStatus, s conversion.Scope) error {
-	out.VolumeID = in.VolumeID
-	out.State = storagev1alpha1.VolumeState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.Access = (*storagev1alpha1.VolumeAccess)(unsafe.Pointer(in.Access))
-	out.Conditions = *(*[]storagev1alpha1.VolumeCondition)(unsafe.Pointer(&in.Conditions))
-	out.Resources = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Resources))
+	*out = *(*storagev1alpha1.VolumeStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1226,10 +1110,7 @@ func Convert_storage_VolumeStatus_To_v1alpha1_VolumeStatus(in *storage.VolumeSta
 }
 
 func autoConvert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *storagev1alpha1.VolumeTemplateSpec, out *storage.VolumeTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1alpha1_VolumeSpec_To_storage_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*storage.VolumeTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1239,10 +1120,7 @@ func Convert_v1alpha1_VolumeTemplateSpec_To_storage_VolumeTemplateSpec(in *stora
 }
 
 func autoConvert_storage_VolumeTemplateSpec_To_v1alpha1_VolumeTemplateSpec(in *storage.VolumeTemplateSpec, out *storagev1alpha1.VolumeTemplateSpec, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_storage_VolumeSpec_To_v1alpha1_VolumeSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
+	*out = *(*storagev1alpha1.VolumeTemplateSpec)(unsafe.Pointer(in))
 	return nil
 }
 

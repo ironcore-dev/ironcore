@@ -12,9 +12,9 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// Prefixes returns a PrefixInformer.
-	Prefixes() PrefixInformer
+	Prefixes() TypedPrefixInformer
 	// PrefixAllocations returns a PrefixAllocationInformer.
-	PrefixAllocations() PrefixAllocationInformer
+	PrefixAllocations() TypedPrefixAllocationInformer
 }
 
 type version struct {
@@ -28,12 +28,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Prefixes returns a PrefixInformer.
-func (v *version) Prefixes() PrefixInformer {
+// Prefixes returns a TypedPrefixInformer.
+func (v *version) Prefixes() TypedPrefixInformer {
 	return &prefixInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// PrefixAllocations returns a PrefixAllocationInformer.
-func (v *version) PrefixAllocations() PrefixAllocationInformer {
+// PrefixAllocations returns a TypedPrefixAllocationInformer.
+func (v *version) PrefixAllocations() TypedPrefixAllocationInformer {
 	return &prefixAllocationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

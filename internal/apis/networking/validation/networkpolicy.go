@@ -155,7 +155,7 @@ func validateNetworkPolicyPeer(peer *networking.NetworkPolicyPeer, supportedObje
 		if numPeers > 0 {
 			allErrs = append(allErrs, field.Forbidden(fldPath.Child("ipBlock"), "cannot specify multiple peers"))
 		} else {
-			numPeers++ //nolint:ineffassign
+			numPeers++ //nolint:ineffassign,staticcheck // numPeers is used to detect multiple peer types
 			allErrs = append(allErrs, validateIPBlock(peer.IPBlock, fldPath.Child("ipBlock"))...)
 		}
 	}

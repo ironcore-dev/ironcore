@@ -21,7 +21,7 @@ type VolumeApplyConfiguration struct {
 	// If empty, an unused device name will be determined if possible.
 	Device *string `json:"device,omitempty"`
 	// VolumeSource is the source where the storage for the Volume resides at.
-	VolumeSourceApplyConfiguration `json:",inline"`
+	VolumeSourceApplyConfiguration `json:""`
 }
 
 // VolumeApplyConfiguration constructs a declarative configuration of the Volume type for use with

@@ -85,11 +85,11 @@ func (volumePoolStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Obje
 	return nil
 }
 
-func (volumePoolStrategy) AllowCreateOnUpdate() bool {
+func (volumePoolStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (volumePoolStrategy) AllowUnconditionalUpdate() bool {
+func (volumePoolStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

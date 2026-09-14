@@ -74,11 +74,11 @@ func (machineClassStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Ob
 	return nil
 }
 
-func (machineClassStrategy) AllowCreateOnUpdate() bool {
+func (machineClassStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (machineClassStrategy) AllowUnconditionalUpdate() bool {
+func (machineClassStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 
