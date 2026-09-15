@@ -22,6 +22,14 @@ var (
 		certificatesv1.UsageKeyEncipherment,
 		certificatesv1.UsageClientAuth,
 	)
+
+	// BucketPoolRequiredUsagesNoEncipherment is the usage set for EC keys,
+	// which cannot perform key encipherment. Poollets generate ECDSA keys,
+	// so their CSRs always carry this usage set.
+	BucketPoolRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
+		certificatesv1.UsageDigitalSignature,
+		certificatesv1.UsageClientAuth,
+	)
 )
 
 func IsBucketPoolClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
@@ -54,7 +62,7 @@ func ValidateBucketPoolClientCSR(req *x509.CertificateRequest, usages sets.Set[c
 		return fmt.Errorf("subject common name does not begin with %s", storagev1alpha1.BucketPoolUserNamePrefix)
 	}
 
-	if !BucketPoolRequiredUsages.Equal(usages) {
+	if !BucketPoolRequiredUsages.Equal(usages) && !BucketPoolRequiredUsagesNoEncipherment.Equal(usages) {
 		return fmt.Errorf("usages did not match %v", sets.List(BucketPoolRequiredUsages))
 	}
 

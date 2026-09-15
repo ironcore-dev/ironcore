@@ -21,6 +21,13 @@ var PoolLifecycleControllerRequiredUsages = sets.New[certificatesv1.KeyUsage](
 	certificatesv1.UsageClientAuth,
 )
 
+// PoolLifecycleControllerRequiredUsagesNoEncipherment is the usage set for
+// EC keys, which cannot perform key encipherment.
+var PoolLifecycleControllerRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
+	certificatesv1.UsageDigitalSignature,
+	certificatesv1.UsageClientAuth,
+)
+
 func IsPoolLifecycleControllerClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
 	if csr.Spec.SignerName != certificatesv1.KubeAPIServerClientSignerName {
 		return false
@@ -51,7 +58,7 @@ func ValidatePoolLifecycleControllerClientCSR(req *x509.CertificateRequest, usag
 		return fmt.Errorf("subject common name is not %s", computev1alpha1.PoolLifecycleControllerCommonName)
 	}
 
-	if !PoolLifecycleControllerRequiredUsages.Equal(usages) {
+	if !PoolLifecycleControllerRequiredUsages.Equal(usages) && !PoolLifecycleControllerRequiredUsagesNoEncipherment.Equal(usages) {
 		return fmt.Errorf("usages did not match %v", sets.List(PoolLifecycleControllerRequiredUsages))
 	}
 

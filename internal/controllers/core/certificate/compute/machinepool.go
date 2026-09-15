@@ -22,6 +22,14 @@ var (
 		certificatesv1.UsageKeyEncipherment,
 		certificatesv1.UsageClientAuth,
 	)
+
+	// MachinePoolRequiredUsagesNoEncipherment is the usage set for EC keys,
+	// which cannot perform key encipherment. Poollets generate ECDSA keys,
+	// so their CSRs always carry this usage set.
+	MachinePoolRequiredUsagesNoEncipherment = sets.New[certificatesv1.KeyUsage](
+		certificatesv1.UsageDigitalSignature,
+		certificatesv1.UsageClientAuth,
+	)
 )
 
 func IsMachinePoolClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
@@ -54,7 +62,7 @@ func ValidateMachinePoolClientCSR(req *x509.CertificateRequest, usages sets.Set[
 		return fmt.Errorf("subject common name does not begin with %s", computev1alpha1.MachinePoolUserNamePrefix)
 	}
 
-	if !MachinePoolRequiredUsages.Equal(usages) {
+	if !MachinePoolRequiredUsages.Equal(usages) && !MachinePoolRequiredUsagesNoEncipherment.Equal(usages) {
 		return fmt.Errorf("usages did not match %v", sets.List(MachinePoolRequiredUsages))
 	}
 
