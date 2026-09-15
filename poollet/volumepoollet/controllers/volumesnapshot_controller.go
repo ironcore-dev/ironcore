@@ -258,6 +258,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 	if err := r.Get(ctx, client.ObjectKey{Namespace: volumeSnapshot.Namespace, Name: volumeSnapshot.Spec.VolumeRef.Name}, volume); err != nil {
 		if apierrors.IsNotFound(err) {
 			r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotFound,
+				volumepoolletevents.ResolvingSourceVolume,
 				"Source volume %s not found", volumeSnapshot.Spec.VolumeRef.Name)
 			return nil, false, nil
 		}
@@ -266,6 +267,7 @@ func (r *VolumeSnapshotReconciler) prepareIRIVolumeSnapshot(ctx context.Context,
 
 	if volume.Status.State != storagev1alpha1.VolumeStateAvailable {
 		r.Eventf(volumeSnapshot, nil, corev1.EventTypeNormal, volumepoolletevents.SourceVolumeNotAvailable,
+			volumepoolletevents.ResolvingSourceVolume,
 			"Source volume %s is not available (state: %s)", volumeSnapshot.Spec.VolumeRef.Name, volume.Status.State)
 		return nil, false, nil
 	}

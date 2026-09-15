@@ -73,7 +73,7 @@ func (s *BucketScheduler) schedule(ctx context.Context, log logr.Logger, bucket 
 	}
 	if len(available) == 0 {
 		log.Info("No bucket pool available for bucket class", "BucketClass", bucket.Spec.BucketClassRef.Name)
-		s.Eventf(bucket, nil, corev1.EventTypeNormal, "CannotSchedule", "No BucketPoolRef found for BucketClass %s", bucket.Spec.BucketClassRef.Name)
+		s.Eventf(bucket, nil, corev1.EventTypeNormal, "CannotSchedule", scheduling, "No BucketPoolRef found for BucketClass %s", bucket.Spec.BucketClassRef.Name)
 		return ctrl.Result{}, nil
 	}
 
@@ -86,7 +86,7 @@ func (s *BucketScheduler) schedule(ctx context.Context, log logr.Logger, bucket 
 	}
 	if len(filtered) == 0 {
 		log.Info("No bucket pool tolerated by the bucket", "Tolerations", bucket.Spec.Tolerations)
-		s.Eventf(bucket, nil, corev1.EventTypeNormal, "CannotSchedule", "No BucketPoolRef tolerated by the %s", bucket.Name)
+		s.Eventf(bucket, nil, corev1.EventTypeNormal, "CannotSchedule", scheduling, "No BucketPoolRef tolerated by the %s", bucket.Name)
 		return ctrl.Result{}, nil
 	}
 	available = filtered

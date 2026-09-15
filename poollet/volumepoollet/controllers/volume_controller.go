@@ -265,7 +265,7 @@ func (r *VolumeReconciler) prepareIRIVolumeClass(ctx context.Context, volume *st
 			return "", false, fmt.Errorf("error getting volume class %s: %w", volumeClassName, err)
 		}
 
-		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeClassNotReady, "Volume class %s not found", volumeClassName)
+		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeClassNotReady, volumepoolletevents.ResolvingVolumeClass, "Volume class %s not found", volumeClassName)
 		return "", false, nil
 	}
 
@@ -288,7 +288,7 @@ func (r *VolumeReconciler) prepareIRIVolumeResources(resources corev1alpha1.Reso
 
 func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1alpha1.Volume, volumeSnapshot *storagev1alpha1.VolumeSnapshot) (*iri.VolumeDataSource, bool, error) {
 	if volumeSnapshot.Status.State != storagev1alpha1.VolumeSnapshotStateReady || volumeSnapshot.Status.SnapshotID == "" {
-		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeSnapshotNotReady, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
+		r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeSnapshotNotReady, volumepoolletevents.ResolvingVolumeSnapshot, "VolumeSnapshot %s is not ready (state: %s)", volumeSnapshot.Name, volumeSnapshot.Status.State)
 		return nil, false, nil
 	}
 
@@ -326,7 +326,7 @@ func (r *VolumeReconciler) prepareIRIVolumeSpecEncryption(ctx context.Context, v
 	encryptionSecretKey := client.ObjectKey{Name: secretName, Namespace: volume.Namespace}
 	if err := r.Get(ctx, encryptionSecretKey, encryptionSecret); err != nil {
 		if apierrors.IsNotFound(err) {
-			r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeEncryptionSecretNotReady, "Volume encryption secret %s not found", secretName)
+			r.Eventf(volume, nil, corev1.EventTypeNormal, volumepoolletevents.VolumeEncryptionSecretNotReady, volumepoolletevents.ResolvingVolumeEncryptionSecret, "Volume encryption secret %s not found", secretName)
 			return nil, false, nil
 		}
 		return nil, false, fmt.Errorf("error getting volume encryption secret %s: %w", secretName, err)
@@ -382,6 +382,7 @@ func (r *VolumeReconciler) prepareIRIVolumeEncryption(ctx context.Context, volum
 			}
 
 			r.Eventf(volume, nil, corev1.EventTypeNormal, "VolumeEncryptionInherited",
+				volumepoolletevents.PreparingVolumeEncryption,
 				"Inheriting encryption from encrypted source volume %s", volumeSnapshot.Spec.VolumeRef.Name)
 			return inheritedEncryption, true, nil
 		}
@@ -417,6 +418,7 @@ func (r *VolumeReconciler) prepareIRIVolume(ctx context.Context, log logr.Logger
 		if err := r.Get(ctx, volumeSnapshotKey, volumeSnapshot); err != nil {
 			if apierrors.IsNotFound(err) {
 				r.Eventf(volume, nil, corev1.EventTypeWarning, volumepoolletevents.VolumeSnapshotNotFound,
+					volumepoolletevents.ResolvingVolumeSnapshot,
 					"VolumeSnapshot %s not found", volumeSnapshotRef.Name)
 				return nil, false, fmt.Errorf("volume snapshot %s not found", volumeSnapshotRef.Name)
 			}

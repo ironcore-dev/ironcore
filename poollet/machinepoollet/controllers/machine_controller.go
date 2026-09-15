@@ -710,7 +710,7 @@ func (r *MachineReconciler) prepareIRIMachineClass(ctx context.Context, machine 
 			return "", false, fmt.Errorf("error getting machine class: %w", err)
 		}
 
-		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.MachineClassNotReady, "Machine class %s is not ready: %v", machineClassName, err)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.MachineClassNotReady, machinepoolletEvents.ResolvingMachineClass, "Machine class %s is not ready: %v", machineClassName, err)
 		return "", false, nil
 	}
 
@@ -744,7 +744,7 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 			return nil, false, err
 		}
 
-		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, "Ignition not ready: %v", ignitionSecret.GetName(), err)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, machinepoolletEvents.ResolvingIgnition, "Ignition %s not ready: %v", ignitionSecret.GetName(), err)
 		return nil, false, nil
 	}
 
@@ -755,7 +755,7 @@ func (r *MachineReconciler) prepareIRIIgnitionData(ctx context.Context, machine 
 
 	data, ok := ignitionSecret.Data[ignitionKey]
 	if !ok {
-		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, "Ignition has no data at key %s", ignitionKey)
+		r.Eventf(machine, nil, corev1.EventTypeNormal, machinepoolletEvents.IgnitionNotReady, machinepoolletEvents.ResolvingIgnition, "Ignition has no data at key %s", ignitionKey)
 		return nil, false, nil
 	}
 

@@ -3,9 +3,19 @@
 
 package events
 
+// Event reasons.
 const (
 	MachineClassNotReady     = "MachineClassNotReady"
 	NetworkInterfaceNotReady = "NetworkInterfaceNotReady"
 	VolumeNotReady           = "VolumeNotReady"
 	IgnitionNotReady         = "IgnitionNotReady"
+)
+
+// Event actions.
+const (
+	ResolvingMachineClass     = "ResolvingMachineClass"
+	ResolvingIgnition         = "ResolvingIgnition"
+	AttachingNetworkInterface = "AttachingNetworkInterface"
+	AttachingVolume           = "AttachingVolume"
+	CreatingEphemeralVolume   = "CreatingEphemeralVolume"
 )

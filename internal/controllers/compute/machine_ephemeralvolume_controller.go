@@ -217,7 +217,7 @@ func (r *MachineEphemeralVolumeReconciler) reconcile(ctx context.Context, log lo
 		r.addArchitectureIfNeeded(log, volume, arch)
 		if err := r.handleCreateVolume(ctx, log, machine, volume); err != nil {
 			if apierrors.IsForbidden(err) {
-				r.Eventf(machine, volume, corev1.EventTypeNormal, events.VolumeNotReady, "Volume %s exceeded quota ", volume.Name)
+				r.Eventf(machine, volume, corev1.EventTypeNormal, events.VolumeNotReady, events.CreatingEphemeralVolume, "Volume %s exceeded quota ", volume.Name)
 			}
 			errs = append(errs, err)
 		}

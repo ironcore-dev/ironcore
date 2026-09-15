@@ -23,6 +23,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
+const (
+	scheduling = "Scheduling"
+)
+
 type PrefixAllocationScheduler struct {
 	events.EventRecorder
 	client.Client
@@ -149,7 +153,7 @@ func (s *PrefixAllocationScheduler) reconcile(ctx context.Context, log logr.Logg
 	}
 	if ref == "" {
 		log.V(1).Info("No suitable prefix found")
-		s.Eventf(allocation, nil, corev1.EventTypeNormal, "NoSuitablePrefix", "No suitable prefix for scheduling %s found.", allocation.Name)
+		s.Eventf(allocation, nil, corev1.EventTypeNormal, "NoSuitablePrefix", scheduling, "No suitable prefix for scheduling %s found.", allocation.Name)
 		return ctrl.Result{}, nil
 	}
 
