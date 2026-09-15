@@ -16,6 +16,8 @@ type NetworkSpecApplyConfiguration struct {
 	Peerings []NetworkPeeringApplyConfiguration `json:"peerings,omitempty"`
 	// PeeringClaimRefs are the peering claim references of other networks.
 	PeeringClaimRefs []NetworkPeeringClaimRefApplyConfiguration `json:"incomingPeerings,omitempty"`
+	// EnableEncryption specifies whether the traffic of this network shall be encrypted.
+	EnableEncryption *bool `json:"enableEncryption,omitempty"`
 }
 
 // NetworkSpecApplyConfiguration constructs a declarative configuration of the NetworkSpec type for use with
@@ -55,5 +57,13 @@ func (b *NetworkSpecApplyConfiguration) WithPeeringClaimRefs(values ...*NetworkP
 		}
 		b.PeeringClaimRefs = append(b.PeeringClaimRefs, *values[i])
 	}
+	return b
+}
+
+// WithEnableEncryption sets the EnableEncryption field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the EnableEncryption field is set to the value of the last call.
+func (b *NetworkSpecApplyConfiguration) WithEnableEncryption(value bool) *NetworkSpecApplyConfiguration {
+	b.EnableEncryption = &value
 	return b
 }
