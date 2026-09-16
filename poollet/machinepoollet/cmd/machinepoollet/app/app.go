@@ -300,7 +300,7 @@ func Run(ctx context.Context, opts Options) error {
 	if !opts.EnableHTTP2 {
 		tlsOpts = append(tlsOpts, disableHTTP2)
 	}
-	// Metrics endpoint is enabled in 'config/machinepoollet-broker/default/kustomization.yaml'. The Metrics options configure the server.
+	// The Metrics options configure the server.
 	// More info:
 	// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.23.1/pkg/metrics/server
 	// - https://book.kubebuilder.io/reference/metrics.html

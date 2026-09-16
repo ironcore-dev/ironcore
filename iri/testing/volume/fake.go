@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/common/idgen"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/labels"

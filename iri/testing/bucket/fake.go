@@ -11,8 +11,8 @@ import (
 	irievent "github.com/ironcore-dev/ironcore/iri/apis/event/v1alpha1"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/ironcore-dev/ironcore/broker/common/idgen"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/bucket/v1alpha1"
+	"github.com/ironcore-dev/ironcore/iri/common/idgen"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

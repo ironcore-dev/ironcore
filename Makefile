@@ -2,25 +2,16 @@
 CONTROLLER_IMG ?= controller:latest
 APISERVER_IMG ?= apiserver:latest
 MACHINEPOOLLET_IMG ?= machinepoollet:latest
-MACHINEBROKER_IMG ?= machinebroker:latest
 IRICTL_MACHINE_IMG ?= irictl-machine:latest
 VOLUMEPOOLLET_IMG ?= volumepoollet:latest
-VOLUMEBROKER_IMG ?= volumebroker:latest
 IRICTL_VOLUME_IMG ?= irictl-volume:latest
 BUCKETPOOLLET_IMG ?= bucketpoollet:latest
-BUCKETBROKER_IMG ?= bucketbroker:latest
 IRICTL_BUCKET_IMG ?= irictl-bucket:latest
 
 # LDFLAGS for the build targets
 LDFLAGS ?= -s -w
 VERSION=$(shell git describe --tags --abbrev=0)
 COMMIT=$(shell git log -n1 --format="%h")
-MACHINEBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/machinebroker/version.Version
-MACHINEBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/machinebroker/version.Commit
-VOLUMEBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/volumebroker/version.Version
-VOLUMEBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/volumebroker/version.Commit
-BUCKETBROKER_VERSION = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Version
-BUCKETBROKER_COMMIT = github.com/ironcore-dev/ironcore/broker/bucketbroker/version.Commit
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -58,33 +49,16 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-FILE="config/machinepoollet-broker/broker-rbac/role.yaml"
 manifests: controller-gen ## Generate ClusterRole and CustomResourceDefinition objects.
 	# ironcore-controller-manager
 	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./internal/controllers/...;./api/..." output:rbac:artifacts:config=config/controller/rbac
 
-	# machinepoollet-broker
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/machinepoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/machinebroker/..." output:rbac:artifacts:config=config/machinepoollet-broker/broker-rbac
-	./hack/replace.sh config/machinepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# volumepoollet-broker
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/volumepoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/volumebroker/..." output:rbac:artifacts:config=config/volumepoollet-broker/broker-rbac
-	./hack/replace.sh config/volumepoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# bucketpoollet-broker
-	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/bucketpoollet/controllers/..." output:rbac:artifacts:config=config/bucketpoollet-broker/poollet-rbac
-	$(CONTROLLER_GEN) rbac:roleName=broker-role paths="./broker/bucketbroker/..." output:rbac:artifacts:config=config/bucketpoollet-broker/broker-rbac
-	./hack/replace.sh config/bucketpoollet-broker/broker-rbac/role.yaml 's/ClusterRole/Role/g'
-
-	# poollet system roles
-	cp config/machinepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/machinepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/machinepool_role.yaml 's/manager-role/compute.ironcore.dev:system:machinepools/g'
-	cp config/volumepoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/volumepool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/volumepool_role.yaml 's/manager-role/storage.ironcore.dev:system:volumepools/g'
-	cp config/bucketpoollet-broker/poollet-rbac/role.yaml config/apiserver/rbac/bucketpool_role.yaml
-	./hack/replace.sh config/apiserver/rbac/bucketpool_role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/machinepoollet/controllers/..." output:rbac:artifacts:config=config/apiserver/rbac/machinepool
+	./hack/replace.sh config/apiserver/rbac/machinepool/role.yaml 's/manager-role/compute.ironcore.dev:system:machinepools/g'
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/volumepoollet/controllers/..." output:rbac:artifacts:config=config/apiserver/rbac/volumepool
+	./hack/replace.sh config/apiserver/rbac/volumepool/role.yaml 's/manager-role/storage.ironcore.dev:system:volumepools/g'
+	$(CONTROLLER_GEN) rbac:roleName=manager-role paths="./poollet/bucketpoollet/controllers/..." output:rbac:artifacts:config=config/apiserver/rbac/bucketpool
+	./hack/replace.sh config/apiserver/rbac/bucketpool/role.yaml 's/manager-role/storage.ironcore.dev:system:bucketpools/g'
 
 .PHONY: generate
 generate: models-schema openapi-gen proto
@@ -166,9 +140,9 @@ run: manifests generate fmt vet ## Run a controller from your host.
 .PHONY: docker-build
 docker-build: \
 	docker-build-ironcore-apiserver docker-build-ironcore-controller-manager \
-	docker-build-machinepoollet docker-build-machinebroker docker-build-irictl-machine \
-	docker-build-volumepoollet docker-build-volumebroker docker-build-irictl-volume \
-	docker-build-bucketpoollet docker-build-bucketbroker docker-build-irictl-bucket ## Build docker image with the manager.
+	docker-build-machinepoollet docker-build-irictl-machine \
+	docker-build-volumepoollet docker-build-irictl-volume \
+	docker-build-bucketpoollet docker-build-irictl-bucket ## Build docker image with the manager.
 
 .PHONY: docker-build-ironcore-apiserver
 docker-build-ironcore-apiserver: ## Build ironcore-apiserver.
@@ -182,10 +156,6 @@ docker-build-ironcore-controller-manager: ## Build ironcore-controller-manager.
 docker-build-machinepoollet: ## Build machinepoollet image.
 	docker build --target machinepoollet -t ${MACHINEPOOLLET_IMG} .
 
-.PHONY: docker-build-machinebroker
-docker-build-machinebroker: ## Build machinebroker image.
-	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(MACHINEBROKER_VERSION)=$(VERSION) -X $(MACHINEBROKER_COMMIT)=$(COMMIT)" --target machinebroker -t ${MACHINEBROKER_IMG} .
-
 .PHONY: docker-build-irictl-machine
 docker-build-irictl-machine: ## Build irictl-machine image.
 	docker build --target irictl-machine -t ${IRICTL_MACHINE_IMG} .
@@ -194,21 +164,13 @@ docker-build-irictl-machine: ## Build irictl-machine image.
 docker-build-volumepoollet: ## Build volumepoollet image.
 	docker build --target volumepoollet -t ${VOLUMEPOOLLET_IMG} .
 
-.PHONY: docker-build-volumebroker
-docker-build-volumebroker: ## Build volumebroker image.
-	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(VOLUMEBROKER_VERSION)=$(VERSION) -X $(VOLUMEBROKER_COMMIT)=$(COMMIT)" --target volumebroker -t ${VOLUMEBROKER_IMG} .
-
 .PHONY: docker-build-irictl-volume
 docker-build-irictl-volume: ## Build irictl-volume image.
 	docker build --target irictl-volume -t ${IRICTL_VOLUME_IMG} .
 
 .PHONY: docker-build-bucketpoollet
 docker-build-bucketpoollet: ## Build bucketpoollet image.
-	docker build --build-arg LDFLAGS="${LDFLAGS} -X $(BUCKETBROKER_VERSION)=$(VERSION) -X $(BUCKETBROKER_COMMIT)=$(COMMIT)" --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
-
-.PHONY: docker-build-bucketbroker
-docker-build-bucketbroker: ## Build bucketbroker image.
-	docker build --target bucketbroker -t ${BUCKETBROKER_IMG} .
+	docker build --target bucketpoollet -t ${BUCKETPOOLLET_IMG} .
 
 .PHONY: docker-build-irictl-bucket
 docker-build-irictl-bucket: ## Build irictl-bucket image.
@@ -264,25 +226,13 @@ kind-load-controller: ## Load the controller image into the kind cluster.
 kind-load-machinepoollet:
 	kind load docker-image ${MACHINEPOOLLET_IMG}
 
-.PHONY: kind-load-machinebroker
-kind-load-machinebroker:
-	kind load docker-image ${MACHINEBROKER_IMG}
-
 .PHONY: kind-load-volumepoollet
 kind-load-volumepoollet:
 	kind load docker-image ${VOLUMEPOOLLET_IMG}
 
-.PHONY: kind-load-volumebroker
-kind-load-volumebroker:
-	kind load docker-image ${VOLUMEBROKER_IMG}
-
 .PHONY: kind-load-bucketpoollet
 kind-load-bucketpoollet:
 	kind load docker-image ${BUCKETPOOLLET_IMG}
-
-.PHONY: kind-load-bucketbroker
-kind-load-bucketbroker:
-	kind load docker-image ${BUCKETBROKER_IMG}
 
 .PHONY: kind-load
 kind-load: kind-load-apiserver kind-load-controller ## Load the apiserver and controller in kind.
