@@ -156,20 +156,6 @@ func NewGetterOrDie(opts GetterOptions) *Getter {
 	return getter
 }
 
-type BrokerGetter struct {
-	name           string
-	logConstructor func() logr.Logger
-	networkContext egressselector.NetworkContext
-}
-
-func NewBrokerGetter(opts GetterOptions) (*BrokerGetter, error) {
-	setGetterOptionsDefaults(&opts)
-	return &BrokerGetter{
-		name:           opts.Name,
-		logConstructor: opts.LogConstructor,
-	}, nil
-}
-
 func StoreFromOptions(o *GetConfigOptions) (Store, error) {
 	switch {
 	case o.Kubeconfig != "" && o.KubeconfigSecretName != "":
@@ -268,19 +254,6 @@ func (g *Getter) GetConfig(ctx context.Context, opts ...GetConfigOption) (*rest.
 		restConfig, err := getConfig(ctx, o, g.networkContext)
 		return restConfig, nil, err
 	}
-}
-
-func (bg *BrokerGetter) GetConfig(ctx context.Context, opts ...GetConfigOption) (*rest.Config, error) {
-	o := &GetConfigOptions{}
-	o.ApplyOptions(opts)
-
-	if o.Kubeconfig != "" && o.KubeconfigSecretName != "" {
-		return nil, fmt.Errorf("cannot specify kubeconfig and kubeconfig-secret-name")
-	}
-
-	bg.logConstructor().Info("Getting config")
-	return getConfig(ctx, o, bg.networkContext)
-
 }
 
 func getConfig(ctx context.Context, o *GetConfigOptions, networkContext egressselector.NetworkContext) (*rest.Config, error) {

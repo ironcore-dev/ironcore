@@ -11,7 +11,6 @@ RUN go mod download
 
 # Copy the go source
 COPY api/ api/
-COPY broker/ broker/
 COPY client-go/ client-go/
 COPY cmd/ cmd/
 COPY internal/ internal/
@@ -47,14 +46,6 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/machinepoollet ./poollet/machinepoollet/cmd/machinepoollet/main.go
 
-FROM builder AS machinebroker-builder
-
-# TODO: Remove irictl-machine once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/machinebroker ./broker/machinebroker/cmd/machinebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-machine ./irictl-machine/cmd/irictl-machine/main.go
-
 FROM builder AS irictl-machine-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -68,14 +59,6 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/volumepoollet ./poollet/volumepoollet/cmd/volumepoollet/main.go
 
 
-FROM builder AS volumebroker-builder
-
-# TODO: Remove irictl-volume once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/volumebroker ./broker/volumebroker/cmd/volumebroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-volume ./irictl-volume/cmd/irictl-volume/main.go
-
 FROM builder AS irictl-volume-builder
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -88,14 +71,6 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/bucketpoollet ./poollet/bucketpoollet/cmd/bucketpoollet/main.go
 
-
-FROM builder AS bucketbroker-builder
-
-# TODO: Remove irictl-bucket once debug containers are more broadly available.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="${LDFLAGS}" -a -o bin/bucketbroker ./broker/bucketbroker/cmd/bucketbroker/main.go && \
-    CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH GO111MODULE=on go build -ldflags="-s -w" -a -o bin/irictl-bucket ./irictl-bucket/cmd/irictl-bucket/main.go
 
 FROM builder AS irictl-bucket-builder
 
@@ -126,16 +101,6 @@ USER 65532:65532
 
 ENTRYPOINT ["/machinepoollet"]
 
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim AS machinebroker
-WORKDIR /
-COPY --from=machinebroker-builder /workspace/bin/machinebroker .
-# TODO: Remove irictl-machine as soon as ephemeral debug containers are more broadly available.
-COPY --from=machinebroker-builder /workspace/bin/irictl-machine .
-USER 65532:65532
-
-ENTRYPOINT ["/machinebroker"]
-
 FROM debian:bullseye-slim AS irictl-machine
 WORKDIR /
 COPY --from=irictl-machine-builder /workspace/bin/irictl-machine .
@@ -148,16 +113,6 @@ USER 65532:65532
 
 ENTRYPOINT ["/volumepoollet"]
 
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim AS volumebroker
-WORKDIR /
-COPY --from=volumebroker-builder /workspace/bin/volumebroker .
-# TODO: Remove irictl-volume as soon as ephemeral debug containers are more broadly available.
-COPY --from=volumebroker-builder /workspace/bin/irictl-volume .
-USER 65532:65532
-
-ENTRYPOINT ["/volumebroker"]
-
 FROM debian:bullseye-slim AS irictl-volume
 WORKDIR /
 COPY --from=irictl-volume-builder /workspace/bin/irictl-volume .
@@ -169,16 +124,6 @@ COPY --from=bucketpoollet-builder /workspace/bin/bucketpoollet .
 USER 65532:65532
 
 ENTRYPOINT ["/bucketpoollet"]
-
-# TODO: Switch to distroless as soon as ephemeral debug containers are more broadly available.
-FROM debian:bullseye-slim AS bucketbroker
-WORKDIR /
-COPY --from=bucketbroker-builder /workspace/bin/bucketbroker .
-# TODO: Remove irictl-bucket as soon as ephemeral debug containers are more broadly available.
-COPY --from=bucketbroker-builder /workspace/bin/irictl-bucket .
-USER 65532:65532
-
-ENTRYPOINT ["/bucketbroker"]
 
 FROM debian:bullseye-slim AS irictl-bucket
 WORKDIR /
