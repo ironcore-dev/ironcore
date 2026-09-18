@@ -85,11 +85,11 @@ func (machinePoolStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Obj
 	return nil
 }
 
-func (machinePoolStrategy) AllowCreateOnUpdate() bool {
+func (machinePoolStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (machinePoolStrategy) AllowUnconditionalUpdate() bool {
+func (machinePoolStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

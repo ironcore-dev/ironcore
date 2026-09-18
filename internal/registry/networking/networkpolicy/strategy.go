@@ -71,11 +71,11 @@ func (networkPolicyStrategy) WarningsOnCreate(ctx context.Context, obj runtime.O
 	return nil
 }
 
-func (networkPolicyStrategy) AllowCreateOnUpdate() bool {
+func (networkPolicyStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (networkPolicyStrategy) AllowUnconditionalUpdate() bool {
+func (networkPolicyStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

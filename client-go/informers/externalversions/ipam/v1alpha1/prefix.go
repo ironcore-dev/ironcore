@@ -21,11 +21,39 @@ import (
 )
 
 // PrefixInformer provides access to a shared informer and lister for
-// Prefixes.
+// Prefixes. Prefer using the type-safe variant (see [TypedPrefixInformer]).
 type PrefixInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() ipamv1alpha1.PrefixLister
 }
+
+// TypedPrefixInformer provides access to a shared informer and lister for
+// Prefixes, including the type-safe TypedInformer variant.
+// It is a superset of PrefixInformer.
+type TypedPrefixInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() PrefixIndexInformer
+	Lister() ipamv1alpha1.PrefixLister
+}
+
+// PrefixIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type PrefixIndexInformer cache.TypedSharedIndexInformer[*apiipamv1alpha1.Prefix]
+
+// PrefixHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for Prefix.
+type PrefixHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apiipamv1alpha1.Prefix]
+
+// PrefixDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for Prefix.
+type PrefixDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apiipamv1alpha1.Prefix]
+
+// PrefixFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for Prefix.
+type PrefixFilteringHandler = cache.TypedFilteringResourceEventHandler[*apiipamv1alpha1.Prefix]
+
+// PrefixIndexers is a specialization of [cache.TypedIndexers] for Prefix.
+type PrefixIndexers = cache.TypedIndexers[*apiipamv1alpha1.Prefix]
+
+// DeletedPrefix is a specialization of [cache.DeletedObject] for Prefix.
+type DeletedPrefix = cache.DeletedObject[*apiipamv1alpha1.Prefix]
 
 type prefixInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type prefixInformer struct {
 // NewPrefixInformer constructs a new informer for Prefix type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedPrefixInformer]).
 func NewPrefixInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewPrefixInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedPrefixInformer constructs a new informer for Prefix type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedPrefixInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers PrefixIndexers) PrefixIndexInformer {
+	return NewTypedPrefixInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredPrefixInformer constructs a new informer for Prefix type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredPrefixInformer]).
 func NewFilteredPrefixInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewPrefixInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedPrefixInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredPrefixInformer constructs a new informer for Prefix type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredPrefixInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers PrefixIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) PrefixIndexInformer {
+	return NewTypedPrefixInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewPrefixInformerWithOptions constructs a new informer for Prefix type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedPrefixInformerWithOptions]).
 func NewPrefixInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedPrefixInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedPrefixInformerWithOptions constructs a new informer for Prefix type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedPrefixInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) PrefixIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "ipam.ironcore.dev", Version: "v1alpha1", Resource: "prefixs"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.Prefix](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewPrefixInformerWithOptions(client versioned.Interface, namespace string, 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *prefixInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewPrefixInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedPrefixInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *prefixInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apiipamv1alpha1.Prefix{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *prefixInformer) TypedInformer() PrefixIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.Prefix](f.factory.InformerFor(&apiipamv1alpha1.Prefix{}, f.defaultInformer))
 }
 
 func (f *prefixInformer) Lister() ipamv1alpha1.PrefixLister {
 	return ipamv1alpha1.NewPrefixLister(f.Informer().GetIndexer())
+}
+
+// ToTypedPrefixInformer converts an untyped informer into a TypedPrefixInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Prefix. If that is not the case, calling type-safe methods of the returned
+// TypedPrefixInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedPrefixInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedPrefixInformer(informer PrefixInformer) TypedPrefixInformer {
+	if informer, ok := informer.(TypedPrefixInformer); ok {
+		return informer
+	}
+	return &prefixTypedInformerAdapter{informer}
+}
+
+type prefixTypedInformerAdapter struct {
+	PrefixInformer
+}
+
+func (a *prefixTypedInformerAdapter) TypedInformer() PrefixIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.Prefix](a.Informer())
+}
+
+// ToPrefixIndexInformer converts an untyped informer into a PrefixIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Prefix. If that is not the case, calling type-safe methods of the returned
+// PrefixIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a PrefixIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToPrefixIndexInformer(informer cache.SharedIndexInformer) PrefixIndexInformer {
+	if informer, ok := informer.(PrefixIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apiipamv1alpha1.Prefix](informer)
 }

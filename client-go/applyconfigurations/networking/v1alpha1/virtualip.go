@@ -19,7 +19,7 @@ import (
 //
 // VirtualIP is the Schema for the virtualips API
 type VirtualIPApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VirtualIPSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *VirtualIPStatusApplyConfiguration `json:"status,omitempty"`

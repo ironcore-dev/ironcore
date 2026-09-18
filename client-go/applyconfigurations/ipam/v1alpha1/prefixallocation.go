@@ -19,7 +19,7 @@ import (
 //
 // PrefixAllocation is the Schema for the prefixallocations API
 type PrefixAllocationApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *PrefixAllocationSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *PrefixAllocationStatusApplyConfiguration `json:"status,omitempty"`

@@ -21,11 +21,39 @@ import (
 )
 
 // VolumeInformer provides access to a shared informer and lister for
-// Volumes.
+// Volumes. Prefer using the type-safe variant (see [TypedVolumeInformer]).
 type VolumeInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() storagev1alpha1.VolumeLister
 }
+
+// TypedVolumeInformer provides access to a shared informer and lister for
+// Volumes, including the type-safe TypedInformer variant.
+// It is a superset of VolumeInformer.
+type TypedVolumeInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() VolumeIndexInformer
+	Lister() storagev1alpha1.VolumeLister
+}
+
+// VolumeIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type VolumeIndexInformer cache.TypedSharedIndexInformer[*apistoragev1alpha1.Volume]
+
+// VolumeHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for Volume.
+type VolumeHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apistoragev1alpha1.Volume]
+
+// VolumeDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for Volume.
+type VolumeDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apistoragev1alpha1.Volume]
+
+// VolumeFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for Volume.
+type VolumeFilteringHandler = cache.TypedFilteringResourceEventHandler[*apistoragev1alpha1.Volume]
+
+// VolumeIndexers is a specialization of [cache.TypedIndexers] for Volume.
+type VolumeIndexers = cache.TypedIndexers[*apistoragev1alpha1.Volume]
+
+// DeletedVolume is a specialization of [cache.DeletedObject] for Volume.
+type DeletedVolume = cache.DeletedObject[*apistoragev1alpha1.Volume]
 
 type volumeInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type volumeInformer struct {
 // NewVolumeInformer constructs a new informer for Volume type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVolumeInformer]).
 func NewVolumeInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewVolumeInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedVolumeInformer constructs a new informer for Volume type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVolumeInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers VolumeIndexers) VolumeIndexInformer {
+	return NewTypedVolumeInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredVolumeInformer constructs a new informer for Volume type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredVolumeInformer]).
 func NewFilteredVolumeInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewVolumeInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedVolumeInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredVolumeInformer constructs a new informer for Volume type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredVolumeInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers VolumeIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) VolumeIndexInformer {
+	return NewTypedVolumeInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewVolumeInformerWithOptions constructs a new informer for Volume type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVolumeInformerWithOptions]).
 func NewVolumeInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedVolumeInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedVolumeInformerWithOptions constructs a new informer for Volume type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVolumeInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) VolumeIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "storage.ironcore.dev", Version: "v1alpha1", Resource: "volumes"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Volume](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewVolumeInformerWithOptions(client versioned.Interface, namespace string, 
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *volumeInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewVolumeInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedVolumeInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *volumeInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apistoragev1alpha1.Volume{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *volumeInformer) TypedInformer() VolumeIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Volume](f.factory.InformerFor(&apistoragev1alpha1.Volume{}, f.defaultInformer))
 }
 
 func (f *volumeInformer) Lister() storagev1alpha1.VolumeLister {
 	return storagev1alpha1.NewVolumeLister(f.Informer().GetIndexer())
+}
+
+// ToTypedVolumeInformer converts an untyped informer into a TypedVolumeInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Volume. If that is not the case, calling type-safe methods of the returned
+// TypedVolumeInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedVolumeInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedVolumeInformer(informer VolumeInformer) TypedVolumeInformer {
+	if informer, ok := informer.(TypedVolumeInformer); ok {
+		return informer
+	}
+	return &volumeTypedInformerAdapter{informer}
+}
+
+type volumeTypedInformerAdapter struct {
+	VolumeInformer
+}
+
+func (a *volumeTypedInformerAdapter) TypedInformer() VolumeIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Volume](a.Informer())
+}
+
+// ToVolumeIndexInformer converts an untyped informer into a VolumeIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *Volume. If that is not the case, calling type-safe methods of the returned
+// VolumeIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a VolumeIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToVolumeIndexInformer(informer cache.SharedIndexInformer) VolumeIndexInformer {
+	if informer, ok := informer.(VolumeIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apistoragev1alpha1.Volume](informer)
 }

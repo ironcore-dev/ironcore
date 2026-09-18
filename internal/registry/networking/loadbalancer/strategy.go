@@ -73,11 +73,11 @@ func (loadBalancerStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Ob
 	return nil
 }
 
-func (loadBalancerStrategy) AllowCreateOnUpdate() bool {
+func (loadBalancerStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (loadBalancerStrategy) AllowUnconditionalUpdate() bool {
+func (loadBalancerStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

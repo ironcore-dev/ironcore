@@ -20,7 +20,7 @@ import (
 //
 // LoadBalancerRouting is the Schema for the loadbalancerroutings API
 type LoadBalancerRoutingApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// NetworkRef is the network the load balancer is assigned to.
 	NetworkRef *commonv1alpha1.LocalUIDReference `json:"networkRef,omitempty"`

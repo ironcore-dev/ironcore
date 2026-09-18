@@ -21,11 +21,39 @@ import (
 )
 
 // VirtualIPInformer provides access to a shared informer and lister for
-// VirtualIPs.
+// VirtualIPs. Prefer using the type-safe variant (see [TypedVirtualIPInformer]).
 type VirtualIPInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() networkingv1alpha1.VirtualIPLister
 }
+
+// TypedVirtualIPInformer provides access to a shared informer and lister for
+// VirtualIPs, including the type-safe TypedInformer variant.
+// It is a superset of VirtualIPInformer.
+type TypedVirtualIPInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() VirtualIPIndexInformer
+	Lister() networkingv1alpha1.VirtualIPLister
+}
+
+// VirtualIPIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type VirtualIPIndexInformer cache.TypedSharedIndexInformer[*apinetworkingv1alpha1.VirtualIP]
+
+// VirtualIPHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for VirtualIP.
+type VirtualIPHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apinetworkingv1alpha1.VirtualIP]
+
+// VirtualIPDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for VirtualIP.
+type VirtualIPDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apinetworkingv1alpha1.VirtualIP]
+
+// VirtualIPFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for VirtualIP.
+type VirtualIPFilteringHandler = cache.TypedFilteringResourceEventHandler[*apinetworkingv1alpha1.VirtualIP]
+
+// VirtualIPIndexers is a specialization of [cache.TypedIndexers] for VirtualIP.
+type VirtualIPIndexers = cache.TypedIndexers[*apinetworkingv1alpha1.VirtualIP]
+
+// DeletedVirtualIP is a specialization of [cache.DeletedObject] for VirtualIP.
+type DeletedVirtualIP = cache.DeletedObject[*apinetworkingv1alpha1.VirtualIP]
 
 type virtualIPInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type virtualIPInformer struct {
 // NewVirtualIPInformer constructs a new informer for VirtualIP type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVirtualIPInformer]).
 func NewVirtualIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewVirtualIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedVirtualIPInformer constructs a new informer for VirtualIP type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVirtualIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers VirtualIPIndexers) VirtualIPIndexInformer {
+	return NewTypedVirtualIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredVirtualIPInformer constructs a new informer for VirtualIP type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredVirtualIPInformer]).
 func NewFilteredVirtualIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewVirtualIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedVirtualIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredVirtualIPInformer constructs a new informer for VirtualIP type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredVirtualIPInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers VirtualIPIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) VirtualIPIndexInformer {
+	return NewTypedVirtualIPInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewVirtualIPInformerWithOptions constructs a new informer for VirtualIP type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedVirtualIPInformerWithOptions]).
 func NewVirtualIPInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedVirtualIPInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedVirtualIPInformerWithOptions constructs a new informer for VirtualIP type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedVirtualIPInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) VirtualIPIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "networking.ironcore.dev", Version: "v1alpha1", Resource: "virtualips"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.VirtualIP](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewVirtualIPInformerWithOptions(client versioned.Interface, namespace strin
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *virtualIPInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewVirtualIPInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedVirtualIPInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *virtualIPInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apinetworkingv1alpha1.VirtualIP{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *virtualIPInformer) TypedInformer() VirtualIPIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.VirtualIP](f.factory.InformerFor(&apinetworkingv1alpha1.VirtualIP{}, f.defaultInformer))
 }
 
 func (f *virtualIPInformer) Lister() networkingv1alpha1.VirtualIPLister {
 	return networkingv1alpha1.NewVirtualIPLister(f.Informer().GetIndexer())
+}
+
+// ToTypedVirtualIPInformer converts an untyped informer into a TypedVirtualIPInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *VirtualIP. If that is not the case, calling type-safe methods of the returned
+// TypedVirtualIPInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedVirtualIPInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedVirtualIPInformer(informer VirtualIPInformer) TypedVirtualIPInformer {
+	if informer, ok := informer.(TypedVirtualIPInformer); ok {
+		return informer
+	}
+	return &virtualIPTypedInformerAdapter{informer}
+}
+
+type virtualIPTypedInformerAdapter struct {
+	VirtualIPInformer
+}
+
+func (a *virtualIPTypedInformerAdapter) TypedInformer() VirtualIPIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.VirtualIP](a.Informer())
+}
+
+// ToVirtualIPIndexInformer converts an untyped informer into a VirtualIPIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *VirtualIP. If that is not the case, calling type-safe methods of the returned
+// VirtualIPIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a VirtualIPIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToVirtualIPIndexInformer(informer cache.SharedIndexInformer) VirtualIPIndexInformer {
+	if informer, ok := informer.(VirtualIPIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.VirtualIP](informer)
 }
