@@ -36,19 +36,21 @@ spec:
               port: 8081
             initialDelaySeconds: 15
             periodSeconds: 20
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /readyz
               port: 8081
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 5
           resources:
             limits:
-              cpu: 100m
-              memory: 30Mi
+              cpu: 500m
+              memory: 256Mi
             requests:
               cpu: 100m
-              memory: 20Mi
+              memory: 64Mi
           volumeMounts: []
       volumes: []
       serviceAccountName: controller-manager
