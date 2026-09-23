@@ -39,8 +39,6 @@ spec:
               port: 2379
             initialDelaySeconds: 5
             periodSeconds: 10
-          # TODO(user): Configure the resources accordingly based on the project requirements.
-          # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
           ports:
             - containerPort: 2379
               name: etcd
@@ -51,10 +49,10 @@ spec:
           resources:
             limits:
               cpu: 500m
-              memory: 128Mi
+              memory: 3Gi
             requests:
               cpu: 10m
-              memory: 64Mi
+              memory: 512Mi
       terminationGracePeriodSeconds: 10
   volumeClaimTemplates:
     - metadata:
