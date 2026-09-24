@@ -66,11 +66,11 @@ func (virtualIPStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Objec
 	return nil
 }
 
-func (virtualIPStrategy) AllowCreateOnUpdate() bool {
+func (virtualIPStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (virtualIPStrategy) AllowUnconditionalUpdate() bool {
+func (virtualIPStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

@@ -66,11 +66,11 @@ func (networkInterfaceStrategy) WarningsOnCreate(ctx context.Context, obj runtim
 	return nil
 }
 
-func (networkInterfaceStrategy) AllowCreateOnUpdate() bool {
+func (networkInterfaceStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (networkInterfaceStrategy) AllowUnconditionalUpdate() bool {
+func (networkInterfaceStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

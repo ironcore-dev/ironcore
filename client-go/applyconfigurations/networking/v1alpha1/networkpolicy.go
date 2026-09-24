@@ -19,7 +19,7 @@ import (
 //
 // NetworkPolicy is the Schema for the networkpolicies API
 type NetworkPolicyApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkPolicySpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *NetworkPolicyStatusApplyConfiguration `json:"status,omitempty"`

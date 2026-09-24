@@ -106,11 +106,11 @@ func (machineStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object)
 	return nil
 }
 
-func (machineStrategy) AllowCreateOnUpdate() bool {
+func (machineStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (machineStrategy) AllowUnconditionalUpdate() bool {
+func (machineStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

@@ -66,11 +66,11 @@ func (natGatewayStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Obje
 	return nil
 }
 
-func (natGatewayStrategy) AllowCreateOnUpdate() bool {
+func (natGatewayStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (natGatewayStrategy) AllowUnconditionalUpdate() bool {
+func (natGatewayStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

@@ -20,7 +20,7 @@ import (
 //
 // BucketClass is the Schema for the bucketclasses API
 type BucketClassApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Capabilities describes the capabilities of a BucketClass.
 	Capabilities *corev1alpha1.ResourceList `json:"capabilities,omitempty"`

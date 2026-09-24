@@ -15,14 +15,9 @@ import (
 	commonv1alpha1 "github.com/ironcore-dev/ironcore/api/common/v1alpha1"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	corev1alpha1 "github.com/ironcore-dev/ironcore/api/core/v1alpha1"
-	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
-	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
 	compute "github.com/ironcore-dev/ironcore/internal/apis/compute"
 	core "github.com/ironcore-dev/ironcore/internal/apis/core"
-	networking "github.com/ironcore-dev/ironcore/internal/apis/networking"
-	storage "github.com/ironcore-dev/ironcore/internal/apis/storage"
 	v1 "k8s.io/api/core/v1"
-	resource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -324,7 +319,7 @@ func RegisterConversions(s *runtime.Scheme) error {
 }
 
 func autoConvert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *computev1alpha1.DaemonEndpoint, out *compute.DaemonEndpoint, s conversion.Scope) error {
-	out.Port = in.Port
+	*out = *(*compute.DaemonEndpoint)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -334,7 +329,7 @@ func Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(in *computev1alph
 }
 
 func autoConvert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.DaemonEndpoint, out *computev1alpha1.DaemonEndpoint, s conversion.Scope) error {
-	out.Port = in.Port
+	*out = *(*computev1alpha1.DaemonEndpoint)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -344,9 +339,7 @@ func Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(in *compute.Daemo
 }
 
 func autoConvert_v1alpha1_EFIVar_To_compute_EFIVar(in *computev1alpha1.EFIVar, out *compute.EFIVar, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UUID = in.UUID
-	out.Value = in.Value
+	*out = *(*compute.EFIVar)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -356,9 +349,7 @@ func Convert_v1alpha1_EFIVar_To_compute_EFIVar(in *computev1alpha1.EFIVar, out *
 }
 
 func autoConvert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *computev1alpha1.EFIVar, s conversion.Scope) error {
-	out.Name = in.Name
-	out.UUID = in.UUID
-	out.Value = in.Value
+	*out = *(*computev1alpha1.EFIVar)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -368,7 +359,7 @@ func Convert_compute_EFIVar_To_v1alpha1_EFIVar(in *compute.EFIVar, out *computev
 }
 
 func autoConvert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in *computev1alpha1.EmptyDiskVolumeSource, out *compute.EmptyDiskVolumeSource, s conversion.Scope) error {
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
+	*out = *(*compute.EmptyDiskVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -378,7 +369,7 @@ func Convert_v1alpha1_EmptyDiskVolumeSource_To_compute_EmptyDiskVolumeSource(in 
 }
 
 func autoConvert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in *compute.EmptyDiskVolumeSource, out *computev1alpha1.EmptyDiskVolumeSource, s conversion.Scope) error {
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
+	*out = *(*computev1alpha1.EmptyDiskVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -388,7 +379,7 @@ func Convert_compute_EmptyDiskVolumeSource_To_v1alpha1_EmptyDiskVolumeSource(in 
 }
 
 func autoConvert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetworkInterfaceSource(in *computev1alpha1.EphemeralNetworkInterfaceSource, out *compute.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
-	out.NetworkInterfaceTemplate = (*networking.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in.NetworkInterfaceTemplate))
+	*out = *(*compute.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -398,7 +389,7 @@ func Convert_v1alpha1_EphemeralNetworkInterfaceSource_To_compute_EphemeralNetwor
 }
 
 func autoConvert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetworkInterfaceSource(in *compute.EphemeralNetworkInterfaceSource, out *computev1alpha1.EphemeralNetworkInterfaceSource, s conversion.Scope) error {
-	out.NetworkInterfaceTemplate = (*networkingv1alpha1.NetworkInterfaceTemplateSpec)(unsafe.Pointer(in.NetworkInterfaceTemplate))
+	*out = *(*computev1alpha1.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -408,7 +399,7 @@ func Convert_compute_EphemeralNetworkInterfaceSource_To_v1alpha1_EphemeralNetwor
 }
 
 func autoConvert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in *computev1alpha1.EphemeralVolumeSource, out *compute.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeTemplate = (*storage.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
+	*out = *(*compute.EphemeralVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -418,7 +409,7 @@ func Convert_v1alpha1_EphemeralVolumeSource_To_compute_EphemeralVolumeSource(in 
 }
 
 func autoConvert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in *compute.EphemeralVolumeSource, out *computev1alpha1.EphemeralVolumeSource, s conversion.Scope) error {
-	out.VolumeTemplate = (*storagev1alpha1.VolumeTemplateSpec)(unsafe.Pointer(in.VolumeTemplate))
+	*out = *(*computev1alpha1.EphemeralVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -428,8 +419,7 @@ func Convert_compute_EphemeralVolumeSource_To_v1alpha1_EphemeralVolumeSource(in 
 }
 
 func autoConvert_v1alpha1_LocalDiskVolumeSource_To_compute_LocalDiskVolumeSource(in *computev1alpha1.LocalDiskVolumeSource, out *compute.LocalDiskVolumeSource, s conversion.Scope) error {
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
-	out.Image = in.Image
+	*out = *(*compute.LocalDiskVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -439,8 +429,7 @@ func Convert_v1alpha1_LocalDiskVolumeSource_To_compute_LocalDiskVolumeSource(in 
 }
 
 func autoConvert_compute_LocalDiskVolumeSource_To_v1alpha1_LocalDiskVolumeSource(in *compute.LocalDiskVolumeSource, out *computev1alpha1.LocalDiskVolumeSource, s conversion.Scope) error {
-	out.SizeLimit = (*resource.Quantity)(unsafe.Pointer(in.SizeLimit))
-	out.Image = in.Image
+	*out = *(*computev1alpha1.LocalDiskVolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -526,11 +515,7 @@ func Convert_compute_MachineClassList_To_v1alpha1_MachineClassList(in *compute.M
 }
 
 func autoConvert_v1alpha1_MachineCondition_To_compute_MachineCondition(in *computev1alpha1.MachineCondition, out *compute.MachineCondition, s conversion.Scope) error {
-	out.Type = compute.MachineConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*compute.MachineCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -540,11 +525,7 @@ func Convert_v1alpha1_MachineCondition_To_compute_MachineCondition(in *computev1
 }
 
 func autoConvert_compute_MachineCondition_To_v1alpha1_MachineCondition(in *compute.MachineCondition, out *computev1alpha1.MachineCondition, s conversion.Scope) error {
-	out.Type = computev1alpha1.MachineConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*computev1alpha1.MachineCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -592,7 +573,7 @@ func Convert_url_Values_To_v1alpha1_MachineExecOptions(in *url.Values, out *comp
 }
 
 func autoConvert_v1alpha1_MachineGuestConfig_To_compute_MachineGuestConfig(in *computev1alpha1.MachineGuestConfig, out *compute.MachineGuestConfig, s conversion.Scope) error {
-	out.Hostname = in.Hostname
+	*out = *(*compute.MachineGuestConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -602,7 +583,7 @@ func Convert_v1alpha1_MachineGuestConfig_To_compute_MachineGuestConfig(in *compu
 }
 
 func autoConvert_compute_MachineGuestConfig_To_v1alpha1_MachineGuestConfig(in *compute.MachineGuestConfig, out *computev1alpha1.MachineGuestConfig, s conversion.Scope) error {
-	out.Hostname = in.Hostname
+	*out = *(*computev1alpha1.MachineGuestConfig)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -686,8 +667,7 @@ func Convert_compute_MachinePool_To_v1alpha1_MachinePool(in *compute.MachinePool
 }
 
 func autoConvert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *computev1alpha1.MachinePoolAddress, out *compute.MachinePoolAddress, s conversion.Scope) error {
-	out.Type = compute.MachinePoolAddressType(in.Type)
-	out.Address = in.Address
+	*out = *(*compute.MachinePoolAddress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -697,8 +677,7 @@ func Convert_v1alpha1_MachinePoolAddress_To_compute_MachinePoolAddress(in *compu
 }
 
 func autoConvert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compute.MachinePoolAddress, out *computev1alpha1.MachinePoolAddress, s conversion.Scope) error {
-	out.Type = computev1alpha1.MachinePoolAddressType(in.Type)
-	out.Address = in.Address
+	*out = *(*computev1alpha1.MachinePoolAddress)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -708,13 +687,7 @@ func Convert_compute_MachinePoolAddress_To_v1alpha1_MachinePoolAddress(in *compu
 }
 
 func autoConvert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *computev1alpha1.MachinePoolCondition, out *compute.MachinePoolCondition, s conversion.Scope) error {
-	out.Type = compute.MachinePoolConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastUpdateTime = in.LastUpdateTime
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*compute.MachinePoolCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -724,13 +697,7 @@ func Convert_v1alpha1_MachinePoolCondition_To_compute_MachinePoolCondition(in *c
 }
 
 func autoConvert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *compute.MachinePoolCondition, out *computev1alpha1.MachinePoolCondition, s conversion.Scope) error {
-	out.Type = computev1alpha1.MachinePoolConditionType(in.Type)
-	out.Status = v1.ConditionStatus(in.Status)
-	out.Reason = in.Reason
-	out.Message = in.Message
-	out.ObservedGeneration = in.ObservedGeneration
-	out.LastUpdateTime = in.LastUpdateTime
-	out.LastTransitionTime = in.LastTransitionTime
+	*out = *(*computev1alpha1.MachinePoolCondition)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -740,9 +707,7 @@ func Convert_compute_MachinePoolCondition_To_v1alpha1_MachinePoolCondition(in *c
 }
 
 func autoConvert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(in *computev1alpha1.MachinePoolDaemonEndpoints, out *compute.MachinePoolDaemonEndpoints, s conversion.Scope) error {
-	if err := Convert_v1alpha1_DaemonEndpoint_To_compute_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
-		return err
-	}
+	*out = *(*compute.MachinePoolDaemonEndpoints)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -752,9 +717,7 @@ func Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEnd
 }
 
 func autoConvert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(in *compute.MachinePoolDaemonEndpoints, out *computev1alpha1.MachinePoolDaemonEndpoints, s conversion.Scope) error {
-	if err := Convert_compute_DaemonEndpoint_To_v1alpha1_DaemonEndpoint(&in.MachinepoolletEndpoint, &out.MachinepoolletEndpoint, s); err != nil {
-		return err
-	}
+	*out = *(*computev1alpha1.MachinePoolDaemonEndpoints)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -786,8 +749,7 @@ func Convert_compute_MachinePoolList_To_v1alpha1_MachinePoolList(in *compute.Mac
 }
 
 func autoConvert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *computev1alpha1.MachinePoolSpec, out *compute.MachinePoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*compute.MachinePoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -797,8 +759,7 @@ func Convert_v1alpha1_MachinePoolSpec_To_compute_MachinePoolSpec(in *computev1al
 }
 
 func autoConvert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.MachinePoolSpec, out *computev1alpha1.MachinePoolSpec, s conversion.Scope) error {
-	out.ProviderID = in.ProviderID
-	out.Taints = *(*[]commonv1alpha1.Taint)(unsafe.Pointer(&in.Taints))
+	*out = *(*computev1alpha1.MachinePoolSpec)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -808,15 +769,7 @@ func Convert_compute_MachinePoolSpec_To_v1alpha1_MachinePoolSpec(in *compute.Mac
 }
 
 func autoConvert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *computev1alpha1.MachinePoolStatus, out *compute.MachinePoolStatus, s conversion.Scope) error {
-	out.State = compute.MachinePoolState(in.State)
-	out.Conditions = *(*[]compute.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
-	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
-	out.Addresses = *(*[]compute.MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
-	if err := Convert_v1alpha1_MachinePoolDaemonEndpoints_To_compute_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
-		return err
-	}
-	out.Capacity = *(*core.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*core.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	*out = *(*compute.MachinePoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -826,15 +779,7 @@ func Convert_v1alpha1_MachinePoolStatus_To_compute_MachinePoolStatus(in *compute
 }
 
 func autoConvert_compute_MachinePoolStatus_To_v1alpha1_MachinePoolStatus(in *compute.MachinePoolStatus, out *computev1alpha1.MachinePoolStatus, s conversion.Scope) error {
-	out.State = computev1alpha1.MachinePoolState(in.State)
-	out.Conditions = *(*[]computev1alpha1.MachinePoolCondition)(unsafe.Pointer(&in.Conditions))
-	out.AvailableMachineClasses = *(*[]v1.LocalObjectReference)(unsafe.Pointer(&in.AvailableMachineClasses))
-	out.Addresses = *(*[]computev1alpha1.MachinePoolAddress)(unsafe.Pointer(&in.Addresses))
-	if err := Convert_compute_MachinePoolDaemonEndpoints_To_v1alpha1_MachinePoolDaemonEndpoints(&in.DaemonEndpoints, &out.DaemonEndpoints, s); err != nil {
-		return err
-	}
-	out.Capacity = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Capacity))
-	out.Allocatable = *(*corev1alpha1.ResourceList)(unsafe.Pointer(&in.Allocatable))
+	*out = *(*computev1alpha1.MachinePoolStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -902,12 +847,7 @@ func Convert_compute_MachineSpec_To_v1alpha1_MachineSpec(in *compute.MachineSpec
 }
 
 func autoConvert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *computev1alpha1.MachineStatus, out *compute.MachineStatus, s conversion.Scope) error {
-	out.MachineID = in.MachineID
-	out.ObservedGeneration = in.ObservedGeneration
-	out.Conditions = *(*[]compute.MachineCondition)(unsafe.Pointer(&in.Conditions))
-	out.State = compute.MachineState(in.State)
-	out.NetworkInterfaces = *(*[]compute.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))
-	out.Volumes = *(*[]compute.VolumeStatus)(unsafe.Pointer(&in.Volumes))
+	*out = *(*compute.MachineStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -917,12 +857,7 @@ func Convert_v1alpha1_MachineStatus_To_compute_MachineStatus(in *computev1alpha1
 }
 
 func autoConvert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.MachineStatus, out *computev1alpha1.MachineStatus, s conversion.Scope) error {
-	out.MachineID = in.MachineID
-	out.ObservedGeneration = in.ObservedGeneration
-	out.Conditions = *(*[]computev1alpha1.MachineCondition)(unsafe.Pointer(&in.Conditions))
-	out.State = computev1alpha1.MachineState(in.State)
-	out.NetworkInterfaces = *(*[]computev1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(&in.NetworkInterfaces))
-	out.Volumes = *(*[]computev1alpha1.VolumeStatus)(unsafe.Pointer(&in.Volumes))
+	*out = *(*computev1alpha1.MachineStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -932,10 +867,7 @@ func Convert_compute_MachineStatus_To_v1alpha1_MachineStatus(in *compute.Machine
 }
 
 func autoConvert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *computev1alpha1.NetworkInterface, out *compute.NetworkInterface, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(&in.NetworkInterfaceSource, &out.NetworkInterfaceSource, s); err != nil {
-		return err
-	}
+	*out = *(*compute.NetworkInterface)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -945,10 +877,7 @@ func Convert_v1alpha1_NetworkInterface_To_compute_NetworkInterface(in *computev1
 }
 
 func autoConvert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.NetworkInterface, out *computev1alpha1.NetworkInterface, s conversion.Scope) error {
-	out.Name = in.Name
-	if err := Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(&in.NetworkInterfaceSource, &out.NetworkInterfaceSource, s); err != nil {
-		return err
-	}
+	*out = *(*computev1alpha1.NetworkInterface)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -958,8 +887,7 @@ func Convert_compute_NetworkInterface_To_v1alpha1_NetworkInterface(in *compute.N
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(in *computev1alpha1.NetworkInterfaceSource, out *compute.NetworkInterfaceSource, s conversion.Scope) error {
-	out.NetworkInterfaceRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.NetworkInterfaceRef))
-	out.Ephemeral = (*compute.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*compute.NetworkInterfaceSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -969,8 +897,7 @@ func Convert_v1alpha1_NetworkInterfaceSource_To_compute_NetworkInterfaceSource(i
 }
 
 func autoConvert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(in *compute.NetworkInterfaceSource, out *computev1alpha1.NetworkInterfaceSource, s conversion.Scope) error {
-	out.NetworkInterfaceRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.NetworkInterfaceRef))
-	out.Ephemeral = (*computev1alpha1.EphemeralNetworkInterfaceSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*computev1alpha1.NetworkInterfaceSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -980,11 +907,7 @@ func Convert_compute_NetworkInterfaceSource_To_v1alpha1_NetworkInterfaceSource(i
 }
 
 func autoConvert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(in *computev1alpha1.NetworkInterfaceStatus, out *compute.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Handle = in.Handle
-	out.State = compute.NetworkInterfaceState(in.State)
-	out.NetworkInterfaceRef = in.NetworkInterfaceRef
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	*out = *(*compute.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -994,11 +917,7 @@ func Convert_v1alpha1_NetworkInterfaceStatus_To_compute_NetworkInterfaceStatus(i
 }
 
 func autoConvert_compute_NetworkInterfaceStatus_To_v1alpha1_NetworkInterfaceStatus(in *compute.NetworkInterfaceStatus, out *computev1alpha1.NetworkInterfaceStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Handle = in.Handle
-	out.State = computev1alpha1.NetworkInterfaceState(in.State)
-	out.NetworkInterfaceRef = in.NetworkInterfaceRef
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
+	*out = *(*computev1alpha1.NetworkInterfaceStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1040,10 +959,7 @@ func Convert_compute_Volume_To_v1alpha1_Volume(in *compute.Volume, out *computev
 }
 
 func autoConvert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *computev1alpha1.VolumeSource, out *compute.VolumeSource, s conversion.Scope) error {
-	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
-	out.EmptyDisk = (*compute.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
-	out.LocalDisk = (*compute.LocalDiskVolumeSource)(unsafe.Pointer(in.LocalDisk))
-	out.Ephemeral = (*compute.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*compute.VolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1053,10 +969,7 @@ func Convert_v1alpha1_VolumeSource_To_compute_VolumeSource(in *computev1alpha1.V
 }
 
 func autoConvert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSource, out *computev1alpha1.VolumeSource, s conversion.Scope) error {
-	out.VolumeRef = (*v1.LocalObjectReference)(unsafe.Pointer(in.VolumeRef))
-	out.EmptyDisk = (*computev1alpha1.EmptyDiskVolumeSource)(unsafe.Pointer(in.EmptyDisk))
-	out.LocalDisk = (*computev1alpha1.LocalDiskVolumeSource)(unsafe.Pointer(in.LocalDisk))
-	out.Ephemeral = (*computev1alpha1.EphemeralVolumeSource)(unsafe.Pointer(in.Ephemeral))
+	*out = *(*computev1alpha1.VolumeSource)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1066,11 +979,7 @@ func Convert_compute_VolumeSource_To_v1alpha1_VolumeSource(in *compute.VolumeSou
 }
 
 func autoConvert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *computev1alpha1.VolumeStatus, out *compute.VolumeStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Handle = in.Handle
-	out.State = compute.VolumeState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.VolumeRef = in.VolumeRef
+	*out = *(*compute.VolumeStatus)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -1080,11 +989,7 @@ func Convert_v1alpha1_VolumeStatus_To_compute_VolumeStatus(in *computev1alpha1.V
 }
 
 func autoConvert_compute_VolumeStatus_To_v1alpha1_VolumeStatus(in *compute.VolumeStatus, out *computev1alpha1.VolumeStatus, s conversion.Scope) error {
-	out.Name = in.Name
-	out.Handle = in.Handle
-	out.State = computev1alpha1.VolumeState(in.State)
-	out.LastStateTransitionTime = (*metav1.Time)(unsafe.Pointer(in.LastStateTransitionTime))
-	out.VolumeRef = in.VolumeRef
+	*out = *(*computev1alpha1.VolumeStatus)(unsafe.Pointer(in))
 	return nil
 }
 

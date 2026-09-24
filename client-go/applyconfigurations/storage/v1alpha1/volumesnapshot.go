@@ -19,7 +19,7 @@ import (
 //
 // VolumeSnapshot is the Schema for the VolumeSnapshots API
 type VolumeSnapshotApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *VolumeSnapshotSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *VolumeSnapshotStatusApplyConfiguration `json:"status,omitempty"`

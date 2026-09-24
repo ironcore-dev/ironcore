@@ -12,19 +12,19 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// Buckets returns a BucketInformer.
-	Buckets() BucketInformer
+	Buckets() TypedBucketInformer
 	// BucketClasses returns a BucketClassInformer.
-	BucketClasses() BucketClassInformer
+	BucketClasses() TypedBucketClassInformer
 	// BucketPools returns a BucketPoolInformer.
-	BucketPools() BucketPoolInformer
+	BucketPools() TypedBucketPoolInformer
 	// Volumes returns a VolumeInformer.
-	Volumes() VolumeInformer
+	Volumes() TypedVolumeInformer
 	// VolumeClasses returns a VolumeClassInformer.
-	VolumeClasses() VolumeClassInformer
+	VolumeClasses() TypedVolumeClassInformer
 	// VolumePools returns a VolumePoolInformer.
-	VolumePools() VolumePoolInformer
+	VolumePools() TypedVolumePoolInformer
 	// VolumeSnapshots returns a VolumeSnapshotInformer.
-	VolumeSnapshots() VolumeSnapshotInformer
+	VolumeSnapshots() TypedVolumeSnapshotInformer
 }
 
 type version struct {
@@ -38,37 +38,37 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Buckets returns a BucketInformer.
-func (v *version) Buckets() BucketInformer {
+// Buckets returns a TypedBucketInformer.
+func (v *version) Buckets() TypedBucketInformer {
 	return &bucketInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// BucketClasses returns a BucketClassInformer.
-func (v *version) BucketClasses() BucketClassInformer {
+// BucketClasses returns a TypedBucketClassInformer.
+func (v *version) BucketClasses() TypedBucketClassInformer {
 	return &bucketClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// BucketPools returns a BucketPoolInformer.
-func (v *version) BucketPools() BucketPoolInformer {
+// BucketPools returns a TypedBucketPoolInformer.
+func (v *version) BucketPools() TypedBucketPoolInformer {
 	return &bucketPoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// Volumes returns a VolumeInformer.
-func (v *version) Volumes() VolumeInformer {
+// Volumes returns a TypedVolumeInformer.
+func (v *version) Volumes() TypedVolumeInformer {
 	return &volumeInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// VolumeClasses returns a VolumeClassInformer.
-func (v *version) VolumeClasses() VolumeClassInformer {
+// VolumeClasses returns a TypedVolumeClassInformer.
+func (v *version) VolumeClasses() TypedVolumeClassInformer {
 	return &volumeClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// VolumePools returns a VolumePoolInformer.
-func (v *version) VolumePools() VolumePoolInformer {
+// VolumePools returns a TypedVolumePoolInformer.
+func (v *version) VolumePools() TypedVolumePoolInformer {
 	return &volumePoolInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
-// VolumeSnapshots returns a VolumeSnapshotInformer.
-func (v *version) VolumeSnapshots() VolumeSnapshotInformer {
+// VolumeSnapshots returns a TypedVolumeSnapshotInformer.
+func (v *version) VolumeSnapshots() TypedVolumeSnapshotInformer {
 	return &volumeSnapshotInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

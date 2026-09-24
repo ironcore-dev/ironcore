@@ -21,11 +21,39 @@ import (
 )
 
 // MachinePoolInformer provides access to a shared informer and lister for
-// MachinePools.
+// MachinePools. Prefer using the type-safe variant (see [TypedMachinePoolInformer]).
 type MachinePoolInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() computev1alpha1.MachinePoolLister
 }
+
+// TypedMachinePoolInformer provides access to a shared informer and lister for
+// MachinePools, including the type-safe TypedInformer variant.
+// It is a superset of MachinePoolInformer.
+type TypedMachinePoolInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() MachinePoolIndexInformer
+	Lister() computev1alpha1.MachinePoolLister
+}
+
+// MachinePoolIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type MachinePoolIndexInformer cache.TypedSharedIndexInformer[*apicomputev1alpha1.MachinePool]
+
+// MachinePoolHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for MachinePool.
+type MachinePoolHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apicomputev1alpha1.MachinePool]
+
+// MachinePoolDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for MachinePool.
+type MachinePoolDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apicomputev1alpha1.MachinePool]
+
+// MachinePoolFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for MachinePool.
+type MachinePoolFilteringHandler = cache.TypedFilteringResourceEventHandler[*apicomputev1alpha1.MachinePool]
+
+// MachinePoolIndexers is a specialization of [cache.TypedIndexers] for MachinePool.
+type MachinePoolIndexers = cache.TypedIndexers[*apicomputev1alpha1.MachinePool]
+
+// DeletedMachinePool is a specialization of [cache.DeletedObject] for MachinePool.
+type DeletedMachinePool = cache.DeletedObject[*apicomputev1alpha1.MachinePool]
 
 type machinePoolInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -35,25 +63,49 @@ type machinePoolInformer struct {
 // NewMachinePoolInformer constructs a new informer for MachinePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedMachinePoolInformer]).
 func NewMachinePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedMachinePoolInformer constructs a new informer for MachinePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedMachinePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers MachinePoolIndexers) MachinePoolIndexInformer {
+	return NewTypedMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredMachinePoolInformer constructs a new informer for MachinePool type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredMachinePoolInformer]).
 func NewFilteredMachinePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredMachinePoolInformer constructs a new informer for MachinePool type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredMachinePoolInformer(client versioned.Interface, resyncPeriod time.Duration, indexers MachinePoolIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) MachinePoolIndexInformer {
+	return NewTypedMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewMachinePoolInformerWithOptions constructs a new informer for MachinePool type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedMachinePoolInformerWithOptions]).
 func NewMachinePoolInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedMachinePoolInformerWithOptions(client, options)
+}
+
+// NewTypedMachinePoolInformerWithOptions constructs a new informer for MachinePool type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedMachinePoolInformerWithOptions(client versioned.Interface, options internalinterfaces.InformerOptions) MachinePoolIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "compute.ironcore.dev", Version: "v1alpha1", Resource: "machinepools"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apicomputev1alpha1.MachinePool](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -86,17 +138,57 @@ func NewMachinePoolInformerWithOptions(client versioned.Interface, options inter
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *machinePoolInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedMachinePoolInformerWithOptions(client, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *machinePoolInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apicomputev1alpha1.MachinePool{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *machinePoolInformer) TypedInformer() MachinePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicomputev1alpha1.MachinePool](f.factory.InformerFor(&apicomputev1alpha1.MachinePool{}, f.defaultInformer))
 }
 
 func (f *machinePoolInformer) Lister() computev1alpha1.MachinePoolLister {
 	return computev1alpha1.NewMachinePoolLister(f.Informer().GetIndexer())
+}
+
+// ToTypedMachinePoolInformer converts an untyped informer into a TypedMachinePoolInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *MachinePool. If that is not the case, calling type-safe methods of the returned
+// TypedMachinePoolInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedMachinePoolInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedMachinePoolInformer(informer MachinePoolInformer) TypedMachinePoolInformer {
+	if informer, ok := informer.(TypedMachinePoolInformer); ok {
+		return informer
+	}
+	return &machinePoolTypedInformerAdapter{informer}
+}
+
+type machinePoolTypedInformerAdapter struct {
+	MachinePoolInformer
+}
+
+func (a *machinePoolTypedInformerAdapter) TypedInformer() MachinePoolIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apicomputev1alpha1.MachinePool](a.Informer())
+}
+
+// ToMachinePoolIndexInformer converts an untyped informer into a MachinePoolIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *MachinePool. If that is not the case, calling type-safe methods of the returned
+// MachinePoolIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a MachinePoolIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToMachinePoolIndexInformer(informer cache.SharedIndexInformer) MachinePoolIndexInformer {
+	if informer, ok := informer.(MachinePoolIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apicomputev1alpha1.MachinePool](informer)
 }

@@ -65,11 +65,11 @@ func (bucketClassStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Obj
 	return nil
 }
 
-func (bucketClassStrategy) AllowCreateOnUpdate() bool {
+func (bucketClassStrategy) AllowCreateOnUpdate(ctx context.Context) bool {
 	return false
 }
 
-func (bucketClassStrategy) AllowUnconditionalUpdate() bool {
+func (bucketClassStrategy) AllowUnconditionalUpdate(context.Context) bool {
 	return false
 }
 

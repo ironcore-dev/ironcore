@@ -21,11 +21,39 @@ import (
 )
 
 // LoadBalancerInformer provides access to a shared informer and lister for
-// LoadBalancers.
+// LoadBalancers. Prefer using the type-safe variant (see [TypedLoadBalancerInformer]).
 type LoadBalancerInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() networkingv1alpha1.LoadBalancerLister
 }
+
+// TypedLoadBalancerInformer provides access to a shared informer and lister for
+// LoadBalancers, including the type-safe TypedInformer variant.
+// It is a superset of LoadBalancerInformer.
+type TypedLoadBalancerInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() LoadBalancerIndexInformer
+	Lister() networkingv1alpha1.LoadBalancerLister
+}
+
+// LoadBalancerIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type LoadBalancerIndexInformer cache.TypedSharedIndexInformer[*apinetworkingv1alpha1.LoadBalancer]
+
+// LoadBalancerHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for LoadBalancer.
+type LoadBalancerHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apinetworkingv1alpha1.LoadBalancer]
+
+// LoadBalancerDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for LoadBalancer.
+type LoadBalancerDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apinetworkingv1alpha1.LoadBalancer]
+
+// LoadBalancerFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for LoadBalancer.
+type LoadBalancerFilteringHandler = cache.TypedFilteringResourceEventHandler[*apinetworkingv1alpha1.LoadBalancer]
+
+// LoadBalancerIndexers is a specialization of [cache.TypedIndexers] for LoadBalancer.
+type LoadBalancerIndexers = cache.TypedIndexers[*apinetworkingv1alpha1.LoadBalancer]
+
+// DeletedLoadBalancer is a specialization of [cache.DeletedObject] for LoadBalancer.
+type DeletedLoadBalancer = cache.DeletedObject[*apinetworkingv1alpha1.LoadBalancer]
 
 type loadBalancerInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -36,25 +64,49 @@ type loadBalancerInformer struct {
 // NewLoadBalancerInformer constructs a new informer for LoadBalancer type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedLoadBalancerInformer]).
 func NewLoadBalancerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewLoadBalancerInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedLoadBalancerInformer constructs a new informer for LoadBalancer type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedLoadBalancerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers LoadBalancerIndexers) LoadBalancerIndexInformer {
+	return NewTypedLoadBalancerInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredLoadBalancerInformer constructs a new informer for LoadBalancer type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredLoadBalancerInformer]).
 func NewFilteredLoadBalancerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewLoadBalancerInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedLoadBalancerInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredLoadBalancerInformer constructs a new informer for LoadBalancer type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredLoadBalancerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers LoadBalancerIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) LoadBalancerIndexInformer {
+	return NewTypedLoadBalancerInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewLoadBalancerInformerWithOptions constructs a new informer for LoadBalancer type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedLoadBalancerInformerWithOptions]).
 func NewLoadBalancerInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedLoadBalancerInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedLoadBalancerInformerWithOptions constructs a new informer for LoadBalancer type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedLoadBalancerInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) LoadBalancerIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "networking.ironcore.dev", Version: "v1alpha1", Resource: "loadbalancers"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.LoadBalancer](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -87,17 +139,57 @@ func NewLoadBalancerInformerWithOptions(client versioned.Interface, namespace st
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *loadBalancerInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewLoadBalancerInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedLoadBalancerInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *loadBalancerInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apinetworkingv1alpha1.LoadBalancer{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *loadBalancerInformer) TypedInformer() LoadBalancerIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.LoadBalancer](f.factory.InformerFor(&apinetworkingv1alpha1.LoadBalancer{}, f.defaultInformer))
 }
 
 func (f *loadBalancerInformer) Lister() networkingv1alpha1.LoadBalancerLister {
 	return networkingv1alpha1.NewLoadBalancerLister(f.Informer().GetIndexer())
+}
+
+// ToTypedLoadBalancerInformer converts an untyped informer into a TypedLoadBalancerInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *LoadBalancer. If that is not the case, calling type-safe methods of the returned
+// TypedLoadBalancerInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedLoadBalancerInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedLoadBalancerInformer(informer LoadBalancerInformer) TypedLoadBalancerInformer {
+	if informer, ok := informer.(TypedLoadBalancerInformer); ok {
+		return informer
+	}
+	return &loadBalancerTypedInformerAdapter{informer}
+}
+
+type loadBalancerTypedInformerAdapter struct {
+	LoadBalancerInformer
+}
+
+func (a *loadBalancerTypedInformerAdapter) TypedInformer() LoadBalancerIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.LoadBalancer](a.Informer())
+}
+
+// ToLoadBalancerIndexInformer converts an untyped informer into a LoadBalancerIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *LoadBalancer. If that is not the case, calling type-safe methods of the returned
+// LoadBalancerIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a LoadBalancerIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToLoadBalancerIndexInformer(informer cache.SharedIndexInformer) LoadBalancerIndexInformer {
+	if informer, ok := informer.(LoadBalancerIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apinetworkingv1alpha1.LoadBalancer](informer)
 }

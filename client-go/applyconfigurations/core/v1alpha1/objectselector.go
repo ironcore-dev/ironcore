@@ -17,7 +17,7 @@ type ObjectSelectorApplyConfiguration struct {
 	// Kind is the kind of object to select.
 	Kind *string `json:"kind,omitempty"`
 	// LabelSelector is the label selector to select objects of the specified Kind by.
-	v1.LabelSelectorApplyConfiguration `json:",inline"`
+	v1.LabelSelectorApplyConfiguration `json:""`
 }
 
 // ObjectSelectorApplyConfiguration constructs a declarative configuration of the ObjectSelector type for use with

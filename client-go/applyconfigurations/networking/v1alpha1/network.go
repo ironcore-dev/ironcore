@@ -19,7 +19,7 @@ import (
 //
 // Network is the Schema for the network API
 type NetworkApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration    `json:",inline"`
+	v1.TypeMetaApplyConfiguration    `json:""`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	Spec                             *NetworkSpecApplyConfiguration   `json:"spec,omitempty"`
 	Status                           *NetworkStatusApplyConfiguration `json:"status,omitempty"`
