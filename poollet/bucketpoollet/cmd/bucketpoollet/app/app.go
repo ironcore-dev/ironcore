@@ -32,6 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/certwatcher"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
@@ -194,11 +195,14 @@ func Run(ctx context.Context, opts Options) error {
 	setupLog.Info("IRI Client configuration", "ChannelCapacity", opts.ChannelCapacity, "RelistPeriod", opts.RelistPeriod, "RelistThreshold", opts.RelistThreshold)
 	setupLog.Info("Kubernetes Client configuration", "QPS", cfg.QPS, "Burst", cfg.Burst)
 
-	leaderElectionCfg, err := configutils.GetConfig(
-		configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
-	)
-	if err != nil {
-		return fmt.Errorf("error creating leader election kubeconfig: %w", err)
+	var leaderElectionCfg *rest.Config
+	if opts.EnableLeaderElection {
+		leaderElectionCfg, err = configutils.GetConfig(
+			configutils.Kubeconfig(opts.LeaderElectionKubeconfig),
+		)
+		if err != nil {
+			return fmt.Errorf("error creating leader election kubeconfig: %w", err)
+		}
 	}
 
 	// if the enable-http2 flag is false (the default), http/2 should be disabled
