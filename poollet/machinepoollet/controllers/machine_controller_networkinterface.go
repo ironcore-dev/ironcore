@@ -17,6 +17,7 @@ import (
 	ipamv1alpha1 "github.com/ironcore-dev/ironcore/api/ipam/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/machine/v1alpha1"
+	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	poolletutils "github.com/ironcore-dev/ironcore/poollet/common/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,6 +26,7 @@ import (
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/api/v1alpha1"
 	"github.com/ironcore-dev/ironcore/poollet/machinepoollet/controllers/events"
 	"github.com/ironcore-dev/ironcore/utils/claimmanager"
+	"github.com/ironcore-dev/ironcore/utils/equality"
 	utilsmaps "github.com/ironcore-dev/ironcore/utils/maps"
 	utilslices "github.com/ironcore-dev/ironcore/utils/slices"
 	corev1 "k8s.io/api/core/v1"
@@ -62,7 +64,13 @@ func (s *networkInterfaceClaimStrategy) Release(ctx context.Context, claimer cli
 	base := nic.DeepCopy()
 	nic.Spec.ProviderID = ""
 	nic.Spec.MachineRef = nil
-	return s.Patch(ctx, nic, client.StrategicMergeFrom(base))
+	if err := s.Patch(ctx, nic, client.StrategicMergeFrom(base)); err != nil {
+		return err
+	}
+
+	// The poollet maintains the network interface status: once the claim is released,
+	// no attachment is maintained anymore and the status has to reflect that.
+	return patchNetworkInterfaceStatus(ctx, s.Client, nic, resetNetworkInterfaceStatusValues())
 }
 
 func (r *MachineReconciler) networkInterfaceNameToMachineNetworkInterfaceName(machine *computev1alpha1.Machine) map[string]string {
@@ -283,9 +291,14 @@ func (r *MachineReconciler) prepareIRINetworkInterface(
 		return nil, false, err
 	}
 	return &iri.NetworkInterface{
-		Name:       machineNicName,
-		NetworkId:  network.Spec.ProviderID,
-		Ips:        utilslices.Map(ips, commonv1alpha1.IP.String),
+		Name:      machineNicName,
+		NetworkId: network.Spec.ProviderID,
+		Ips:       utilslices.Map(ips, commonv1alpha1.IP.String),
+		Metadata: &irimeta.ObjectMetadata{
+			Id:        string(nic.UID),
+			Name:      nic.Name,
+			Namespace: nic.Namespace,
+		},
 		Attributes: attributes,
 	}, true, nil
 }
@@ -332,7 +345,7 @@ func (r *MachineReconciler) getExistingIRINetworkInterfacesForMachine(
 		log := log.WithValues("NetworkInterface", iriNic.Name)
 
 		desiredIRINic, desiredNicPresent := desiredIRINicsByName[iriNic.Name]
-		if desiredNicPresent && proto.Equal(desiredIRINic, iriNic) {
+		if desiredNicPresent && iriNetworkInterfaceUpToDate(desiredIRINic, iriNic) {
 			log.V(1).Info("Existing IRI network interface is up-to-date")
 			iriNics = append(iriNics, iriNic)
 			continue
@@ -355,6 +368,19 @@ func (r *MachineReconciler) getExistingIRINetworkInterfacesForMachine(
 		return nil, errors.Join(errs...)
 	}
 	return iriNics, nil
+}
+
+// iriNetworkInterfaceUpToDate reports whether the existing IRI network interface matches
+// the desired one. The metadata is only compared if the provider actually reports it:
+// providers that predate the metadata field never echo it, and comparing it would cause
+// an endless detach/attach loop. Providers that persist and report the metadata do see
+// metadata changes (through one detach/attach cycle), all others simply keep working.
+func iriNetworkInterfaceUpToDate(desired, existing *iri.NetworkInterface) bool {
+	if existing.Metadata == nil && desired.Metadata != nil {
+		desired = proto.Clone(desired).(*iri.NetworkInterface)
+		desired.Metadata = nil
+	}
+	return proto.Equal(desired, existing)
 }
 
 func (r *MachineReconciler) getNewAttachIRINetworkInterfaces(
@@ -440,6 +466,104 @@ func (r *MachineReconciler) computeNetworkInterfaceMapping(
 var iriNetworkInterfaceStateToMachineNetworkInterfaceState = map[iri.NetworkInterfaceState]computev1alpha1.NetworkInterfaceState{
 	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  computev1alpha1.NetworkInterfaceStatePending,
 	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: computev1alpha1.NetworkInterfaceStateAttached,
+	// The machine status only distinguishes between pending and attached network interfaces:
+	// NETWORK_INTERFACE_READY (networking realized but not yet attached) and
+	// NETWORK_INTERFACE_ERROR both map to pending. The authoritative networking view of
+	// a network interface is the status of the NetworkInterface object itself.
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_READY: computev1alpha1.NetworkInterfaceStatePending,
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_ERROR: computev1alpha1.NetworkInterfaceStatePending,
+}
+
+var iriNetworkInterfaceStateToNetworkInterfaceState = map[iri.NetworkInterfaceState]networkingv1alpha1.NetworkInterfaceState{
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_PENDING:  networkingv1alpha1.NetworkInterfaceStatePending,
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_READY:    networkingv1alpha1.NetworkInterfaceStateAvailable,
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_ATTACHED: networkingv1alpha1.NetworkInterfaceStateAvailable,
+	iri.NetworkInterfaceState_NETWORK_INTERFACE_ERROR:    networkingv1alpha1.NetworkInterfaceStateError,
+}
+
+// resetNetworkInterfaceStatusValues returns the status values of a network interface that is
+// not (or no longer) reported by the network interface's provider.
+func resetNetworkInterfaceStatusValues() networkingv1alpha1.NetworkInterfaceStatus {
+	return networkingv1alpha1.NetworkInterfaceStatus{
+		State: networkingv1alpha1.NetworkInterfaceStatePending,
+	}
+}
+
+// patchNetworkInterfaceStatus applies the given status values to the network interface,
+// keeping the LastStateTransitionTime if the state did not change. If the resulting status
+// is equal to the current status, no patch is issued.
+func patchNetworkInterfaceStatus(
+	ctx context.Context,
+	c client.Client,
+	nic *networkingv1alpha1.NetworkInterface,
+	values networkingv1alpha1.NetworkInterfaceStatus,
+) error {
+	now := metav1.Now()
+	base := nic.DeepCopy()
+
+	if nic.Status.State != values.State {
+		nic.Status.LastStateTransitionTime = &now
+	}
+	nic.Status.State = values.State
+	nic.Status.IPs = values.IPs
+	nic.Status.Prefixes = values.Prefixes
+	nic.Status.VirtualIP = values.VirtualIP
+
+	// Note: apiequality.Semantic.DeepEqual must not be used here, as it panics on the
+	// unexported fields of the netip types embedded in the commonv1alpha1 IP types (see
+	// k8s.io/apimachinery/third_party/forked/golang/reflect). The local equality.Semantic
+	// registers custom equality funcs for the IP types and hence is safe to use.
+	if equality.Semantic.DeepEqual(base.Status, nic.Status) {
+		return nil
+	}
+
+	return c.Status().Patch(ctx, nic, client.MergeFrom(base))
+}
+
+// networkInterfaceStatusValues computes the NetworkInterface status values from the status
+// reported via IRI. The provider is expected to report all effective values (ips, prefixes,
+// virtual ip); anything not reported results in the corresponding status field being unset.
+func networkInterfaceStatusValues(
+	iriNicStatus *iri.NetworkInterfaceStatus,
+) (networkingv1alpha1.NetworkInterfaceStatus, error) {
+	state, ok := iriNetworkInterfaceStateToNetworkInterfaceState[iriNicStatus.State]
+	if !ok {
+		return networkingv1alpha1.NetworkInterfaceStatus{}, fmt.Errorf("unknown network interface state %v", iriNicStatus.State)
+	}
+
+	var ips []commonv1alpha1.IP
+	if len(iriNicStatus.Ips) > 0 {
+		parsedIPs, err := commonv1alpha1.ParseIPs(iriNicStatus.Ips...)
+		if err != nil {
+			return networkingv1alpha1.NetworkInterfaceStatus{}, fmt.Errorf("error parsing reported ips %v: %w", iriNicStatus.Ips, err)
+		}
+		ips = parsedIPs
+	}
+
+	var prefixes []commonv1alpha1.IPPrefix
+	for _, reportedPrefix := range iriNicStatus.Prefixes {
+		prefix, err := commonv1alpha1.ParseIPPrefix(reportedPrefix)
+		if err != nil {
+			return networkingv1alpha1.NetworkInterfaceStatus{}, fmt.Errorf("error parsing reported prefix %q: %w", reportedPrefix, err)
+		}
+		prefixes = append(prefixes, prefix)
+	}
+
+	var virtualIP *commonv1alpha1.IP
+	if iriNicStatus.VirtualIp != "" {
+		parsedVirtualIP, err := commonv1alpha1.ParseIP(iriNicStatus.VirtualIp)
+		if err != nil {
+			return networkingv1alpha1.NetworkInterfaceStatus{}, fmt.Errorf("error parsing reported virtual ip %q: %w", iriNicStatus.VirtualIp, err)
+		}
+		virtualIP = &parsedVirtualIP
+	}
+
+	return networkingv1alpha1.NetworkInterfaceStatus{
+		State:     state,
+		IPs:       ips,
+		Prefixes:  prefixes,
+		VirtualIP: virtualIP,
+	}, nil
 }
 
 func (r *MachineReconciler) convertIRINetworkInterfaceState(state iri.NetworkInterfaceState) (computev1alpha1.NetworkInterfaceState, error) {
