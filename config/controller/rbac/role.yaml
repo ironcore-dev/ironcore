@@ -180,6 +180,7 @@ rules:
   - networking.ironcore.dev
   resources:
   - loadbalancers/status
+  - networkinterfaces/status
   - networks/status
   verbs:
   - get

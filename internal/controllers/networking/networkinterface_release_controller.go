@@ -10,6 +10,7 @@ import (
 	"github.com/go-logr/logr"
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	networkingv1alpha1 "github.com/ironcore-dev/ironcore/api/networking/v1alpha1"
+	"github.com/ironcore-dev/ironcore/utils/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/lru"
@@ -28,6 +29,7 @@ type NetworkInterfaceReleaseReconciler struct {
 }
 
 //+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces,verbs=get;list;watch;update;patch
+//+kubebuilder:rbac:groups=networking.ironcore.dev,resources=networkinterfaces/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=compute.ironcore.dev,resources=machines,verbs=get;list;watch
 
 func (r *NetworkInterfaceReleaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -79,7 +81,37 @@ func (r *NetworkInterfaceReleaseReconciler) releaseNetworkInterface(ctx context.
 	if err := r.Patch(ctx, nic, client.StrategicMergeFrom(baseNic, client.MergeFromWithOptimisticLock{})); err != nil {
 		return fmt.Errorf("error patching network interface: %w", err)
 	}
+
+	// The claiming machinepoollet maintains the network interface status. Once
+	// released, no attachment is maintained anymore, so reset the status accordingly.
+	if err := r.resetNetworkInterfaceStatus(ctx, nic); err != nil {
+		return fmt.Errorf("error resetting network interface status: %w", err)
+	}
 	return nil
+}
+
+// resetNetworkInterfaceStatus resets the status of a released network interface to
+// pending, clearing any effective values (ips, prefixes, virtual ip) formerly reported
+// by the machinepoollet. If the status is already reset, no patch is issued.
+// The patch is optimistic-locking, causing a conflict error if the network interface
+// was modified in the meantime.
+func (r *NetworkInterfaceReleaseReconciler) resetNetworkInterfaceStatus(ctx context.Context, nic *networkingv1alpha1.NetworkInterface) error {
+	base := nic.DeepCopy()
+
+	if nic.Status.State != networkingv1alpha1.NetworkInterfaceStatePending {
+		now := metav1.Now()
+		nic.Status.LastStateTransitionTime = &now
+	}
+	nic.Status.State = networkingv1alpha1.NetworkInterfaceStatePending
+	nic.Status.IPs = nil
+	nic.Status.Prefixes = nil
+	nic.Status.VirtualIP = nil
+
+	if equality.Semantic.DeepEqual(base.Status, nic.Status) {
+		return nil
+	}
+
+	return r.Status().Patch(ctx, nic, client.MergeFromWithOptions(base, client.MergeFromWithOptimisticLock{}))
 }
 
 func (r *NetworkInterfaceReleaseReconciler) reconcile(ctx context.Context, log logr.Logger, nic *networkingv1alpha1.NetworkInterface) (ctrl.Result, error) {

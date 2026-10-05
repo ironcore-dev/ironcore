@@ -85,6 +85,7 @@ message NetworkInterface {
   string network_id = 2;
   repeated string ips = 3;
   map<string, string> attributes = 4;
+  meta.v1alpha1.ObjectMetadata metadata = 5;
 }
 
 enum Power {
@@ -134,11 +135,20 @@ message NetworkInterfaceStatus {
   string name = 1;
   string handle = 2;
   NetworkInterfaceState state = 3;
+  repeated string ips = 4;
+  repeated string prefixes = 5;
+  string virtual_ip = 6;
 }
 
+// This enum collapses both the NetworkInterface state and the sub-resource
+// network interface state on the machine resource. Details on the mapping can
+// be found in:
+//   poollet/machinepoollet/controllers/machine_controller_networkinterface.go
 enum NetworkInterfaceState {
   NETWORK_INTERFACE_PENDING = 0;
   NETWORK_INTERFACE_ATTACHED = 1;
+  NETWORK_INTERFACE_READY = 2;
+  NETWORK_INTERFACE_ERROR = 3;
 }
 
 enum MachineState {

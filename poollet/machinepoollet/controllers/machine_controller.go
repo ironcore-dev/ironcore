@@ -458,6 +458,16 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 				errs = append(errs, err)
 			}
 		}
+
+		statusValues, err := networkInterfaceStatusValues(iriNicStatus)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("[network interface %s] error computing status values: %w", iriNicStatus.Name, err))
+			continue
+		}
+
+		if err := patchNetworkInterfaceStatus(ctx, r.Client, nic, statusValues); err != nil {
+			errs = append(errs, fmt.Errorf("[network interface %s] error updating status: %w", iriNicStatus.Name, err))
+		}
 	}
 
 	for _, nic := range unhandledNicByUID {
@@ -465,6 +475,12 @@ func (r *MachineReconciler) updateNetworkInterfaceStatus(
 			if err := r.updateNetworkInterfaceProviderID(ctx, nic, ""); err != nil {
 				errs = append(errs, err)
 			}
+		}
+
+		// The network interface is not part of the IRI machine status, so no networking is
+		// realized for it: reset its status accordingly.
+		if err := patchNetworkInterfaceStatus(ctx, r.Client, nic, resetNetworkInterfaceStatusValues()); err != nil {
+			errs = append(errs, fmt.Errorf("[network interface %s] error resetting status: %w", nic.Name, err))
 		}
 	}
 

@@ -30,6 +30,8 @@ type ObjectMetadata struct {
 	Generation    int64                  `protobuf:"varint,4,opt,name=generation,proto3" json:"generation,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	DeletedAt     int64                  `protobuf:"varint,6,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	Name          string                 `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
+	Namespace     string                 `protobuf:"bytes,8,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -106,11 +108,25 @@ func (x *ObjectMetadata) GetDeletedAt() int64 {
 	return 0
 }
 
+func (x *ObjectMetadata) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ObjectMetadata) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
 var File_meta_v1alpha1_api_proto protoreflect.FileDescriptor
 
 const file_meta_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
-	"\x17meta/v1alpha1/api.proto\x12\rmeta.v1alpha1\"\x8e\x03\n" +
+	"\x17meta/v1alpha1/api.proto\x12\rmeta.v1alpha1\"\xc0\x03\n" +
 	"\x0eObjectMetadata\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12P\n" +
 	"\vannotations\x18\x02 \x03(\v2..meta.v1alpha1.ObjectMetadata.AnnotationsEntryR\vannotations\x12A\n" +
@@ -121,7 +137,9 @@ const file_meta_v1alpha1_api_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"deleted_at\x18\x06 \x01(\x03R\tdeletedAt\x1a>\n" +
+	"deleted_at\x18\x06 \x01(\x03R\tdeletedAt\x12\x12\n" +
+	"\x04name\x18\a \x01(\tR\x04name\x12\x1c\n" +
+	"\tnamespace\x18\b \x01(\tR\tnamespace\x1a>\n" +
 	"\x10AnnotationsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +

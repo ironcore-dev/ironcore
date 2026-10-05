@@ -10,4 +10,6 @@ message ObjectMetadata {
   int64 generation = 4;
   int64 created_at = 5;
   int64 deleted_at = 6;
+  string name = 7;
+  string namespace = 8;
 }
