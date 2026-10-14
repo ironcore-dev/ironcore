@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	github.com/afritzler/protoequal v0.1.11
-	github.com/bits-and-blooms/bitset v1.25.0
+	github.com/bits-and-blooms/bitset v1.26.0
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-logr/logr v1.4.4
 	github.com/google/go-cmp v0.7.0
@@ -16,7 +16,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/sys v0.48.0
+	golang.org/x/sys v0.49.0
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 	k8s.io/api v0.37.0
