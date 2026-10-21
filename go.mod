@@ -5,12 +5,12 @@ go 1.26.4
 require (
 	github.com/afritzler/protoequal v0.1.11
 	github.com/bits-and-blooms/bitset v1.26.0
-	github.com/go-chi/chi/v5 v5.3.2
+	github.com/go-chi/chi/v5 v5.5.0
 	github.com/go-logr/logr v1.4.4
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/ironcore-dev/controller-utils v0.14.1-0.20260904065051-9ddd709051f4
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
