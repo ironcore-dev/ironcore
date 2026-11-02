@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/go-logr/logr"
 	"golang.org/x/exp/maps"
@@ -47,6 +48,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
+
+const iriDeletionRequeueInterval = time.Second
 
 type MachineReconciler struct {
 	events.EventRecorder
@@ -186,7 +189,7 @@ func (r *MachineReconciler) deleteGone(ctx context.Context, log logr.Logger, mac
 	}
 	if !ok {
 		log.V(1).Info("Not all machines are gone yet, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 	log.V(1).Info("Deleted gone")
 	return ctrl.Result{}, nil
@@ -236,8 +239,8 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Added finalizer")
+		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -247,8 +250,8 @@ func (r *MachineReconciler) reconcile(ctx context.Context, log logr.Logger, mach
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Removed reconcile annotation")
+		return ctrl.Result{}, nil
 	}
 
 	nics, err := r.getNetworkInterfacesForMachine(ctx, machine)
