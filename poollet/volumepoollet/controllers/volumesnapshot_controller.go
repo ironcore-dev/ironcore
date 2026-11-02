@@ -299,7 +299,7 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Added finalizer, requeueing")
+		log.V(1).Info("Added finalizer")
 		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
@@ -310,7 +310,7 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
+		log.V(1).Info("Removed reconcile annotation")
 		return ctrl.Result{}, nil
 	}
 
