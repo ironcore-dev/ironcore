@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -21,6 +22,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+const (
+	classInUseAPIReaderRequeueInterval = time.Second
 )
 
 // BucketClassReconciler reconciles a BucketClass object
@@ -88,7 +93,7 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 	}
 	if len(buckets) > 0 {
 		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
-		return ctrl.Result{}, nil
+		return ctrl.Result{RequeueAfter: classInUseAPIReaderRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Bucket Class is not used anymore, removing finalizer")

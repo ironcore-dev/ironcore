@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -21,6 +22,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+const (
+	classInUseAPIReaderRequeueInterval = time.Second
 )
 
 // MachineClassReconciler reconciles a MachineClassRef object
@@ -89,7 +94,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	}
 	if len(machines) > 0 {
 		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
-		return ctrl.Result{}, nil
+		return ctrl.Result{RequeueAfter: classInUseAPIReaderRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Machine class is not in use anymore, removing finalizer")
