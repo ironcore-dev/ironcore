@@ -5,10 +5,15 @@ package apiserver
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
 	"net"
 	"time"
 
+	certificatesv1 "k8s.io/api/certificates/v1"
+	"k8s.io/client-go/rest"
 	"k8s.io/component-base/compatibility"
 
 	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
@@ -28,8 +33,11 @@ import (
 	"github.com/ironcore-dev/ironcore/internal/apiserver"
 	"github.com/ironcore-dev/ironcore/internal/machinepoollet/client"
 	"github.com/ironcore-dev/ironcore/internal/quota/evaluator/ironcore"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
+	config "github.com/ironcore-dev/ironcore/utils/client/config"
 	apiequality "github.com/ironcore-dev/ironcore/utils/equality"
 	"github.com/ironcore-dev/ironcore/utils/quota"
+	utilrest "github.com/ironcore-dev/ironcore/utils/rest"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -40,6 +48,7 @@ import (
 	"k8s.io/apiserver/pkg/admission"
 	"k8s.io/apiserver/pkg/endpoints/openapi"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	"k8s.io/apiserver/pkg/server/healthz"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
 	serverstorage "k8s.io/apiserver/pkg/server/storage"
 	utilfeature "k8s.io/apiserver/pkg/util/feature"
@@ -64,13 +73,6 @@ func NewResourceConfig() *serverstorage.ResourceConfig {
 	return cfg
 }
 
-type IronCoreAPIServerOptions struct {
-	RecommendedOptions   *genericoptions.RecommendedOptions
-	MachinePoolletConfig client.MachinePoolletClientConfig
-
-	SharedInformerFactory informers.SharedInformerFactory
-}
-
 func (o *IronCoreAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 	o.RecommendedOptions.AddFlags(fs)
 
@@ -89,6 +91,8 @@ func (o *IronCoreAPIServerOptions) AddFlags(fs *pflag.FlagSet) {
 
 	fs.StringVar(&o.MachinePoolletConfig.CAFile, "machinepoollet-certificate-authority", o.MachinePoolletConfig.CAFile,
 		"Path to a cert file for the certificate authority.")
+
+	o.MachinePoolletClientGetConfig.BindFlags(fs, config.WithNamePrefix("machinepoollet-client-"))
 }
 
 func NewIronCoreAPIServerOptions() *IronCoreAPIServerOptions {
@@ -177,9 +181,13 @@ func (o *IronCoreAPIServerOptions) Complete() error {
 	return nil
 }
 
-func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
+func (o *IronCoreAPIServerOptions) Config(ctx context.Context) (*apiserver.Config, error) {
 	if err := o.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{netutils.ParseIPSloppy("127.0.0.1")}); err != nil {
 		return nil, fmt.Errorf("error creating self-signed certificates: %w", err)
+	}
+
+	if err := o.setupMachinePoolletClientRotation(ctx); err != nil {
+		return nil, fmt.Errorf("error setting up machinepoollet client certificate rotation: %w", err)
 	}
 
 	o.RecommendedOptions.ExtraAdmissionInitializers = func(c *genericapiserver.RecommendedConfig) ([]admission.PluginInitializer, error) {
@@ -221,6 +229,10 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 
 	apiResourceConfig := NewResourceConfig()
 
+	if o.machinePoolletClientCtrl != nil {
+		serverConfig.AddHealthzChecks(healthz.NamedCheck("machinepoollet-client-rotator", o.machinePoolletClientCtrl.Check))
+	}
+
 	config := &apiserver.Config{
 		GenericConfig: serverConfig,
 		ExtraConfig: apiserver.ExtraConfig{
@@ -237,8 +249,83 @@ func (o *IronCoreAPIServerOptions) Config() (*apiserver.Config, error) {
 	return config, nil
 }
 
+type IronCoreAPIServerOptions struct {
+	RecommendedOptions   *genericoptions.RecommendedOptions
+	MachinePoolletConfig client.MachinePoolletClientConfig
+
+	// MachinePoolletClientGetConfig holds the options for optionally
+	// bootstrapping / CSR-rotating the machinepoollet client certificate.
+	// When unset, the static --machinepoollet-client-certificate/-key path is used.
+	MachinePoolletClientGetConfig config.GetConfigOptions
+
+	// machinePoolletClientCtrl is the running rotator, set when rotation is
+	// enabled; used to register a health check on the apiserver.
+	machinePoolletClientCtrl config.Controller
+
+	SharedInformerFactory informers.SharedInformerFactory
+}
+
+// setupMachinePoolletClientRotation, when rotation is requested via the
+// machinepoollet-client-* flags, builds and starts a client certificate
+// rotator and feeds the rotating certificate into the machinepoollet dialer
+// via a dynamic tls.Config.GetClientCertificate callback. It must run before
+// NewMachinePoolConnectionInfoGetter captures the transport tls.Config.
+func (o *IronCoreAPIServerOptions) setupMachinePoolletClientRotation(ctx context.Context) error {
+	if !o.MachinePoolletClientGetConfig.RotateCertificates {
+		if o.MachinePoolletClientGetConfig.BootstrapKubeconfig != "" {
+			return fmt.Errorf("--machinepoollet-client-bootstrap-kubeconfig requires --machinepoollet-client-rotate-certificates (a static bootstrap config cannot be rotated)")
+		}
+		return nil
+	}
+
+	getter, err := config.NewGetter(config.GetterOptions{
+		Name:       "apiserver-machinepoollet-client",
+		SignerName: certificatesv1.KubeAPIServerClientSignerName,
+		Template: &x509.CertificateRequest{
+			Subject: pkix.Name{
+				CommonName:   "ironcore-apiserver-machinepoollet-client",
+				Organization: []string{"system:masters"},
+			},
+		},
+		GetUsages: utilcertificate.DefaultKubeAPIServerClientGetUsages,
+	})
+	if err != nil {
+		return err
+	}
+
+	// GetConfig already initializes the rotator (Init(ctx, false)); start it
+	// on the long-lived Run context so rotation continues for the apiserver's
+	// lifetime.
+	_, ctrl, err := getter.GetConfig(ctx, &o.MachinePoolletClientGetConfig)
+	if err != nil {
+		return err
+	}
+	o.machinePoolletClientCtrl = ctrl
+	go func() {
+		if err := ctrl.Start(ctx); err != nil {
+			utilruntime.HandleError(fmt.Errorf("error running machinepoollet client certificate rotator: %w", err))
+		}
+	}()
+
+	o.MachinePoolletConfig.GetClientCertificate = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
+		return clientCertFromConfig(ctrl.ClientConfig())
+	}
+	return nil
+}
+
+// clientCertFromConfig extracts a tls.Certificate from a rest.Config produced
+// by the rotator, which materializes CertData/KeyData. It copies the config
+// before reading so the rotator's cached config is not mutated.
+func clientCertFromConfig(cfg *rest.Config) (*tls.Certificate, error) {
+	if cfg == nil {
+		return nil, nil
+	}
+	shallow := *cfg
+	return utilrest.CertificateFromConfig(&shallow)
+}
+
 func (o *IronCoreAPIServerOptions) Run(ctx context.Context) error {
-	config, err := o.Config()
+	config, err := o.Config(ctx)
 	if err != nil {
 		return err
 	}
