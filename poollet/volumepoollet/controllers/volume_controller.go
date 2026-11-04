@@ -292,9 +292,13 @@ func (r *VolumeReconciler) prepareIRIVolumeSnapshotDataSource(volume *storagev1a
 		return nil, false, nil
 	}
 
+	snapshotID, err := poolletutils.ParseID(volumeSnapshot.Status.SnapshotID)
+	if err != nil {
+		return nil, false, fmt.Errorf("error parsing snapshot ID: %w", err)
+	}
 	return &iri.VolumeDataSource{
 		SnapshotDataSource: &iri.SnapshotDataSource{
-			SnapshotId: volumeSnapshot.Name,
+			SnapshotId: snapshotID.ID,
 		},
 	}, true, nil
 }
