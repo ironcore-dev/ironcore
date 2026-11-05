@@ -331,7 +331,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.ID))
 
 		By("verifying the volume is created")
 		Expect(volume).NotTo(BeNil())
@@ -445,7 +445,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.ID))
 	})
 
 	It("should inherit encryption when creating volume from snapshot of encrypted volume", func(ctx SpecContext) {
@@ -574,7 +574,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.ID))
 
 		By("verifying encryption is inherited")
 		Expect(iriVolume.Spec.Encryption).NotTo(BeNil())
@@ -840,7 +840,7 @@ var _ = Describe("VolumeController", func() {
 		Expect(iriVolume).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource).NotTo(BeNil())
 		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource).NotTo(BeNil())
-		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(volumeSnapshot.Name))
+		Expect(iriVolume.Spec.VolumeDataSource.SnapshotDataSource.SnapshotId).To(Equal(expectedSnapshotID.ID))
 
 		By("verifying user's explicit encryption is used")
 		Expect(iriVolume.Spec.Encryption).NotTo(BeNil())
