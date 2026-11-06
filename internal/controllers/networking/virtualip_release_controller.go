@@ -101,11 +101,7 @@ func (r *VirtualIPReleaseReconciler) reconcile(ctx context.Context, log logr.Log
 
 	log.V(1).Info("Virtual IP claimer does not exist, releasing virtual IP")
 	if err := r.releaseVirtualIP(ctx, virtualIP); err != nil {
-		if !apierrors.IsConflict(err) {
-			return ctrl.Result{}, fmt.Errorf("error releasing virtual IP: %w", err)
-		}
-		log.V(1).Info("Virtual IP was updated, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, fmt.Errorf("error releasing virtual IP: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")

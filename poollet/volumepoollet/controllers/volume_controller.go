@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"google.golang.org/grpc/codes"
@@ -47,6 +48,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
+
+const iriDeletionRequeueInterval = time.Second
 
 type VolumeReconciler struct {
 	events.EventRecorder
@@ -150,7 +153,7 @@ func (r *VolumeReconciler) deleteGone(ctx context.Context, log logr.Logger, volu
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volumes are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -223,7 +226,7 @@ func (r *VolumeReconciler) delete(ctx context.Context, log logr.Logger, volume *
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volumes are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted all iri volumes, removing finalizer")
@@ -478,8 +481,8 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Added finalizer")
+		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -489,8 +492,8 @@ func (r *VolumeReconciler) reconcile(ctx context.Context, log logr.Logger, volum
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Removed reconcile annotation")
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Listing volumes")

@@ -134,11 +134,7 @@ func (r *NetworkInterfaceReleaseReconciler) reconcile(ctx context.Context, log l
 
 	log.V(1).Info("Network interface claimer does not exist, releasing network interface")
 	if err := r.releaseNetworkInterface(ctx, nic); err != nil {
-		if !apierrors.IsConflict(err) {
-			return ctrl.Result{}, fmt.Errorf("error releasing network interface: %w", err)
-		}
-		log.V(1).Info("Network interface was updated, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, fmt.Errorf("error releasing network interface: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")
