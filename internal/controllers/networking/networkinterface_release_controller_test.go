@@ -18,7 +18,7 @@ var _ = Describe("NetworkInterfaceReleaseReconciler", func() {
 	ns := SetupNamespace(&k8sClient)
 
 	It("should release network interfaces whose owner is gone", func(ctx SpecContext) {
-		By("creating a network interface referencing an owner that does not exist")
+		By("creating a network interface")
 		nic := &networkingv1alpha1.NetworkInterface{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace:    ns.Name,
@@ -27,20 +27,25 @@ var _ = Describe("NetworkInterfaceReleaseReconciler", func() {
 			Spec: networkingv1alpha1.NetworkInterfaceSpec{
 				NetworkRef: corev1.LocalObjectReference{Name: "my-network"},
 				IPs:        []networkingv1alpha1.IPSource{{Value: commonv1alpha1.MustParseNewIP("10.0.0.1")}},
-				MachineRef: &commonv1alpha1.LocalUIDReference{
-					Name: "should-not-exist",
-					UID:  uuid.NewUUID(),
-				},
 			},
 		}
 		Expect(k8sClient.Create(ctx, nic)).To(Succeed())
 
 		By("setting an available status on the network interface")
-		nic.Status = networkingv1alpha1.NetworkInterfaceStatus{
-			State: networkingv1alpha1.NetworkInterfaceStateAvailable,
-			IPs:   []commonv1alpha1.IP{*commonv1alpha1.MustParseNewIP("10.0.0.1")},
-		}
-		Expect(k8sClient.Status().Update(ctx, nic)).To(Succeed())
+		Eventually(UpdateStatus(nic, func() {
+			nic.Status = networkingv1alpha1.NetworkInterfaceStatus{
+				State: networkingv1alpha1.NetworkInterfaceStateAvailable,
+				IPs:   []commonv1alpha1.IP{*commonv1alpha1.MustParseNewIP("10.0.0.1")},
+			}
+		})).Should(Succeed())
+
+		By("adding a machine reference claiming the network interface")
+		Eventually(Update(nic, func() {
+			nic.Spec.MachineRef = &commonv1alpha1.LocalUIDReference{
+				Name: "should-not-exist",
+				UID:  uuid.NewUUID(),
+			}
+		})).Should(Succeed())
 
 		By("waiting for the network interface to be released")
 		Eventually(Object(nic)).Should(SatisfyAll(
