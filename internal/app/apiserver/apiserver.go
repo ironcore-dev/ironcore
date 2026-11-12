@@ -7,12 +7,10 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"fmt"
 	"net"
 	"time"
 
-	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/component-base/compatibility"
 
@@ -280,12 +278,9 @@ func (o *IronCoreAPIServerOptions) setupMachinePoolletClientRotation(ctx context
 
 	getter, err := config.NewGetter(config.GetterOptions{
 		Name:       "apiserver-machinepoollet-client",
-		SignerName: certificatesv1.KubeAPIServerClientSignerName,
+		SignerName: utilcertificate.MachinePoolletClientSignerName,
 		Template: &x509.CertificateRequest{
-			Subject: pkix.Name{
-				CommonName:   "ironcore-apiserver-machinepoollet-client",
-				Organization: []string{"system:masters"},
-			},
+			Subject: utilcertificate.APIServerMachinePoolletClientCSRSubject(),
 		},
 		GetUsages: utilcertificate.DefaultKubeAPIServerClientGetUsages,
 	})

@@ -8,15 +8,17 @@ import (
 	"fmt"
 
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/generic"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
 	"golang.org/x/exp/slices"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-const (
-	apiServerMachinePoolletClientCommonName = "ironcore-apiserver-machinepoollet-client"
-	apiServerMachinePoolletClientOrg        = "system:masters"
+var (
+	apiServerMachinePoolletClientSubject    = utilcertificate.APIServerMachinePoolletClientCSRSubject()
+	apiServerMachinePoolletClientCommonName = apiServerMachinePoolletClientSubject.CommonName
+	apiServerMachinePoolletClientOrg        = apiServerMachinePoolletClientSubject.Organization
 )
 
 var (
@@ -37,7 +39,7 @@ var (
 )
 
 func IsAPIServerMachinePoolletClientCert(csr *certificatesv1.CertificateSigningRequest, x509cr *x509.CertificateRequest) bool {
-	if csr.Spec.SignerName != certificatesv1.KubeAPIServerClientSignerName {
+	if csr.Spec.SignerName != utilcertificate.MachinePoolletClientSignerName {
 		return false
 	}
 
@@ -45,8 +47,8 @@ func IsAPIServerMachinePoolletClientCert(csr *certificatesv1.CertificateSigningR
 }
 
 func ValidateAPIServerMachinePoolletClientCSR(req *x509.CertificateRequest, usages sets.Set[certificatesv1.KeyUsage]) error {
-	if !slices.Equal([]string{apiServerMachinePoolletClientOrg}, req.Subject.Organization) {
-		return fmt.Errorf("organization is not %s", apiServerMachinePoolletClientOrg)
+	if !slices.Equal(apiServerMachinePoolletClientOrg, req.Subject.Organization) {
+		return fmt.Errorf("organization is not %v", apiServerMachinePoolletClientOrg)
 	}
 
 	if len(req.DNSNames) > 0 {

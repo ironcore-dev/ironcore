@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/compute"
+	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
 )
 
 var (
@@ -149,16 +150,16 @@ func TestIsAPIServerMachinePoolletClientCert(t *testing.T) {
 	}
 
 	if !compute.IsAPIServerMachinePoolletClientCert(
-		csrFor(certificatesv1.KubeAPIServerClientSignerName, ecdsaUsages),
+		csrFor(utilcertificate.MachinePoolletClientSignerName, ecdsaUsages),
 		validAPIServerMachinePoolletClientCSR(),
 	) {
-		t.Error("expected a well-formed kube-apiserver-client CSR to be recognized")
+		t.Error("expected a well-formed machinepoollet-client CSR to be recognized")
 	}
 
 	if compute.IsAPIServerMachinePoolletClientCert(
-		csrFor(certificatesv1.KubeletServingSignerName, ecdsaUsages),
+		csrFor(certificatesv1.KubeAPIServerClientSignerName, ecdsaUsages),
 		validAPIServerMachinePoolletClientCSR(),
 	) {
-		t.Error("expected a non kube-apiserver-client signer CSR not to be recognized")
+		t.Error("expected a CSR for a different signer not to be recognized")
 	}
 }
