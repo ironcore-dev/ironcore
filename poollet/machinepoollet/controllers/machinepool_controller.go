@@ -193,8 +193,8 @@ func (r *MachinePoolReconciler) reconcile(ctx context.Context, log logr.Logger, 
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Removed reconcile annotation")
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Enforcing configured topology labels")

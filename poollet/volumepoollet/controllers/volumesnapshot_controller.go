@@ -94,7 +94,7 @@ func (r *VolumeSnapshotReconciler) deleteGone(ctx context.Context, log logr.Logg
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volume snapshots are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -139,7 +139,7 @@ func (r *VolumeSnapshotReconciler) delete(ctx context.Context, log logr.Logger, 
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volume snapshots are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted all iri volume snapshots, removing finalizer")
@@ -299,8 +299,8 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Added finalizer")
+		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -310,8 +310,8 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Removed reconcile annotation")
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Listing volume snapshots")

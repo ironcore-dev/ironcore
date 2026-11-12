@@ -79,7 +79,7 @@ func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, vol
 	}
 	if len(volumes) > 0 {
 		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, nil
 	}
 
 	volumes, err = r.listReferencingVolumesWithReader(ctx, r.APIReader, volumeClass)
@@ -88,7 +88,7 @@ func (r *VolumeClassReconciler) delete(ctx context.Context, log logr.Logger, vol
 	}
 	if len(volumes) > 0 {
 		log.V(1).Info("Volume class is still in use", "ReferencingVolumeNames", r.collectVolumeNames(volumes))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: classInUseAPIReaderRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Volume Class is not used anymore, removing finalizer")
@@ -124,6 +124,16 @@ func (r *VolumeClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&storagev1alpha1.Volume{},
 			handler.Funcs{
+				UpdateFunc: func(ctx context.Context, event event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+					for _, volume := range []*storagev1alpha1.Volume{
+						event.ObjectOld.(*storagev1alpha1.Volume),
+						event.ObjectNew.(*storagev1alpha1.Volume),
+					} {
+						if volumeClassRef := volume.Spec.VolumeClassRef; volumeClassRef != nil {
+							queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: volumeClassRef.Name}})
+						}
+					}
+				},
 				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					volume := event.Object.(*storagev1alpha1.Volume)
 					volumeClassRef := volume.Spec.VolumeClassRef
