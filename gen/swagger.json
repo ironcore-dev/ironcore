@@ -73254,6 +73254,10 @@
 			"description": "NetworkSpec defines the desired state of Network",
 			"type": "object",
 			"properties": {
+				"enableEncryption": {
+					"description": "EnableEncryption specifies whether the traffic of this network shall be encrypted.",
+					"type": "boolean"
+				},
 				"incomingPeerings": {
 					"description": "PeeringClaimRefs are the peering claim references of other networks.",
 					"type": "array",

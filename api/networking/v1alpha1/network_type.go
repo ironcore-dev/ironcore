@@ -25,6 +25,10 @@ type NetworkSpec struct {
 	// +patchMergeKey=name
 	// +patchStrategy=merge,retainKeys
 	PeeringClaimRefs []NetworkPeeringClaimRef `json:"incomingPeerings,omitempty" patchStrategy:"merge,retainKeys" patchMergeKey:"name"`
+
+	// EnableEncryption specifies whether the traffic of this network shall be encrypted.
+	// +optional
+	EnableEncryption bool `json:"enableEncryption,omitempty"`
 }
 
 type NetworkPeeringClaimRef struct {
