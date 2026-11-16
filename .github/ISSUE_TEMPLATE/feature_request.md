@@ -4,6 +4,12 @@ about: Suggest a new idea for the project.
 labels: enhancement
 ---
 
+<!-- BEGIN slop-grenade-hint -->
+> [!IMPORTANT]
+> Please review our [AI contribution policy](https://github.com/ironcore-dev/community/blob/main/docs/ai.md).
+> Low-effort AI requests may be closed or reworked.
+<!-- END slop-grenade-hint -->
+
 # Summary
 
 Brief explanation of the feature.
