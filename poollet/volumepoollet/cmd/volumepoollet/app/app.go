@@ -387,6 +387,9 @@ func Run(ctx context.Context, opts Options) error {
 		if err := storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer); err != nil {
 			return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSpecVolumeSnapshotRefNameField, err)
 		}
+		if err := storageclient.SetupVolumeSnapshotVolumeRefNameFieldIndexer(ctx, indexer); err != nil {
+			return fmt.Errorf("error setting up %s indexer with manager: %w", storageclient.VolumeSnapshotVolumeRefNameField, err)
+		}
 	}
 
 	onInitialized := func(ctx context.Context) error {

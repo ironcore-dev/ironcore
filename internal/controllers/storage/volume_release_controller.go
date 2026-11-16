@@ -102,11 +102,7 @@ func (r *VolumeReleaseReconciler) reconcile(ctx context.Context, log logr.Logger
 
 	log.V(1).Info("Volume claimer does not exist, releasing volume")
 	if err := r.releaseVolume(ctx, volume); err != nil {
-		if !apierrors.IsConflict(err) {
-			return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
-		}
-		log.V(1).Info("Volume was updated, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, fmt.Errorf("error releasing volume: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")

@@ -142,7 +142,7 @@ var _ = Describe("VolumeSnapshotController", func() {
 		Eventually(Get(volumeSnapshot)).Should(Satisfy(apierrors.IsNotFound))
 	})
 
-	It("should not create volume snapshot if referenced volume is not available", func(ctx SpecContext) {
+	It("should create volume snapshot once referenced volume becomes available", func(ctx SpecContext) {
 		By("setting the volume status to pending in the runtime")
 		_, iriVolume := GetSingleMapEntry(srv.Volumes)
 		iriVolume.Status.State = iri.VolumeState_VOLUME_PENDING
@@ -165,6 +165,19 @@ var _ = Describe("VolumeSnapshotController", func() {
 
 		By("ensuring no volume snapshot is created in the runtime")
 		Consistently(srv).Should(HaveField("VolumeSnapshots", HaveLen(0)))
+
+		By("making the referenced volume available")
+		iriVolume = &testingvolume.FakeVolume{Volume: proto.Clone(iriVolume.Volume).(*iri.Volume)}
+		iriVolume.Status.State = iri.VolumeState_VOLUME_AVAILABLE
+		iriVolume.Status.Access = &iri.VolumeAccess{
+			Driver: "test-driver",
+			Handle: "test-volume-id",
+		}
+		srv.SetVolumes([]*testingvolume.FakeVolume{iriVolume})
+		Eventually(Object(volume)).Should(HaveField("Status.State", Equal(storagev1alpha1.VolumeStateAvailable)))
+
+		By("waiting for the volume snapshot to be created in the runtime")
+		Eventually(srv).Should(HaveField("VolumeSnapshots", HaveLen(1)))
 	})
 
 	It("should not create volume snapshot if referenced volume does not exist", func(ctx SpecContext) {

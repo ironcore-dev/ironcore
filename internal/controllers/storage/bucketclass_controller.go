@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -21,6 +22,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+const (
+	classInUseAPIReaderRequeueInterval = time.Second
 )
 
 // BucketClassReconciler reconciles a BucketClass object
@@ -79,7 +84,7 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 	}
 	if len(buckets) > 0 {
 		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, nil
 	}
 
 	buckets, err = r.listReferencingBucketsWithReader(ctx, r.APIReader, bucketClass)
@@ -88,7 +93,7 @@ func (r *BucketClassReconciler) delete(ctx context.Context, log logr.Logger, buc
 	}
 	if len(buckets) > 0 {
 		log.V(1).Info("Bucket class is still in use", "ReferencingBucketNames", r.collectBucketNames(buckets))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: classInUseAPIReaderRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Bucket Class is not used anymore, removing finalizer")
@@ -124,6 +129,16 @@ func (r *BucketClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&storagev1alpha1.Bucket{},
 			handler.Funcs{
+				UpdateFunc: func(ctx context.Context, event event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+					for _, bucket := range []*storagev1alpha1.Bucket{
+						event.ObjectOld.(*storagev1alpha1.Bucket),
+						event.ObjectNew.(*storagev1alpha1.Bucket),
+					} {
+						if bucketClassRef := bucket.Spec.BucketClassRef; bucketClassRef != nil {
+							queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: bucketClassRef.Name}})
+						}
+					}
+				},
 				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					bucket := event.Object.(*storagev1alpha1.Bucket)
 					bucketClassRef := bucket.Spec.BucketClassRef

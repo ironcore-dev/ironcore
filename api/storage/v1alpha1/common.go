@@ -10,6 +10,8 @@ const (
 	VolumeVolumeClassRefNameField    = "spec.volumeClassRef.name"
 	VolumeVolumeSnapshotRefNameField = "spec.volumeSnapshotRef.name"
 
+	VolumeSnapshotVolumeRefNameField = "spec.volumeRef.name"
+
 	BucketBucketPoolRefNameField  = "spec.bucketPoolRef.name"
 	BucketBucketClassRefNameField = "spec.bucketClassRef.name"
 

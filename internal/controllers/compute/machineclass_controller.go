@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -21,6 +22,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+)
+
+const (
+	classInUseAPIReaderRequeueInterval = time.Second
 )
 
 // MachineClassReconciler reconciles a MachineClassRef object
@@ -80,7 +85,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	}
 	if len(machines) > 0 {
 		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, nil
 	}
 
 	machines, err = r.listReferencingMachinesWithReader(ctx, r.APIReader, machineClass)
@@ -89,7 +94,7 @@ func (r *MachineClassReconciler) delete(ctx context.Context, log logr.Logger, ma
 	}
 	if len(machines) > 0 {
 		log.V(1).Info("Machine class is still in use", "ReferencingMachineNames", r.collectMachineNames(machines))
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: classInUseAPIReaderRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Machine class is not in use anymore, removing finalizer")
@@ -125,9 +130,21 @@ func (r *MachineClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&computev1alpha1.Machine{},
 			handler.Funcs{
+				UpdateFunc: func(ctx context.Context, event event.UpdateEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
+					for _, machine := range []*computev1alpha1.Machine{
+						event.ObjectOld.(*computev1alpha1.Machine),
+						event.ObjectNew.(*computev1alpha1.Machine),
+					} {
+						if name := machine.Spec.MachineClassRef.Name; name != "" {
+							queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: name}})
+						}
+					}
+				},
 				DeleteFunc: func(ctx context.Context, event event.DeleteEvent, queue workqueue.TypedRateLimitingInterface[reconcile.Request]) {
 					machine := event.Object.(*computev1alpha1.Machine)
-					queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: machine.Spec.MachineClassRef.Name}})
+					if name := machine.Spec.MachineClassRef.Name; name != "" {
+						queue.Add(ctrl.Request{NamespacedName: types.NamespacedName{Name: name}})
+					}
 				},
 			},
 		).

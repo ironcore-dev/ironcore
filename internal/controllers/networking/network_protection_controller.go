@@ -6,7 +6,6 @@ package networking
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/ironcore-dev/controller-utils/clientutils"
@@ -22,8 +21,7 @@ import (
 )
 
 const (
-	networkFinalizer            = "networking.ironcore.dev/network"
-	networkInUseRequeueInterval = time.Second
+	networkFinalizer = "networking.ironcore.dev/network"
 )
 
 type NetworkProtectionReconciler struct {
@@ -61,7 +59,7 @@ func (r *NetworkProtectionReconciler) delete(ctx context.Context, log logr.Logge
 	if ok, err := r.isNetworkInUse(ctx, log, network); err != nil {
 		return ctrl.Result{}, err
 	} else if ok {
-		return ctrl.Result{RequeueAfter: networkInUseRequeueInterval}, nil
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Removing finalizer from Network as the Network is not in use")
@@ -243,25 +241,27 @@ func (r *NetworkProtectionReconciler) enqueueByPeeredNetwork() handler.EventHand
 			return nil
 		}
 
-		var res []ctrl.Request
+		reqs := make(map[ctrl.Request]struct{})
 		for _, targetNetwork := range networkList.Items {
-			var found bool
 			for _, claimRef := range targetNetwork.Spec.PeeringClaimRefs {
 				if claimRef.UID == network.UID {
-					networkKey := types.NamespacedName{
-						Namespace: claimRef.Namespace,
-						Name:      claimRef.Name,
-					}
-					res = append(res, ctrl.Request{NamespacedName: networkKey})
-					found = true
+					reqs[ctrl.Request{NamespacedName: client.ObjectKeyFromObject(&targetNetwork)}] = struct{}{}
 					break
 				}
 			}
-			if found {
-				break
-			}
 		}
 
+		for _, claimRef := range network.Spec.PeeringClaimRefs {
+			reqs[ctrl.Request{NamespacedName: types.NamespacedName{
+				Namespace: claimRef.Namespace,
+				Name:      claimRef.Name,
+			}}] = struct{}{}
+		}
+
+		res := make([]ctrl.Request, 0, len(reqs))
+		for req := range reqs {
+			res = append(res, req)
+		}
 		return res
 	})
 }

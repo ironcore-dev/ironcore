@@ -14,6 +14,7 @@ import (
 	"k8s.io/client-go/tools/events"
 
 	storagev1alpha1 "github.com/ironcore-dev/ironcore/api/storage/v1alpha1"
+	storageclient "github.com/ironcore-dev/ironcore/internal/client/storage"
 	irimeta "github.com/ironcore-dev/ironcore/iri/apis/meta/v1alpha1"
 	iriVolume "github.com/ironcore-dev/ironcore/iri/apis/volume"
 	iri "github.com/ironcore-dev/ironcore/iri/apis/volume/v1alpha1"
@@ -36,6 +37,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
 type VolumeSnapshotReconciler struct {
@@ -94,7 +98,7 @@ func (r *VolumeSnapshotReconciler) deleteGone(ctx context.Context, log logr.Logg
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volume snapshots are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted gone")
@@ -139,7 +143,7 @@ func (r *VolumeSnapshotReconciler) delete(ctx context.Context, log logr.Logger, 
 	}
 	if !ok {
 		log.V(1).Info("Not all iri volume snapshots are gone, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{RequeueAfter: iriDeletionRequeueInterval}, nil
 	}
 
 	log.V(1).Info("Deleted all iri volume snapshots, removing finalizer")
@@ -299,8 +303,8 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring finalizer: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Added finalizer, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Added finalizer")
+		return ctrl.Result{}, nil
 	}
 	log.V(1).Info("Finalizer is present")
 
@@ -310,8 +314,8 @@ func (r *VolumeSnapshotReconciler) reconcile(ctx context.Context, log logr.Logge
 		return ctrl.Result{}, fmt.Errorf("error ensuring no reconcile annotation: %w", err)
 	}
 	if modified {
-		log.V(1).Info("Removed reconcile annotation, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		log.V(1).Info("Removed reconcile annotation")
+		return ctrl.Result{}, nil
 	}
 
 	log.V(1).Info("Listing volume snapshots")
@@ -420,6 +424,59 @@ func (r *VolumeSnapshotReconciler) updateStatus(ctx context.Context, log logr.Lo
 	return nil
 }
 
+func (r *VolumeSnapshotReconciler) enqueueVolumeSnapshotsReferencingVolume() handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, obj client.Object) []ctrl.Request {
+		volume := obj.(*storagev1alpha1.Volume)
+		log := ctrl.LoggerFrom(ctx)
+
+		volumeSnapshotList := &storagev1alpha1.VolumeSnapshotList{}
+		if err := r.List(ctx, volumeSnapshotList,
+			client.InNamespace(volume.Namespace),
+			client.MatchingFields{
+				storageclient.VolumeSnapshotVolumeRefNameField: volume.Name,
+			},
+		); err != nil {
+			log.Error(err, "Error listing volume snapshots referencing volume", "VolumeKey", client.ObjectKeyFromObject(volume))
+			return nil
+		}
+
+		filterLabel := predicates.ResourceHasFilterLabel(log, r.WatchFilterValue)
+		notExternallyManaged := predicates.ResourceIsNotExternallyManaged(log)
+
+		var filtered []storagev1alpha1.VolumeSnapshot
+		for i := range volumeSnapshotList.Items {
+			snapshot := &volumeSnapshotList.Items[i]
+			if !filterLabel.Create(event.CreateEvent{Object: snapshot}) ||
+				!notExternallyManaged.Create(event.CreateEvent{Object: snapshot}) {
+				continue
+			}
+			filtered = append(filtered, *snapshot)
+		}
+
+		return ironcoreclient.ReconcileRequestsFromObjectStructSlice(filtered)
+	})
+}
+
+func (r *VolumeSnapshotReconciler) volumeReadinessChangedPredicate() predicate.Predicate {
+	return predicate.Funcs{
+		CreateFunc: func(evt event.CreateEvent) bool {
+			volume := evt.Object.(*storagev1alpha1.Volume)
+			return volume.Status.State == storagev1alpha1.VolumeStateAvailable
+		},
+		UpdateFunc: func(evt event.UpdateEvent) bool {
+			oldVolume := evt.ObjectOld.(*storagev1alpha1.Volume)
+			newVolume := evt.ObjectNew.(*storagev1alpha1.Volume)
+			return (oldVolume.Status.State == storagev1alpha1.VolumeStateAvailable) != (newVolume.Status.State == storagev1alpha1.VolumeStateAvailable)
+		},
+		DeleteFunc: func(evt event.DeleteEvent) bool {
+			return false
+		},
+		GenericFunc: func(evt event.GenericEvent) bool {
+			return false
+		},
+	}
+}
+
 func (r *VolumeSnapshotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	log := ctrl.Log.WithName("volumepoollet").WithName("volumesnapshot")
 
@@ -429,6 +486,15 @@ func (r *VolumeSnapshotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			builder.WithPredicates(
 				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
 				predicates.ResourceIsNotExternallyManaged(log),
+			),
+		).
+		Watches(
+			&storagev1alpha1.Volume{},
+			r.enqueueVolumeSnapshotsReferencingVolume(),
+			builder.WithPredicates(
+				predicates.ResourceHasFilterLabel(log, r.WatchFilterValue),
+				predicates.ResourceIsNotExternallyManaged(log),
+				r.volumeReadinessChangedPredicate(),
 			),
 		).
 		WithOptions(controller.Options{

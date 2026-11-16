@@ -125,11 +125,7 @@ func (r *NetworkReleaseReconciler) reconcile(ctx context.Context, log logr.Logge
 
 	log.V(1).Info("Some network peering claims do not exist, releasing network")
 	if err := r.releaseNetwork(ctx, network, filteredPeeringClaimRefs); err != nil {
-		if !apierrors.IsConflict(err) {
-			return ctrl.Result{}, fmt.Errorf("error releasing network: %w", err)
-		}
-		log.V(1).Info("Network was updated, requeueing")
-		return ctrl.Result{RequeueAfter: 1}, nil
+		return ctrl.Result{}, fmt.Errorf("error releasing network: %w", err)
 	}
 
 	log.V(1).Info("Reconciled")

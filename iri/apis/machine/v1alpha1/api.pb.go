@@ -116,6 +116,11 @@ func (VolumeState) EnumDescriptor() ([]byte, []int) {
 	return file_machine_v1alpha1_api_proto_rawDescGZIP(), []int{1}
 }
 
+// This enum collapses both the NetworkInterface state and the sub-resource
+// network interface state on the machine resource. Details on the mapping can
+// be found in:
+//
+//	poollet/machinepoollet/controllers/machine_controller_networkinterface.go
 type NetworkInterfaceState int32
 
 const (
