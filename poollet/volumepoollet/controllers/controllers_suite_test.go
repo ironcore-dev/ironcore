@@ -226,6 +226,7 @@ func SetupTest() (*corev1.Namespace, *storagev1alpha1.VolumePool, *storagev1alph
 		indexer := k8sManager.GetFieldIndexer()
 		Expect(storageclient.SetupVolumeSpecVolumePoolRefNameFieldIndexer(ctx, indexer)).To(Succeed())
 		Expect(storageclient.SetupVolumeSpecVolumeSnapshotRefNameFieldIndexer(ctx, indexer)).To(Succeed())
+		Expect(storageclient.SetupVolumeSnapshotVolumeRefNameFieldIndexer(ctx, indexer)).To(Succeed())
 
 		volumeClassMapper := vcm.NewGeneric(srv, vcm.GenericOptions{
 			RelistPeriod: 2 * time.Second,
