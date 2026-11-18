@@ -16,7 +16,7 @@ require (
 	github.com/spf13/pflag v1.1.0
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
-	golang.org/x/sys v0.49.0
+	golang.org/x/sys v0.50.0
 	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 	k8s.io/api v0.37.0
