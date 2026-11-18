@@ -7,18 +7,13 @@ import (
 	"crypto/x509"
 	"fmt"
 
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/generic"
 	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
 	"golang.org/x/exp/slices"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-)
-
-var (
-	apiServerMachinePoolletClientSubject    = utilcertificate.APIServerMachinePoolletClientCSRSubject()
-	apiServerMachinePoolletClientCommonName = apiServerMachinePoolletClientSubject.CommonName
-	apiServerMachinePoolletClientOrg        = apiServerMachinePoolletClientSubject.Organization
 )
 
 var (
@@ -47,8 +42,8 @@ func IsAPIServerMachinePoolletClientCert(csr *certificatesv1.CertificateSigningR
 }
 
 func ValidateAPIServerMachinePoolletClientCSR(req *x509.CertificateRequest, usages sets.Set[certificatesv1.KeyUsage]) error {
-	if !slices.Equal(apiServerMachinePoolletClientOrg, req.Subject.Organization) {
-		return fmt.Errorf("organization is not %v", apiServerMachinePoolletClientOrg)
+	if !slices.Equal([]string{computev1alpha1.APIServerMachinePoolletClientsGroup}, req.Subject.Organization) {
+		return fmt.Errorf("organization is not %s", computev1alpha1.APIServerMachinePoolletClientsGroup)
 	}
 
 	if len(req.DNSNames) > 0 {
@@ -64,8 +59,8 @@ func ValidateAPIServerMachinePoolletClientCSR(req *x509.CertificateRequest, usag
 		return fmt.Errorf("uri subject alternative names are not allowed")
 	}
 
-	if req.Subject.CommonName != apiServerMachinePoolletClientCommonName {
-		return fmt.Errorf("subject common name is not %s", apiServerMachinePoolletClientCommonName)
+	if req.Subject.CommonName != computev1alpha1.APIServerMachinePoolletClientCommonName {
+		return fmt.Errorf("subject common name is not %s", computev1alpha1.APIServerMachinePoolletClientCommonName)
 	}
 
 	if !apiServerClientRequiredUsages.Equal(usages) && !apiServerClientRequiredUsagesNoEncipherment.Equal(usages) {

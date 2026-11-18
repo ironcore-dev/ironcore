@@ -3,7 +3,11 @@
 
 package certificate
 
-import "crypto/x509/pkix"
+import (
+	"crypto/x509/pkix"
+
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
+)
 
 // MachinePoolletClientSignerName routes the apiserver machinepoollet-client CSR
 // to the cert-manager CA ClusterIssuer named "ironcore-machinepoollet-client".
@@ -16,10 +20,12 @@ const MachinePoolletClientSignerName = "clusterissuers.cert-manager.io/ironcore-
 
 // APIServerMachinePoolletClientCSRSubject returns the CSR subject for the
 // apiserver's machinepoollet client cert. It is shared by the rotator and the
-// recognizer so both agree on the exact identity.
+// recognizer so both agree on the exact identity. The organization is the
+// dedicated ironcore group (authorized by the poollet's delegating SAR for
+// machinepools/proxy), not the Kubernetes superuser group system:masters.
 func APIServerMachinePoolletClientCSRSubject() pkix.Name {
 	return pkix.Name{
-		CommonName:   "ironcore-apiserver-machinepoollet-client",
-		Organization: []string{"system:masters"},
+		CommonName:   computev1alpha1.APIServerMachinePoolletClientCommonName,
+		Organization: []string{computev1alpha1.APIServerMachinePoolletClientsGroup},
 	}
 }

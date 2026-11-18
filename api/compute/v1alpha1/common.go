@@ -29,6 +29,15 @@ const (
 	// PoolLifecycleControllerCommonName is the fixed common name of the pool-lifecycle-controller cert.
 	PoolLifecycleControllerCommonName = "compute.ironcore.dev:system:pool-lifecycle-controller"
 
+	// APIServerMachinePoolletClientsGroup is the system rbac group the ironcore apiserver's
+	// machinepoollet client identity is in. Membership is authorized by the poollet (via a
+	// delegating SubjectAccessReview back to the ironcore apiserver) for machinepools/proxy.
+	APIServerMachinePoolletClientsGroup = "compute.ironcore.dev:system:apiserver-machinepoollet-clients"
+
+	// APIServerMachinePoolletClientCommonName is the fixed common name of the ironcore
+	// apiserver's machinepoollet client cert (used when it dials a poollet).
+	APIServerMachinePoolletClientCommonName = "compute.ironcore.dev:system:apiserver-machinepoollet-client"
+
 	SecretTypeIgnition = corev1.SecretType("compute.ironcore.dev/ignition")
 )
 

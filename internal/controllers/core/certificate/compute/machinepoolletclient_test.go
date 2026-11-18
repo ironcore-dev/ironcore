@@ -13,6 +13,7 @@ import (
 	certificatesv1 "k8s.io/api/certificates/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	computev1alpha1 "github.com/ironcore-dev/ironcore/api/compute/v1alpha1"
 	"github.com/ironcore-dev/ironcore/internal/controllers/core/certificate/compute"
 	utilcertificate "github.com/ironcore-dev/ironcore/utils/certificate"
 )
@@ -32,8 +33,8 @@ var (
 func validAPIServerMachinePoolletClientCSR() *x509.CertificateRequest {
 	return &x509.CertificateRequest{
 		Subject: pkix.Name{
-			CommonName:   "ironcore-apiserver-machinepoollet-client",
-			Organization: []string{"system:masters"},
+			CommonName:   computev1alpha1.APIServerMachinePoolletClientCommonName,
+			Organization: []string{computev1alpha1.APIServerMachinePoolletClientsGroup},
 		},
 	}
 }

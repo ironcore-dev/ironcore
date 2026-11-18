@@ -36,3 +36,9 @@ resources:
 - poollifecycle_bootstrapper_rolebinding.yaml
 - poollifecycle_role.yaml
 - poollifecycle_rolebinding.yaml
+
+# APIServer machinepoollet-client (proxy + CSR bootstrapper) roles
+- apiserver_machinepoollet_client_role.yaml
+- apiserver_machinepoollet_client_rolebinding.yaml
+- apiserver_machinepoollet_client_bootstrapper_role.yaml
+- apiserver_machinepoollet_client_bootstrapper_rolebinding.yaml
