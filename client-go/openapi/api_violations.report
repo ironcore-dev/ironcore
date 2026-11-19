@@ -51,6 +51,7 @@ API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NATGatewayStatus,IPs
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NetworkInterfaceSpec,IPs
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NetworkInterfaceStatus,IPs
+API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NetworkSpec,EnableEncryption
 API rule violation: names_match,github.com/ironcore-dev/ironcore/api/networking/v1alpha1,NetworkSpec,PeeringClaimRefs
 API rule violation: names_match,k8s.io/api/core/v1,AzureDiskVolumeSource,DataDiskURI
 API rule violation: names_match,k8s.io/api/core/v1,ContainerStatus,LastTerminationState
