@@ -47,6 +47,7 @@ rules:
 - apiGroups:
   - certificates.k8s.io
   resourceNames:
+  - clusterissuers.cert-manager.io/ironcore-machinepoollet-client
   - kubernetes.io/kube-apiserver-client
   resources:
   - signers

@@ -5,6 +5,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -84,6 +85,10 @@ type MachinePoolletClientConfig struct {
 
 	// Lookup will give us a dialer if the egress selector is configured for it
 	Lookup egressselector.Lookup
+
+	// GetClientCertificate, when set, supplies the client certificate
+	// dynamically (e.g. from a rotator), taking precedence over CertFile/KeyFile.
+	GetClientCertificate func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
 }
 
 func (c *MachinePoolletClientConfig) transportConfig() *transport.Config {
@@ -105,6 +110,25 @@ func (c *MachinePoolletClientConfig) transportConfig() *transport.Config {
 	return cfg
 }
 
+// clientTLSConfig builds the base client *tls.Config from the transport config
+// and layers the dynamic GetClientCertificate callback on top, if set.
+// When no callback is set, it returns exactly what transport.TLSConfigFor
+// returns (possibly nil), so default behavior is unchanged.
+func (c *MachinePoolletClientConfig) clientTLSConfig() (*tls.Config, error) {
+	tlsConfig, err := transport.TLSConfigFor(c.transportConfig())
+	if err != nil {
+		return nil, err
+	}
+	if c.GetClientCertificate == nil {
+		return tlsConfig, nil
+	}
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{}
+	}
+	tlsConfig.GetClientCertificate = c.GetClientCertificate
+	return tlsConfig, nil
+}
+
 // MakeTransport creates a secure RoundTripper for HTTP Transport.
 func MakeTransport(config *MachinePoolletClientConfig) (http.RoundTripper, error) {
 	return makeTransport(config, false)
@@ -117,18 +141,13 @@ func MakeInsecureTransport(config *MachinePoolletClientConfig) (http.RoundTrippe
 
 // makeTransport creates a RoundTripper for HTTP Transport.
 func makeTransport(config *MachinePoolletClientConfig, insecureSkipTLSVerify bool) (http.RoundTripper, error) {
-	// do the insecureSkipTLSVerify on the pre-transport *before* we go get a potentially cached connection.
-	// transportConfig always produces a new struct pointer.
-	preTLSConfig := config.transportConfig()
-	if insecureSkipTLSVerify && preTLSConfig != nil {
-		preTLSConfig.TLS.Insecure = true
-		preTLSConfig.TLS.CAData = nil
-		preTLSConfig.TLS.CAFile = ""
-	}
-
-	tlsConfig, err := transport.TLSConfigFor(preTLSConfig)
+	tlsConfig, err := config.clientTLSConfig()
 	if err != nil {
 		return nil, err
+	}
+	if insecureSkipTLSVerify && tlsConfig != nil {
+		tlsConfig.InsecureSkipVerify = true
+		tlsConfig.RootCAs = nil
 	}
 
 	rt := http.DefaultTransport
