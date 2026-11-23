@@ -489,40 +489,6 @@ string
 </tr>
 </tbody>
 </table>
-<h3 id="compute.ironcore.dev/v1alpha1.EmptyDiskVolumeSource">EmptyDiskVolumeSource
-</h3>
-<p>
-(<em>Appears on:</em><a href="#compute.ironcore.dev/v1alpha1.VolumeSource">VolumeSource</a>)
-</p>
-<div>
-<p>EmptyDiskVolumeSource is a volume that&rsquo;s offered by the machine pool provider.
-Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with
-varying performance characteristics. Potentially not recoverable.</p>
-</div>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>sizeLimit</code><br/>
-<em>
-<a href="https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity">
-k8s.io/apimachinery/pkg/api/resource.Quantity
-</a>
-</em>
-</td>
-<td>
-<p>SizeLimit is the total amount of local storage required for this EmptyDisk volume.
-The default is nil which means that the limit is undefined.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="compute.ironcore.dev/v1alpha1.EphemeralNetworkInterfaceSource">EphemeralNetworkInterfaceSource
 </h3>
 <p>
@@ -1767,20 +1733,6 @@ Kubernetes core/v1.LocalObjectReference
 </td>
 <td>
 <p>VolumeRef instructs to use the specified Volume as source for the attachment.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>emptyDisk</code><br/>
-<em>
-<a href="#compute.ironcore.dev/v1alpha1.EmptyDiskVolumeSource">
-EmptyDiskVolumeSource
-</a>
-</em>
-</td>
-<td>
-<p>Deprecated: Use LocalDisk instead
-EmptyDisk instructs to use a Volume offered by the machine pool provider.</p>
 </td>
 </tr>
 <tr>

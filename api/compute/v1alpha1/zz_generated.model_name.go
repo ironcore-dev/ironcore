@@ -19,11 +19,6 @@ func (in EFIVar) OpenAPIModelName() string {
 }
 
 // OpenAPIModelName returns the OpenAPI model name for this type.
-func (in EmptyDiskVolumeSource) OpenAPIModelName() string {
-	return "com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource"
-}
-
-// OpenAPIModelName returns the OpenAPI model name for this type.
 func (in EphemeralNetworkInterfaceSource) OpenAPIModelName() string {
 	return "com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralNetworkInterfaceSource"
 }

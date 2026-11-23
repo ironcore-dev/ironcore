@@ -54,14 +54,6 @@ func (b *VolumeApplyConfiguration) WithVolumeRef(value v1.LocalObjectReference) 
 	return b
 }
 
-// WithEmptyDisk sets the EmptyDisk field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the EmptyDisk field is set to the value of the last call.
-func (b *VolumeApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApplyConfiguration) *VolumeApplyConfiguration {
-	b.VolumeSourceApplyConfiguration.EmptyDisk = value
-	return b
-}
-
 // WithLocalDisk sets the LocalDisk field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the LocalDisk field is set to the value of the last call.

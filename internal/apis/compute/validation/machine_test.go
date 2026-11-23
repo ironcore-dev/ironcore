@@ -123,22 +123,6 @@ var _ = Describe("Machine", func() {
 							Name:   "foo",
 							Device: "oda",
 							VolumeSource: compute.VolumeSource{
-								EmptyDisk: &compute.EmptyDiskVolumeSource{SizeLimit: mustParseNewQuantity("-1Gi")},
-							},
-						},
-					},
-				},
-			},
-			ContainElement(InvalidField("spec.volume[0].emptyDisk.sizeLimit")),
-		),
-		Entry("invalid empty disk size limit quantity",
-			&compute.Machine{
-				Spec: compute.MachineSpec{
-					Volumes: []compute.Volume{
-						{
-							Name:   "foo",
-							Device: "oda",
-							VolumeSource: compute.VolumeSource{
 								LocalDisk: &compute.LocalDiskVolumeSource{SizeLimit: mustParseNewQuantity("-1Gi")},
 							},
 						},
@@ -146,6 +130,16 @@ var _ = Describe("Machine", func() {
 				},
 			},
 			ContainElement(InvalidField("spec.volume[0].localDisk.sizeLimit")),
+		),
+		Entry("volume without source",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{Name: "foo", Device: "oda"},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volume[0]")),
 		),
 		Entry("duplicate machine volume device",
 			&compute.Machine{
@@ -563,6 +557,50 @@ var _ = Describe("Machine", func() {
 				},
 			},
 			ContainElement(DuplicateField("spec.volume[1].name")),
+		),
+		Entry("keep existing volume without source",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Power:   compute.PowerOff,
+					Volumes: []compute.Volume{{Name: "foo", Device: "oda"}},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{{Name: "foo", Device: "oda"}},
+				},
+			},
+			Not(ContainElement(InvalidField("spec.volume[0]"))),
+		),
+		Entry("add volume without source",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{{Name: "foo", Device: "oda"}},
+				},
+			},
+			&compute.Machine{},
+			ContainElement(InvalidField("spec.volume[0]")),
+		),
+		Entry("clear source of existing volume",
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{{Name: "foo", Device: "oda"}},
+				},
+			},
+			&compute.Machine{
+				Spec: compute.MachineSpec{
+					Volumes: []compute.Volume{
+						{
+							Name:   "foo",
+							Device: "oda",
+							VolumeSource: compute.VolumeSource{
+								LocalDisk: &compute.LocalDiskVolumeSource{},
+							},
+						},
+					},
+				},
+			},
+			ContainElement(InvalidField("spec.volume[0]")),
 		),
 		Entry("set hostname if not set and guestConfig is not set",
 			&compute.Machine{
