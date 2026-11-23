@@ -4152,20 +4152,6 @@
 					}
 				}
 			},
-			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource": {
-				"description": "EmptyDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
-				"type": "object",
-				"properties": {
-					"sizeLimit": {
-						"description": "SizeLimit is the total amount of local storage required for this EmptyDisk volume. The default is nil which means that the limit is undefined.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/io.k8s.apimachinery.pkg.api.resource.Quantity"
-							}
-						]
-					}
-				}
-			},
 			"com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EphemeralNetworkInterfaceSource": {
 				"description": "EphemeralNetworkInterfaceSource is a definition for an ephemeral (i.e. coupled to the lifetime of the surrounding object) networking.NetworkInterface.",
 				"type": "object",
@@ -4939,14 +4925,6 @@
 					"device": {
 						"description": "Device is the device name where the volume should be attached. Pointer to distinguish between explicit zero and not specified. If empty, an unused device name will be determined if possible.",
 						"type": "string"
-					},
-					"emptyDisk": {
-						"description": "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/com.github.ironcore-dev.ironcore.api.compute.v1alpha1.EmptyDiskVolumeSource"
-							}
-						]
 					},
 					"ephemeral": {
 						"description": "Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object) Volume to use.",

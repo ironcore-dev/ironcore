@@ -22,10 +22,14 @@ import (
 
 // ValidateMachine validates a Machine object.
 func ValidateMachine(machine *compute.Machine) field.ErrorList {
+	return validateMachine(machine, nil)
+}
+
+func validateMachine(machine *compute.Machine, oldSpec *compute.MachineSpec) field.ErrorList {
 	var allErrs field.ErrorList
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessor(machine, true, apivalidation.NameIsDNSLabel, field.NewPath("metadata"))...)
-	allErrs = append(allErrs, validateMachineSpec(&machine.Spec, field.NewPath("spec"))...)
+	allErrs = append(allErrs, validateMachineSpec(&machine.Spec, oldSpec, field.NewPath("spec"))...)
 
 	return allErrs
 }
@@ -52,7 +56,7 @@ func ValidateMachineUpdate(newMachine, oldMachine *compute.Machine) field.ErrorL
 
 	allErrs = append(allErrs, apivalidation.ValidateObjectMetaAccessorUpdate(newMachine, oldMachine, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, validateMachineSpecUpdate(&newMachine.Spec, &oldMachine.Spec, field.NewPath("spec"))...)
-	allErrs = append(allErrs, ValidateMachine(newMachine)...)
+	allErrs = append(allErrs, validateMachine(newMachine, &oldMachine.Spec)...)
 
 	return allErrs
 }
@@ -66,8 +70,8 @@ func validateMachinePower(power compute.Power, fldPath *field.Path) field.ErrorL
 	return ironcorevalidation.ValidateEnum(supportedMachinePowers, power, fldPath, "must specify machine power")
 }
 
-// validateMachineSpec validates the spec of a Machine object.
-func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) field.ErrorList {
+// validateMachineSpec validates the spec of a Machine object. oldSpec is nil on create.
+func validateMachineSpec(machineSpec, oldSpec *compute.MachineSpec, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	if machineSpec.MachineClassRef == (corev1.LocalObjectReference{}) {
@@ -105,7 +109,7 @@ func validateMachineSpec(machineSpec *compute.MachineSpec, fldPath *field.Path) 
 		} else {
 			seenDevices.Insert(vol.Device)
 		}
-		allErrs = append(allErrs, validateVolume(&vol, fldPath.Child("volume").Index(i))...)
+		allErrs = append(allErrs, validateVolume(&vol, hasVolumeWithoutSource(oldSpec, vol.Name), fldPath.Child("volume").Index(i))...)
 	}
 
 	allErrs = append(allErrs, metav1validation.ValidateLabels(machineSpec.MachinePoolSelector, fldPath.Child("machinePoolSelector"))...)
@@ -190,7 +194,7 @@ func validateNetworkInterfaceTemplateSpecForMachine(template *networking.Network
 	return allErrs
 }
 
-func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList {
+func validateVolume(volume *compute.Volume, allowNoSource bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	for _, msg := range apivalidation.NameIsDNSSubdomain(volume.Name, false) {
@@ -201,12 +205,27 @@ func validateVolume(volume *compute.Volume, fldPath *field.Path) field.ErrorList
 		allErrs = append(allErrs, field.Invalid(fldPath.Child("device"), volume.Device, fmt.Sprintf("invalid device name: %v", err)))
 	}
 
-	allErrs = append(allErrs, validateVolumeSource(&volume.VolumeSource, fldPath)...)
+	allErrs = append(allErrs, validateVolumeSource(&volume.VolumeSource, allowNoSource, fldPath)...)
 
 	return allErrs
 }
 
-func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) field.ErrorList {
+// hasVolumeWithoutSource reports whether spec has a volume with the given name and no source.
+// Volumes stored with the removed emptyDisk source have no source.
+// They stay valid on update, so that such Machines can still be updated and deleted, and the volume removed.
+func hasVolumeWithoutSource(spec *compute.MachineSpec, name string) bool {
+	if spec == nil {
+		return false
+	}
+	for _, vol := range spec.Volumes {
+		if vol.Name == name {
+			return vol.VolumeSource == (compute.VolumeSource{})
+		}
+	}
+	return false
+}
+
+func validateVolumeSource(source *compute.VolumeSource, allowNoSource bool, fldPath *field.Path) field.ErrorList {
 	var allErrs field.ErrorList
 
 	var numDefs int
@@ -214,14 +233,6 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 		numDefs++
 		for _, msg := range apivalidation.NameIsDNSSubdomain(source.VolumeRef.Name, false) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("volumeRef").Child("name"), source.VolumeRef.Name, msg))
-		}
-	}
-	if source.EmptyDisk != nil {
-		if numDefs > 0 {
-			allErrs = append(allErrs, field.Forbidden(fldPath.Child("emptyDisk"), "must only specify one volume source"))
-		} else {
-			numDefs++
-			allErrs = append(allErrs, validateEmptyDiskVolumeSource(source.EmptyDisk, fldPath.Child("emptyDisk"))...)
 		}
 	}
 	if source.LocalDisk != nil {
@@ -240,18 +251,8 @@ func validateVolumeSource(source *compute.VolumeSource, fldPath *field.Path) fie
 			allErrs = append(allErrs, validateEphemeralVolumeSource(source.Ephemeral, fldPath.Child("ephemeral"))...)
 		}
 	}
-	if numDefs == 0 {
-		allErrs = append(allErrs, field.Invalid(fldPath, source, "must specify at least one volume source"))
-	}
-
-	return allErrs
-}
-
-func validateEmptyDiskVolumeSource(source *compute.EmptyDiskVolumeSource, fldPath *field.Path) field.ErrorList {
-	var allErrs field.ErrorList
-
-	if sizeLimit := source.SizeLimit; sizeLimit != nil {
-		allErrs = append(allErrs, ironcorevalidation.ValidateNonNegativeQuantity(*sizeLimit, fldPath.Child("sizeLimit"))...)
+	if numDefs == 0 && !allowNoSource {
+		allErrs = append(allErrs, field.Invalid(fldPath, source, "must specify one of volumeRef, localDisk or ephemeral"))
 	}
 
 	return allErrs

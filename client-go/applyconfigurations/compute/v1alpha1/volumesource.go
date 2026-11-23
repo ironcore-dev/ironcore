@@ -16,9 +16,6 @@ import (
 type VolumeSourceApplyConfiguration struct {
 	// VolumeRef instructs to use the specified Volume as source for the attachment.
 	VolumeRef *v1.LocalObjectReference `json:"volumeRef,omitempty"`
-	// Deprecated: Use LocalDisk instead
-	// EmptyDisk instructs to use a Volume offered by the machine pool provider.
-	EmptyDisk *EmptyDiskVolumeSourceApplyConfiguration `json:"emptyDisk,omitempty"`
 	// LocalDisk instructs to use a Volume offered by the machine pool provider.
 	LocalDisk *LocalDiskVolumeSourceApplyConfiguration `json:"localDisk,omitempty"`
 	// Ephemeral instructs to create an ephemeral (i.e. coupled to the lifetime of the surrounding object)
@@ -37,14 +34,6 @@ func VolumeSource() *VolumeSourceApplyConfiguration {
 // If called multiple times, the VolumeRef field is set to the value of the last call.
 func (b *VolumeSourceApplyConfiguration) WithVolumeRef(value v1.LocalObjectReference) *VolumeSourceApplyConfiguration {
 	b.VolumeRef = &value
-	return b
-}
-
-// WithEmptyDisk sets the EmptyDisk field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the EmptyDisk field is set to the value of the last call.
-func (b *VolumeSourceApplyConfiguration) WithEmptyDisk(value *EmptyDiskVolumeSourceApplyConfiguration) *VolumeSourceApplyConfiguration {
-	b.EmptyDisk = value
 	return b
 }
 

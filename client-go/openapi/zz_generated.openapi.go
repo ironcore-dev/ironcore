@@ -37,7 +37,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		v1alpha1.UIDReference{}.OpenAPIModelName():                           schema_ironcore_api_common_v1alpha1_UIDReference(ref),
 		computev1alpha1.DaemonEndpoint{}.OpenAPIModelName():                  schema_ironcore_api_compute_v1alpha1_DaemonEndpoint(ref),
 		computev1alpha1.EFIVar{}.OpenAPIModelName():                          schema_ironcore_api_compute_v1alpha1_EFIVar(ref),
-		computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName():           schema_ironcore_api_compute_v1alpha1_EmptyDiskVolumeSource(ref),
 		computev1alpha1.EphemeralNetworkInterfaceSource{}.OpenAPIModelName(): schema_ironcore_api_compute_v1alpha1_EphemeralNetworkInterfaceSource(ref),
 		computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName():           schema_ironcore_api_compute_v1alpha1_EphemeralVolumeSource(ref),
 		computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName():           schema_ironcore_api_compute_v1alpha1_LocalDiskVolumeSource(ref),
@@ -791,27 +790,6 @@ func schema_ironcore_api_compute_v1alpha1_EFIVar(ref common.ReferenceCallback) c
 				Required: []string{"name", "uuid", "value"},
 			},
 		},
-	}
-}
-
-func schema_ironcore_api_compute_v1alpha1_EmptyDiskVolumeSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "EmptyDiskVolumeSource is a volume that's offered by the machine pool provider. Usually ephemeral (i.e. deleted when the surrounding entity is deleted), with varying performance characteristics. Potentially not recoverable.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"sizeLimit": {
-						SchemaProps: spec.SchemaProps{
-							Description: "SizeLimit is the total amount of local storage required for this EmptyDisk volume. The default is nil which means that the limit is undefined.",
-							Ref:         ref(resource.Quantity{}.OpenAPIModelName()),
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			resource.Quantity{}.OpenAPIModelName()},
 	}
 }
 
@@ -1874,12 +1852,6 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 							Ref:         ref(v1.LocalObjectReference{}.OpenAPIModelName()),
 						},
 					},
-					"emptyDisk": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref(computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName()),
-						},
-					},
 					"localDisk": {
 						SchemaProps: spec.SchemaProps{
 							Description: "LocalDisk instructs to use a Volume offered by the machine pool provider.",
@@ -1897,7 +1869,7 @@ func schema_ironcore_api_compute_v1alpha1_Volume(ref common.ReferenceCallback) c
 			},
 		},
 		Dependencies: []string{
-			computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName(), computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
@@ -1912,12 +1884,6 @@ func schema_ironcore_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCallb
 						SchemaProps: spec.SchemaProps{
 							Description: "VolumeRef instructs to use the specified Volume as source for the attachment.",
 							Ref:         ref(v1.LocalObjectReference{}.OpenAPIModelName()),
-						},
-					},
-					"emptyDisk": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Deprecated: Use LocalDisk instead EmptyDisk instructs to use a Volume offered by the machine pool provider.",
-							Ref:         ref(computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName()),
 						},
 					},
 					"localDisk": {
@@ -1936,7 +1902,7 @@ func schema_ironcore_api_compute_v1alpha1_VolumeSource(ref common.ReferenceCallb
 			},
 		},
 		Dependencies: []string{
-			computev1alpha1.EmptyDiskVolumeSource{}.OpenAPIModelName(), computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
+			computev1alpha1.EphemeralVolumeSource{}.OpenAPIModelName(), computev1alpha1.LocalDiskVolumeSource{}.OpenAPIModelName(), v1.LocalObjectReference{}.OpenAPIModelName()},
 	}
 }
 
